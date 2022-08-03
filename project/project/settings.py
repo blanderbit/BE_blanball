@@ -36,10 +36,14 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'rest_framework_swagger',
-    'drf_yasg',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework_swagger',
+    'rest_framework',
+    'drf_yasg',
+    'django_filters',
+    'phonenumber_field',
+    'ivents',
 ]
 
 MIDDLEWARE = [
@@ -57,13 +61,14 @@ MIDDLEWARE = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': config('NAME'),
-        'USER': config('USER'),
+        'NAME': 'blanball',
+        'USER': 'root',
         'PASSWORD': config('PASSWORD'),
-        'HOST': config('HOST',default = 'localhost'),
-        'PORT': config('PORT',cast = int,default = 3306),
+        'HOST': 'localhost',
+        'PORT': 3306,
     }
 }
+
 
 SWAGGER_SETTINGS = {
     'SHOW_REQUEST_HEADERS': True,
@@ -83,6 +88,7 @@ SWAGGER_SETTINGS = {
         'delete',
     ],
 }
+
 
 
 TEMPLATES = [
@@ -125,7 +131,7 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 10,
+    'PAGE_SIZE': 2,
 }
 
 SIMPLE_JWT = {
