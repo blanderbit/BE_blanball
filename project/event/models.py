@@ -3,7 +3,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 
-class Ivent(models.Model):
+class Event(models.Model):
     '''footbal ivent model'''
     class Gender(models.TextChoices):
         man = 'Man'
