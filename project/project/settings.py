@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'django_filters',
     'phonenumber_field',
-    'ivents',
+    'event',
 ]
 
 MIDDLEWARE = [
