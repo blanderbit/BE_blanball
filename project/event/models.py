@@ -1,18 +1,21 @@
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 from django.core.validators import MaxValueValidator, MinValueValidator
-
+from authentication.models import User
 
 class Event(models.Model):
     '''footbal ivent model'''
     class Gender(models.TextChoices):
+        '''ivent gender choices'''
         man = 'Man'
         woomen = 'Woomen'
         
     class Type(models.TextChoices):
+        '''ivent  type choices'''
         football = 'Football'
         futsal = 'Futsal'
 
+    author = models.ForeignKey(User,on_delete=models.PROTECT)
     name = models.CharField(max_length=100)
     small_disc = models.CharField(max_length=500)
     place = models.CharField(max_length=100)
@@ -21,7 +24,7 @@ class Event(models.Model):
     contact_number = PhoneNumberField()
     need_ball = models.BooleanField()
     amount_members = models.PositiveSmallIntegerField(validators=[
-            MaxValueValidator(50),MinValueValidator(1)])
+            MinValueValidator(1),MaxValueValidator(50)])
     type = models.CharField(choices=Type.choices,max_length=100)
     price = models.PositiveSmallIntegerField()
     price_description = models.CharField(max_length=500)

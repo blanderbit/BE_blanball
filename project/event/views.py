@@ -6,17 +6,20 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 
 class CreateEvent(generics.CreateAPIView):
+    '''class that allows you to create a new event'''
     serializer_class = EventSerializer
     # permission_classes = []
     queryset = Event.objects.all()
 
 class GetPutDeleteEvent(GetPutDeleteAPIView):
+    '''a class that allows you to get, update, delete an event'''
     serializer_class = EventSerializer
     permission_classes = [permissions.IsAuthenticated]
     queryset = Event.objects.all()
 
 class EventList(generics.ListAPIView):
-    serializer_class = EventSerializer
+    '''class that allows you to get a complete list of events'''
+    serializer_class = EventListSerializer
     # permission_classes = [permissions.IsAuthenticated]
     filter_backends = (filters.SearchFilter,DjangoFilterBackend)
     search_fields = ['id','name','small_disc','price','place','date_and_time','amount_members']
@@ -24,6 +27,7 @@ class EventList(generics.ListAPIView):
     queryset = Event.objects.all()
 
 class DeleteEvents(generics.GenericAPIView):
+    '''class that allows you to delete multiple events at once'''
     serializer_class = DeleteIventsSerializer
 
     def post(self, request):

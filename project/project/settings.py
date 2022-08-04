@@ -27,7 +27,7 @@ ROOT_URLCONF = 'project.urls'
 
 DEBUG = config('DEBUG',cast = bool,default = True)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 
@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django_filters',
     'phonenumber_field',
     'event',
+    'authentication',
 ]
 
 MIDDLEWARE = [
@@ -61,10 +62,10 @@ MIDDLEWARE = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'blanball',
+        'NAME': config('NAME'),
         'USER': 'root',
         'PASSWORD': config('PASSWORD'),
-        'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': 3306,
     }
 }
