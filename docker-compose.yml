@@ -1,10 +1,10 @@
-
-version: "3.3"
+version: "3.7"
 
 services: 
   web:
+    container_name: web
     build: .
-    command: python /usr/src/blanball/project/manage.py runserver 0.0.0.0:8000
+    command: bash start.sh
     volumes:
       - .:/usr/src/blanball
     ports:
@@ -14,10 +14,16 @@ services:
     links: 
       - db
   db:
-    image: mysql:8
     ports:
-      - '3306:3306'
+      - 3306:3306
+    container_name: db
+    image: mysql:8
     environment:
       MYSQL_DATABASE: 'blanball'
-      MYSQL_PASSWORD: 'Djoncarton1921_' 
+      MYSQL_PASSWORD: 'Djoncarton1921_'
+      MYSQL_ROOT_HOST: '%'  
       MYSQL_ROOT_PASSWORD: 'Djoncarton1921_'
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
