@@ -59,3 +59,5 @@ swagger-spec-validator==2.7.4
 psycopg2==2.9.3
 mysqlclient==2.1.1
 django-phonenumber-field==6.3.0
+channels-redis==3.4.1
+channels==3.0.5

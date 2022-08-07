@@ -3,6 +3,8 @@ from pathlib import Path
 from decouple import config
 import datetime
 
+from django import conf
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -23,6 +25,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 SECRET_KEY = config('SECRET_KEY')
 
 WSGI_APPLICATION = 'project.wsgi.application'
+ASGI_APPLICATION = 'project.asgi.application'
+
 ROOT_URLCONF = 'project.urls'
 
 DEBUG = config('DEBUG',cast = bool,default = True)
@@ -43,6 +47,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'django_filters',
     'phonenumber_field',
+    # 'channels',
     'event',
     'authentication',
 ]
@@ -63,11 +68,20 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': config('NAME'),
-        'USER': 'root',
+        'USER': config('USER'),
         'PASSWORD': config('PASSWORD'),
         'HOST': 'db',
-        'PORT': 3306,
+        'PORT': config('PORT'),
     }
+}
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
 }
 
 
@@ -95,7 +109,9 @@ SWAGGER_SETTINGS = {
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR.joinpath('templates')
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

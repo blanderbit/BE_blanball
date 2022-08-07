@@ -36,5 +36,5 @@ class DeleteEvents(generics.GenericAPIView):
         for i in range(len(serializer.validated_data["dele"])):
             v_data = serializer.validated_data["dele"] 
             Event.objects.filter(id = serializer.validated_data["dele"][i]).delete()
-        return Response(f"{{ivents{v_data} have been removed}}")
+        return Response({})
 

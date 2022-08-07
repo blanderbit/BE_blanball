@@ -23,3 +23,9 @@ class AdminUsersList(generics.ListAPIView):
 
     def get_queryset(self):
         return self.queryset.filter(role_id = Role.objects.get(name = "Admin").id)
+
+
+class CreateRole(generics.CreateAPIView):
+    serializer_class = RoleSerializer
+    permission_classes = []
+    queryset = Role.objects.all()
