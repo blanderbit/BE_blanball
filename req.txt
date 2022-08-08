@@ -56,7 +56,6 @@ phonenumberslite==8.12.50
 python-decouple==3.6
 django-rest-swagger==2.2.0
 swagger-spec-validator==2.7.4
-psycopg2==2.9.3
 mysqlclient==2.1.1
 django-phonenumber-field==6.3.0
 channels-redis==3.4.1

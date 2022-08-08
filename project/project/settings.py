@@ -47,9 +47,10 @@ INSTALLED_APPS = [
     'drf_yasg',
     'django_filters',
     'phonenumber_field',
-    # 'channels',
+    'channels',
     'event',
     'authentication',
+    'notifications',
 ]
 
 MIDDLEWARE = [
