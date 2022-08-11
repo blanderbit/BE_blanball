@@ -7,14 +7,14 @@ from rest_framework.response import Response
 
 class CreateEvent(generics.CreateAPIView):
     '''class that allows you to create a new event'''
-    serializer_class = EventSerializer
+    serializer_class = CreateEventSerializer
     # permission_classes = []
     queryset = Event.objects.all()
 
 class GetPutDeleteEvent(GetPutDeleteAPIView):
     '''a class that allows you to get, update, delete an event'''
-    serializer_class = EventSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = DetailEventSerializer
+    # permission_classes = [permissions.IsAuthenticated]
     queryset = Event.objects.all()
 
 class EventList(generics.ListAPIView):
@@ -36,5 +36,7 @@ class DeleteEvents(generics.GenericAPIView):
         for i in range(len(serializer.validated_data["dele"])):
             v_data = serializer.validated_data["dele"] 
             Event.objects.filter(id = serializer.validated_data["dele"][i]).delete()
-        return Response({})
+        return Response({
+            "deleted": v_data
+        })
 

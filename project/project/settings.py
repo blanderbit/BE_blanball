@@ -31,6 +31,8 @@ ROOT_URLCONF = 'project.urls'
 
 DEBUG = config('DEBUG',cast = bool,default = True)
 
+AUTH_USER_MODEL = config('AUTH_USER_MODEL')
+
 ALLOWED_HOSTS = ['*']
 
 
@@ -47,7 +49,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'django_filters',
     'phonenumber_field',
-    'channels',
+    # 'channels',
     'event',
     'authentication',
     'notifications',
@@ -71,7 +73,7 @@ DATABASES = {
         'NAME': config('NAME'),
         'USER': config('USER'),
         'PASSWORD': config('PASSWORD'),
-        'HOST': 'db',
+        'HOST': 'localhost',
         'PORT': config('PORT'),
     }
 }
@@ -149,7 +151,7 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 2,
+    'PAGE_SIZE': 10,
 }
 
 SIMPLE_JWT = {
@@ -166,3 +168,13 @@ EMAIL_PORT = config('EMAIL_PORT',cast = int)
 EMAIL_USE_TLS = config('EMAIL_USE_TLS',cast = bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+
+
+REDIS_HOST = '0.0.0.0'
+REDIS_PORT = '6379'
+CELERY_BROKER_URL = 'redis://'+ REDIS_HOST + ':' + REDIS_PORT + '0'
+CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
+CELERY_RESULT_BACKEND = 'redis://'+ REDIS_HOST + ':' + REDIS_PORT + '0'
+CELERY_ACCEPT_CONTENT = {'application/json'}
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'

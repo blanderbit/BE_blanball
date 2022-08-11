@@ -6,7 +6,7 @@ from .views import *
 urlpatterns = [
     #endpoint where a user with admin
     #role can create a new one event 
-    path('admin/event/create',CreateEvent.as_view(),
+    path('client/event/create',CreateEvent.as_view(),
         name = 'create-event'),
     #endpoint where a user with admin
     #role can get detail info,update and delete event 
