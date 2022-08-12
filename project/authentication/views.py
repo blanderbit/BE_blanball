@@ -7,28 +7,6 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.conf import settings
 from django.urls import reverse
 
-# class RegisterUser(generics.GenericAPIView):
-#     '''register user'''
-#     serializer_class = RegisterSerializer
-
-#     def post(self, request):
-#         user = request.data
-#         serializer = self.serializer_class(data=user)
-#         serializer.is_valid(raise_exception=True)
-#         profile = Profile.objects.create(**serializer.validated_data['profile'])
-#         serializer.save(profile = profile)
-#         user_data = serializer.data
-#         user = User.objects.get(email=user_data['email'])
-#         token = AccessToken.for_user(user)
-#         current_site = get_current_site(request).domain
-#         # relativeLink = reverse('email-verify')
-#         absurl = 'http://'+current_site+'?token='+str(token)
-#         email_body = f'Hi,{user.username}, use the link below to verify your email \n {absurl}'
-#         data = {'email_body': email_body, 'to_email': user.email,
-#                 'email_subject': 'Verify your email'}
-#         Util.send_email(data)
-#         return response.Response(user_data, status=status.HTTP_201_CREATED)
-
 
 class RegisterUser(generics.GenericAPIView):
     '''register user'''
@@ -36,13 +14,13 @@ class RegisterUser(generics.GenericAPIView):
 
     def post(self, request):
         user = request.data
-        us_ref = request.POST.get('used_ref_code')
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        profile = Profile.objects.create(**serializer.validated_data['profile'])
+        serializer.save(profile = profile)
         user_data = serializer.data
         user = User.objects.get(email=user_data['email'])
-        token = RefreshToken.for_user(user).access_token
+        token = RefreshToken.for_user(user).access_token  
         current_site = get_current_site(request).domain
         absurl = 'http://'+current_site+'?token='+str(token)
         email_body = f'Hi,{user.username}, use the link below to verify your email \n {absurl}'

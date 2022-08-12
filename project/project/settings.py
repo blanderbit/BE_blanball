@@ -73,7 +73,7 @@ DATABASES = {
         'NAME': config('NAME'),
         'USER': config('USER'),
         'PASSWORD': config('PASSWORD'),
-        'HOST': 'localhost',
+        'HOST': config('HOST'),
         'PORT': config('PORT'),
     }
 }
@@ -169,7 +169,7 @@ EMAIL_USE_TLS = config('EMAIL_USE_TLS',cast = bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 
-
+#celery framework settings
 REDIS_HOST = '0.0.0.0'
 REDIS_PORT = '6379'
 CELERY_BROKER_URL = 'redis://'+ REDIS_HOST + ':' + REDIS_PORT + '0'

@@ -29,7 +29,7 @@ services:
   db:
     container_name: db
     ports:
-      - 3306:3306
+      - 3307:3306
     image: mysql:8
     cap_add:
       - SYS_NICE
@@ -47,7 +47,6 @@ services:
 volumes:
   db:
     driver: local
-
 
 
 
