@@ -1,6 +1,6 @@
 from .serializers import *
 from .models import *
-from .utils import *
+from .tasks import Util
 from rest_framework import generics,filters,permissions,status,response,views
 from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.sites.shortcuts import get_current_site
@@ -26,7 +26,7 @@ class RegisterUser(generics.GenericAPIView):
         email_body = f'Hi,{user.username}, use the link below to verify your email \n {absurl}'
         data = {'email_body': email_body, 'to_email': user.email,
             'email_subject': 'Verify your email'}
-        Util.send_email(data)
+        Util.send_email.delay(data)
         return response.Response(user_data, status=status.HTTP_201_CREATED)
 
 
@@ -55,6 +55,9 @@ class UserOwnerProfile(views.APIView):
             serializer.save()
             return response.Response(serializer.data)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self,request):
+        User.objects.get(id=self.request.user.id).delete()
 
 
 class UserProfile(generics.RetrieveAPIView):
