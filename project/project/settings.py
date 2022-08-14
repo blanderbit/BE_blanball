@@ -33,7 +33,8 @@ DEBUG = config('DEBUG',cast = bool,default = True)
 
 AUTH_USER_MODEL = config('AUTH_USER_MODEL')
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]
+
 
 
 
@@ -66,15 +67,16 @@ MIDDLEWARE = [
 ]
 
 
-#mysql conected datdabse settings
+#POSTGRES conected datdabse settings
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': config('NAME'),
-        'USER': config('USER'),
-        'PASSWORD': config('PASSWORD'),
-        'HOST': config('HOST'),
-        'PORT': config('PORT'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME':  config('POSTGRES_DB_NAME'),
+        'USER': config('POSTGRES_USER'),
+        'PASSWORD': config('POSTGRES_PASSWORD'),
+        'HOST': config('POSTGRES_HOST'),
+        'PORT': config('POSTGRES_PORT'),
     }
 }
 
@@ -112,9 +114,7 @@ SWAGGER_SETTINGS = {
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            BASE_DIR.joinpath('templates')
-        ],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -172,9 +172,9 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 #celery framework settings
 REDIS_HOST = '0.0.0.0'
 REDIS_PORT = '6379'
-CELERY_BROKER_URL = 'redis://'+ REDIS_HOST + ':' + REDIS_PORT + '0'
+CELERY_BROKER_URL = 'redis://localhost:6381/0'
 CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
-CELERY_RESULT_BACKEND = 'redis://'+ REDIS_HOST + ':' + REDIS_PORT + '0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6381/0'
 CELERY_ACCEPT_CONTENT = {'application/json'}
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
