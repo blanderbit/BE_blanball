@@ -13,7 +13,3 @@ RUN /usr/local/bin/python -m pip install --upgrade pip
 RUN pip install -r  req.txt
 
 EXPOSE 8000
-
-
-
-# celery -A project worker -l info
