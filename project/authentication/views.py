@@ -4,9 +4,7 @@ from .tasks import Util
 from rest_framework import generics,filters,permissions,status,response,views
 from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.sites.shortcuts import get_current_site
-from django.conf import settings
-from django.urls import reverse
-
+from project.services import code_create
 
 class RegisterUser(generics.GenericAPIView):
     '''register user'''
@@ -19,16 +17,35 @@ class RegisterUser(generics.GenericAPIView):
         profile = Profile.objects.create(**serializer.validated_data['profile'])
         serializer.save(profile = profile)
         user_data = serializer.data
-        user = User.objects.get(email=user_data['email'])
-        token = RefreshToken.for_user(user).access_token  
-        current_site = get_current_site(request).domain
-        absurl = 'http://'+current_site+'?token='+str(token)
-        email_body = f'Hi,{user.username}, use the link below to verify your email \n {absurl}'
-        data = {'email_body': email_body, 'to_email': user.email,
-            'email_subject': 'Verify your email'}
-        Util.send_email.delay(data)
+        code_create(email=user_data['email'],k=3,type='email_verify')
         return response.Response(user_data, status=status.HTTP_201_CREATED)
 
+
+
+class RequestPasswordReset(generics.GenericAPIView):
+    serializer_class = ResetPasswordRequestSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+
+        email = request.data.get('email', '')
+
+        if User.objects.filter(email=email).exists():
+            code_create(email=email,k=3,type='password_reset')
+            return response.Response(SENT_CODE_TO_EMAIL_SUCCESS, status=status.HTTP_200_OK)
+        else:
+            return response.Response(NO_SUCH_USER_ERROR, status=status.HTTP_200_OK)
+
+
+
+class SetNewPassword(generics.GenericAPIView):
+    '''client password reset'''
+    serializer_class = SetNewPasswordSerializer
+
+    def put(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return response.Response(PASSWORD_RESET_SUCCESS, status=status.HTTP_200_OK)
 
 
 class LoginUser(generics.GenericAPIView):
@@ -36,7 +53,6 @@ class LoginUser(generics.GenericAPIView):
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
-        print(request.data)
         serializer.is_valid(raise_exception=True)
         return response.Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -84,3 +100,14 @@ class AdminUsersList(generics.ListAPIView):
 
     def get_queryset(self):
         return self.queryset.filter(role_id = Role.objects.get(name = "Admin").id)
+
+
+
+class EmailVerify(generics.GenericAPIView):
+    '''client password reset'''
+    serializer_class = EmailVerifySerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return response.Response(ACTIVATION_SUCCESS, status=status.HTTP_200_OK)

@@ -12,12 +12,12 @@ from djangochannelsrestframework.observer import model_observer
 from authentication.models import User
 from event.models import Event
 from .models import Notification
-from event.serializers import EventSerializer
+from event.serializers import DetailEventSerializer
 from .serializers import *
 
 class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):
     queryset = Event.objects.all()
-    serializer_class = EventSerializer
+    serializer_class = DetailEventSerializer
     lookup_field = "pk"
 
     async def disconnect(self, code):

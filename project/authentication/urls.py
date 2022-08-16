@@ -21,4 +21,13 @@ urlpatterns = [
     # about any user profile
     path('client/profile/<int:pk>', UserProfile.as_view(),
       name="profile-detail"),
+    #endpoint at which a password change request
+    path('client/request-reset/password', RequestPasswordReset.as_view(),
+      name="request-reset-password"),
+    #endpoint where the password is reset according
+    # to the data sent to the mail
+    path('client/password/reset-complete', SetNewPassword.as_view(),
+      name='password-reset-complete'),
+     #endpoint for account verification by mail
+    path('client/email/verify', EmailVerify.as_view(), name="email-verify"),
 ]

@@ -25,3 +25,7 @@
 >1.7 - create migrations using the command `python manage.py makemigrations`
 >1.8  - run the migrations using the command  `python manage.py migrate`
 >1.9 - and last step run project using the command `python manage.py runserver`
+
+
+<!-- # cd project 
+# celery -A project worker -l info" -->

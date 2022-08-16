@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'django_filters',
     'phonenumber_field',
-    # 'channels',
+    'channels',
     'event',
     'authentication',
     'notifications',
@@ -170,11 +170,9 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 
 #celery framework settings
-REDIS_HOST = '0.0.0.0'
-REDIS_PORT = '6379'
-CELERY_BROKER_URL = 'redis://localhost:6381/0'
+CELERY_BROKER_URL = 'redis://redis'
 CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
-CELERY_RESULT_BACKEND = 'redis://localhost:6381/0'
+CELERY_RESULT_BACKEND = 'redis://redis'
 CELERY_ACCEPT_CONTENT = {'application/json'}
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'

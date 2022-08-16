@@ -1,5 +1,8 @@
+import email
 from rest_framework import serializers
 from .models import *
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
 from project.constaints import *
 from django.contrib import auth
 from rest_framework.exceptions import AuthenticationFailed 
@@ -101,3 +104,72 @@ class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
         fields = '__all__'
+
+
+
+class ResetPasswordRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField(min_length=2)
+
+    class Meta:
+        fields = ['email']
+
+
+
+class SetNewPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField(max_length=255, min_length=3)
+    new_password = serializers.CharField(
+        min_length=6, max_length=68, write_only=True)
+    uidb64 = serializers.CharField(
+        min_length=5, write_only=True)
+
+    class Meta:
+        fields = ['new_password','uidb64','email']
+
+    def validate(self, attrs):
+        new_password = attrs.get('new_password')
+        uidb64 = attrs.get('uidb64')
+        code = Code.objects.filter(value = uidb64)
+        if not code:
+            raise AuthenticationFailed(BAD_CODE_ERROR, 401)
+        elif Code.objects.get(value = uidb64).type != 'password_reset':
+            raise AuthenticationFailed(BAD_CODE_ERROR, 401)
+        else:
+            uidb64 = uidb64[:2]
+            id = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(id=id)
+            if User.objects.filter(email = email) and user.email == email:
+                user.set_password(new_password)
+                user.save()
+                code.delete()
+                return (user)
+            else:
+                raise AuthenticationFailed(BAD_CODE_ERROR, 401)
+
+
+class EmailVerifySerializer(serializers.Serializer):
+    uidb64 = serializers.CharField(
+        min_length=5, write_only=True)
+    email = serializers.EmailField(max_length=255, min_length=3)
+
+    class Meta:
+        fields = ['email','uidb64']
+
+    def validate(self, attrs):
+        uidb64 = attrs.get('uidb64')
+        email = attrs.get('email')
+        code = Code.objects.filter(value = uidb64)
+        if not code:
+            raise AuthenticationFailed(BAD_CODE_ERROR, 401)
+        elif Code.objects.get(value = uidb64).type != 'email_verify':
+            raise AuthenticationFailed(BAD_CODE_ERROR, 401)
+        else:
+            uidb64 = uidb64[:2]
+            id = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(id=id)
+            if User.objects.filter(email = email) and user.email == email:
+                user.is_verified = True
+                user.save()
+                code.delete()
+                return (user)
+            else:
+                raise AuthenticationFailed(BAD_CODE_ERROR, 401)

@@ -1,4 +1,5 @@
 from multiprocessing import Event
+from xmlrpc.client import DateTime
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from phonenumber_field.modelfields import PhoneNumberField
@@ -9,7 +10,6 @@ class Gender(models.TextChoices):
     '''gender choices'''
     man = 'Man'
     woomen = 'Woomen'
-    all = 'All'
 
 
 class Role(models.Model):
@@ -56,3 +56,13 @@ class User(AbstractBaseUser):
             'refresh': str(refresh),
             'access': str(access)
         }
+
+
+class Code(models.Model):
+    value = models.CharField(max_length=5,unique=True)
+    expire_time = DateTime()
+    type = models.CharField(max_length=20)
+    user = models.ForeignKey(User,on_delete=models.PROTECT)
+
+    def __str__(self):
+        return self.value
