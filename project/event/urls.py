@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import *
+from notifications.consumers import *
 
 
 
@@ -19,4 +20,5 @@ urlpatterns = [
     #role can delete events
     path('client/events/delete',DeleteEvents.as_view(),
         name = 'events-delete'),
+    path('client/events/cons',RoomConsumer.as_asgi())
 ]

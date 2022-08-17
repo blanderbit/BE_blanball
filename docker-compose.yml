@@ -19,18 +19,16 @@ services:
   api:
     container_name: api
     build: .
-    command: >
-          bash -c "python3 project/manage.py makemigrations &&
-                  python3 project/manage.py migrate &&
-                  python3 project/manage.py runserver 0.0.0.0:8000"
+    command: bash django-start.sh
     volumes:
       - .:/usr/src/blanball
     ports:
       - "8000:8000"
     depends_on:
-      - db
-    links: 
-      - db
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
   redis:
     container_name: redis
     image: redis:latest
@@ -43,6 +41,8 @@ services:
 
 volumes:
   db:
+    driver: local
+  redis:
     driver: local
 
 
