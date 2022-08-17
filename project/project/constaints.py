@@ -18,4 +18,10 @@ PASSWORD_RESET_SUCCESS = {'success': 'Password reset '}
 
 NO_SUCH_USER_ERROR = {'error': 'No such user'}
 
-ACTIVATION_SUCCESS = {'success': 'Activation succes'}
+ACTIVATION_SUCCESS = {'success': 'Activation by email'}
+
+ACCOUNT_DELETED_SUCCESS = {'success':  'Account deleted'}
+
+ADMIN_ROLE = "Admin"
+
+USER_ROLE = "User"

@@ -8,15 +8,15 @@ import string
 from authentication.models import Code ,User
 
 def code_create(email,k,type):
+    '''create email verification code  and password 
+    reset verification code'''
     user = User.objects.get(email=email)
     uidb64 = urlsafe_base64_encode(smart_bytes(user.id))
             
     uidb64 += ''.join(random.choices(string.ascii_uppercase, k=k))
-    print(uidb64)
     Code.objects.create(value = uidb64,user = User.objects.get(email=email),type = type)
 
-    data = {'email_body': uidb64 ,'to_email': email, 
-            'email_subject': 'Your verify code'}
+    data = {'email_subject': 'Your verify code','email_body': uidb64 ,'to_email': email}
     Util.send_email.delay(data)
 
 

@@ -27,8 +27,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      redis:
-        condition: service_healthy
   redis:
     container_name: redis
     image: redis:latest
@@ -58,7 +56,8 @@ volumes:
     driver: local
   redis:
     driver: local
-
+  celery:
+    driver: local
 
 
 
