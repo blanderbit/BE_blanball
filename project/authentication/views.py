@@ -1,13 +1,90 @@
 from .serializers import *
 from .models import *
-from rest_framework import generics,filters,permissions
+from .tasks import Util
+from rest_framework import generics,filters,permissions,status,response,views
 from django_filters.rest_framework import DjangoFilterBackend
+from django.contrib.sites.shortcuts import get_current_site
+from project.services import code_create
+
+class RegisterUser(generics.GenericAPIView):
+    '''register user'''
+    serializer_class = RegisterSerializer
+
+    def post(self, request):
+        user = request.data
+        serializer = self.serializer_class(data=user)
+        serializer.is_valid(raise_exception=True)
+        profile = Profile.objects.create(**serializer.validated_data['profile'])
+        serializer.save(profile = profile)
+        user_data = serializer.data
+        code_create(email=user_data['email'],k=3,type='email_verify')
+        return response.Response(user_data, status=status.HTTP_201_CREATED)
+
+
+
+class RequestPasswordReset(generics.GenericAPIView):
+    serializer_class = ResetPasswordRequestSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+
+        email = request.data.get('email', '')
+
+        if User.objects.filter(email=email).exists():
+            code_create(email=email,k=3,type='password_reset')
+            return response.Response(SENT_CODE_TO_EMAIL_SUCCESS, status=status.HTTP_200_OK)
+        else:
+            return response.Response(NO_SUCH_USER_ERROR, status=status.HTTP_200_OK)
+
+
+
+class SetNewPassword(generics.GenericAPIView):
+    '''client password reset'''
+    serializer_class = SetNewPasswordSerializer
+
+    def put(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return response.Response(PASSWORD_RESET_SUCCESS, status=status.HTTP_200_OK)
+
+
+class LoginUser(generics.GenericAPIView):
+    serializer_class = LoginSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return response.Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+class UserOwnerProfile(views.APIView):
+    def get(self,request):
+        user = User.objects.get(id=self.request.user.id)
+        serializer = UserProfileSerializer(user)
+        return response.Response (serializer.data)
+
+    def put(self, request):
+        user = User.objects.get(id=self.request.user.id)
+        serializer = UserProfileSerializer(user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return response.Response(serializer.data)
+        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self,request):
+        User.objects.get(id=self.request.user.id).delete()
+
+
+class UserProfile(generics.RetrieveAPIView):
+    serializer_class = UserProfileSerializer
+    queryset  = User.objects.all()
 
 class UserList(generics.ListAPIView):
     serializer_class = UserListSerializer
     # permission_classes = [permissions.IsAuthenticated]
     filter_backends = (filters.SearchFilter,DjangoFilterBackend)
-    search_fields = '__all__'
+    search_fields = ('id','email')
     queryset = User.objects.all()
 
     def get_queryset(self):
@@ -18,8 +95,19 @@ class AdminUsersList(generics.ListAPIView):
     serializer_class = UserListSerializer
     #permission_classes = [permissions.IsAuthenticated]
     filter_backends = (filters.SearchFilter,DjangoFilterBackend)
-    search_fields = '__all__'
+    search_fields = ('id','email')
     queryset = User.objects.all()
 
     def get_queryset(self):
         return self.queryset.filter(role_id = Role.objects.get(name = "Admin").id)
+
+
+
+class EmailVerify(generics.GenericAPIView):
+    '''client password reset'''
+    serializer_class = EmailVerifySerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return response.Response(ACTIVATION_SUCCESS, status=status.HTTP_200_OK)

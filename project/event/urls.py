@@ -1,12 +1,13 @@
 from django.urls import path
 from .views import *
+from notifications.consumers import *
 
 
 
 urlpatterns = [
     #endpoint where a user with admin
     #role can create a new one event 
-    path('admin/event/create',CreateEvent.as_view(),
+    path('client/event/create',CreateEvent.as_view(),
         name = 'create-event'),
     #endpoint where a user with admin
     #role can get detail info,update and delete event 
@@ -19,4 +20,5 @@ urlpatterns = [
     #role can delete events
     path('client/events/delete',DeleteEvents.as_view(),
         name = 'events-delete'),
+    path('client/events/cons',RoomConsumer.as_asgi())
 ]

@@ -10,11 +10,6 @@ COPY . /usr/src/blanball
 
 RUN /usr/local/bin/python -m pip install --upgrade pip
 
-COPY req.txt /usr/src/blanball/
-
 RUN pip install -r  req.txt
 
 EXPOSE 8000
-
-
-

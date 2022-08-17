@@ -3,6 +3,8 @@ from pathlib import Path
 from decouple import config
 import datetime
 
+from django import conf
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -23,11 +25,16 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 SECRET_KEY = config('SECRET_KEY')
 
 WSGI_APPLICATION = 'project.wsgi.application'
+ASGI_APPLICATION = 'project.asgi.application'
+
 ROOT_URLCONF = 'project.urls'
 
 DEBUG = config('DEBUG',cast = bool,default = True)
 
-ALLOWED_HOSTS = ['*']
+AUTH_USER_MODEL = config('AUTH_USER_MODEL')
+
+ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]
+
 
 
 
@@ -43,8 +50,10 @@ INSTALLED_APPS = [
     'drf_yasg',
     'django_filters',
     'phonenumber_field',
+    'channels',
     'event',
     'authentication',
+    'notifications',
 ]
 
 MIDDLEWARE = [
@@ -58,16 +67,26 @@ MIDDLEWARE = [
 ]
 
 
-#mysql conected datdabse settings
+#POSTGRES conected datdabse settings
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': config('NAME'),
-        'USER': 'root',
-        'PASSWORD': config('PASSWORD'),
-        'HOST': 'db',
-        'PORT': 3306,
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME':  config('POSTGRES_DB_NAME'),
+        'USER': config('POSTGRES_USER'),
+        'PASSWORD': config('POSTGRES_PASSWORD'),
+        'HOST': config('POSTGRES_HOST'),
+        'PORT': config('POSTGRES_PORT'),
     }
+}
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
 }
 
 
@@ -132,7 +151,7 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 2,
+    'PAGE_SIZE': 10,
 }
 
 SIMPLE_JWT = {
@@ -149,3 +168,11 @@ EMAIL_PORT = config('EMAIL_PORT',cast = int)
 EMAIL_USE_TLS = config('EMAIL_USE_TLS',cast = bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+
+#celery framework settings
+CELERY_BROKER_URL = 'redis://redis'
+CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
+CELERY_RESULT_BACKEND = 'redis://redis'
+CELERY_ACCEPT_CONTENT = {'application/json'}
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'

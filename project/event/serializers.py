@@ -1,16 +1,25 @@
-from pyexpat import model
 from rest_framework import serializers
 from .models import *
-import datetime
+from authentication.serializers import UserProfileSerializer
 
 
-class EventSerializer(serializers.ModelSerializer):
+class CreateEventSerializer(serializers.ModelSerializer):
+    forms = serializers.ListField(child = serializers.CharField())
     class Meta:
         model = Event
-        exclude = ['author',]
+        exclude = ('current_users',)
 
     def create(self,validated_data):
-        return EventSerializer.objects.create(author = self.context['request'].author,**validated_data)
+        author = self.context['request'].user
+        print(validated_data)
+        return Event.objects.create(**validated_data)
+
+
+class DetailEventSerializer(serializers.ModelSerializer):
+    # current_users = UserProfileSerializer()
+    class Meta:
+        model = Event
+        fields = '__all__'
 
 class EventListSerializer(serializers.ModelSerializer):
     class Meta:
