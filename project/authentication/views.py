@@ -6,6 +6,13 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.sites.shortcuts import get_current_site
 from project.services import code_create
 
+def user_delete(pk):
+    user_codes = Code.objects.filter(user_id = pk)
+    if user_codes != None:
+        user_codes.delete()
+    Profile.objects.filter(id = pk).delete()
+    User.objects.filter(id = pk).delete()
+
 class RegisterUser(generics.GenericAPIView):
     '''register user'''
     serializer_class = RegisterSerializer
@@ -66,8 +73,7 @@ class UserOwnerProfile(generics.GenericAPIView):
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self,request):
-        User.objects.get(id=self.request.user.id).delete()
-        return response.Response(ACCOUNT_DELETED_SUCCESS,status=status.HTTP_200_OK)
+        user_delete(pk = self.request.user.id)
 
 
 class UserProfile(generics.RetrieveAPIView):

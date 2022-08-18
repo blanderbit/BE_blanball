@@ -14,11 +14,8 @@ import notifications.routing
 
 application = ProtocolTypeRouter({
   "http": django_asgi_app,
-  "websocket": AllowedHostsOriginValidator(
-        AuthMiddlewareStack(
-            URLRouter(
-                notifications.routing.websocket_urlpatterns
-            )
-        )
-    ),
+  "websocket": URLRouter(
+        notifications.routing.websocket_urlpatterns
+    )
 })
+ 

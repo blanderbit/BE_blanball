@@ -6,8 +6,8 @@ services:
     ports:
       - 5432:5432
     image: postgres:latest
-    volumes: 
-      - db:/var/lib/postgresql/data
+    volumes:
+      - ./storage/postgres:/data
     environment:
        - POSTGRES_USER=postgres
        - POSTGRES_PASSWORD=root
@@ -27,11 +27,17 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+    links:
+     - redis
   redis:
     container_name: redis
     image: redis:latest
     ports:
-      - "6380:6379"
+      - "6379:6379"
+    volumes:
+      - ./storage/redis/data:/data
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
       timeout: 3s

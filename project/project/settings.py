@@ -3,8 +3,6 @@ from pathlib import Path
 from decouple import config
 import datetime
 
-from django import conf
-
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -33,7 +31,7 @@ DEBUG = config('DEBUG',cast = bool,default = True)
 
 AUTH_USER_MODEL = config('AUTH_USER_MODEL')
 
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]
+ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1","172.20.0.1"]
 
 
 
@@ -84,7 +82,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [("redis",6379)],
         },
     },
 }

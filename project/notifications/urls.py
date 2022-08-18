@@ -4,7 +4,8 @@ from .views import *
 
 
 urlpatterns = [
-    #endpoint where a user can check her notifications 
-    path('notifications/client/my/notifications ', UserNotificationsList.as_view(),
-        name = 'user-notifications'),
+    #endpoint where a user with admin
+    #role can create a new one notification
+    path('client/notification/create',CreateNotification.as_view(),
+        name = 'notification-event'),
 ]

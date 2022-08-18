@@ -1,5 +1,3 @@
-from multiprocessing import Event
-from xmlrpc.client import DateTime
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from phonenumber_field.modelfields import PhoneNumberField
@@ -60,7 +58,7 @@ class User(AbstractBaseUser):
 
 class Code(models.Model):
     value = models.CharField(max_length=5,unique=True)
-    expire_time = DateTime()
+    # expire_time = models.DateTimeField()
     type = models.CharField(max_length=20)
     user = models.ForeignKey(User,on_delete=models.PROTECT)
 
