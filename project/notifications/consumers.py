@@ -10,9 +10,9 @@ from djangochannelsrestframework.observer.generics import (ObserverModelInstance
 from djangochannelsrestframework.observer import model_observer
 
 from authentication.models import User
-from event.models import Event
+from events.models import Event
 from .models import Notification
-from event.serializers import DetailEventSerializer
+from events.serializers import DetailEventSerializer
 from .serializers import *
 
 class RoomConsumer(ObserverModelInstanceMixin, GenericAsyncAPIConsumer):

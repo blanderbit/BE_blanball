@@ -1,4 +1,3 @@
-import email
 from rest_framework import serializers
 from .models import *
 from django.utils.encoding import force_str

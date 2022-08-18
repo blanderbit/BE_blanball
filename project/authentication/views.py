@@ -48,7 +48,7 @@ class LoginUser(generics.GenericAPIView):
         return response.Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class UserOwnerProfile(views.APIView):
+class UserOwnerProfile(generics.GenericAPIView):
     '''get put delete private user profile'''
     serializer_class = UserProfileSerializer
     permission_classes = [permissions.IsAuthenticated]

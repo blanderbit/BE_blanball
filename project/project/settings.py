@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     'django_filters',
     'phonenumber_field',
     'channels',
-    'event',
+    'events',
     'authentication',
     'notifications',
 ]
