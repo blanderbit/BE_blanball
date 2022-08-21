@@ -7,7 +7,7 @@ services:
       - 5432:5432
     image: postgres:latest
     volumes:
-      - ./storage/postgres:/data
+      - ./storage/db/data:/usr/src/blanball/storage/db/data
     environment:
        - POSTGRES_USER=postgres
        - POSTGRES_PASSWORD=root
@@ -15,13 +15,13 @@ services:
     healthcheck:
       test: pg_isready -U postgres -d postgres
       timeout: 40s
-      retries: 20
+      retries: 20    
   api:
     container_name: api
     build: .
     command: bash django-start.sh
     volumes:
-      - .:/usr/src/blanball
+      - ./storage/api/data:/usr/src/blanball/storage/api/data
     ports:
       - "8000:8000"
     depends_on:
@@ -37,23 +37,29 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - ./storage/redis/data:/data
+      - ./storage/redis/data:/usr/src/blanball/storage/redis/data
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
       timeout: 3s
       retries: 5
 
-  celery:
-    container_name: celery
+  celery-worker:
+    container_name: celery-worker
     build: .
-    command: >
-      bash -c "cd project && 
-              celery -A project worker -l info"
+    command: bash celery-worker-start.sh
     volumes:
-      - .:/usr/src/blanball
+      - ./storage/celery-worker/data:/usr/src/blanball/storage/celery-worker/data
     depends_on:
-      db:
+      redis:
         condition: service_healthy
+
+  celery-beat:
+    container_name: celery-beat
+    build: .
+    command: bash celery-beat-start.sh
+    volumes:
+      - ./storage/beat/data:/usr/src/blanball/storage/celery-beat/data
+    depends_on:
       redis:
         condition: service_healthy
 
@@ -61,8 +67,6 @@ volumes:
   db:
     driver: local
   redis:
-    driver: local
-  celery:
     driver: local
 
 

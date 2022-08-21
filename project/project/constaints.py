@@ -18,10 +18,16 @@ PASSWORD_RESET_SUCCESS = {'success': 'Password reset '}
 
 NO_SUCH_USER_ERROR = {'error': 'No such user'}
 
+CODE_EXPIRED_ERROR = {'error': 'This code expired'}
+
 ACTIVATION_SUCCESS = {'success': 'Activation by email'}
 
 ACCOUNT_DELETED_SUCCESS = {'success':  'Account deleted'}
 
+
+
 ADMIN_ROLE = "Admin"
 
 USER_ROLE = "User"
+
+CODE_EXPIRE_MINUTES_TIME = 5

@@ -3,8 +3,9 @@ from .models import *
 from .tasks import Util
 from rest_framework import generics,filters,permissions,status,response,views
 from django_filters.rest_framework import DjangoFilterBackend
-from django.contrib.sites.shortcuts import get_current_site
 from project.services import code_create
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_str
 
 def user_delete(pk):
     user_codes = Code.objects.filter(user_id = pk)
@@ -24,7 +25,7 @@ class RegisterUser(generics.GenericAPIView):
         profile = Profile.objects.create(**serializer.validated_data['profile'])
         serializer.save(profile = profile)
         user_data = serializer.data
-        code_create(email=user_data['email'],k=3,type='email_verify')
+        code_create(email=user_data['email'],k=5,type='email_verify')
         return response.Response(user_data, status=status.HTTP_201_CREATED)
 
 class EmailVerify(generics.GenericAPIView):
@@ -34,11 +35,9 @@ class EmailVerify(generics.GenericAPIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        uidb64 = serializer.validated_data["uidb64"]
-        code = Code.objects.filter(value = uidb64)
-        uidb64 = uidb64[:2]
-        id = force_str(urlsafe_base64_decode(uidb64))
-        user = User.objects.get(id=id)
+        verify_code = serializer.validated_data["verify_code"]
+        code = Code.objects.get(value=verify_code)
+        user = User.objects.get(email=code.user_email)
         user.is_verified = True
         user.save()
         code.delete()
@@ -115,7 +114,7 @@ class RequestPasswordReset(generics.GenericAPIView):
         email = request.data.get('email', '')
 
         if User.objects.filter(email=email).exists():
-            code_create(email=email,k=3,type='password_reset')
+            code_create(user_email=email,k=5,type='password_reset')
             return response.Response(SENT_CODE_TO_EMAIL_SUCCESS, status=status.HTTP_200_OK)
         else:
             return response.Response(NO_SUCH_USER_ERROR, status=status.HTTP_200_OK)
@@ -129,13 +128,11 @@ class SetNewPassword(generics.GenericAPIView):
     def put(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        uidb64 = serializer.validated_data["uidb64"]
-        code = Code.objects.filter(value = uidb64)
-        uidb64 = uidb64[:2]
-        id = force_str(urlsafe_base64_decode(uidb64))
-        user = User.objects.get(id=id)
+        verify_code = serializer.validated_data["verify_code"]
+        code = Code.objects.get(value=verify_code)
+        user = User.objects.get(email=code.user_email)
+        user.is_verified = True
         user.set_password(serializer.validated_data["new_password"])
         user.save()
         code.delete()
-        return response.Response(PASSWORD_RESET_SUCCESS, status=status.HTTP_200_OK)
-
+        return response.Response(ACTIVATION_SUCCESS, status=status.HTTP_200_OK) 

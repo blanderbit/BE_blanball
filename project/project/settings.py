@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from decouple import config
+from decouple import config, Csv
 import datetime
 
 
@@ -31,9 +31,7 @@ DEBUG = config('DEBUG',cast = bool,default = True)
 
 AUTH_USER_MODEL = config('AUTH_USER_MODEL')
 
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1","172.20.0.1"]
-
-
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
 
 INSTALLED_APPS = [
@@ -89,7 +87,7 @@ CHANNEL_LAYERS = {
 
 
 SWAGGER_SETTINGS = {
-    'SHOW_REQUEST_HEADERS': True,
+    'SHOW_REQUEST_HEADERS': config('SHOW_REQUEST_HEADERS',cast = bool),
     'SECURITY_DEFINITIONS': {
         'Bearer': {
             'type': 'apiKey',
@@ -97,8 +95,8 @@ SWAGGER_SETTINGS = {
             'in': 'Header'
         }
     },
-    'USE_SESSION_AUTH': False,
-    'JSON_EDITOR': True,
+    'USE_SESSION_AUTH': config('USE_SESSION_AUTH',cast = bool),
+    'JSON_EDITOR': config('JSON_EDITOR',cast = bool),
     'SUPPORTED_SUBMIT_METHODS': [
         'get',
         'post',
@@ -168,9 +166,9 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 
 #celery framework settings
-CELERY_BROKER_URL = 'redis://redis'
+CELERY_BROKER_URL = config('CELERY_BROKER_URL')
 CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
-CELERY_RESULT_BACKEND = 'redis://redis'
+CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND')
 CELERY_ACCEPT_CONTENT = {'application/json'}
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
