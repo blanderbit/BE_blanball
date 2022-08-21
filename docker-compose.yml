@@ -8,18 +8,18 @@ services:
     image: postgres:latest
     volumes:
       - ./storage/db/data:/usr/src/blanball/storage/db/data
-    environment:
-       - POSTGRES_USER=postgres
-       - POSTGRES_PASSWORD=root
-       - POSTGRES_DB=postgres
+    env_file:
+      - ./compose/db.env
     healthcheck:
       test: pg_isready -U postgres -d postgres
       timeout: 40s
       retries: 20    
   api:
     container_name: api
-    build: .
-    command: bash django-start.sh
+    build: 
+      context: .
+      dockerfile: compose/Dockerfile
+    command: bash ./compose/start/django-start.sh
     volumes:
       - ./storage/api/data:/usr/src/blanball/storage/api/data
     ports:
@@ -45,8 +45,10 @@ services:
 
   celery-worker:
     container_name: celery-worker
-    build: .
-    command: bash celery-worker-start.sh
+    build: 
+      context: .
+      dockerfile: compose/Dockerfile
+    command: bash compose/start/celery-worker-start.sh
     volumes:
       - ./storage/celery-worker/data:/usr/src/blanball/storage/celery-worker/data
     depends_on:
@@ -55,8 +57,10 @@ services:
 
   celery-beat:
     container_name: celery-beat
-    build: .
-    command: bash celery-beat-start.sh
+    build: 
+      context: .
+      dockerfile: compose/Dockerfile 
+    command: bash compose/start/celery-beat-start.sh
     volumes:
       - ./storage/beat/data:/usr/src/blanball/storage/celery-beat/data
     depends_on:
