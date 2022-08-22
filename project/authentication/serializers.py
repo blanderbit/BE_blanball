@@ -21,7 +21,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'username','password','re_password','profile']
+        fields = ['email', 'username','last_name','password','re_password','profile']
 
     def validate(self, attrs):
         '''data validation function'''
@@ -46,7 +46,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class EmailVerifySerializer(serializers.Serializer):
     verify_code = serializers.CharField(
-        min_length=5, write_only=True)
+        min_length=5,max_length=5, write_only=True)
 
     class Meta:
         fields = ['verify_code']
@@ -56,7 +56,7 @@ class EmailVerifySerializer(serializers.Serializer):
         code = Code.objects.filter(value = verify_code)
         if not code:
             raise AuthenticationFailed(BAD_CODE_ERROR, 401)
-        elif Code.objects.get(value = verify_code).type != 'email_verify':
+        elif Code.objects.get(value = verify_code).type != EMAIL_VERIFY_TOKEN_TYPE:
             raise AuthenticationFailed(BAD_CODE_ERROR, 401)
         elif Code.objects.get(value = verify_code).life_time < timezone.now():
             raise AuthenticationFailed(CODE_EXPIRED_ERROR, 401)
@@ -136,7 +136,7 @@ class SetNewPasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(
         min_length=6, max_length=68, write_only=True)
     verify_code = serializers.CharField(
-        min_length=5, write_only=True)
+        min_length=5,max_length=5, write_only=True)
 
     class Meta:
         fields = ['verify_code']
@@ -146,7 +146,7 @@ class SetNewPasswordSerializer(serializers.Serializer):
         code = Code.objects.filter(value = verify_code)
         if not code:
             raise AuthenticationFailed(BAD_CODE_ERROR, 401)
-        elif Code.objects.get(value = verify_code).type != 'email_verify':
+        elif Code.objects.get(value = verify_code).type != PASSWORD_RESET_TOKEN_TYPE:
             raise AuthenticationFailed(BAD_CODE_ERROR, 401)
         elif Code.objects.get(value = verify_code).life_time < timezone.now():
             raise AuthenticationFailed(CODE_EXPIRED_ERROR, 401)

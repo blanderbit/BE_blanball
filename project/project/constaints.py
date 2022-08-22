@@ -30,4 +30,8 @@ ADMIN_ROLE = "Admin"
 
 USER_ROLE = "User"
 
+PASSWORD_RESET_TOKEN_TYPE  = 'password_reset'
+
+EMAIL_VERIFY_TOKEN_TYPE = 'email_verify'
+
 CODE_EXPIRE_MINUTES_TIME = 5

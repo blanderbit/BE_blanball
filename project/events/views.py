@@ -8,13 +8,13 @@ from rest_framework.response import Response
 class CreateEvent(generics.CreateAPIView):
     '''class that allows you to create a new event'''
     serializer_class = CreateEventSerializer
-    # permission_classes = []
+    permission_classes = [permissions.IsAuthenticated]
     queryset = Event.objects.all()
 
 class GetPutDeleteEvent(GetPutDeleteAPIView):
     '''a class that allows you to get, update, delete an event'''
     serializer_class = DetailEventSerializer
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
     queryset = Event.objects.all()
 
 class EventList(generics.ListAPIView):

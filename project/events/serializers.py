@@ -10,9 +10,7 @@ class CreateEventSerializer(serializers.ModelSerializer):
         exclude = ('current_users',)
 
     def create(self,validated_data):
-        author = self.context['request'].user
-        print(validated_data)
-        return Event.objects.create(**validated_data)
+        return Event.objects.create(author = self.context['request'].user,**validated_data)
 
 
 class DetailEventSerializer(serializers.ModelSerializer):

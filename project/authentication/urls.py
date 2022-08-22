@@ -7,8 +7,8 @@ urlpatterns = [
     path('client/register', RegisterUser.as_view(), name="register"),
     # endpoint where the user can log into a previously created account
     path('client/login', LoginUser.as_view(), name="login"),
-    # endpoint where admin can check all users list
-    path('admin/user/list',UserList.as_view(),
+    # endpoint where client can check all users list
+    path('client/user/list',UserList.as_view(),
       name = 'users-list'),
     # endpoint where admin can check all admins list
     path('admin/list',AdminUsersList.as_view(),

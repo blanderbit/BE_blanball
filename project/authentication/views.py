@@ -7,12 +7,12 @@ from project.services import code_create
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
 
-def user_delete(pk):
-    user_codes = Code.objects.filter(user_id = pk)
+def user_delete(email):
+    user_codes = Code.objects.filter(user_email = email)
     if user_codes != None:
         user_codes.delete()
-    Profile.objects.filter(id = pk).delete()
-    User.objects.filter(id = pk).delete()
+    Profile.objects.filter(id = User.objects.get(email = email).profile_id).delete()
+    User.objects.filter(email = email).delete()
 
 class RegisterUser(generics.GenericAPIView):
     '''register user'''
@@ -25,7 +25,7 @@ class RegisterUser(generics.GenericAPIView):
         profile = Profile.objects.create(**serializer.validated_data['profile'])
         serializer.save(profile = profile)
         user_data = serializer.data
-        code_create(email=user_data['email'],k=5,type='email_verify')
+        code_create(email=user_data['email'],k=5,type=EMAIL_VERIFY_TOKEN_TYPE)
         return response.Response(user_data, status=status.HTTP_201_CREATED)
 
 class EmailVerify(generics.GenericAPIView):
@@ -68,11 +68,12 @@ class UserOwnerProfile(generics.GenericAPIView):
         serializer = self.serializer_class(user, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return response.Response(serializer.data)
+            return response.Response(serializer.data,status=status.HTTP_200_OK)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self,request):
-        user_delete(pk = self.request.user.id)
+        user_delete(email = self.request.user.email)
+        return response.Response(ACCOUNT_DELETED_SUCCESS, status=status.HTTP_200_OK)
 
 
 class UserProfile(generics.RetrieveAPIView):
@@ -114,7 +115,7 @@ class RequestPasswordReset(generics.GenericAPIView):
         email = request.data.get('email', '')
 
         if User.objects.filter(email=email).exists():
-            code_create(user_email=email,k=5,type='password_reset')
+            code_create(user_email=email,k=5,type=PASSWORD_RESET_TOKEN_TYPE)
             return response.Response(SENT_CODE_TO_EMAIL_SUCCESS, status=status.HTTP_200_OK)
         else:
             return response.Response(NO_SUCH_USER_ERROR, status=status.HTTP_200_OK)
