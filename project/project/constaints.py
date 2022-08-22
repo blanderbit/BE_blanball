@@ -18,4 +18,21 @@ PASSWORD_RESET_SUCCESS = {'success': 'Password reset '}
 
 NO_SUCH_USER_ERROR = {'error': 'No such user'}
 
-ACTIVATION_SUCCESS = {'success': 'Activation succes'}
+CODE_EXPIRED_ERROR = {'error': 'This code expired'}
+
+ACTIVATION_SUCCESS = {'success': 'Activation by email'}
+
+ACCOUNT_DELETED_SUCCESS = {'success':  'Account deleted'}
+
+EVENT_DELETED_SUCCESS = {'success':  'Event deleted'}
+
+
+ADMIN_ROLE = "Admin"
+
+USER_ROLE = "User"
+
+PASSWORD_RESET_TOKEN_TYPE  = 'password_reset'
+
+EMAIL_VERIFY_TOKEN_TYPE = 'email_verify'
+
+CODE_EXPIRE_MINUTES_TIME = 5

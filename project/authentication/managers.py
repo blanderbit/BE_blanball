@@ -24,7 +24,7 @@ class UserManager(BaseUserManager):
         if email is None:
             raise TypeError(NO_EMAIL_REGISTRATION_ERROR)
         user = self.model(username=username, email=self.normalize_email(email),*agrs,**kwargs)
-        # user.role_id = 1 #3
+        user.role_id = 1 #3
         user.set_password(password)
         user.save()
         return user

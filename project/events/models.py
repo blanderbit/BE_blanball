@@ -11,7 +11,7 @@ class Event(models.Model):
         football = 'Football'
         futsal = 'Futsal'
 
-    # author = models.ForeignKey(User,on_delete=models.PROTECT)
+    author = models.ForeignKey(User,on_delete=models.PROTECT)
     name = models.CharField(max_length=100)
     small_disc = models.CharField(max_length=500)
     place = models.CharField(max_length=500)

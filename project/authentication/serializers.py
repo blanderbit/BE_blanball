@@ -1,11 +1,9 @@
-import email
 from rest_framework import serializers
 from .models import *
-from django.utils.encoding import force_str
-from django.utils.http import urlsafe_base64_decode
 from project.constaints import *
 from django.contrib import auth
 from rest_framework.exceptions import AuthenticationFailed 
+from django.utils import timezone
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,7 +21,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'username', 'password','re_password','profile']
+        fields = ['email', 'username','last_name','password','re_password','profile']
 
     def validate(self, attrs):
         '''data validation function'''
@@ -44,6 +42,25 @@ class RegisterSerializer(serializers.ModelSerializer):
         validated_data.pop("re_password")
         '''creating a user with previously validated data'''
         return User.objects.create_user(**validated_data)
+
+
+class EmailVerifySerializer(serializers.Serializer):
+    verify_code = serializers.CharField(
+        min_length=5,max_length=5, write_only=True)
+
+    class Meta:
+        fields = ['verify_code']
+
+    def validate(self, attrs):
+        verify_code = attrs.get('verify_code')
+        code = Code.objects.filter(value = verify_code)
+        if not code:
+            raise AuthenticationFailed(BAD_CODE_ERROR, 401)
+        elif Code.objects.get(value = verify_code).type != EMAIL_VERIFY_TOKEN_TYPE:
+            raise AuthenticationFailed(BAD_CODE_ERROR, 401)
+        elif Code.objects.get(value = verify_code).life_time < timezone.now():
+            raise AuthenticationFailed(CODE_EXPIRED_ERROR, 401)
+        return super().validate(attrs)
 
 
 class LoginSerializer(serializers.ModelSerializer):
@@ -88,10 +105,11 @@ class LoginSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    '''user pricate and public profile serializer'''
     profile = ProfileSerializer()
     class Meta:
         model = User
-        fields = ['username','email','role','profile']
+        fields = ['username','email','profile']
         
 
 class UserListSerializer(serializers.ModelSerializer):
@@ -114,62 +132,22 @@ class ResetPasswordRequestSerializer(serializers.Serializer):
         fields = ['email']
 
 
-
 class SetNewPasswordSerializer(serializers.Serializer):
-    email = serializers.EmailField(max_length=255, min_length=3)
     new_password = serializers.CharField(
         min_length=6, max_length=68, write_only=True)
-    uidb64 = serializers.CharField(
-        min_length=5, write_only=True)
+    verify_code = serializers.CharField(
+        min_length=5,max_length=5, write_only=True)
 
     class Meta:
-        fields = ['new_password','uidb64','email']
+        fields = ['verify_code']
 
     def validate(self, attrs):
-        new_password = attrs.get('new_password')
-        uidb64 = attrs.get('uidb64')
-        code = Code.objects.filter(value = uidb64)
+        verify_code = attrs.get('verify_code')
+        code = Code.objects.filter(value = verify_code)
         if not code:
             raise AuthenticationFailed(BAD_CODE_ERROR, 401)
-        elif Code.objects.get(value = uidb64).type != 'password_reset':
+        elif Code.objects.get(value = verify_code).type != PASSWORD_RESET_TOKEN_TYPE:
             raise AuthenticationFailed(BAD_CODE_ERROR, 401)
-        else:
-            uidb64 = uidb64[:2]
-            id = force_str(urlsafe_base64_decode(uidb64))
-            user = User.objects.get(id=id)
-            if User.objects.filter(email = email) and user.email == email:
-                user.set_password(new_password)
-                user.save()
-                code.delete()
-                return (user)
-            else:
-                raise AuthenticationFailed(BAD_CODE_ERROR, 401)
-
-
-class EmailVerifySerializer(serializers.Serializer):
-    uidb64 = serializers.CharField(
-        min_length=5, write_only=True)
-    email = serializers.EmailField(max_length=255, min_length=3)
-
-    class Meta:
-        fields = ['email','uidb64']
-
-    def validate(self, attrs):
-        uidb64 = attrs.get('uidb64')
-        email = attrs.get('email')
-        code = Code.objects.filter(value = uidb64)
-        if not code:
-            raise AuthenticationFailed(BAD_CODE_ERROR, 401)
-        elif Code.objects.get(value = uidb64).type != 'email_verify':
-            raise AuthenticationFailed(BAD_CODE_ERROR, 401)
-        else:
-            uidb64 = uidb64[:2]
-            id = force_str(urlsafe_base64_decode(uidb64))
-            user = User.objects.get(id=id)
-            if User.objects.filter(email = email) and user.email == email:
-                user.is_verified = True
-                user.save()
-                code.delete()
-                return (user)
-            else:
-                raise AuthenticationFailed(BAD_CODE_ERROR, 401)
+        elif Code.objects.get(value = verify_code).life_time < timezone.now():
+            raise AuthenticationFailed(CODE_EXPIRED_ERROR, 401)
+        return super().validate(attrs)

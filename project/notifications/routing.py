@@ -1,7 +1,6 @@
 from django.urls import re_path
-from . import consumers
+from .consumers import *
+from djangochannelsrestframework.consumers import view_as_consumer
+from .views import *
 
-
-websocket_urlpatterns = [
-    re_path(r'ws/chat/room/$', consumers.RoomConsumer.as_asgi()),
-]
+websocket_urlpatterns = []

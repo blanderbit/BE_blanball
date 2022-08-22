@@ -1,24 +1,21 @@
 from rest_framework import mixins
 from rest_framework.generics import GenericAPIView
 from authentication.tasks import Util
-from django.utils.encoding import smart_str, smart_bytes
-from django.utils.http import urlsafe_base64_encode
 import random
 import string
-from authentication.models import Code ,User
+from authentication.models import Code
+from .constaints import  CODE_EXPIRE_MINUTES_TIME
+from django.utils import timezone
 
 def code_create(email,k,type):
-    user = User.objects.get(email=email)
-    uidb64 = urlsafe_base64_encode(smart_bytes(user.id))
-            
-    uidb64 += ''.join(random.choices(string.ascii_uppercase, k=k))
-    print(uidb64)
-    Code.objects.create(value = uidb64,user = User.objects.get(email=email),type = type)
-
-    data = {'email_body': uidb64 ,'to_email': email, 
-            'email_subject': 'Your verify code'}
+    '''create email verification code  and password 
+    reset verification code'''
+    verify_code = ''.join(random.choices(string.ascii_uppercase, k=k))
+    code = Code.objects.create(value = verify_code,user_email = email,type = type,life_time =timezone.now() + 
+            timezone.timedelta(minutes=CODE_EXPIRE_MINUTES_TIME))
+    print(code.value)
+    data = {'email_subject': 'Your verify code','email_body': verify_code ,'to_email': email}
     Util.send_email.delay(data)
-
 
 class GetPutDeleteAPIView(mixins.RetrieveModelMixin,
                                    mixins.UpdateModelMixin,

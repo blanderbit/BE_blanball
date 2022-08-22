@@ -13,4 +13,3 @@ class IsSuperOrDefaultAdmin(permissions.BasePermission):
             return bool(request.user and CheckRole(role_id = request.user.role_id,role_names = ["User","Admin"]))
         else:
             return bool(request.user and CheckRole(role_id = request.user.role_id,role_names = ["Admin"]))
-
