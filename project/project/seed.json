@@ -1,0 +1,16 @@
+[
+    {
+        "model": "authentication.Role",
+        "pk": 1,
+        "fields": {
+          "name": "User"
+        }
+    },
+    {
+      "model": "authentication.Role",
+      "pk": 2,
+      "fields": {
+        "name": "Admin"
+      }
+    }
+]

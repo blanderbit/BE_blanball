@@ -24,6 +24,7 @@ ACTIVATION_SUCCESS = {'success': 'Activation by email'}
 
 ACCOUNT_DELETED_SUCCESS = {'success':  'Account deleted'}
 
+EVENT_DELETED_SUCCESS = {'success':  'Event deleted'}
 
 
 ADMIN_ROLE = "Admin"

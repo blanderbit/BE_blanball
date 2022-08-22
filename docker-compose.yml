@@ -19,7 +19,7 @@ services:
     build: 
       context: .
       dockerfile: compose/Dockerfile
-    command: bash ./compose/start/django-start.sh
+    command: bash ./compose/local/django-start.sh
     volumes:
       - .:/usr/src/blanball
     ports:
@@ -49,7 +49,7 @@ services:
       context: .
       dockerfile: compose/Dockerfile
     restart: always
-    command: bash compose/start/celery-worker-start.sh
+    command: bash compose/local/celery-worker-start.sh
     volumes:
       - ./storage/celery-worker/data:/usr/src/blanball/storage/celery-worker/data
     depends_on:
@@ -62,9 +62,9 @@ services:
       context: .
       dockerfile: compose/Dockerfile
     restart: always 
-    command: bash compose/start/celery-beat-start.sh
+    command: bash compose/local/celery-beat-start.sh
     volumes:
-      - ./storage/beat/data:/usr/src/blanball/storage/celery-beat/data
+      - ./storage/celery-beat/data:/usr/src/blanball/storage/celery-beat/data
     depends_on:
       redis:
         condition: service_healthy

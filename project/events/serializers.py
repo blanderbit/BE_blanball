@@ -7,19 +7,13 @@ class CreateEventSerializer(serializers.ModelSerializer):
     forms = serializers.ListField(child = serializers.CharField())
     class Meta:
         model = Event
-        exclude = ('current_users',)
+        exclude = ('current_users','author')
 
     def create(self,validated_data):
         return Event.objects.create(author = self.context['request'].user,**validated_data)
 
 
-class DetailEventSerializer(serializers.ModelSerializer):
-    # current_users = UserProfileSerializer()
-    class Meta:
-        model = Event
-        fields = '__all__'
-
-class EventListSerializer(serializers.ModelSerializer):
+class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = '__all__'

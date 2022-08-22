@@ -109,7 +109,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer()
     class Meta:
         model = User
-        fields = ['username','email','role','profile']
+        fields = ['username','email','profile']
         
 
 class UserListSerializer(serializers.ModelSerializer):
