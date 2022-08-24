@@ -1,11 +1,13 @@
 from .serializers import *
 from .models import *
-from .tasks import Util
 from rest_framework import generics,filters,permissions,status,response,views
 from django_filters.rest_framework import DjangoFilterBackend
 from project.services import code_create
-from django.utils.http import urlsafe_base64_decode
-from django.utils.encoding import force_str
+from project.services import *
+from .permisions import IsNotAuthenticated
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
 
 def user_delete(email):
     user_codes = Code.objects.filter(user_email = email)
@@ -25,7 +27,7 @@ class RegisterUser(generics.GenericAPIView):
         profile = Profile.objects.create(**serializer.validated_data['profile'])
         serializer.save(profile = profile)
         user_data = serializer.data
-        code_create(email=user_data['email'],k=5,type=EMAIL_VERIFY_TOKEN_TYPE)
+        code_create(email=user_data['email'],k=5,type=EMAIL_VERIFY_TOKEN_TYPE,dop_info = None)
         return response.Response(user_data, status=status.HTTP_201_CREATED)
 
 class EmailVerify(generics.GenericAPIView):
@@ -53,19 +55,29 @@ class LoginUser(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         return response.Response(serializer.data, status=status.HTTP_200_OK)
 
-
+    
 class UserOwnerProfile(generics.GenericAPIView):
     '''get put delete private user profile'''
     serializer_class = UserProfileSerializer
+    pagination_class = None
     permission_classes = [permissions.IsAuthenticated]
     def get(self,request):
         user = User.objects.get(id=self.request.user.id)
-        serializer = self.serializer_class(user)
+        serializer = UserProfileSerializer(user)
+        channel_layer = get_channel_layer()
+
+        async_to_sync(channel_layer.group_send)(
+            'ff',
+            {
+                'type': 'kafka.message',
+                'message': 'Test message'
+            }
+        )
         return response.Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request):
-        user = User.objects.get(id=self.request.user.id)
-        serializer = self.serializer_class(user, data=request.data)
+        profile = Profile.objects.get(id=self.request.user.profile_id)
+        serializer = ProfileSerializer(profile, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return response.Response(serializer.data,status=status.HTTP_200_OK)
@@ -79,12 +91,14 @@ class UserOwnerProfile(generics.GenericAPIView):
 class UserProfile(generics.RetrieveAPIView):
     '''get public user profile'''
     serializer_class = UserProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
     queryset  = User.objects.all()
 
 class UserList(generics.ListAPIView):
     '''get all users list'''
     serializer_class = UserListSerializer
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
+    pagination_class = CustomPagination
     filter_backends = (filters.SearchFilter,DjangoFilterBackend)
     search_fields = ('id','email')
     queryset = User.objects.all()
@@ -95,7 +109,8 @@ class UserList(generics.ListAPIView):
 class AdminUsersList(generics.ListAPIView):
     '''displaying the full list of admin users'''
     serializer_class = UserListSerializer
-    #permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
+    pagination_class = CustomPagination
     filter_backends = (filters.SearchFilter,DjangoFilterBackend)
     search_fields = ('id','email')
     queryset = User.objects.all()
@@ -108,6 +123,7 @@ class AdminUsersList(generics.ListAPIView):
 class RequestPasswordReset(generics.GenericAPIView):
     '''send request to reset user password by email'''
     serializer_class = ResetPasswordRequestSerializer
+    permission_classes = [IsNotAuthenticated]
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -115,25 +131,67 @@ class RequestPasswordReset(generics.GenericAPIView):
         email = request.data.get('email', '')
 
         if User.objects.filter(email=email).exists():
-            code_create(user_email=email,k=5,type=PASSWORD_RESET_TOKEN_TYPE)
+            code_create(email=email,k=5,type=PASSWORD_RESET_TOKEN_TYPE,dop_info = None)
             return response.Response(SENT_CODE_TO_EMAIL_SUCCESS, status=status.HTTP_200_OK)
         else:
-            return response.Response(NO_SUCH_USER_ERROR, status=status.HTTP_200_OK)
+            return response.Response(NO_SUCH_USER_ERROR,status=status.HTTP_400_BAD_REQUEST)
 
 
 
-class SetNewPassword(generics.GenericAPIView):
+class ResetPassword(generics.GenericAPIView):
     '''password reset on a previously sent request'''
-    serializer_class = SetNewPasswordSerializer
+    serializer_class = ResetPasswordSerializer
+    permission_classes = [IsNotAuthenticated]
 
-    def put(self, request):
+    def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         verify_code = serializer.validated_data["verify_code"]
         code = Code.objects.get(value=verify_code)
         user = User.objects.get(email=code.user_email)
-        user.is_verified = True
         user.set_password(serializer.validated_data["new_password"])
         user.save()
         code.delete()
-        return response.Response(ACTIVATION_SUCCESS, status=status.HTTP_200_OK) 
+        return response.Response(PASSWORD_RESET_SUCCESS, status=status.HTTP_200_OK) 
+
+
+
+class RequestChangePassword(generics.GenericAPIView):
+    serializer_class = RequestChangePasswordSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        print(serializer.data)
+
+        if serializer.is_valid():
+            if not request.user.check_password(serializer.data.get("old_password")):
+                return response.Response(WRONG_PASSWORD_ERROR, status=status.HTTP_400_BAD_REQUEST)
+
+            else:
+                code_create(email=request.user.email,k=5,type=PASSWORD_CHANGE_TOKEN_TYPE,
+                dop_info =  serializer.validated_data['new_password'])
+                return response.Response(SENT_CODE_TO_EMAIL_SUCCESS, status=status.HTTP_200_OK)
+
+
+
+class ChangePassword(generics.GenericAPIView):
+    '''password reset on a previously sent request'''
+    serializer_class = ChangePasswordSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        code = Code.objects.get(value=verify_code)
+        user = User.objects.get(id = request.user.id)
+        if code.email != user.email:
+            return response.Response(PASSWORD_CHANGE_SUCCESS, status=status.HTTP_200_OK) 
+        verify_code = serializer.validated_data["verify_code"]
+        user.set_password(code.dop_info)
+        user.save()
+        code.delete()
+        return response.Response(PASSWORD_CHANGE_SUCCESS, status=status.HTTP_200_OK) 
+
+
+

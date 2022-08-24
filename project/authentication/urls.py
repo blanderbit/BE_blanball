@@ -26,8 +26,17 @@ urlpatterns = [
       name="request-reset-password"),
     #endpoint where the password is reset according
     # to the data sent to the mail
-    path('client/password/reset-complete', SetNewPassword.as_view(),
+    path('client/password/reset-complete', ResetPassword.as_view(),
       name='password-reset-complete'),
      #endpoint for account verification by mail
-    path('client/email/verify', EmailVerify.as_view(), name="email-verify"),
+    path('client/email/verify', EmailVerify.as_view(), 
+      name="email-verify"),
+    #endpoint at which a password change request
+    path('client/request-change/password', RequestChangePassword.as_view(),
+      name="request-change-password"),
+    #endpoint where the password is reset according
+    # to the data sent to the mail
+    path('client/password/change-complete', ChangePassword.as_view(),
+      name='password-change-complete'),
+
 ]
