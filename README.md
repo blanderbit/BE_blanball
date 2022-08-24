@@ -17,6 +17,7 @@
 
 In the main directory `BE_blanball/project` run the command `sudo docker-compose up` or `sudo docker-compose up -d` this command will start the project without taking up your console
 
+
 <!-- # cd project 
 # celery -A project worker -l info" -->
 
