@@ -8,13 +8,15 @@ INVALID_CREDENTIALS_ERROR =  {'error': 'Invalid credentials, try again'}
 
 NOT_VERIFIED_BY_EMAIL_ERROR = {'error': 'Email is not verified'}
 
-PASSWORD_DO_NOT_MATCH = {'error': 'Passwords do not match'}
+PASSWORDS_DO_NOT_MATCH = {'error': 'Passwords do not match'}
 
 BAD_CODE_ERROR = {'error': 'Bad verify code'}
 
 SENT_CODE_TO_EMAIL_SUCCESS = {'success': 'We have sent you a code to reset your password'}
 
-PASSWORD_RESET_SUCCESS = {'success': 'Password reset '}
+PASSWORD_RESET_SUCCESS = {'success': 'Password reset'}
+
+PASSWORD_CHANGE_SUCCESS = {'success': 'Password change'}
 
 NO_SUCH_USER_ERROR = {'error': 'No such user'}
 
@@ -26,6 +28,15 @@ ACCOUNT_DELETED_SUCCESS = {'success':  'Account deleted'}
 
 EVENT_DELETED_SUCCESS = {'success':  'Event deleted'}
 
+WRONG_PASSWORD_ERROR = {'error': 'Wrong old password'}
+
+OBJECT_NOT_FOUND_ERROR = {'error': 'Object not found'}
+
+NO_PERMISSIONS_ERROR = {'error': 'You have no permissions to do this'}
+
+EVENT_UPDATE_SUCCESS = {'success': 'Event updated'}
+
+EVENT_DELETE_SUCCESS = {'success': 'Event deleted'}
 
 ADMIN_ROLE = "Admin"
 
@@ -35,4 +46,6 @@ PASSWORD_RESET_TOKEN_TYPE  = 'password_reset'
 
 EMAIL_VERIFY_TOKEN_TYPE = 'email_verify'
 
-CODE_EXPIRE_MINUTES_TIME = 5
+PASSWORD_CHANGE_TOKEN_TYPE = 'password_change'
+
+CODE_EXPIRE_MINUTES_TIME = 1

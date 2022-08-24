@@ -16,6 +16,8 @@ services:
       retries: 20    
   api:
     container_name: api
+    env_file:
+      - ./compose/.env
     build: 
       context: .
       dockerfile: compose/Dockerfile
