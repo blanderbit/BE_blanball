@@ -22,7 +22,7 @@ services:
     build: 
       context: .
       dockerfile: compose/Dockerfile
-    command: bash ./compose/local/django-start.sh
+    command: bash compose/local/django-start.sh
     volumes:
       - .:/usr/src/blanball
     ports:
