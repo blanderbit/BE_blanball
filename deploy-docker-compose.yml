@@ -1,0 +1,70 @@
+version: "3.8"
+
+services: 
+  db:
+    container_name: db
+    image: postgres:latest
+    volumes:
+      - ./storage/db/data:/usr/src/blanball/storage/db/data
+    healthcheck:
+      test: pg_isready -U postgres -d postgres
+      timeout: 40s
+      retries: 20    
+  api:
+    container_name: api
+    build: 
+      context: .
+      dockerfile: compose/Dockerfile
+    command: bash ./compose/local/django-start.sh
+    volumes:
+      - .:/usr/src/blanball
+    ports:
+      - "49200:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    links:
+     - redis
+  redis:
+    container_name: redis
+    image: redis:latest
+    volumes:
+      - ./storage/redis/data:/usr/src/blanball/storage/redis/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      timeout: 3s
+      retries: 5
+
+  celery-worker:
+    container_name: celery-worker
+    build: 
+      context: .
+      dockerfile: compose/Dockerfile
+    restart: always
+    command: bash compose/local/celery-worker-start.sh
+    volumes:
+      - ./storage/celery-worker/data:/usr/src/blanball/storage/celery-worker/data
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  celery-beat:
+    container_name: celery-beat
+    build: 
+      context: .
+      dockerfile: compose/Dockerfile
+    restart: always 
+    command: bash compose/local/celery-beat-start.sh
+    volumes:
+      - ./storage/celery-beat/data:/usr/src/blanball/storage/celery-beat/data
+    depends_on:
+      redis:
+        condition: service_healthy
+
+volumes:
+  db:
+    driver: local
+  redis:
+    driver: local
