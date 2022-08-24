@@ -23,8 +23,6 @@ services:
       context: .
       dockerfile: compose/Dockerfile
     command: bash compose/local/django-start.sh
-    volumes:
-      - .:/usr/src/blanball
     ports:
       - "49200:8000"
     depends_on:
