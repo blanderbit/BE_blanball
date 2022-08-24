@@ -5,11 +5,13 @@ services:
     container_name: db
     image: postgres:latest
     volumes:
-      - ./storage/db/data:/usr/src/blanball/storage/db/data
+      - db-data:/usr/src/blanball/storage/db/data
     healthcheck:
       test: pg_isready -U postgres -d postgres
       timeout: 40s
-      retries: 20    
+      retries: 20
+    networks:
+      - app-network  
   api:
     container_name: api
     build: 
@@ -25,13 +27,17 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    networks:
+      - app-network    
     links:
      - redis
   redis:
     container_name: redis
     image: redis:latest
     volumes:
-      - ./storage/redis/data:/usr/src/blanball/storage/redis/data
+      - redis-data:/usr/src/blanball/storage/redis/data
+    networks:
+      - app-network  
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
       timeout: 3s
@@ -45,7 +51,9 @@ services:
     restart: always
     command: bash compose/local/celery-worker-start.sh
     volumes:
-      - ./storage/celery-worker/data:/usr/src/blanball/storage/celery-worker/data
+      - celery-worker-data:/usr/src/blanball/storage/celery-worker/data
+    networks:
+      - app-network  
     depends_on:
       redis:
         condition: service_healthy
@@ -58,13 +66,19 @@ services:
     restart: always 
     command: bash compose/local/celery-beat-start.sh
     volumes:
-      - ./storage/celery-beat/data:/usr/src/blanball/storage/celery-beat/data
+      - celery-beat-data:/usr/src/blanball/storage/celery-beat/data
+    networks:
+      - app-network
     depends_on:
       redis:
         condition: service_healthy
-
+    
+networks:
+  app-network:
+     driver: bridge    
+     
 volumes:
-  db:
-    driver: local
-  redis:
-    driver: local
+  db-data:
+  redis-data:
+  celery-worker-data:     
+  celery-beat-data: 
