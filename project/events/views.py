@@ -18,14 +18,14 @@ class GetPutDeleteEvent(GetPutDeleteAPIView):
     queryset = Event.objects.all()
     permission_classes = [permissions.IsAuthenticated]
         
-    def put(self, request,pk: int):
-        obj = self.queryset.filter(id = pk)
-        if obj:
-            if obj[0].author.id == request.user.id:
-                obj[0].put()
-                return response.Response(EVENT_UPDATE_SUCCESS,status=status.HTTP_200_OK)
-            return response.Response(NO_PERMISSIONS_ERROR,status=status.HTTP_400_BAD_REQUEST)
-        return response.Response(OBJECT_NOT_FOUND_ERROR,status=status.HTTP_400_BAD_REQUEST)
+    # def put(self, request,pk: int):
+    #     obj = self.queryset.filter(id = pk)
+    #     if obj:
+    #         if obj[0].author.id == request.user.id:
+    #             obj[0].save
+    #             return response.Response(EVENT_UPDATE_SUCCESS,status=status.HTTP_200_OK)
+    #         return response.Response(NO_PERMISSIONS_ERROR,status=status.HTTP_400_BAD_REQUEST)
+    #     return response.Response(OBJECT_NOT_FOUND_ERROR,status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request,pk: int):
         obj = self.queryset.filter(id = pk)
