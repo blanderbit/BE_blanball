@@ -32,5 +32,3 @@ ws.onmessage = function(e){
     action: "list",
     request_id: new Date().getTime()
 })) -->
-
-
