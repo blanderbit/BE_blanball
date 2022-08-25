@@ -47,6 +47,8 @@ services:
 
   celery-worker:
     container_name: celery-worker
+    env_file:
+      - ./compose/.env
     build: 
       context: .
       dockerfile: compose/Dockerfile
@@ -60,6 +62,8 @@ services:
 
   celery-beat:
     container_name: celery-beat
+    env_file:
+      - ./compose/.env
     build: 
       context: .
       dockerfile: compose/Dockerfile

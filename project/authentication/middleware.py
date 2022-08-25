@@ -23,21 +23,15 @@ ALGORITHM = "HS256"
 def get_user(token):
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=ALGORITHM)
-        print('payload', payload)
-    except:
-        print('no payload')
-        return AnonymousUser()
+    except:        return AnonymousUser()
 
     token_exp = datetime.fromtimestamp(payload['exp'])
     if token_exp < datetime.utcnow():
-        print("no date-time")
         return AnonymousUser()
 
     try:
         user = User.objects.get(id=payload['user_id'])
-        print('user', user)
     except User.DoesNotExist:
-        print('no user')
         return AnonymousUser()
 
     return user
@@ -54,8 +48,6 @@ class TokenAuthMiddleware(BaseMiddleware):
             token_key = None
     
         scope['user'] = await get_user(token_key)
-        print(token_key)
-        print('d2', scope['user'])
         return await super().__call__(scope, receive, send)
 
 
