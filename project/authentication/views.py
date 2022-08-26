@@ -64,15 +64,6 @@ class UserOwnerProfile(generics.GenericAPIView):
     def get(self,request):
         user = User.objects.get(id=self.request.user.id)
         serializer = UserProfileSerializer(user)
-        channel_layer = get_channel_layer()
-
-        async_to_sync(channel_layer.group_send)(
-            'ff',
-            {
-                'type': 'kafka.message',
-                'message': 'Test message'
-            }
-        )
         return response.Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request):

@@ -62,6 +62,9 @@ class User(AbstractBaseUser):
             'refresh': str(refresh),
             'access': str(access)
         }
+    @property
+    def group_name(self):
+        return "user_%s" % self.id
 
 
 class Code(models.Model):

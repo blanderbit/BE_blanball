@@ -34,7 +34,7 @@ class GetPutDeleteEvent(GetPutDeleteAPIView):
                 obj[0].delete()
                 return response.Response(EVENT_DELETE_SUCCESS,status=status.HTTP_200_OK)
             return response.Response(NO_PERMISSIONS_ERROR,status=status.HTTP_400_BAD_REQUEST)
-        return response.Response(OBJECT_NOT_FOUND_ERROR,status=status.HTTP_400_BAD_REQUEST)
+        return response.Response(EVENT_NOT_FOUND_ERROR,status=status.HTTP_400_BAD_REQUEST)
 
 
   

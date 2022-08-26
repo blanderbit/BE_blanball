@@ -30,13 +30,15 @@ EVENT_DELETED_SUCCESS = {'success':  'Event deleted'}
 
 WRONG_PASSWORD_ERROR = {'error': 'Wrong old password'}
 
-OBJECT_NOT_FOUND_ERROR = {'error': 'Object not found'}
+EVENT_NOT_FOUND_ERROR = {'error': 'Event not found'}
 
 NO_PERMISSIONS_ERROR = {'error': 'You have no permissions to do this'}
 
 EVENT_UPDATE_SUCCESS = {'success': 'Event updated'}
 
 EVENT_DELETE_SUCCESS = {'success': 'Event deleted'}
+
+JOIN_EVENT_SUCCES = {'success': 'Join event'}
 
 ADMIN_ROLE = "Admin"
 
