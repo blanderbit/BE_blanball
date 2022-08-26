@@ -4,6 +4,7 @@ from .serializers import *
 from project.services import *
 from django_filters.rest_framework import DjangoFilterBackend
 from project.constaints import *
+from notifications.tasks import send_to_user
 
 class CreateEvent(generics.CreateAPIView,):
     '''class that allows you to create a new event'''
@@ -62,3 +63,38 @@ class DeleteEvents(generics.GenericAPIView):
             "deleted": v_data
         })
 
+
+class JoinToEvent(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = JoinOrRemoveRoomSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = request.user
+        event = Event.objects.get(id = serializer.data['event_id'])
+        if not user.current_rooms.filter(id=serializer.data['event_id']).exists():
+            if event.amount_members > len(event.current_users.all())+1:
+                user.current_rooms.add(event)
+                send_to_user(user = User.objects.get(id = event.author.id),notification_text= 'XDDD')
+            elif event.amount_members == len(event.current_users.all())+1:
+                user.current_rooms.add(event)
+            else:
+                return response.Response(NO_EVENT_PLACE_ERROR)
+            return response.Response(JOIN_EVENT_SUCCES,status=status.HTTP_200_OK)
+        return response.Response(ALREADY_IN_MEMBER_LIST_ERROR)
+
+
+class LeaveFromEvent(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = JoinOrRemoveRoomSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = request.user
+        event = Event.objects.get(id = serializer.data['event_id'])
+        if user.current_rooms.filter(id=serializer.data['event_id']).exists():
+            user.current_rooms.remove(event)
+            return response.Response(DISCONNECT_FROM_EVENT_SUCCESS+event.id,status=status.HTTP_200_OK)
+        return response.Response(NO_IN_MEMBER_LIST_ERROR)

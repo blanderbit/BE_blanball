@@ -38,7 +38,15 @@ EVENT_UPDATE_SUCCESS = {'success': 'Event updated'}
 
 EVENT_DELETE_SUCCESS = {'success': 'Event deleted'}
 
-JOIN_EVENT_SUCCES = {'success': 'Join event'}
+JOIN_EVENT_SUCCES = {'success': 'Join to event'}
+
+DISCONNECT_FROM_EVENT_SUCCESS = {'success': 'Dicsonnect from event'}
+
+NO_EVENT_PLACE_ERROR = {'error': 'No place'}
+
+ALREADY_IN_MEMBER_LIST_ERROR = {'error': 'You are already on the event member list'}
+
+NO_IN_MEMBER_LIST_ERROR = {'error': 'You are not in event member list'}
 
 ADMIN_ROLE = "Admin"
 

@@ -14,6 +14,4 @@ urlpatterns = [
     #endpoint where a use can get list of her notifications
     path('client/my/notifications/list',UserNotificationsList.as_view(),
         name = 'user-notification-list'),
-    path('client/join/event',JoinEvent.as_view(),
-        name = 'user-notification-list'),
 ]

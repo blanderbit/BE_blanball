@@ -1,12 +1,10 @@
 from .serializers import *
 from .models import *
-from rest_framework import generics,filters,permissions,status,response,views
+from rest_framework import generics,filters,permissions,status,response
 from django_filters.rest_framework import DjangoFilterBackend
-from project.services import code_create
 from project.services import *
 from .permisions import IsNotAuthenticated
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
+
 
 
 def user_delete(email):
