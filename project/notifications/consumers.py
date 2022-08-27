@@ -1,8 +1,7 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
-from authentication.models import User
+from authentication.models import User,ActiveUser
 from channels.db import database_sync_to_async
-from events.models import Event
 from .tasks import *
     
 class UserConsumer(AsyncWebsocketConsumer):

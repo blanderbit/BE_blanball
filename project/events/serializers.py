@@ -1,6 +1,8 @@
+from datetime import datetime
 from rest_framework import serializers,status
 from .models import *
 from project.constaints import EVENT_NOT_FOUND_ERROR
+import pandas
 
 class CreateEventSerializer(serializers.ModelSerializer):
     forms = serializers.ListField(child = serializers.CharField())
@@ -9,6 +11,7 @@ class CreateEventSerializer(serializers.ModelSerializer):
         exclude = ('current_users','author')
 
     def create(self,validated_data):
+        validated_data['date_and_time'] = pandas.to_datetime(validated_data['date_and_time'].isoformat()).round('1min')
         return Event.objects.create(author = self.context['request'].user,**validated_data)
 
 

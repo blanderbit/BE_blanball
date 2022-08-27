@@ -39,6 +39,9 @@ class Profile(models.Model):
         return self.name
 
 
+class ActiveUser(models.Model):
+    user_id = models.IntegerField()
+
 class User(AbstractBaseUser):
     '''basic user model'''
     email = models.EmailField(max_length=255, unique=True, db_index=True)
