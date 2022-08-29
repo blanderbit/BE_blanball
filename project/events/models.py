@@ -18,7 +18,7 @@ class Event(models.Model):
     place = models.CharField(max_length=500)
     gender =  models.CharField(choices=Gender.choices,max_length=10)
     date_and_time = models.DateTimeField()
-    contact_number = PhoneNumberField()
+    contact_number = PhoneNumberField(null=True,blank=True)
     need_ball = models.BooleanField()
     amount_members = models.PositiveSmallIntegerField(validators=[
             MinValueValidator(6),MaxValueValidator(50)],default=6)

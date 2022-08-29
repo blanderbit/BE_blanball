@@ -4,9 +4,11 @@ from django.urls import path
 
 urlpatterns = [
     # endpoint where the user can create an account
-    path('client/register', RegisterUser.as_view(), name="register"),
+    path('client/register', RegisterUser.as_view(), 
+      name="register"),
     # endpoint where the user can log into a previously created account
-    path('client/login', LoginUser.as_view(), name="login"),
+    path('client/login', LoginUser.as_view(), 
+      name="login"),
     # endpoint where client can check all users list
     path('client/user/list',UserList.as_view(),
       name = 'user-list'),
@@ -38,9 +40,7 @@ urlpatterns = [
     # to the data sent to the mail
     path('client/password/change-complete', ChangePassword.as_view(),
       name='password-change-complete'),
-     # endpoint where client can check all active users list
-    path('client/active/user/list',ActiveUsersList.as_view(),
-      name = 'active-user-list'),
     # endpoint where user can delete her account
-    path('client/account/delete', AccountDelete.as_view(), name="account-delete"),
+    path('client/account/delete', AccountDelete.as_view(), 
+      name="account-delete"),
 ]

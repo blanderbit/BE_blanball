@@ -60,9 +60,9 @@ class DeleteEvents(generics.GenericAPIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception= True)
-        for i in range(len(serializer.validated_data["dele"])):
-            v_data = serializer.validated_data["dele"] 
-            self.queryset.filter(id = serializer.validated_data["dele"][i]).delete()
+        for i in range(len(serializer.validated_data["event_id"])):
+            v_data = serializer.validated_data["event_id"] 
+            self.queryset.filter(id = serializer.validated_data["event_id"][i]).delete()
         return response.Response({
             "deleted": v_data
         })
