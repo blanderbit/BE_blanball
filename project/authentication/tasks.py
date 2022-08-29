@@ -23,7 +23,6 @@ class Util:
         EmailThread(email).start()
 
 
-
 @app.task
 def delete_expire_codes():
     for code in Code.objects.all():

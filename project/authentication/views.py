@@ -1,20 +1,25 @@
+from urllib import request
+from notifications.models import Notification
 from .serializers import *
 from .models import *
 from rest_framework import generics,filters,permissions,status,response,views
 from django_filters.rest_framework import DjangoFilterBackend
-from project.services import code_create
 from project.services import *
+from events.models import Event
 from .permisions import IsNotAuthenticated
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
+from django.contrib.sites.shortcuts import get_current_site
+from django.urls import reverse
+import jwt
+from django.conf import settings
+from django.shortcuts import redirect
 
 
-def user_delete(email):
-    user_codes = Code.objects.filter(user_email = email)
-    if user_codes != None:
-        user_codes.delete()
-    Profile.objects.filter(id = User.objects.get(email = email).profile_id).delete()
-    User.objects.filter(email = email).delete()
+def user_delete(pk):
+    Code.objects.filter(user_email = User.objects.get(id = pk).email).delete()
+    Event.objects.filter(author_id = pk).delete()
+    Notification.objects.filter(user_id = pk).delete()
+    Profile.objects.filter(id = pk).delete()
+    User.objects.filter(id = pk).delete()
 
 class RegisterUser(generics.GenericAPIView):
     '''register user'''
@@ -56,51 +61,67 @@ class LoginUser(generics.GenericAPIView):
         return response.Response(serializer.data, status=status.HTTP_200_OK)
 
     
+
+class AccountDelete(views.APIView):
+    serializer_class = AccountDeleteSerializer
+
+    def get(self, request):
+        token = request.GET.get('token')
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms='HS256')
+            user_delete(pk = User.objects.get(id=payload['user_id']).id)
+            return redirect("login")
+        except jwt.ExpiredSignatureError:
+            return response.Response("", status=status.HTTP_400_BAD_REQUEST)
+        except jwt.exceptions.DecodeError:
+            return response.Response("", status=status.HTTP_400_BAD_REQUEST)
+
+
+
 class UserOwnerProfile(generics.GenericAPIView):
     '''get put delete private user profile'''
-    serializer_class = UserProfileSerializer
     pagination_class = None
+    serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
     def get(self,request):
         user = User.objects.get(id=self.request.user.id)
-        serializer = UserProfileSerializer(user)
-        channel_layer = get_channel_layer()
-
-        async_to_sync(channel_layer.group_send)(
-            'ff',
-            {
-                'type': 'kafka.message',
-                'message': 'Test message'
-            }
-        )
+        self.serializer_class =  UserSerializer
+        serializer = UserSerializer(user)
         return response.Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request):
         profile = Profile.objects.get(id=self.request.user.profile_id)
-        serializer = ProfileSerializer(profile, data=request.data)
+        serializer = self.serializer_class(profile, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return response.Response(serializer.data,status=status.HTTP_200_OK)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self,request):
-        user_delete(email = self.request.user.email)
-        return response.Response(ACCOUNT_DELETED_SUCCESS, status=status.HTTP_200_OK)
+        token = RefreshToken.for_user(request.user)
+        current_site = get_current_site(request).domain
+        relativeLink = reverse('account-delete')
+        absurl = 'http://'+current_site+relativeLink+'?token='+str(token)
+        email_body = f'Hi,{request.user.profile.name}, use the link below to delete your account \n {absurl}'
+        data = {'email_body': email_body, 'to_email': request.user.email,
+            'email_subject': 'Verify your email'}
+        Util.send_email.delay(data)
+        return response.Response(SENT_CODE_TO_EMAIL_SUCCESS , status=status.HTTP_200_OK)
 
 
 class UserProfile(generics.RetrieveAPIView):
     '''get public user profile'''
-    serializer_class = UserProfileSerializer
+    serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
     queryset  = User.objects.all()
 
 class UserList(generics.ListAPIView):
     '''get all users list'''
-    serializer_class = UserListSerializer
+    serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = CustomPagination
     filter_backends = (filters.SearchFilter,DjangoFilterBackend)
-    search_fields = ('id','email')
+    search_fields = ('id','email','phone')
     queryset = User.objects.all()
 
     def get_queryset(self):
@@ -108,11 +129,11 @@ class UserList(generics.ListAPIView):
 
 class AdminUsersList(generics.ListAPIView):
     '''displaying the full list of admin users'''
-    serializer_class = UserListSerializer
+    serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = CustomPagination
     filter_backends = (filters.SearchFilter,DjangoFilterBackend)
-    search_fields = ('id','email')
+    search_fields = ('id','email','phone','name')
     queryset = User.objects.all()
 
     def get_queryset(self):
@@ -163,12 +184,9 @@ class RequestChangePassword(generics.GenericAPIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        print(serializer.data)
-
         if serializer.is_valid():
             if not request.user.check_password(serializer.data.get("old_password")):
                 return response.Response(WRONG_PASSWORD_ERROR, status=status.HTTP_400_BAD_REQUEST)
-
             else:
                 code_create(email=request.user.email,k=5,type=PASSWORD_CHANGE_TOKEN_TYPE,
                 dop_info =  serializer.validated_data['new_password'])
@@ -179,6 +197,7 @@ class RequestChangePassword(generics.GenericAPIView):
 class ChangePassword(generics.GenericAPIView):
     '''password reset on a previously sent request'''
     serializer_class = ChangePasswordSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -186,12 +205,10 @@ class ChangePassword(generics.GenericAPIView):
         code = Code.objects.get(value=verify_code)
         user = User.objects.get(id = request.user.id)
         if code.email != user.email:
-            return response.Response(PASSWORD_CHANGE_SUCCESS, status=status.HTTP_200_OK) 
+            return response.Response(PASSWORD_CHANGE_ERROR, status=status.HTTP_400_BAD_REQUEST) 
         verify_code = serializer.validated_data["verify_code"]
         user.set_password(code.dop_info)
         user.save()
         code.delete()
         return response.Response(PASSWORD_CHANGE_SUCCESS, status=status.HTTP_200_OK) 
-
-
 

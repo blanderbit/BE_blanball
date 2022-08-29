@@ -10,7 +10,6 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = Profile
         fields = '__all__'
 
-
 class RegisterSerializer(serializers.ModelSerializer):
     '''a class that serializes user registration'''
     password = serializers.CharField(
@@ -75,7 +74,7 @@ class LoginSerializer(serializers.ModelSerializer):
         return super().validate(attrs)
 
 
-class UserProfileSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     '''user pricate and public profile serializer'''
     profile = ProfileSerializer()
     class Meta:
@@ -83,11 +82,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = ['id','phone','email','role','profile']
         
 
-class UserListSerializer(serializers.ModelSerializer):
-    profile = ProfileSerializer()
+class ActiveUsersListSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
     class Meta:
-        model = User
-        fields = ['id','phone','email','profile']
+        model = ActiveUser
+        fields = ['user']
 
 
 class RoleSerializer(serializers.ModelSerializer):
@@ -175,3 +174,12 @@ class ChangePasswordSerializer(serializers.Serializer):
         elif Code.objects.get(value = verify_code).life_time < timezone.now():
             raise serializers.ValidationError(CODE_EXPIRED_ERROR,status.HTTP_400_BAD_REQUEST)
         return super().validate(attrs)
+
+
+
+class AccountDeleteSerializer(serializers.ModelSerializer):
+    '''class that serializes user verification by mail'''
+    token = serializers.CharField(max_length=555)
+    class Meta:
+        model = User
+        fields = ['token']

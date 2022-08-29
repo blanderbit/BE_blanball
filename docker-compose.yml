@@ -7,7 +7,7 @@ services:
       - 5432:5432
     image: postgres:latest
     volumes:
-      - ./storage/db/data:/usr/src/blanball/storage/db/data
+      - ./storage/db/data:/usr/src/blanball/db
     env_file:
       - ./compose/db.env
     healthcheck:
@@ -22,10 +22,10 @@ services:
       context: .
       dockerfile: compose/Dockerfile
     command: bash ./compose/local/django-start.sh
-    volumes:
-      - .:/usr/src/blanball
     ports:
       - "8000:8000"
+    volumes:
+      - .:/usr/src/blanball
     depends_on:
       db:
         condition: service_healthy
@@ -39,7 +39,7 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - ./storage/redis/data:/usr/src/blanball/storage/redis/data
+      - ./storage/redis/data:/usr/src/blanball/redis
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
       timeout: 3s
@@ -55,7 +55,7 @@ services:
     restart: always
     command: bash compose/local/celery-worker-start.sh
     volumes:
-      - ./storage/celery-worker/data:/usr/src/blanball/storage/celery-worker/data
+      - .:/usr/src/blanball
     depends_on:
       redis:
         condition: service_healthy
@@ -70,7 +70,7 @@ services:
     restart: always 
     command: bash compose/local/celery-beat-start.sh
     volumes:
-      - ./storage/celery-beat/data:/usr/src/blanball/storage/celery-beat/data
+      - .:/usr/src/blanball
     depends_on:
       redis:
         condition: service_healthy

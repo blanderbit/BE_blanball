@@ -12,7 +12,7 @@ PASSWORDS_DO_NOT_MATCH = {'error': 'Passwords do not match'}
 
 BAD_CODE_ERROR = {'error': 'Bad verify code'}
 
-SENT_CODE_TO_EMAIL_SUCCESS = {'success': 'We have sent you a code to reset your password'}
+SENT_CODE_TO_EMAIL_SUCCESS = {'success': 'We have sent you a code to email'}
 
 PASSWORD_RESET_SUCCESS = {'success': 'Password reset'}
 
@@ -30,13 +30,25 @@ EVENT_DELETED_SUCCESS = {'success':  'Event deleted'}
 
 WRONG_PASSWORD_ERROR = {'error': 'Wrong old password'}
 
-OBJECT_NOT_FOUND_ERROR = {'error': 'Object not found'}
+EVENT_NOT_FOUND_ERROR = {'error': 'Event not found'}
 
 NO_PERMISSIONS_ERROR = {'error': 'You have no permissions to do this'}
 
 EVENT_UPDATE_SUCCESS = {'success': 'Event updated'}
 
 EVENT_DELETE_SUCCESS = {'success': 'Event deleted'}
+
+JOIN_EVENT_SUCCES = {'success': 'Join to event'}
+
+DISCONNECT_FROM_EVENT_SUCCESS = {'success': 'Dicsonnect from event'}
+
+NO_EVENT_PLACE_ERROR = {'error': 'No place'}
+
+ALREADY_IN_MEMBER_LIST_ERROR = {'error': 'You are already on the event member list'}
+
+NO_IN_MEMBER_LIST_ERROR = {'error': 'You are not in event member list'}
+
+PASSWORD_CHANGE_ERROR = {'error': 'Password not change'}
 
 ADMIN_ROLE = "Admin"
 

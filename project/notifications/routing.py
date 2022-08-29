@@ -4,5 +4,5 @@ from djangochannelsrestframework.consumers import view_as_consumer
 from .views import *
 
 websocket_urlpatterns = [
-    path('ws/<str:room_name>/',KafkaConsumer.as_asgi())
+    path('my/notifications/',UserConsumer.as_asgi())
 ]
