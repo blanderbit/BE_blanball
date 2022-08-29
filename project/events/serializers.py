@@ -12,7 +12,12 @@ class EventSerializer(serializers.ModelSerializer):
 
     def create(self,validated_data):
         validated_data['date_and_time'] = pandas.to_datetime(validated_data['date_and_time'].isoformat()).round('1min')
-        return Event.objects.create(author = self.context['request'].user,**validated_data)
+        user  = self.context['request'].user
+        if validated_data['contact_number']:
+            return Event.objects.create(author = user,**validated_data)
+        else:
+            return Event.objects.create(author = user, contact_number = User.objects.get(id = user).phone,
+            **validated_data)
     
 
 
@@ -22,7 +27,7 @@ class EventListSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class DeleteIventsSerializer(serializers.Serializer):
-    dele = serializers.ListField(child=serializers.IntegerField(min_value=0))
+    event_id = serializers.ListField(child=serializers.IntegerField(min_value=0))
 
 
 class JoinOrRemoveRoomSerializer(serializers.Serializer):
