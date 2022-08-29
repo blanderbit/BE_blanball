@@ -3,33 +3,55 @@ import json
 from authentication.models import User,ActiveUser
 from channels.db import database_sync_to_async
 from .tasks import *
-    
-class UserConsumer(AsyncWebsocketConsumer):
+from djangochannelsrestframework.observer.generics import ObserverModelInstanceMixin
+from djangochannelsrestframework.observer import model_observer
+
+class UserConsumer(ObserverModelInstanceMixin,AsyncWebsocketConsumer):
     async def connect(self):
-        self.user_group_name = self.scope['url_route']['kwargs']['user_group_name']
-        self.room_group_name = self.user_group_name
+        if await self.check_user():
+            self.user_group_name = await self.room_groop_name()
+            self.room_group_name = self.user_group_name
 
-        await self.channel_layer.group_add(
-            self.room_group_name,
-            self.channel_name
-        )
-
-        if await self.check_user(user_email = self.scope['user']):
-            await self.accept()
+            await self.channel_layer.group_add(
+                self.room_group_name,
+                self.channel_name
+            )
+            if await self.check_user_group_name():
+                await self.accept()
+                await self.add_user_to_active()
 
     @database_sync_to_async
-    def check_user(self,user_email):
-        user = User.objects.filter(email = user_email)
+    def check_user(self):
+        user = User.objects.filter(email = self.scope['user'])
         if user:
-            if user[0].group_name == self.room_group_name:
-                return True
+            return True
+
+    @database_sync_to_async
+    def check_user_group_name(self):
+        user = User.objects.filter(email = self.scope['user'])
+        if user[0].group_name ==  self.room_group_name:
+            return True
+
+    @database_sync_to_async
+    def room_groop_name(self):
+        return User.objects.get(email = self.scope['user']).group_name
+
+    @database_sync_to_async
+    def add_user_to_active(self):
+        ActiveUser.objects.create(user = User.objects.get(email = self.scope['user']))
+
+    @database_sync_to_async
+    def delete_user_from_active(self):
+        ActiveUser.objects.filter(user = User.objects.get(email = self.scope['user']).id).delete()
 
     async def disconnect(self,close_code):
         # Leave room group
-        await self.channel_layer.group_discard(
-            self.room_group_name,
-            self.channel_name
-        )
+        if await self.check_user():
+            await self.channel_layer.group_discard(
+                self.room_group_name,
+                self.channel_name
+            )
+            await self.delete_user_from_active()
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)

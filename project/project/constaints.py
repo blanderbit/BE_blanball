@@ -12,7 +12,7 @@ PASSWORDS_DO_NOT_MATCH = {'error': 'Passwords do not match'}
 
 BAD_CODE_ERROR = {'error': 'Bad verify code'}
 
-SENT_CODE_TO_EMAIL_SUCCESS = {'success': 'We have sent you a code to reset your password'}
+SENT_CODE_TO_EMAIL_SUCCESS = {'success': 'We have sent you a code to email'}
 
 PASSWORD_RESET_SUCCESS = {'success': 'Password reset'}
 
@@ -47,6 +47,8 @@ NO_EVENT_PLACE_ERROR = {'error': 'No place'}
 ALREADY_IN_MEMBER_LIST_ERROR = {'error': 'You are already on the event member list'}
 
 NO_IN_MEMBER_LIST_ERROR = {'error': 'You are not in event member list'}
+
+PASSWORD_CHANGE_ERROR = {'error': 'Password not change'}
 
 ADMIN_ROLE = "Admin"
 

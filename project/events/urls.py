@@ -25,4 +25,7 @@ urlpatterns = [
     #endpoint where a user can leaver from event 
     path('client/event/leave',LeaveFromEvent.as_view(),
         name = 'event-leave'),
+    #endpoint where a use can get list of user events
+    path('client/my/events/list',UserEvents.as_view(),
+        name = 'events-list'),
 ]

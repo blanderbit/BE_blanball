@@ -4,5 +4,5 @@ from djangochannelsrestframework.consumers import view_as_consumer
 from .views import *
 
 websocket_urlpatterns = [
-    path('ws/e/<str:user_group_name>/',UserConsumer.as_asgi())
+    path('my/notifications/',UserConsumer.as_asgi())
 ]

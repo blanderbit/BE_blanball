@@ -39,13 +39,10 @@ class Profile(models.Model):
         return self.name
 
 
-class ActiveUser(models.Model):
-    user_id = models.IntegerField()
-
 class User(AbstractBaseUser):
     '''basic user model'''
     email = models.EmailField(max_length=255, unique=True, db_index=True)
-    phone = PhoneNumberField(unique=True, db_index=True)
+    phone = PhoneNumberField(unique=True)
     is_verified = models.BooleanField(default=False)
     role =  models.ForeignKey(Role,on_delete=models.CASCADE,blank=True,null = True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -79,3 +76,10 @@ class Code(models.Model):
 
     def __str__(self):  
         return self.value
+
+
+class ActiveUser(models.Model):
+    user = models.ForeignKey(User,on_delete=models.PROTECT)
+
+    def __str__(self):
+        return self.user.id
