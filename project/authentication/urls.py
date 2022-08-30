@@ -4,15 +4,17 @@ from django.urls import path
 
 urlpatterns = [
     # endpoint where the user can create an account
-    path('client/register', RegisterUser.as_view(), name="register"),
+    path('client/register', RegisterUser.as_view(), 
+      name="register"),
     # endpoint where the user can log into a previously created account
-    path('client/login', LoginUser.as_view(), name="login"),
-    # endpoint where admin can check all users list
-    path('admin/user/list',UserList.as_view(),
-      name = 'users-list'),
+    path('client/login', LoginUser.as_view(), 
+      name="login"),
+    # endpoint where client can check all users list
+    path('client/user/list',UserList.as_view(),
+      name = 'user-list'),
     # endpoint where admin can check all admins list
     path('admin/list',AdminUsersList.as_view(),
-        name = 'admins-list'),
+        name = 'admin-list'),
     # endpoint where the user can see detail information
     # about your account
     path('client/me', UserOwnerProfile.as_view(),
@@ -26,8 +28,23 @@ urlpatterns = [
       name="request-reset-password"),
     #endpoint where the password is reset according
     # to the data sent to the mail
-    path('client/password/reset-complete', SetNewPassword.as_view(),
+    path('client/password/reset-complete', ResetPassword.as_view(),
       name='password-reset-complete'),
      #endpoint for account verification by mail
-    path('client/email/verify', EmailVerify.as_view(), name="email-verify"),
+    path('client/email/verify', EmailVerify.as_view(), 
+      name="email-verify"),
+    #endpoint at which a password change request
+    path('client/request-change/password', RequestChangePassword.as_view(),
+      name="request-change-password"),
+    #endpoint where the password is reset according
+    # to the data sent to the mail
+    path('client/password/change-complete', ChangePassword.as_view(),
+      name='password-change-complete'),
+    #endpoint where user can delete her account
+    path('client/me/delete', AccountDelete.as_view(), 
+      name="account-delete"),
+    # endpoint where the user can see detail information
+    # about your account
+    path('client/me/update',  UpdateProfile.as_view(),
+      name="my-profile"),
 ]

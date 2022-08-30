@@ -14,3 +14,10 @@ class IsSuperOrDefaultAdmin(permissions.BasePermission):
         else:
             return bool(request.user and CheckRole(role_id = request.user.role_id,role_names = ["Admin"]))
 
+
+
+class IsNotAuthenticated(permissions.BasePermission):
+    '''allows access only to admin users'''
+    def has_permission(self, request, view):
+        if request.user.id == None:
+            return True

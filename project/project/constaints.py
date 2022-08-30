@@ -8,20 +8,60 @@ INVALID_CREDENTIALS_ERROR =  {'error': 'Invalid credentials, try again'}
 
 NOT_VERIFIED_BY_EMAIL_ERROR = {'error': 'Email is not verified'}
 
-PASSWORD_DO_NOT_MATCH = {'error': 'Passwords do not match'}
+PASSWORDS_DO_NOT_MATCH = {'error': 'Passwords do not match'}
 
 BAD_CODE_ERROR = {'error': 'Bad verify code'}
 
-SENT_CODE_TO_EMAIL_SUCCESS = {'success': 'We have sent you a code to reset your password'}
+SENT_CODE_TO_EMAIL_SUCCESS = {'success': 'We have sent you a code to email'}
 
-PASSWORD_RESET_SUCCESS = {'success': 'Password reset '}
+PASSWORD_RESET_SUCCESS = {'success': 'Password reset'}
+
+PASSWORD_CHANGE_SUCCESS = {'success': 'Password change'}
 
 NO_SUCH_USER_ERROR = {'error': 'No such user'}
+
+CODE_EXPIRED_ERROR = {'error': 'This code expired'}
 
 ACTIVATION_SUCCESS = {'success': 'Activation by email'}
 
 ACCOUNT_DELETED_SUCCESS = {'success':  'Account deleted'}
 
+EVENT_DELETED_SUCCESS = {'success':  'Event deleted'}
+
+WRONG_PASSWORD_ERROR = {'error': 'Wrong old password'}
+
+EVENT_NOT_FOUND_ERROR = {'error': 'Event not found'}
+
+NO_PERMISSIONS_ERROR = {'error': 'You have no permissions to do this'}
+
+EVENT_UPDATE_SUCCESS = {'success': 'Event updated'}
+
+EVENT_DELETE_SUCCESS = {'success': 'Event deleted'}
+
+JOIN_EVENT_SUCCES = {'success': 'Join to event'}
+
+DISCONNECT_FROM_EVENT_SUCCESS = {'success': 'Dicsonnect from event'}
+
+NO_EVENT_PLACE_ERROR = {'error': 'No place'}
+
+ALREADY_IN_MEMBER_LIST_ERROR = {'error': 'You are already on the event member list'}
+
+NO_IN_MEMBER_LIST_ERROR = {'error': 'You are not in event member list'}
+
+PASSWORD_CHANGE_ERROR = {'error': 'Password not change'}
+
 ADMIN_ROLE = "Admin"
 
 USER_ROLE = "User"
+
+PASSWORD_RESET_TOKEN_TYPE  = 'password_reset'
+
+EMAIL_VERIFY_TOKEN_TYPE = 'email_verify'
+
+PASSWORD_CHANGE_TOKEN_TYPE = 'password_change'
+
+CODE_EXPIRE_MINUTES_TIME = 5
+
+REVIEW_CREATE_SUCCESS = {'success': 'Review create'}
+
+REVIEW_CREATE_ERROR = {'error':'You cant leave a review for yourself'}

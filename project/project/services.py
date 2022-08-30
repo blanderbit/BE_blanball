@@ -1,24 +1,21 @@
-from rest_framework import mixins
+from rest_framework import mixins,response,pagination
 from rest_framework.generics import GenericAPIView
 from authentication.tasks import Util
-from django.utils.encoding import smart_str, smart_bytes
-from django.utils.http import urlsafe_base64_encode
 import random
 import string
-from authentication.models import Code ,User
+from authentication.models import Code
+from .constaints import  CODE_EXPIRE_MINUTES_TIME
+from django.utils import timezone
 
-def code_create(email,k,type):
+def code_create(email,k,type,dop_info):
     '''create email verification code  and password 
     reset verification code'''
-    user = User.objects.get(email=email)
-    uidb64 = urlsafe_base64_encode(smart_bytes(user.id))
-            
-    uidb64 += ''.join(random.choices(string.ascii_uppercase, k=k))
-    Code.objects.create(value = uidb64,user = User.objects.get(email=email),type = type)
-
-    data = {'email_subject': 'Your verify code','email_body': uidb64 ,'to_email': email}
+    verify_code = ''.join(random.choices(string.ascii_uppercase, k=k))
+    code = Code.objects.create(dop_info = dop_info,value = verify_code,user_email = email,type = type,life_time =timezone.now() + 
+            timezone.timedelta(minutes=CODE_EXPIRE_MINUTES_TIME))
+    print(code.life_time,code.value)
+    data = {'email_subject': 'Your verify code','email_body': verify_code ,'to_email': email}
     Util.send_email.delay(data)
-
 
 class GetPutDeleteAPIView(mixins.RetrieveModelMixin,
                                    mixins.UpdateModelMixin,
@@ -40,3 +37,17 @@ class PutAPIView(mixins.UpdateModelMixin,
     '''concrete view for put a model instance'''
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
+
+
+
+class CustomPagination(pagination.PageNumberPagination):
+    def get_paginated_response(self, data):
+        return response.Response({
+            'links': {
+                'next': self.get_next_link(),
+                'previous': self.get_previous_link()
+            },
+            'total_count': self.page.paginator.count,
+            'total_pages': self.page.paginator.num_pages,
+            'results': data
+        })

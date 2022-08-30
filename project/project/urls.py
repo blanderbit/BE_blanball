@@ -4,7 +4,8 @@ from .yasg import urlpatterns as doc_urls
 urlpatterns = [
     path('events/api/v1/', include('events.urls')),
     path('authentication/api/v1/', include('authentication.urls')),
-    path('notifications/api/v1/', include('notifications.urls')),
+    path('notifications/api/v1/',include('notifications.urls')),
+    path('reviews/api/v1/',include('reviews.urls')),
 ]
 
 
