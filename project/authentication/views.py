@@ -1,3 +1,4 @@
+from re import T
 from urllib import request
 from notifications.models import Notification
 from .serializers import *
@@ -31,9 +32,10 @@ class RegisterUser(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         profile = Profile.objects.create(**serializer.validated_data['profile'])
         serializer.save(profile = profile)
-        user_data = serializer.data
-        code_create(email=user_data['email'],k=5,type=EMAIL_VERIFY_TOKEN_TYPE,dop_info = None)
-        return response.Response(user_data, status=status.HTTP_201_CREATED)
+        data = {'email_subject': 'Регистарция','email_body': f'{profile.name},спасибо за регистрацию!' ,'to_email': user['email']}
+        Util.send_email.delay(data)
+        # code_create(email=user_data['email'],k=5,type=EMAIL_VERIFY_TOKEN_TYPE,dop_info = None)
+        return response.Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class EmailVerify(generics.GenericAPIView):
     '''account verify by email'''
@@ -62,7 +64,7 @@ class LoginUser(generics.GenericAPIView):
 
     
 
-class AccountDelete(views.APIView):
+class AccountDelete(generics.GenericAPIView):
     serializer_class = AccountDeleteSerializer
 
     def get(self, request):
@@ -72,10 +74,9 @@ class AccountDelete(views.APIView):
             user_delete(pk = User.objects.get(id=payload['user_id']).id)
             return redirect("login")
         except jwt.ExpiredSignatureError:
-            return response.Response("", status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(CODE_EXPIRED_ERROR , status=status.HTTP_400_BAD_REQUEST)
         except jwt.exceptions.DecodeError:
-            return response.Response("", status=status.HTTP_400_BAD_REQUEST)
-
+            return response.Response(BAD_CODE_ERROR, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserOwnerProfile(generics.GenericAPIView):
@@ -85,17 +86,11 @@ class UserOwnerProfile(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     def get(self,request):
         user = User.objects.get(id=self.request.user.id)
-        self.serializer_class =  UserSerializer
+        # raiting = Review.objects.aggregate(Sum('stars'))
+        # raiting = raiting.items[1]
+        # print(raiting)
         serializer = UserSerializer(user)
         return response.Response(serializer.data, status=status.HTTP_200_OK)
-
-    def put(self, request):
-        profile = Profile.objects.get(id=self.request.user.profile_id)
-        serializer = self.serializer_class(profile, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return response.Response(serializer.data,status=status.HTTP_200_OK)
-        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self,request):
         token = RefreshToken.for_user(request.user)
@@ -108,12 +103,39 @@ class UserOwnerProfile(generics.GenericAPIView):
         Util.send_email.delay(data)
         return response.Response(SENT_CODE_TO_EMAIL_SUCCESS , status=status.HTTP_200_OK)
 
+class UpdateProfile(generics.GenericAPIView):
+    pagination_class = None
+    serializer_class = ProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Profile.objects.all()
 
-class UserProfile(generics.RetrieveAPIView):
+    def put(self, request):
+        profile = self.queryset.get(id=self.request.user.profile_id)
+        serializer = self.serializer_class(profile, data=request.data)
+        serializer.is_valid(raise_exception = True)
+        serializer.save()
+        return response.Response(serializer.data,status=status.HTTP_200_OK)
+
+
+class UserProfile(generics.GenericAPIView):
     '''get public user profile'''
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
     queryset  = User.objects.all()
+
+    def get(self,request,pk):
+        fields = ['configuration']
+        try:
+            user = self.queryset.get(id=pk)
+            for item in user.configuration.items():
+                if item[1] == True:
+                    serializer = UserSerializer(user,fields=(fields))
+                elif item[1] == False:
+                    fields.append(item[0])
+                    serializer = UserSerializer(user,fields=(fields))
+            return response.Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return response.Response(NO_SUCH_USER_ERROR,status=status.HTTP_200_OK)
 
 class UserList(generics.ListAPIView):
     '''get all users list'''
@@ -173,6 +195,8 @@ class ResetPassword(generics.GenericAPIView):
         user.set_password(serializer.validated_data["new_password"])
         user.save()
         code.delete()
+        data = {'email_subject': 'Смена пароля','email_body': f'{user.profile.name},ваш пароль был успешно обновлен!' ,'to_email': user.email}
+        Util.send_email.delay(data)
         return response.Response(PASSWORD_RESET_SUCCESS, status=status.HTTP_200_OK) 
 
 
@@ -202,13 +226,14 @@ class ChangePassword(generics.GenericAPIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
+        verify_code = serializer.validated_data["verify_code"]
         code = Code.objects.get(value=verify_code)
         user = User.objects.get(id = request.user.id)
-        if code.email != user.email:
+        if code.user_email != user.email:
             return response.Response(PASSWORD_CHANGE_ERROR, status=status.HTTP_400_BAD_REQUEST) 
-        verify_code = serializer.validated_data["verify_code"]
         user.set_password(code.dop_info)
         user.save()
         code.delete()
+        data = {'email_subject': 'Смена пароля','email_body': f'{user.profile.name},ваш пароль был успешно обновлен!' ,'to_email': request.user.email}
+        Util.send_email.delay(data)
         return response.Response(PASSWORD_CHANGE_SUCCESS, status=status.HTTP_200_OK) 
-

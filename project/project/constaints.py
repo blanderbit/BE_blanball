@@ -60,4 +60,8 @@ EMAIL_VERIFY_TOKEN_TYPE = 'email_verify'
 
 PASSWORD_CHANGE_TOKEN_TYPE = 'password_change'
 
-CODE_EXPIRE_MINUTES_TIME = 1
+CODE_EXPIRE_MINUTES_TIME = 5
+
+REVIEW_CREATE_SUCCESS = {'success': 'Review create'}
+
+REVIEW_CREATE_ERROR = {'error':'You cant leave a review for yourself'}
