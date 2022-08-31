@@ -17,7 +17,7 @@ class UserNotificationsList(generics.ListAPIView):
     queryset = Notification.objects.all()
      
     def get_queryset(self):
-        return self.queryset.filter(user_id = self.request.user.id).order_by('-date_time')
+        return self.queryset.filter(user_id = self.request.user.id).order_by('-time_created')
 
 
 

@@ -5,18 +5,18 @@ from project.constaints import EVENT_NOT_FOUND_ERROR
 import pandas
 
 class EventSerializer(serializers.ModelSerializer):
-    forms = serializers.ListField(child = serializers.CharField())
     class Meta:
         model = Event
-        exclude = ('current_users','author')
+        exclude = ('author','current_users')
 
     def create(self,validated_data):
         validated_data['date_and_time'] = pandas.to_datetime(validated_data['date_and_time'].isoformat()).round('1min')
         user  = self.context['request'].user
-        if validated_data['contact_number']:
-            return Event.objects.create(author = user,**validated_data)
-        else:
-            return Event.objects.create(author = user, contact_number = User.objects.get(id = user).phone,
+        try:
+            if validated_data['contact_number']:
+                return Event.objects.create(author = user,**validated_data)
+        except:
+            return Event.objects.create(author = user, contact_number = User.objects.get(id = user.id).phone,
             **validated_data)
     
 

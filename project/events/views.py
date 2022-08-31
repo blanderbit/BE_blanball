@@ -19,26 +19,28 @@ class GetPutDeleteEvent(GetPutDeleteAPIView):
     permission_classes = [permissions.IsAuthenticated]
         
     def put(self, request,pk: int):
-        obj = self.queryset.filter(id = pk)
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception= True)
-        if obj:
-            if obj[0].author.id == request.user.id:
-                obj[0].save()
-                send_notification_to_subscribe_event_user(event = obj[0],notification_text='event_updated')
+        try:
+            event = self.queryset.get(id = pk)
+            if event.author.id == request.user.id:
+                send_notification_to_subscribe_event_user(event = event,notification_text='event_updated')
+                serializer.save()
                 return response.Response(EVENT_UPDATE_SUCCESS,status=status.HTTP_200_OK)
             return response.Response(NO_PERMISSIONS_ERROR,status=status.HTTP_400_BAD_REQUEST)
-        return response.Response(EVENT_NOT_FOUND_ERROR,status=status.HTTP_400_BAD_REQUEST)
+        except:
+            return response.Response(EVENT_NOT_FOUND_ERROR,status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request,pk: int):
-        obj = Event.objects.filter(id = pk)
-        if obj:
-            if obj[0].author.id == request.user.id:
-                send_notification_to_subscribe_event_user(event = obj[0],notification_text='event_deleted')
-                obj[0].delete()
+        try:
+            event = self.queryset.get(id = pk)
+            if event.author.id == request.user.id:
+                send_notification_to_subscribe_event_user(event = event,notification_text='event_deleted')
+                event.delete()
                 return response.Response(EVENT_DELETE_SUCCESS,status=status.HTTP_200_OK)
             return response.Response(NO_PERMISSIONS_ERROR,status=status.HTTP_400_BAD_REQUEST)
-        return response.Response(EVENT_NOT_FOUND_ERROR,status=status.HTTP_400_BAD_REQUEST)
+        except:
+            return response.Response(EVENT_NOT_FOUND_ERROR,status=status.HTTP_400_BAD_REQUEST)
 
 
   

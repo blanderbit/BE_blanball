@@ -40,7 +40,11 @@ urlpatterns = [
     # to the data sent to the mail
     path('client/password/change-complete', ChangePassword.as_view(),
       name='password-change-complete'),
-    # endpoint where user can delete her account
-    path('client/account/delete', AccountDelete.as_view(), 
+    #endpoint where user can delete her account
+    path('client/me/delete', AccountDelete.as_view(), 
       name="account-delete"),
+    # endpoint where the user can see detail information
+    # about your account
+    path('client/me/update',  UpdateProfile.as_view(),
+      name="my-profile"),
 ]

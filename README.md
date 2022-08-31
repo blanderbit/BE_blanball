@@ -19,6 +19,7 @@ In the main directory `BE_blanball/project` run the command `sudo docker-compose
 
 
 <!-- # cd project 
+
 # celery -A project worker -l info" -->
 
 
@@ -32,3 +33,4 @@ ws.onmessage = function(e){
     action: "list",
     request_id: new Date().getTime()
 })) -->
+

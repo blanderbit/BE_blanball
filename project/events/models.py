@@ -11,6 +11,10 @@ class Event(models.Model):
         football = 'Football'
         futsal = 'Futsal'
 
+    class CloseType(models.TextChoices):
+        shirt_front = 'Shirt-Front'
+        t_shirt = 'T-Shirt'
+
     author = models.ForeignKey(User,on_delete=models.PROTECT)
     name = models.CharField(max_length=100)
     small_disc = models.CharField(max_length=200)
@@ -22,11 +26,11 @@ class Event(models.Model):
     need_ball = models.BooleanField()
     amount_members = models.PositiveSmallIntegerField(validators=[
             MinValueValidator(6),MaxValueValidator(50)],default=6)
-    type = models.CharField(choices=Type.choices,max_length=100)
+    type = models.CharField(choices=Type.choices,max_length=15)
     price = models.PositiveSmallIntegerField(null = True,blank= True)
     price_description = models.CharField(max_length=500,null = True,blank= True)
     need_form = models.BooleanField()
-    forms = models.CharField(max_length=500)
+    forms = models.CharField(choices=CloseType.choices,max_length=15)
     current_users = models.ManyToManyField(User, related_name="current_rooms",null = True, blank=True)
 
     def __str__(self):

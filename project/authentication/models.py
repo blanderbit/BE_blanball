@@ -1,4 +1,3 @@
-from distutils.command.upload import upload
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from phonenumber_field.modelfields import PhoneNumberField
@@ -34,7 +33,6 @@ class Profile(models.Model):
     position = models.CharField(max_length=50,null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     about_me =  models.TextField(blank=True,null = True)
-
     def __str__(self):
         return self.name
 
@@ -46,7 +44,10 @@ class User(AbstractBaseUser):
     is_verified = models.BooleanField(default=False)
     role =  models.ForeignKey(Role,on_delete=models.CASCADE,blank=True,null = True)
     updated_at = models.DateTimeField(auto_now=True)
+    raiting = models.PositiveSmallIntegerField(null = True,blank=True)
     profile = models.ForeignKey(Profile,on_delete=models.CASCADE,blank=True,null = True)
+    configuration = models.JSONField(null = True,blank= True,default={'email': True,'phone':True})
+
 
     USERNAME_FIELD = 'email'
 
@@ -83,3 +84,4 @@ class ActiveUser(models.Model):
 
     def __str__(self):
         return self.user.id
+
