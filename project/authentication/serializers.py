@@ -28,15 +28,19 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = Profile
         fields = '__all__'
 
+
 class UpdateProfileSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer()
     class Meta:
         model = User
         fields = ('configuration','profile')
     
+    def validate(self,attrs):
+        config =  attrs.get('configuration')
+        return super().validate(attrs)
+
     def update(self, instance, validated_data):
-        print(instance.configuration)
-        return super().update(instance, validated_data)
+        return super().update(instance,validated_data)
 
 class RegisterSerializer(serializers.ModelSerializer):
     '''a class that serializes user registration'''

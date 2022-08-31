@@ -106,14 +106,20 @@ class UserOwnerProfile(generics.GenericAPIView):
 
 class UpdateProfile(generics.GenericAPIView):
     pagination_class = None
-    serializer_class = ProfileSerializer
+    serializer_class = UpdateProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
-    queryset = Profile.objects.all()
+    queryset = User.objects.all()
 
     def put(self, request):
-        profile = self.queryset.get(id=self.request.user.profile_id)
-        serializer = self.serializer_class(profile, data=request.data)
+        user = self.queryset.get(id=self.request.user.id)
+        serializer = self.serializer_class(user, data=request.data)
         serializer.is_valid(raise_exception = True)
+        # items = serializer.validated_data['profile'].items()
+        # for i  in serializer.validated_data['profile'].keys():
+
+        # prof = Profile.objects.get(id = user.profile_id)
+        # prof.save(**serializer.validated_data['profile'])
+        serializer.validated_data.pop('profile')
         serializer.save()
         return response.Response(serializer.data,status=status.HTTP_200_OK)
 
