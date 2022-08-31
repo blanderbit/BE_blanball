@@ -10,7 +10,7 @@ class NotificationSerializer(serializers.ModelSerializer):
 class UserNotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
-        fields = ['notification_text','date_time']
+        fields = ['notification_text','time_created']
 
 
 class ReadOrDeleteNotificationsSerializer(serializers.Serializer):

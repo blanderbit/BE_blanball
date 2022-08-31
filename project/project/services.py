@@ -13,7 +13,6 @@ def code_create(email,k,type,dop_info):
     verify_code = ''.join(random.choices(string.ascii_uppercase, k=k))
     code = Code.objects.create(dop_info = dop_info,value = verify_code,user_email = email,type = type,life_time =timezone.now() + 
             timezone.timedelta(minutes=CODE_EXPIRE_MINUTES_TIME))
-    print(code.life_time,code.value)
     data = {'email_subject': 'Your verify code','email_body': verify_code ,'to_email': email}
     Util.send_email.delay(data)
 

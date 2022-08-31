@@ -9,6 +9,9 @@ class EventSerializer(serializers.ModelSerializer):
         model = Event
         exclude = ('author','current_users')
 
+    # def validate(self, attrs):
+    #     print(self.context['request'].data)
+
     def create(self,validated_data):
         validated_data['date_and_time'] = pandas.to_datetime(validated_data['date_and_time'].isoformat()).round('1min')
         user  = self.context['request'].user

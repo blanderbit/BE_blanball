@@ -24,3 +24,8 @@ class ReviewListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         exclude = ('user',)
+
+class ReviewUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ('text',)
