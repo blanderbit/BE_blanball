@@ -19,9 +19,7 @@ services:
     container_name: api
     env_file:
       - stack.env
-    build: 
-      context: .
-      dockerfile: compose/Dockerfile
+    image: registry.it-flumx.com/blanball_be:latest
     command: bash compose/local/django-start.sh
     ports:
       - "49200:8000"
@@ -53,9 +51,7 @@ services:
     env_file:
       - stack.env
     container_name: celery-worker
-    build: 
-      context: .
-      dockerfile: compose/Dockerfile
+    image: registry.it-flumx.com/blanball_be:latest
     restart: always
     command: bash compose/local/celery-worker-start.sh
     volumes:
@@ -70,9 +66,7 @@ services:
     env_file:
       - stack.env
     container_name: celery-beat
-    build: 
-      context: .
-      dockerfile: compose/Dockerfile
+    image: registry.it-flumx.com/blanball_be:latest
     restart: always 
     command: bash compose/local/celery-beat-start.sh
     volumes:
