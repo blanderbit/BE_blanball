@@ -11,6 +11,6 @@ urlpatterns = [
     path('client/my/reviews/list', UserReviewsList.as_view(),
       name="my-reviews"),
     # endpoint where client can update her reviews
-    path('client/review/<int:pk>', PutDeleteReview.as_view(),
+    path('client/review/<int:pk>', GetPutDeleteReview.as_view(),
       name="update-review"),
 ]
