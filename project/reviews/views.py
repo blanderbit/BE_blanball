@@ -1,7 +1,7 @@
 from .serializers import *
 from .models import *
 from rest_framework import generics,permissions,response,status
-from project.services import CustomPagination
+from project.services import CustomPagination,GetPutDeleteAPIView
 
 
 class ReviewCreate(generics.CreateAPIView):
@@ -17,3 +17,9 @@ class UserReviewsList(generics.ListAPIView):
 
     def get_queryset(self):
         return self.queryset.filter(user_id = self.request.user).order_by('-time_created')
+
+
+class GetPutDeleteReview(GetPutDeleteAPIView):
+    serializer_class =  ReviewUpdateSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Review.objects.all()

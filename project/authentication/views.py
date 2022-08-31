@@ -66,6 +66,7 @@ class LoginUser(generics.GenericAPIView):
 
 class AccountDelete(generics.GenericAPIView):
     serializer_class = AccountDeleteSerializer
+    pagination_class = None
 
     def get(self, request):
         token = request.GET.get('token')

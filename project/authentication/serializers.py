@@ -48,7 +48,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email','password','role','re_password','phone','profile']
+        fields = ['email','phone','password','re_password','role','profile']
 
     def validate(self, attrs):
         '''data validation function'''
@@ -109,7 +109,7 @@ class UserSerializer(DynamicFieldsModelSerializer):
         slug_field="name", read_only = True)
     class Meta:
         model = User
-        fields = ['id','phone','email','role','profile','role','configuration','raiting']
+        fields = ['id','phone','email','role','raiting','profile','configuration']
 
 
 class ResetPasswordRequestSerializer(serializers.Serializer):
