@@ -15,6 +15,31 @@ class Event(models.Model):
         shirt_front = 'Shirt-Front'
         t_shirt = 'T-Shirt'
 
+    class Status(models.TextChoices):
+        planned = 'Planned'
+        active = 'Active'
+        finished = 'Finished'
+
+    class Duration(models.IntegerChoices):
+        minutes_10 = 10
+        minutes_20 = 20
+        minutes_30 = 30
+        minutes_40 = 40
+        minutes_50 = 50
+        minutes_60 = 60
+        minutes_70 = 70
+        minutes_80 = 80
+        minutes_90 = 90
+        minutes_100 = 100
+        minutes_110 = 110
+        minutes_120 = 120
+        minutes_130 = 130
+        minutes_140 = 140
+        minutes_150 = 150
+        minutes_160 = 160
+        minutes_170 = 170
+        minutes_180 = 180
+
     author = models.ForeignKey(User,on_delete=models.PROTECT)
     name = models.CharField(max_length=100)
     small_disc = models.CharField(max_length=200)
@@ -30,8 +55,10 @@ class Event(models.Model):
     price = models.PositiveSmallIntegerField(null = True,blank= True)
     price_description = models.CharField(max_length=500,null = True,blank= True)
     need_form = models.BooleanField()
+    duration = models.PositiveSmallIntegerField(choices = Duration.choices)
     forms = models.CharField(choices=CloseType.choices,max_length=15)
-    current_users = models.ManyToManyField(User, related_name="current_rooms",null = True, blank=True)
+    status =  models.CharField(choices=Status.choices,max_length=10,default = "Planned")
+    current_users = models.ManyToManyField(User, related_name="current_rooms")
 
     def __str__(self):
         return self.name

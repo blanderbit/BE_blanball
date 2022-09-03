@@ -6,6 +6,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from project.constaints import *
 from notifications.tasks import send_notification_to_subscribe_event_user,send_to_user
 
+
 class CreateEvent(generics.CreateAPIView,):
     '''class that allows you to create a new event'''
     serializer_class = EventSerializer

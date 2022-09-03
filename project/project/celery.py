@@ -12,12 +12,16 @@ app.autodiscover_tasks()
 
 
 app.conf.beat_schedule = {
-    'delete-expire-codes': {
+    'delete_expire_codes': {
         'task':'authentication.tasks.delete_expire_codes',
         'schedule': crontab(minute ='*/10')
     },
     'check_event_start_time': {
         'task':'notifications.tasks.check_event_start_time',
         'schedule': crontab(minute ='*/1')
-    }
+    },
+    'check_user_age': {
+        'task':'authentication.tasks.check_user_age',
+        'schedule': crontab(minute=0, hour=0)
+    },
 }

@@ -1,9 +1,10 @@
+from distutils.log import error
 from rest_framework import serializers,status
 from .models import *
 from project.constaints import *
 from django.contrib import auth
 from django.utils import timezone
-
+from .validators import CodeValidator
 
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
     """
@@ -23,24 +24,48 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
             for field_name in existing:
                 self.fields.pop(field_name)
 
+class UserListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['role','raiting']
+
+class ProfileListSerializer(serializers.ModelSerializer):
+    user_profile = UserListSerializer()
+    class Meta:
+        model =  Profile
+        fields = ['id','name','avatar','age','position','gender','user_profile']
+
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = '__all__'
 
+class CreateUpdateProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model =  Profile
+        exclude = ('created_at','age')
 
 class UpdateProfileSerializer(serializers.ModelSerializer):
-    profile = ProfileSerializer()
+    profile = CreateUpdateProfileSerializer()
     class Meta:
         model = User
         fields = ('configuration','profile')
-    
+
     def validate(self,attrs):
-        config =  attrs.get('configuration')
+        conf =  attrs.get('configuration')
+        keys = ['email','phone']
+        errors = []
+    
+        for key in conf.keys():
+            if key not in keys:
+                errors.append(key)  
+        if errors:
+                raise serializers.ValidationError(CANNOT_HIDE_SHOW_THIS_FIELD_ERROR(key=errors),status.HTTP_400_BAD_REQUEST) 
         return super().validate(attrs)
 
     def update(self, instance, validated_data):
         return super().update(instance,validated_data)
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     '''a class that serializes user registration'''
@@ -48,8 +73,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         max_length=68, min_length=8, write_only=True)
     re_password = serializers.CharField(
         max_length=68, min_length=8, write_only=True)
-    profile = ProfileSerializer()
-
+    profile = CreateUpdateProfileSerializer()
     class Meta:
         model = User
         fields = ['email','phone','password','re_password','role','profile']
@@ -59,10 +83,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         email = attrs.get('email', ''),
         password = attrs.get('password', '')
         re_password = attrs.get('re_password', '')
-
+        
         if password != re_password :
             raise serializers.ValidationError(PASSWORDS_DO_NOT_MATCH,status.HTTP_400_BAD_REQUEST) 
-
         return attrs
 
     def create(self, validated_data):
@@ -113,7 +136,7 @@ class UserSerializer(DynamicFieldsModelSerializer):
         slug_field="name", read_only = True)
     class Meta:
         model = User
-        fields = ['id','phone','email','role','raiting','profile','configuration']
+        fields = ['id','phone','email','role','raiting','profile','configuration','current_rooms']
 
 
 class ResetPasswordRequestSerializer(serializers.Serializer):
@@ -133,21 +156,6 @@ class RequestChangePasswordSerializer(serializers.Serializer):
     class Meta:
         fields = ['new_password','old_password']
 
-
-class MultipleOf:
-    def __init__(self, verify_code,code):
-        self.verify_code = verify_code
-        self.code = code
-
-    def __call__(self, value):
-        if not self.code:
-            raise serializers.ValidationError(BAD_CODE_ERROR,status.HTTP_400_BAD_REQUEST)
-        elif Code.objects.get(value = self.verify_code).type != PASSWORD_RESET_TOKEN_TYPE:
-            raise serializers.ValidationError(BAD_CODE_ERROR,status.HTTP_400_BAD_REQUEST)
-        elif Code.objects.get(value = self.verify_code).life_time < timezone.now():
-            raise serializers.ValidationError(CODE_EXPIRED_ERROR,status.HTTP_400_BAD_REQUEST)
-
-
 class ResetPasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(
         min_length=8, max_length=68, write_only=True)
@@ -155,19 +163,8 @@ class ResetPasswordSerializer(serializers.Serializer):
         min_length=5,max_length=5, write_only=True)
 
     class Meta:
+        validators = [CodeValidator(token_type = PASSWORD_RESET_CODE_TYPE)]
         fields = ['verify_code','new_password']
-
-    def validate(self, attrs):
-        verify_code = attrs.get('verify_code')
-        code = Code.objects.filter(value = verify_code)
-        # validators = [MultipleOf(verify_code = attrs.get('verify_code'),code = Code.objects.filter(value = attrs.get('verify_code')))]
-        if not code:
-            raise serializers.ValidationError(BAD_CODE_ERROR,status.HTTP_400_BAD_REQUEST)
-        elif Code.objects.get(value = verify_code).type != PASSWORD_RESET_TOKEN_TYPE:
-            raise serializers.ValidationError(BAD_CODE_ERROR,status.HTTP_400_BAD_REQUEST)
-        elif Code.objects.get(value = verify_code).life_time < timezone.now():
-            raise serializers.ValidationError(CODE_EXPIRED_ERROR,status.HTTP_400_BAD_REQUEST)
-        return super().validate(attrs)
 
 
 class EmailVerifySerializer(serializers.Serializer):
@@ -175,39 +172,17 @@ class EmailVerifySerializer(serializers.Serializer):
         min_length=5,max_length=5, write_only=True)
 
     class Meta:
+        validators = [CodeValidator(token_type = EMAIL_VERIFY_CODE_TYPE)]
         fields = ['verify_code']
     
-    def validate(self, attrs):
-        verify_code = attrs.get('verify_code')
-        code = Code.objects.filter(value = verify_code)
-        if not code:
-            raise serializers.ValidationError(BAD_CODE_ERROR,status.HTTP_400_BAD_REQUEST)
-        elif Code.objects.get(value = verify_code).type != EMAIL_VERIFY_TOKEN_TYPE:
-            raise serializers.ValidationError(BAD_CODE_ERROR,status.HTTP_400_BAD_REQUEST)
-        elif Code.objects.get(value = verify_code).life_time < timezone.now():
-            raise serializers.ValidationError(CODE_EXPIRED_ERROR,status.HTTP_400_BAD_REQUEST)
-        return super().validate(attrs)
-
 
 class ChangePasswordSerializer(serializers.Serializer):
     verify_code = serializers.CharField(
         min_length=5,max_length=5, write_only=True)
 
     class Meta:
+        validators = [CodeValidator(token_type = PASSWORD_CHANGE_CODE_TYPE)]
         fields = ['verify_code']
-
-    def validate(self, attrs):
-        verify_code = attrs.get('verify_code')
-        code = Code.objects.filter(value = verify_code)
-        if not code:
-            raise serializers.ValidationError(BAD_CODE_ERROR,status.HTTP_400_BAD_REQUEST)
-        elif Code.objects.get(value = verify_code).type != PASSWORD_CHANGE_TOKEN_TYPE:
-            raise serializers.ValidationError(BAD_CODE_ERROR,status.HTTP_400_BAD_REQUEST)
-        elif Code.objects.get(value = verify_code).life_time < timezone.now():
-            raise serializers.ValidationError(CODE_EXPIRED_ERROR,status.HTTP_400_BAD_REQUEST)
-        return super().validate(attrs)
-
-
 
 class AccountDeleteSerializer(serializers.ModelSerializer):
     '''class that serializes user verification by mail'''
@@ -215,5 +190,4 @@ class AccountDeleteSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['token']
-
 

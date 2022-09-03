@@ -1,5 +1,3 @@
-from re import T
-from urllib import request
 from notifications.models import Notification
 from .serializers import *
 from .models import *
@@ -13,6 +11,9 @@ from django.urls import reverse
 import jwt
 from django.conf import settings
 from django.shortcuts import redirect
+from dateutil.relativedelta import relativedelta
+import datetime
+from notifications.tasks import send_notification_to_subscribe_event_user
 
 
 def user_delete(pk):
@@ -21,6 +22,14 @@ def user_delete(pk):
     Notification.objects.filter(user_id = pk).delete()
     Profile.objects.filter(id = pk).delete()
     User.objects.filter(id = pk).delete()
+
+def count_age(profile,data):
+    for item in data:
+        if item[0] == 'birthday':
+            birthday = item[1]
+            age = (timezone.now().date() - birthday) // timezone.timedelta(days=365)
+            profile.age = age
+            return profile.save()
 
 class RegisterUser(generics.GenericAPIView):
     '''register user'''
@@ -31,6 +40,7 @@ class RegisterUser(generics.GenericAPIView):
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
         profile = Profile.objects.create(**serializer.validated_data['profile'])
+        count_age(profile=profile,data = serializer.validated_data['profile'].items())
         serializer.save(profile = profile)
         data = {'email_subject': 'Регистарция','email_body': f'{profile.name},спасибо за регистрацию!' ,'to_email': user['email']}
         Util.send_email.delay(data)
@@ -76,8 +86,8 @@ class AccountDelete(generics.GenericAPIView):
             return redirect("login")
         except jwt.ExpiredSignatureError:
             return response.Response(CODE_EXPIRED_ERROR , status=status.HTTP_400_BAD_REQUEST)
-        except jwt.exceptions.DecodeError:
-            return response.Response(BAD_CODE_ERROR, status=status.HTTP_400_BAD_REQUEST)
+        except:
+            return response.Response(BAD_CODE_ERROR, status=status.HTTP_400_BAD_REQUEST)   
 
 
 class UserOwnerProfile(generics.GenericAPIView):
@@ -87,10 +97,8 @@ class UserOwnerProfile(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     def get(self,request):
         user = User.objects.get(id=self.request.user.id)
-        # raiting = Review.objects.aggregate(Sum('stars'))
-        # raiting = raiting.items[1]
-        # print(raiting)
         serializer = UserSerializer(user)
+        print(serializer.data)
         return response.Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self,request):
@@ -101,6 +109,7 @@ class UserOwnerProfile(generics.GenericAPIView):
         email_body = f'Hi,{request.user.profile.name}, use the link below to delete your account \n {absurl}'
         data = {'email_body': email_body, 'to_email': request.user.email,
             'email_subject': 'Verify your email'}
+        print(data)
         Util.send_email.delay(data)
         return response.Response(SENT_CODE_TO_EMAIL_SUCCESS , status=status.HTTP_200_OK)
 
@@ -114,11 +123,9 @@ class UpdateProfile(generics.GenericAPIView):
         user = self.queryset.get(id=self.request.user.id)
         serializer = self.serializer_class(user, data=request.data)
         serializer.is_valid(raise_exception = True)
-        # items = serializer.validated_data['profile'].items()
-        # for i  in serializer.validated_data['profile'].keys():
-
-        # prof = Profile.objects.get(id = user.profile_id)
-        # prof.save(**serializer.validated_data['profile'])
+        profile = Profile.objects.filter(id =user.profile_id)
+        profile.update(**serializer.validated_data['profile'])
+        count_age(profile=profile[0],data = serializer.validated_data['profile'].items())
         serializer.validated_data.pop('profile')
         serializer.save()
         return response.Response(serializer.data,status=status.HTTP_200_OK)
@@ -136,25 +143,25 @@ class UserProfile(generics.GenericAPIView):
             user = self.queryset.get(id=pk)
             for item in user.configuration.items():
                 if item[1] == True:
-                    serializer = UserSerializer(user,fields=(fields))
+                    serializer = self.serializer_class(user,fields=(fields))
                 elif item[1] == False:
                     fields.append(item[0])
-                    serializer = UserSerializer(user,fields=(fields))
+                    serializer = self.serializer_class(user,fields=(fields))
             return response.Response(serializer.data, status=status.HTTP_200_OK)
         except:
-            return response.Response(NO_SUCH_USER_ERROR,status=status.HTTP_200_OK)
+            return response.Response(NO_SUCH_USER_ERROR,status=status.HTTP_400_BAD_REQUEST)
 
 class UserList(generics.ListAPIView):
     '''get all users list'''
-    serializer_class = UserSerializer
+    serializer_class = ProfileListSerializer
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = CustomPagination
     filter_backends = (filters.SearchFilter,DjangoFilterBackend)
     search_fields = ('id','email','phone')
-    queryset = User.objects.all()
+    queryset = Profile.objects.all()
 
-    def get_queryset(self):
-        return self.queryset.filter(role_id = Role.objects.get(name = USER_ROLE).id) 
+    # def get_queryset(self):
+    #     return self.queryset.filter(role_id = Role.objects.get(name = USER_ROLE).id) 
 
 class AdminUsersList(generics.ListAPIView):
     '''displaying the full list of admin users'''
@@ -162,7 +169,7 @@ class AdminUsersList(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = CustomPagination
     filter_backends = (filters.SearchFilter,DjangoFilterBackend)
-    search_fields = ('id','email','phone','name')
+    search_fields = ('id','email','phone')
     queryset = User.objects.all()
 
     def get_queryset(self):
@@ -181,7 +188,7 @@ class RequestPasswordReset(generics.GenericAPIView):
         email = request.data.get('email', '')
 
         if User.objects.filter(email=email).exists():
-            code_create(email=email,k=5,type=PASSWORD_RESET_TOKEN_TYPE,dop_info = None)
+            code_create(email=email,k=5,type=PASSWORD_RESET_CODE_TYPE,dop_info = None)
             return response.Response(SENT_CODE_TO_EMAIL_SUCCESS, status=status.HTTP_200_OK)
         else:
             return response.Response(NO_SUCH_USER_ERROR,status=status.HTTP_400_BAD_REQUEST)
@@ -219,7 +226,7 @@ class RequestChangePassword(generics.GenericAPIView):
             if not request.user.check_password(serializer.data.get("old_password")):
                 return response.Response(WRONG_PASSWORD_ERROR, status=status.HTTP_400_BAD_REQUEST)
             else:
-                code_create(email=request.user.email,k=5,type=PASSWORD_CHANGE_TOKEN_TYPE,
+                code_create(email=request.user.email,k=5,type=PASSWORD_CHANGE_CODE_TYPE,
                 dop_info =  serializer.validated_data['new_password'])
                 return response.Response(SENT_CODE_TO_EMAIL_SUCCESS, status=status.HTTP_200_OK)
 
