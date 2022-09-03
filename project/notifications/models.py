@@ -1,4 +1,3 @@
-from wsgiref.simple_server import demo_app
 from django.db import models
 from authentication.models import User
 

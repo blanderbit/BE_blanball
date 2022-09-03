@@ -1,6 +1,7 @@
 from rest_framework import status,serializers
 from project.constaints import *
 from .models import Code
+from django.utils import timezone
 
 
 class CodeValidator:
@@ -12,7 +13,7 @@ class CodeValidator:
         self.code = Code.objects.filter(value = self.verify_code)
         if not self.code:
             raise serializers.ValidationError(BAD_CODE_ERROR,status.HTTP_400_BAD_REQUEST)
-        elif Code.objects.get(value = self.verify_code).type != self.token_type:
+        elif Code.objects.get(value = self.verify_code).type not in self.token_type:
             raise serializers.ValidationError(BAD_CODE_ERROR,status.HTTP_400_BAD_REQUEST)
         elif Code.objects.get(value = self.verify_code).life_time < timezone.now():
             raise serializers.ValidationError(CODE_EXPIRED_ERROR,status.HTTP_400_BAD_REQUEST)

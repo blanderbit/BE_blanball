@@ -5,7 +5,6 @@ from rest_framework_simplejwt.tokens import RefreshToken,AccessToken
 from .managers import *
 from rest_framework.serializers import ValidationError
 from rest_framework import status
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils import timezone
 
 class Gender(models.TextChoices):
@@ -53,7 +52,7 @@ class User(AbstractBaseUser):
     role =  models.ForeignKey(Role,on_delete=models.CASCADE,blank=True,null = True)
     updated_at = models.DateTimeField(auto_now=True)
     raiting = models.FloatField(null = True,blank= True)
-    profile = models.ForeignKey(Profile,on_delete=models.CASCADE,blank=True,null = True,related_name='user_profile')
+    profile = models.ForeignKey(Profile,on_delete=models.CASCADE,blank=True,null = True,related_name='user')
     configuration = models.JSONField(default = configuration_dict)
 
 

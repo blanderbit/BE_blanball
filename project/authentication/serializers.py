@@ -1,9 +1,7 @@
-from distutils.log import error
 from rest_framework import serializers,status
 from .models import *
 from project.constaints import *
 from django.contrib import auth
-from django.utils import timezone
 from .validators import CodeValidator
 
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
@@ -27,13 +25,12 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['role','raiting']
+        fields = '__all__'
 
 class ProfileListSerializer(serializers.ModelSerializer):
-    user_profile = UserListSerializer()
     class Meta:
         model =  Profile
-        fields = ['id','name','avatar','age','position','gender','user_profile']
+        fields = ['id','name','avatar','age','position','gender','user']
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -181,7 +178,7 @@ class ChangePasswordSerializer(serializers.Serializer):
         min_length=5,max_length=5, write_only=True)
 
     class Meta:
-        validators = [CodeValidator(token_type = PASSWORD_CHANGE_CODE_TYPE)]
+        validators = [CodeValidator(token_type = [PASSWORD_CHANGE_CODE_TYPE])]
         fields = ['verify_code']
 
 class AccountDeleteSerializer(serializers.ModelSerializer):

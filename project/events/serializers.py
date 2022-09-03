@@ -5,7 +5,7 @@ from project.constaints import EVENT_NOT_FOUND_ERROR,BAD_EVENT_TIME_CREATE_ERROR
 import pandas
 from django.utils import timezone
 
-class EventSerializer(serializers.ModelSerializer):
+class CreateEventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         exclude = ('author','current_users','status')
@@ -25,10 +25,21 @@ class EventSerializer(serializers.ModelSerializer):
         except:
             return Event.objects.create(author = user, contact_number = User.objects.get(id = user.id).phone,
             **validated_data)
-    
+
+class UpdateEventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        exclude = ('author','current_users','status')
+
+    def validate(self,attrs):
+        date_and_time =  attrs.get('date_and_time')
+        if date_and_time - timezone.now()+timezone.timedelta(hours=1) > timezone.timedelta(hours=1):
+            return super().validate(attrs) 
+        raise serializers.ValidationError(BAD_EVENT_TIME_CREATE_ERROR,status.HTTP_400_BAD_REQUEST)
 
 
-class EventListSerializer(serializers.ModelSerializer):
+
+class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = '__all__'

@@ -9,29 +9,16 @@ from notifications.tasks import send_notification_to_subscribe_event_user,send_t
 
 class CreateEvent(generics.CreateAPIView,):
     '''class that allows you to create a new event'''
-    serializer_class = EventSerializer
+    serializer_class = CreateEventSerializer
     permission_classes = [permissions.IsAuthenticated]
     queryset = Event.objects.all()
         
-class GetPutDeleteEvent(GetPutDeleteAPIView):
+class GetDeleteEvent(generics.RetrieveAPIView):
     '''a class that allows you to get, update, delete an event'''
     serializer_class =  EventSerializer
     queryset = Event.objects.all()
     permission_classes = [permissions.IsAuthenticated]
-        
-    def put(self, request,pk: int):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception= True)
-        try:
-            event = self.queryset.get(id = pk)
-            if event.author.id == request.user.id:
-                send_notification_to_subscribe_event_user(event = event,notification_text='event_updated')
-                serializer.save()
-                return response.Response(EVENT_UPDATE_SUCCESS,status=status.HTTP_200_OK)
-            return response.Response(NO_PERMISSIONS_ERROR,status=status.HTTP_400_BAD_REQUEST)
-        except:
-            return response.Response(EVENT_NOT_FOUND_ERROR,status=status.HTTP_400_BAD_REQUEST)
-
+    
     def delete(self, request,pk: int):
         try:
             event = self.queryset.get(id = pk)
@@ -44,10 +31,27 @@ class GetPutDeleteEvent(GetPutDeleteAPIView):
             return response.Response(EVENT_NOT_FOUND_ERROR,status=status.HTTP_400_BAD_REQUEST)
 
 
+class UpdateEvent(generics.GenericAPIView):
+    serializer_class = UpdateEventSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Event.objects.all()
+
+    def put(self, request,pk: int):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception= True)
+        event = self.queryset.get(id = pk)
+        try:
+            if event.author.id == request.user.id:
+                send_notification_to_subscribe_event_user(event = event,notification_text='event_updated')
+                serializer.save()
+                return response.Response(EVENT_UPDATE_SUCCESS,status=status.HTTP_200_OK)
+            return response.Response(NO_PERMISSIONS_ERROR,status=status.HTTP_400_BAD_REQUEST)
+        except:
+            return response.Response(EVENT_NOT_FOUND_ERROR,status=status.HTTP_400_BAD_REQUEST)
   
 class EventList(generics.ListAPIView):
     '''class that allows you to get a complete list of events'''
-    serializer_class =  EventListSerializer
+    serializer_class =  EventSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = (filters.SearchFilter,DjangoFilterBackend)
     pagination_class = CustomPagination
@@ -81,16 +85,18 @@ class JoinToEvent(generics.GenericAPIView):
         event = Event.objects.get(id = serializer.data['event_id'])
         
         if not user.current_rooms.filter(id=serializer.data['event_id']).exists():
-            if event.amount_members > len(event.current_users.all())+1:
-                send_to_user(user = User.objects.get(id = event.author.id),notification_text= '+1 user')
-                user.current_rooms.add(event)
-            elif event.amount_members == len(event.current_users.all())+1:
-                send_to_user(user = User.objects.get(id = event.author.id),notification_text= '+1 user and all places')
-                user.current_rooms.add(event)
-            else:
-                return response.Response(NO_EVENT_PLACE_ERROR)
-            return response.Response(JOIN_EVENT_SUCCES,status=status.HTTP_200_OK)
-        return response.Response(ALREADY_IN_MEMBER_LIST_ERROR)
+            if event.status == 'Planned':
+                if event.amount_members > len(event.current_users.all())+1:
+                    send_to_user(user = User.objects.get(id = event.author.id),notification_text= '+1 user')
+                    user.current_rooms.add(event)
+                elif event.amount_members == len(event.current_users.all())+1:
+                    send_to_user(user = User.objects.get(id = event.author.id),notification_text= '+1 user and all places')
+                    user.current_rooms.add(event)
+                else:
+                    return response.Response(NO_EVENT_PLACE_ERROR,status=status.HTTP_400_BAD_REQUEST)
+                return response.Response(JOIN_EVENT_SUCCES,status=status.HTTP_200_OK)
+            return response.Response(EVENT_JOIN_TIME_EXPIRED_ERROR,status=status.HTTP_400_BAD_REQUEST)
+        return response.Response(ALREADY_IN_MEMBER_LIST_ERROR,status=status.HTTP_400_BAD_REQUEST)
 
 
 class LeaveFromEvent(generics.GenericAPIView):
@@ -103,13 +109,15 @@ class LeaveFromEvent(generics.GenericAPIView):
         user = request.user
         event = Event.objects.get(id = serializer.data['event_id'])
         if user.current_rooms.filter(id=serializer.data['event_id']).exists():
-            user.current_rooms.remove(event)
-            return response.Response(DISCONNECT_FROM_EVENT_SUCCESS,status=status.HTTP_200_OK)
-        return response.Response(NO_IN_MEMBER_LIST_ERROR)
+            if event.status == 'Planned':
+                user.current_rooms.remove(event)
+                return response.Response(DISCONNECT_FROM_EVENT_SUCCESS,status=status.HTTP_200_OK)
+            return response.Response(NO_IN_MEMBER_LIST_ERROR,status=status.HTTP_400_BAD_REQUEST)
+        return response.Response(NO_IN_MEMBER_LIST_ERROR,status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserEvents(generics.ListAPIView):
-    serializer_class =  EventListSerializer
+    serializer_class =  EventSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = (filters.SearchFilter,DjangoFilterBackend)
     pagination_class = CustomPagination

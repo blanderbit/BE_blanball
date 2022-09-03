@@ -1,7 +1,7 @@
 from notifications.models import Notification
 from .serializers import *
 from .models import *
-from rest_framework import generics,filters,permissions,status,response,views
+from rest_framework import generics,filters,permissions,status,response
 from django_filters.rest_framework import DjangoFilterBackend
 from project.services import *
 from events.models import Event
@@ -11,9 +11,6 @@ from django.urls import reverse
 import jwt
 from django.conf import settings
 from django.shortcuts import redirect
-from dateutil.relativedelta import relativedelta
-import datetime
-from notifications.tasks import send_notification_to_subscribe_event_user
 
 
 def user_delete(pk):
@@ -160,8 +157,6 @@ class UserList(generics.ListAPIView):
     search_fields = ('id','email','phone')
     queryset = Profile.objects.all()
 
-    # def get_queryset(self):
-    #     return self.queryset.filter(role_id = Role.objects.get(name = USER_ROLE).id) 
 
 class AdminUsersList(generics.ListAPIView):
     '''displaying the full list of admin users'''
@@ -244,7 +239,7 @@ class ChangePassword(generics.GenericAPIView):
         code = Code.objects.get(value=verify_code)
         user = User.objects.get(id = request.user.id)
         if code.user_email != user.email:
-            return response.Response(PASSWORD_CHANGE_ERROR, status=status.HTTP_400_BAD_REQUEST) 
+            return response.Response(PASSWORD_CHANGE_ERROR, status=status.HTTP_400_BAD_REQUEST)
         user.set_password(code.dop_info)
         user.save()
         code.delete()

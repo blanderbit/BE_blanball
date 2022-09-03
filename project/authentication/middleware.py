@@ -1,12 +1,6 @@
-from lib2to3.pgen2 import token
 import os
 from datetime import datetime
-
 import django
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
-django.setup()
-
 import jwt
 from channels.auth import AuthMiddlewareStack
 from django.conf import settings
@@ -14,8 +8,10 @@ from django.contrib.auth.models import AnonymousUser
 from channels.db import database_sync_to_async
 from .models import User
 from channels.middleware import BaseMiddleware
-
 from django.db import close_old_connections
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+django.setup()
 
 ALGORITHM = "HS256"
 

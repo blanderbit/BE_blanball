@@ -9,9 +9,13 @@ urlpatterns = [
     path('client/event/create',CreateEvent.as_view(),
         name = 'create-event'),
     #endpoint where a user with admin
-    #role can get detail info,update and delete event 
-    path('client/event/<int:pk>',GetPutDeleteEvent.as_view(),
+    #role can get detail info and delete event 
+    path('client/event/<int:pk>',GetDeleteEvent.as_view(),
         name = 'event-detail'),
+    #endpoint where a user with admin
+    #role can get detail info and delete event 
+    path('client/event/update/<int:pk>',UpdateEvent.as_view(),
+        name = 'event-updatel'),
     #endpoint where a use can get list of events
     path('client/event/list',EventList.as_view(),
         name = 'event-list'),
