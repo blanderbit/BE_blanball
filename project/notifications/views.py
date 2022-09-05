@@ -23,9 +23,6 @@ class UserNotificationsList(generics.ListAPIView):
     def get_queryset(self):
         return self.queryset.filter(user_id = self.request.user.id).order_by('-id')
 
-
-
-
 class ReadNotifications(generics.GenericAPIView):
     serializer_class = ReadOrDeleteNotificationsSerializer
     queryset = Notification.objects.all()

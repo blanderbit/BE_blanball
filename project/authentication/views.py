@@ -81,7 +81,6 @@ class UserOwnerProfile(generics.GenericAPIView):
     def get(self,request):
         user = User.objects.get(id=self.request.user.id)
         serializer = UserSerializer(user)
-        print(serializer.data)
         return response.Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self,request):

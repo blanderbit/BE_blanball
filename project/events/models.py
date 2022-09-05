@@ -60,5 +60,9 @@ class Event(models.Model):
     status =  models.CharField(choices=Status.choices,max_length=10,default = "Planned")
     current_users = models.ManyToManyField(User, related_name="current_rooms")
 
+    @property
+    def count_current_users(self):
+        return self.current_users.count()
+
     def __str__(self):
         return self.name

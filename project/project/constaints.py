@@ -73,7 +73,7 @@ MAX_AGE_VALUE_ERROR = {'error': 'Age must not exceed 100 years old'}
 
 MIN_AGE_VALUE_ERROR = {'error': 'Age must be at least 6 years old'}
 
-EVENT_JOIN_TIME_EXPIRED_ERROR = {'eror': 'Join time expired'}
+EVENT_TIME_EXPIRED_ERROR = {'error': 'Event time expired'}
 
 CHANGE_ERROR = 'error : This {key} is already in use'
 

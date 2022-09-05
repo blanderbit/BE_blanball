@@ -37,7 +37,6 @@ class TokenAuthMiddleware(BaseMiddleware):
 
     async def __call__(self, scope, receive, send):
         close_old_connections()
-        # token_key = scope['query_string'].decode().split('=')[-1]
         try:
             token_key = (dict((x.split('=') for x in scope['query_string'].decode().split("&")))).get('token', None)
         except ValueError:
@@ -49,4 +48,3 @@ class TokenAuthMiddleware(BaseMiddleware):
 
 def JwtAuthMiddlewareStack(inner):
     return TokenAuthMiddleware(inner)
-    # return TokenAuthMiddleware(AuthMiddlewareStack(inner))
