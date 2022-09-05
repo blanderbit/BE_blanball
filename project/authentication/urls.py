@@ -30,21 +30,23 @@ urlpatterns = [
     # to the data sent to the mail
     path('client/password/reset-complete', ResetPassword.as_view(),
       name='password-reset-complete'),
-     #endpoint for account verification by mail
-    path('client/email/verify', EmailVerify.as_view(), 
-      name="email-verify"),
     #endpoint at which a password change request
     path('client/request-change/password', RequestChangePassword.as_view(),
       name="request-change-password"),
-    #endpoint where the password is reset according
-    # to the data sent to the mail
-    path('client/password/change-complete', ChangePassword.as_view(),
-      name='password-change-complete'),
+    path('client/check/code',CheckCode.as_view(),
+      name='check-code'),
     #endpoint where user can delete her account
     path('client/me/delete', AccountDelete.as_view(), 
       name="account-delete"),
     # endpoint where the user can see detail information
     # about your account
-    path('client/me/update',  UpdateProfile.as_view(),
+    path('client/me/update', UpdateProfile.as_view(),
       name="my-profile"),
+    #endpoint at which a email change request
+    path('client/request-change/email',RequetChangeEmail.as_view(),
+      name = "request-change-email"),
+    #endpoint at which a phone change request
+    path('client/request-change/phone',RequestChangePhone.as_view(),
+      name = "request-change-phone"),
 ]
+

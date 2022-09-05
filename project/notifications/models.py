@@ -1,4 +1,3 @@
-from wsgiref.simple_server import demo_app
 from django.db import models
 from authentication.models import User
 
@@ -14,4 +13,5 @@ class Notification(models.Model):
     type = models.CharField(choices = Type.choices,max_length=6,default='Unread')
     time_created = models.DateTimeField(auto_now_add=True)
 
-        
+    def __str__(self):
+        return self.notification_text

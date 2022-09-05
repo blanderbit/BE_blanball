@@ -1,69 +1,80 @@
 version: "3.8"
-
 services: 
   db:
     container_name: db
-    ports:
-      - 5432:5432
     image: postgres:latest
-    volumes:
-      - ./storage/db/data:/usr/src/blanball/db
+    ports:
+      - "5432:5432"
     env_file:
-      - ./compose/db.env
+      - ./compose/.env
+    volumes:
+      - db-data:/usr/src/blanball/storage/db/data
     healthcheck:
       test: pg_isready -U postgres -d postgres
       timeout: 40s
-      retries: 20    
+      retries: 20
+    networks:
+      - app-network
+      
   api:
     container_name: api
     env_file:
       - ./compose/.env
+    command: bash compose/local/django-start.sh
+    ports:
+      - "8000:8000"
     build: 
       context: .
       dockerfile: compose/Dockerfile
-    command: bash ./compose/local/django-start.sh
-    ports:
-      - "8000:8000"
-    volumes:
-      - .:/usr/src/blanball
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
+    networks:
+      - app-network    
     links:
      - redis
+    volumes:
+      - .:/usr/src/blanball
+     
   redis:
     container_name: redis
+    env_file:
+      - ./compose/.env
     image: redis:latest
-    ports:
-      - "6379:6379"
     volumes:
-      - ./storage/redis/data:/usr/src/blanball/redis
+      - redis-data:/usr/src/blanball/storage/redis/data
+    networks:
+      - app-network  
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
       timeout: 3s
       retries: 5
-
   celery-worker:
-    container_name: celery-worker
     env_file:
       - ./compose/.env
+    container_name: celery-worker
     build: 
       context: .
       dockerfile: compose/Dockerfile
     restart: always
     command: bash compose/local/celery-worker-start.sh
     volumes:
-      - .:/usr/src/blanball
+      - .:/usr/src/blanball 
+    networks:
+      - app-network  
     depends_on:
       redis:
         condition: service_healthy
-
+      api:
+        condition: service_started
+      db:
+        condition: service_started
   celery-beat:
-    container_name: celery-beat
     env_file:
       - ./compose/.env
+    container_name: celery-beat
     build: 
       context: .
       dockerfile: compose/Dockerfile
@@ -71,17 +82,19 @@ services:
     command: bash compose/local/celery-beat-start.sh
     volumes:
       - .:/usr/src/blanball
+    networks:
+      - app-network
     depends_on:
       redis:
         condition: service_healthy
-
+      api:
+        condition: service_started
+      db:
+        condition: service_started
+networks:
+  app-network:
+     driver: bridge    
+     
 volumes:
-  db:
-    driver: local
-  redis:
-    driver: local
-
-
-
-
-    
+  db-data:
+  redis-data:
