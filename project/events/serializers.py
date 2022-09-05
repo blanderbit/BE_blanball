@@ -4,7 +4,7 @@ from .models import *
 from project.constaints import EVENT_NOT_FOUND_ERROR,BAD_EVENT_TIME_CREATE_ERROR
 import pandas
 from django.utils import timezone
-
+from authentication.serializers import EventUsersSerializer,EventAuthorSerializer
 class CreateEventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
@@ -38,8 +38,9 @@ class UpdateEventSerializer(serializers.ModelSerializer):
         raise serializers.ValidationError(BAD_EVENT_TIME_CREATE_ERROR,status.HTTP_400_BAD_REQUEST)
 
 
-
 class EventSerializer(serializers.ModelSerializer):
+    author =  EventAuthorSerializer()
+    current_users = EventUsersSerializer(many=True)
     class Meta:
         model = Event
         fields = '__all__'

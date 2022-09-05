@@ -12,7 +12,6 @@ import jwt
 from django.conf import settings
 from django.shortcuts import redirect
 
-
 def user_delete(pk):
     Code.objects.filter(user_email = User.objects.get(id = pk).email).delete()
     Event.objects.filter(author_id = pk).delete()
@@ -31,6 +30,7 @@ def count_age(profile,data):
 class RegisterUser(generics.GenericAPIView):
     '''register user'''
     serializer_class = RegisterSerializer
+    permission_classes = [IsNotAuthenticated]
 
     def post(self, request):
         user = request.data
@@ -39,30 +39,13 @@ class RegisterUser(generics.GenericAPIView):
         profile = Profile.objects.create(**serializer.validated_data['profile'])
         count_age(profile=profile,data = serializer.validated_data['profile'].items())
         serializer.save(profile = profile)
-        data = {'email_subject': 'Регистарция','email_body': f'{profile.name},спасибо за регистрацию!' ,'to_email': user['email']}
-        Util.send_email.delay(data)
-        # code_create(email=user_data['email'],k=5,type=EMAIL_VERIFY_TOKEN_TYPE,dop_info = None)
+        Util.send_email.delay(data = {'email_subject': 'Регистарция','email_body': f'{profile.name},спасибо за регистрацию!' ,'to_email': user['email']})
         return response.Response(serializer.data, status=status.HTTP_201_CREATED)
-
-class EmailVerify(generics.GenericAPIView):
-    '''account verify by email'''
-    serializer_class = EmailVerifySerializer
-
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        verify_code = serializer.validated_data["verify_code"]
-        code = Code.objects.get(value=verify_code)
-        user = User.objects.get(email=code.user_email)
-        user.is_verified = True
-        user.save()
-        code.delete()
-        return response.Response(ACTIVATION_SUCCESS, status=status.HTTP_200_OK)
-
 
 class LoginUser(generics.GenericAPIView):
     '''user login'''
     serializer_class = LoginSerializer
+    permission_classes = [IsNotAuthenticated]
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -74,12 +57,15 @@ class LoginUser(generics.GenericAPIView):
 class AccountDelete(generics.GenericAPIView):
     serializer_class = AccountDeleteSerializer
     pagination_class = None
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
         token = request.GET.get('token')
         try:
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms='HS256')
-            user_delete(pk = User.objects.get(id=payload['user_id']).id)
+            user = User.objects.get(id=payload['user_id'])
+            Util.send_email.delay(data = {'email_subject': 'Удалание аккаунта','email_body': f'{user.profile.name},аккаунт удален!' ,'to_email': user['email']})
+            user_delete(pk = user.id)
             return redirect("login")
         except jwt.ExpiredSignatureError:
             return response.Response(CODE_EXPIRED_ERROR , status=status.HTTP_400_BAD_REQUEST)
@@ -104,10 +90,8 @@ class UserOwnerProfile(generics.GenericAPIView):
         relativeLink = reverse('account-delete')
         absurl = 'http://'+current_site+relativeLink+'?token='+str(token)
         email_body = f'Hi,{request.user.profile.name}, use the link below to delete your account \n {absurl}'
-        data = {'email_body': email_body, 'to_email': request.user.email,
-            'email_subject': 'Verify your email'}
-        print(data)
-        Util.send_email.delay(data)
+        Util.send_email.delay(data = {'email_body': email_body, 'to_email': request.user.email,
+        'email_subject': 'Verify your email'})
         return response.Response(SENT_CODE_TO_EMAIL_SUCCESS , status=status.HTTP_200_OK)
 
 class UpdateProfile(generics.GenericAPIView):
@@ -146,7 +130,7 @@ class UserProfile(generics.GenericAPIView):
                     serializer = self.serializer_class(user,fields=(fields))
             return response.Response(serializer.data, status=status.HTTP_200_OK)
         except:
-            return response.Response(NO_SUCH_USER_ERROR,status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(NO_SUCH_USER_ERROR,status=status.HTTP_404_NOT_FOUND)
 
 class UserList(generics.ListAPIView):
     '''get all users list'''
@@ -154,7 +138,7 @@ class UserList(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = CustomPagination
     filter_backends = (filters.SearchFilter,DjangoFilterBackend)
-    search_fields = ('id','email','phone')
+    search_fields = ('name','age','gender','last_name')
     queryset = Profile.objects.all()
 
 
@@ -204,8 +188,7 @@ class ResetPassword(generics.GenericAPIView):
         user.set_password(serializer.validated_data["new_password"])
         user.save()
         code.delete()
-        data = {'email_subject': 'Смена пароля','email_body': f'{user.profile.name},ваш пароль был успешно обновлен!' ,'to_email': user.email}
-        Util.send_email.delay(data)
+        Util.send_email.delay(data = {'email_subject': 'Reset password','email_body': f'{user.profile.name}, reset password success!' ,'to_email': user.email})
         return response.Response(PASSWORD_RESET_SUCCESS, status=status.HTTP_200_OK) 
 
 
@@ -217,32 +200,71 @@ class RequestChangePassword(generics.GenericAPIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        if serializer.is_valid():
-            if not request.user.check_password(serializer.data.get("old_password")):
-                return response.Response(WRONG_PASSWORD_ERROR, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                code_create(email=request.user.email,k=5,type=PASSWORD_CHANGE_CODE_TYPE,
-                dop_info =  serializer.validated_data['new_password'])
-                return response.Response(SENT_CODE_TO_EMAIL_SUCCESS, status=status.HTTP_200_OK)
+        if not request.user.check_password(serializer.data.get("old_password")):
+            return response.Response(WRONG_PASSWORD_ERROR, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            code_create(email=request.user.email,k=5,type=PASSWORD_CHANGE_CODE_TYPE,
+            dop_info =  serializer.validated_data['new_password'])
+            return response.Response(SENT_CODE_TO_EMAIL_SUCCESS, status=status.HTTP_200_OK)
 
-
-
-class ChangePassword(generics.GenericAPIView):
-    '''password reset on a previously sent request'''
-    serializer_class = ChangePasswordSerializer
+class RequetChangeEmail(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ResetPasswordRequestSerializer
+    def post(self,request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        if not User.objects.filter(email = serializer.validated_data['email']):
+            code_create(email=request.user.email,k=5,type=EMAIL_CHANGE_CODE_TYPE,
+            dop_info = serializer.validated_data['email'])
+            return response.Response(SENT_CODE_TO_EMAIL_SUCCESS, status=status.HTTP_200_OK)
+        return response.Response(CHANGE_ERROR.format('email'), status=status.HTTP_400_BAD_REQUEST)
+
+class RequestChangePhone(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = RequestChangePhoneSerializer
+    def post(self,request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        code_create(email=request.user.email,k=5,type=PHONE_CHANGE_CODE_TYPE,
+        dop_info =  serializer.validated_data['phone'])
+        return response.Response(SENT_CODE_TO_EMAIL_SUCCESS, status=status.HTTP_200_OK)
+
+
+class CheckCode(generics.GenericAPIView):
+    '''password reset on a previously sent request'''
+    serializer_class = CheckCodeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    user =  None
+    code =  None
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         verify_code = serializer.validated_data["verify_code"]
-        code = Code.objects.get(value=verify_code)
-        user = User.objects.get(id = request.user.id)
-        if code.user_email != user.email:
-            return response.Response(PASSWORD_CHANGE_ERROR, status=status.HTTP_400_BAD_REQUEST)
-        user.set_password(code.dop_info)
-        user.save()
-        code.delete()
-        data = {'email_subject': 'Смена пароля','email_body': f'{user.profile.name},ваш пароль был успешно обновлен!' ,'to_email': request.user.email}
+        self.code = Code.objects.get(value=verify_code)
+        self.user = User.objects.get(id = request.user.id)
+        if self.code.user_email != self.user.email:
+            return response.Response(PASSWORD_CHANGE_ERROR,status=status.HTTP_400_BAD_REQUEST)
+        if self.code.type == PASSWORD_CHANGE_CODE_TYPE:
+            self.user.set_password(self.code.dop_info)
+            self.success(email_subject='change password',email_body='change password success')
+            return response.Response(CHANGE_PASSWORD_SUCCESS,status=status.HTTP_200_OK) 
+        elif self.code.type == EMAIL_CHANGE_CODE_TYPE:
+            self.user.email = self.code.dop_info
+            self.success(email_subject='change email',email_body='change email success')
+            return response.Response(CHANGE_EMAIL_SUCCESS,status=status.HTTP_200_OK) 
+        elif self.code.type == EMAIL_VERIFY_CODE_TYPE:
+            self.user.is_verified = True
+            self.success(email_subject='email verify',email_body='email verify success')
+            return response.Response(ACTIVATION_SUCCESS,status=status.HTTP_200_OK)
+        elif self.code.type == PHONE_CHANGE_CODE_TYPE:
+            self.user.phone = self.code.dop_info
+            self.success(email_subject='change phone',email_body='change phone success')
+            return response.Response(CHANGE_PHONE_SUCCESS,status=status.HTTP_200_OK)
+
+
+    def success(self,email_subject,email_body):
+        self.user.save()
+        self.code.delete()
+        data = {'email_subject': email_subject,'email_body': f'{self.user.profile.name}{email_body}!' ,'to_email': self.user.email}
         Util.send_email.delay(data)
-        return response.Response(PASSWORD_CHANGE_SUCCESS, status=status.HTTP_200_OK) 

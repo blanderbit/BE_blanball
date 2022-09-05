@@ -1,7 +1,3 @@
-DEFAULT_SERIALIZER_ERROR = {'error': 'The username should only contain alphanumeric characters'}
-
-NO_NAME_REGISTRATION_ERROR = {'error': 'Users should have a username'}
-
 NO_EMAIL_REGISTRATION_ERROR = {'error': 'Users should have a Email'}
 
 INVALID_CREDENTIALS_ERROR =  {'error': 'Invalid credentials, try again'}
@@ -13,8 +9,6 @@ PASSWORDS_DO_NOT_MATCH = {'error': 'Passwords do not match'}
 SENT_CODE_TO_EMAIL_SUCCESS = {'success': 'We have sent you a code to email'}
 
 PASSWORD_RESET_SUCCESS = {'success': 'Password reset'}
-
-PASSWORD_CHANGE_SUCCESS = {'success': 'Password change'}
 
 NO_SUCH_USER_ERROR = {'error': 'No such user'}
 
@@ -61,6 +55,10 @@ EMAIL_VERIFY_CODE_TYPE = 'email_verify'
 
 PASSWORD_CHANGE_CODE_TYPE = 'password_change'
 
+EMAIL_CHANGE_CODE_TYPE = 'email_change'
+
+PHONE_CHANGE_CODE_TYPE = 'phone_change'
+
 REVIEW_CREATE_SUCCESS = {'success': 'Review create'}
 
 BAD_CODE_ERROR = {'error': 'Bad verify code'}
@@ -69,11 +67,20 @@ REVIEW_CREATE_ERROR = {'error':'You cant leave a review for yourself'}
 
 BAD_EVENT_TIME_CREATE_ERROR = {'error': 'The time of the event must differ from the minimum by an hour'}
 
-def CANNOT_HIDE_SHOW_THIS_FIELD_ERROR(key):
-    return f'{{error : You cannot hide or show fields:{key}}}'
+CANNOT_HIDE_SHOW_THIS_FIELD_ERROR = 'error : You cannot hide or show fields:{key}'
 
-MAX_AGE_VALUE_ERROR = {'error': 'Age must not exceed 100 years'}
+MAX_AGE_VALUE_ERROR = {'error': 'Age must not exceed 100 years old'}
 
 MIN_AGE_VALUE_ERROR = {'error': 'Age must be at least 6 years old'}
 
 EVENT_JOIN_TIME_EXPIRED_ERROR = {'eror': 'Join time expired'}
+
+CHANGE_ERROR = 'error : This {key} is already in use'
+
+CHANGE_PHONE_SUCCESS = {'succes' : 'Phone change'}
+
+CHANGE_EMAIL_SUCCESS = {'succes' : 'Email change'}
+
+CHANGE_PASSWORD_SUCCESS = {'succes' : 'Password change'}
+
+CONFIGURATION_IS_REQUIRED_ERROR = {'error': 'Configuration is required field'}

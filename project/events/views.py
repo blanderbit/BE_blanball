@@ -23,12 +23,11 @@ class GetDeleteEvent(generics.RetrieveAPIView):
         try:
             event = self.queryset.get(id = pk)
             if event.author.id == request.user.id:
-                send_notification_to_subscribe_event_user(event = event,notification_text='event_deleted')
                 event.delete()
                 return response.Response(EVENT_DELETE_SUCCESS,status=status.HTTP_200_OK)
-            return response.Response(NO_PERMISSIONS_ERROR,status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(NO_PERMISSIONS_ERROR,status=status.HTTP_403_FORBIDDEN)
         except:
-            return response.Response(EVENT_NOT_FOUND_ERROR,status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(EVENT_NOT_FOUND_ERROR,status=status.HTTP_404_NOT_FOUND)
 
 
 class UpdateEvent(generics.GenericAPIView):
@@ -45,18 +44,19 @@ class UpdateEvent(generics.GenericAPIView):
                 send_notification_to_subscribe_event_user(event = event,notification_text='event_updated')
                 serializer.save()
                 return response.Response(EVENT_UPDATE_SUCCESS,status=status.HTTP_200_OK)
-            return response.Response(NO_PERMISSIONS_ERROR,status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(NO_PERMISSIONS_ERROR,status=status.HTTP_403_FORBIDDEN)
         except:
-            return response.Response(EVENT_NOT_FOUND_ERROR,status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(EVENT_NOT_FOUND_ERROR,status=status.HTTP_404_NOT_FOUND)
   
 class EventList(generics.ListAPIView):
     '''class that allows you to get a complete list of events'''
     serializer_class =  EventSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    filter_backends = (filters.SearchFilter,DjangoFilterBackend)
+    # permission_classes = [permissions.IsAuthenticated]
+    filter_backends = (filters.SearchFilter,DjangoFilterBackend,filters.OrderingFilter,)
     pagination_class = CustomPagination
     search_fields = ['id','name','small_disc','price','place','date_and_time','amount_members']
-    filterset_fields = ['type', 'need_ball','gender']
+    ordering_fields = ('id',)
+    filterset_fields = ['type', 'need_ball','gender','status','duration']
     queryset = Event.objects.all().order_by('-id')
 
 class DeleteEvents(generics.GenericAPIView):

@@ -1,23 +1,27 @@
 from .serializers import *
 from .models import *
-from rest_framework import generics,permissions,response,status
+from rest_framework import generics,permissions,response,status,filters
 from project.services import CustomPagination
 
 class NotificationsList(generics.ListAPIView):
     serializer_class = NotificationSerializer
     pagination_class = CustomPagination
+    filter_backends = (filters.OrderingFilter,)
+    ordering_fields = ('id',)
     permission_classes = [permissions.IsAuthenticated]
-    queryset = Notification.objects.all()
+    queryset = Notification.objects.all().order_by('-id')
 
 
 class UserNotificationsList(generics.ListAPIView):
     serializer_class = UserNotificationSerializer
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = CustomPagination
+    filter_backends = (filters.OrderingFilter,)
+    ordering_fields = ('id',)
     queryset = Notification.objects.all()
      
     def get_queryset(self):
-        return self.queryset.filter(user_id = self.request.user.id).order_by('-time_created')
+        return self.queryset.filter(user_id = self.request.user.id).order_by('-id')
 
 
 

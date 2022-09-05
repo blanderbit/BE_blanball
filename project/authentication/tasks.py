@@ -32,6 +32,8 @@ def delete_expire_codes():
 @app.task
 def check_user_age():
     for user_profile in Profile.objects.all():
+        # print(user_profile.birthday / timezone.timedelta(days=1))
+        print((timezone.now().date() - user_profile.birthday) / timezone.timedelta(days=1))
         if user_profile.birthday == timezone.now().date():
             user_profile.age += 1
             user_profile.save()

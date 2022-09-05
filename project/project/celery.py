@@ -17,11 +17,12 @@ app.conf.beat_schedule = {
         'schedule': crontab(minute ='*/10')
     },
     'check_event_start_time': {
-        'task':'notifications.tasks.check_event_start_time',
+        'task':'events.tasks.check_event_start_time',
         'schedule': crontab(minute ='*/1')
     },
     'check_user_age': {
         'task':'authentication.tasks.check_user_age',
-        'schedule': crontab(minute=0, hour=0)
+        # 'schedule': crontab(minute=0, hour=0)
+        'schedule': crontab(minute ='*/1')
     },
 }

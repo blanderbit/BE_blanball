@@ -3,6 +3,8 @@ from .models import *
 from project.constaints import *
 from django.contrib import auth
 from .validators import CodeValidator
+from phonenumber_field.modelfields import PhoneNumberField
+
 
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
     """
@@ -22,15 +24,31 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
             for field_name in existing:
                 self.fields.pop(field_name)
 
-class UserListSerializer(serializers.ModelSerializer):
+
+
+class EventUsersProfileSerializer(DynamicFieldsModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ['name','last_name','avatar','position']
+
+class EventAuthorSerializer(serializers.ModelSerializer):
+    profile = EventUsersProfileSerializer(fields=('position',))
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ['phone','profile']
+
+class EventUsersSerializer(serializers.ModelSerializer):
+    profile = EventUsersProfileSerializer()
+    class Meta:
+        model = User
+        fields = ['profile']
+
+
 
 class ProfileListSerializer(serializers.ModelSerializer):
     class Meta:
         model =  Profile
-        fields = ['id','name','avatar','age','position','gender','user']
+        fields = '__all__'
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -53,11 +71,13 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
         keys = ['email','phone']
         errors = []
     
+        if not conf.keys():
+            raise serializers.ValidationError(CONFIGURATION_IS_REQUIRED_ERROR,status.HTTP_400_BAD_REQUEST) 
         for key in conf.keys():
             if key not in keys:
                 errors.append(key)  
         if errors:
-                raise serializers.ValidationError(CANNOT_HIDE_SHOW_THIS_FIELD_ERROR(key=errors),status.HTTP_400_BAD_REQUEST) 
+            raise serializers.ValidationError(CANNOT_HIDE_SHOW_THIS_FIELD_ERROR.format(key=errors),status.HTTP_400_BAD_REQUEST) 
         return super().validate(attrs)
 
     def update(self, instance, validated_data):
@@ -77,7 +97,6 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         '''data validation function'''
-        email = attrs.get('email', ''),
         password = attrs.get('password', '')
         re_password = attrs.get('re_password', '')
         
@@ -133,7 +152,7 @@ class UserSerializer(DynamicFieldsModelSerializer):
         slug_field="name", read_only = True)
     class Meta:
         model = User
-        fields = ['id','phone','email','role','raiting','profile','configuration','current_rooms']
+        fields = ['id','phone','email','role','raiting','is_verified','profile','configuration','current_rooms']
 
 
 class ResetPasswordRequestSerializer(serializers.Serializer):
@@ -141,8 +160,11 @@ class ResetPasswordRequestSerializer(serializers.Serializer):
 
     class Meta:
         fields = ['email']
+class RequestChangePhoneSerializer(serializers.ModelSerializer):
 
-
+    class Meta:
+        model =  User
+        fields = ['phone']
 
 class RequestChangePasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(
@@ -152,6 +174,7 @@ class RequestChangePasswordSerializer(serializers.Serializer):
 
     class Meta:
         fields = ['new_password','old_password']
+
 
 class ResetPasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(
@@ -164,21 +187,13 @@ class ResetPasswordSerializer(serializers.Serializer):
         fields = ['verify_code','new_password']
 
 
-class EmailVerifySerializer(serializers.Serializer):
+class CheckCodeSerializer(serializers.Serializer):
     verify_code = serializers.CharField(
         min_length=5,max_length=5, write_only=True)
 
     class Meta:
-        validators = [CodeValidator(token_type = EMAIL_VERIFY_CODE_TYPE)]
-        fields = ['verify_code']
-    
-
-class ChangePasswordSerializer(serializers.Serializer):
-    verify_code = serializers.CharField(
-        min_length=5,max_length=5, write_only=True)
-
-    class Meta:
-        validators = [CodeValidator(token_type = [PASSWORD_CHANGE_CODE_TYPE])]
+        validators = [CodeValidator(token_type = [PASSWORD_CHANGE_CODE_TYPE,EMAIL_CHANGE_CODE_TYPE,
+        EMAIL_VERIFY_CODE_TYPE,PHONE_CHANGE_CODE_TYPE])]
         fields = ['verify_code']
 
 class AccountDeleteSerializer(serializers.ModelSerializer):
