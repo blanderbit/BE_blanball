@@ -19,7 +19,8 @@ ALGORITHM = "HS256"
 def get_user(token):
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=ALGORITHM)
-    except:        return AnonymousUser()
+    except:
+        return AnonymousUser()
 
     token_exp = datetime.fromtimestamp(payload['exp'])
     if token_exp < datetime.utcnow():
