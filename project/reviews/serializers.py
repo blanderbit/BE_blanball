@@ -16,8 +16,15 @@ class CreateReviewSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self,validated_data):
-        send_to_user(user=self.context['request'].user,notification_text="Review Create")
-        return Review.objects.create(email = self.context['request'].user.email,**validated_data)
+        user = User.objects.get(email = validated_data['user'])
+        send_to_user(user=validated_data['user'],notification_text="Review Create")
+        review = Review.objects.create(email = self.context['request'].user.email,**validated_data)
+        user = User.objects.get(email = validated_data['user'])
+        for item in user.reviews.all():
+            stars = item.stars
+        user.raiting = stars / user.reviews.count()
+        user.save()
+        return review
 
 
 class ReviewListSerializer(serializers.ModelSerializer):

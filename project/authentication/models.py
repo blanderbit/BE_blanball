@@ -3,7 +3,9 @@ from django.contrib.auth.models import AbstractBaseUser
 from phonenumber_field.modelfields import PhoneNumberField
 from rest_framework_simplejwt.tokens import RefreshToken,AccessToken
 from .managers import *
-from django.core.validators import MaxValueValidator, MinValueValidator
+from rest_framework.serializers import ValidationError
+from rest_framework import status
+from django.utils import timezone
 
 class Gender(models.TextChoices):
     '''gender choices'''
@@ -17,17 +19,22 @@ class Role(models.Model):
     def __str__(self):
         return self.name
 
+def validate_birthday(value):
+    if timezone.now().date() - value > timezone.timedelta(days=29200):
+        raise ValidationError(MAX_AGE_VALUE_ERROR,status.HTTP_400_BAD_REQUEST) 
+    if timezone.now().date() - value < timezone.timedelta(days=2191):
+        raise ValidationError(MIN_AGE_VALUE_ERROR,status.HTTP_400_BAD_REQUEST) 
+
+def configuration_dict():
+    return {'email': True,'phone':True}
 
 class Profile(models.Model):
     name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     gender = models.CharField(choices =  Gender.choices,max_length=10)
-    birthday = models.DateField(blank=True,null = True)
-    avatar = models.ImageField(null=True,blank=True)
-    age = models.PositiveSmallIntegerField(validators=[
-            MinValueValidator(6),
-            MaxValueValidator(80)
-        ])
+    birthday = models.DateField(blank=True,null = True,validators = [validate_birthday])
+    avatar = models.ImageField(null=True,blank=True,upload_to = 'media/profile')
+    age = models.PositiveSmallIntegerField(null=True,blank=True)
     height = models.PositiveSmallIntegerField(null=True,blank=True)
     weight = models.PositiveSmallIntegerField(null=True,blank=True)
     position = models.CharField(max_length=50,null=True,blank=True)
@@ -44,9 +51,9 @@ class User(AbstractBaseUser):
     is_verified = models.BooleanField(default=False)
     role =  models.ForeignKey(Role,on_delete=models.CASCADE,blank=True,null = True)
     updated_at = models.DateTimeField(auto_now=True)
-    raiting = models.PositiveSmallIntegerField(null = True,blank=True)
-    profile = models.ForeignKey(Profile,on_delete=models.CASCADE,blank=True,null = True)
-    configuration = models.JSONField(null = True,blank= True,default={'email': True,'phone':True})
+    raiting = models.FloatField(null = True,blank= True)
+    profile = models.ForeignKey(Profile,on_delete=models.CASCADE,blank=True,null = True,related_name='user')
+    configuration = models.JSONField(default = configuration_dict)
 
 
     USERNAME_FIELD = 'email'

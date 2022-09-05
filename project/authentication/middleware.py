@@ -1,12 +1,6 @@
-from lib2to3.pgen2 import token
 import os
 from datetime import datetime
-
 import django
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
-django.setup()
-
 import jwt
 from channels.auth import AuthMiddlewareStack
 from django.conf import settings
@@ -14,8 +8,10 @@ from django.contrib.auth.models import AnonymousUser
 from channels.db import database_sync_to_async
 from .models import User
 from channels.middleware import BaseMiddleware
-
 from django.db import close_old_connections
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+django.setup()
 
 ALGORITHM = "HS256"
 
@@ -41,7 +37,6 @@ class TokenAuthMiddleware(BaseMiddleware):
 
     async def __call__(self, scope, receive, send):
         close_old_connections()
-        # token_key = scope['query_string'].decode().split('=')[-1]
         try:
             token_key = (dict((x.split('=') for x in scope['query_string'].decode().split("&")))).get('token', None)
         except ValueError:
@@ -53,4 +48,3 @@ class TokenAuthMiddleware(BaseMiddleware):
 
 def JwtAuthMiddlewareStack(inner):
     return TokenAuthMiddleware(inner)
-    # return TokenAuthMiddleware(AuthMiddlewareStack(inner))
