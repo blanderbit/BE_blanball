@@ -36,9 +36,13 @@ DISCONNECT_FROM_EVENT_SUCCESS = {'success': 'Dicsonnect from event'}
 
 NO_EVENT_PLACE_ERROR = {'error': 'No place'}
 
-ALREADY_IN_MEMBER_LIST_ERROR = {'error': 'You are already on the event member list'}
+ALREADY_IN_MEMBERS_LIST_ERROR = {'error': 'You are already in the event members list'}
 
-NO_IN_MEMBER_LIST_ERROR = {'error': 'You are not in event member list'}
+ALREADY_IN_FANS_LIST_ERROR = {'error': 'You are already in the event fans list'}
+
+NO_IN_MEMBERS_LIST_ERROR = {'error': 'You are not in event members list'}
+
+NO_IN_FANS_LIST_ERROR = {'error': 'You are not in event fans list'}
 
 PASSWORD_CHANGE_ERROR = {'error': 'Password not change'}
 
@@ -84,3 +88,7 @@ CHANGE_EMAIL_SUCCESS = {'succes' : 'Email change'}
 CHANGE_PASSWORD_SUCCESS = {'succes' : 'Password change'}
 
 CONFIGURATION_IS_REQUIRED_ERROR = {'error': 'Configuration is required field'}
+
+EVENT_AUTHOR_CAN_NOT_JOIN_ERROR = {'error': 'Author can`t join to your event'}
+
+GET_PLANNED_IVENTS_ERROR = {'error': 'Get planned ivents can only contain: day(d), month(m) and year(y)'}

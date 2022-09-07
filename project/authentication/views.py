@@ -11,6 +11,7 @@ from django.urls import reverse
 import jwt
 from django.conf import settings
 from django.shortcuts import redirect
+from django.template.loader import render_to_string
 
 def user_delete(pk):
     Code.objects.filter(user_email = User.objects.get(id = pk).email).delete()
@@ -39,7 +40,10 @@ class RegisterUser(generics.GenericAPIView):
         profile = Profile.objects.create(**serializer.validated_data['profile'])
         count_age(profile=profile,data = serializer.validated_data['profile'].items())
         serializer.save(profile = profile)
-        Util.send_email.delay(data = {'email_subject': 'Регистарция','email_body': f'{profile.name},спасибо за регистрацию!' ,'to_email': user['email']})
+        # context = ({'list': [1,2,3,4,5,6],'name':profile.name,'surname':profile.last_name})
+        # message = render_to_string("index.html",context)
+        # 'email_body': f'{profile.name},спасибо за регистрацию!' ,
+        Util.send_email.delay(data = {'email_subject': 'Регистарция','email_body':'fdfdfddf','to_email': user['email']})
         return response.Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class LoginUser(generics.GenericAPIView):

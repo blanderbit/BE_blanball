@@ -59,10 +59,15 @@ class Event(models.Model):
     forms = models.CharField(choices=CloseType.choices,max_length=15)
     status =  models.CharField(choices=Status.choices,max_length=10,default = "Planned")
     current_users = models.ManyToManyField(User, related_name="current_rooms")
+    fans =  models.ManyToManyField(User, related_name="current_views_rooms")
 
     @property
     def count_current_users(self):
         return self.current_users.count()
+
+    @property
+    def count_fans(self):
+        return self.fans.count()
 
     def __str__(self):
         return self.name

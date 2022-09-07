@@ -9,7 +9,7 @@ from authentication.serializers import EventUsersSerializer,EventAuthorSerialize
 class CreateUpdateEventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
-        exclude = ('author','current_users','status')
+        exclude = ('author','current_users','status','fans')
 
     def validate(self,attrs):
         date_and_time =  attrs.get('date_and_time')
@@ -33,7 +33,7 @@ class EventListSerializer(serializers.ModelSerializer):
         model = Event
         fields = ('author','id','name','place','amount_members','status','gender',
         'price','type','need_ball','need_form','date_and_time',
-        'count_current_users')
+        'count_current_users','count_fans') 
 
 class DeleteIventsSerializer(serializers.Serializer):
     event_id = serializers.ListField(child=serializers.IntegerField(min_value=0))
