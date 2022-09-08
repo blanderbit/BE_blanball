@@ -1,9 +1,12 @@
-from rest_framework import serializers,status
+import re
+
 from .models import *
 from project.constaints import *
-from django.contrib import auth
 from .validators import CodeValidator
-import re
+
+from django.contrib import auth
+
+from rest_framework import serializers,status
 
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
     """

@@ -1,5 +1,6 @@
-from django.urls import path,include
 from .yasg import urlpatterns as doc_urls
+
+from django.urls import path,include
 
 urlpatterns = [
     path('events/api/v1/', include('events.urls')),

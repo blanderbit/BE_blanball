@@ -1,9 +1,10 @@
-from django.core.mail import EmailMessage
 import threading
+
 from .models import Code,Profile
-from django.utils import timezone
 from project.celery import app
-from django.template.loader import render_to_string
+
+from django.core.mail import EmailMessage
+from django.utils import timezone
 
 class EmailThread(threading.Thread):
 

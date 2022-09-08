@@ -1,7 +1,9 @@
-from django.db import models
-from phonenumber_field.modelfields import PhoneNumberField
-from django.core.validators import MaxValueValidator, MinValueValidator
 from authentication.models import User,Gender
+
+from django.db import models
+from django.core.validators import MaxValueValidator, MinValueValidator
+
+from phonenumber_field.modelfields import PhoneNumberField
 
 class Event(models.Model):
     '''footbal ivent model'''

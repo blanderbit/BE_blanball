@@ -1,17 +1,20 @@
-from notifications.models import Notification
-from .serializers import *
+import jwt
+
 from .models import *
-from rest_framework import generics,filters,permissions,status,response
-from django_filters.rest_framework import DjangoFilterBackend
+from .serializers import *
 from project.services import *
-from events.models import Event
+from notifications.models import Notification
 from .permisions import IsNotAuthenticated
+from events.models import Event
+
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
-import jwt
 from django.conf import settings
-from django.shortcuts import redirect
-from django.template.loader import render_to_string
+
+from rest_framework import generics,filters,permissions,status,response
+from django_filters.rest_framework import DjangoFilterBackend
+
+
 
 def user_delete(pk):
     Code.objects.filter(user_email = User.objects.get(id = pk).email).delete()
@@ -70,11 +73,11 @@ class AccountDelete(generics.GenericAPIView):
             user = User.objects.get(id=payload['user_id'])
             Util.send_email.delay(data = {'email_subject': 'Удалание аккаунта','email_body': f'{user.profile.name},аккаунт удален!' ,'to_email': user['email']})
             user_delete(pk = user.id)
-            return redirect("login")
+            return  response.Response(ACCOUNT_DELETED_SUCCESS,status=status.HTTP_200_OK)
         except jwt.ExpiredSignatureError:
-            return response.Response(CODE_EXPIRED_ERROR , status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(CODE_EXPIRED_ERROR,status=status.HTTP_400_BAD_REQUEST)
         except:
-            return response.Response(BAD_CODE_ERROR, status=status.HTTP_400_BAD_REQUEST)   
+            return response.Response(BAD_CODE_ERROR,status=status.HTTP_400_BAD_REQUEST)   
 
 
 class UserOwnerProfile(generics.GenericAPIView):

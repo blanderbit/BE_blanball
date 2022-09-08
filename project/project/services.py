@@ -1,14 +1,16 @@
 from nis import match
-from rest_framework import mixins,response,pagination
-from rest_framework.generics import GenericAPIView
 from authentication.tasks import Util
+from authentication.models import User,Code
+from .constaints import  *
+
 import random
 import string
-from authentication.models import Code
-from authentication.models import User
-from .constaints import  *
+
 from django.utils import timezone
 from django.template.loader import render_to_string
+
+from rest_framework import mixins,response,pagination
+from rest_framework.generics import GenericAPIView
 
 
 def code_create(email,k,type,dop_info):

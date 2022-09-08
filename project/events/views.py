@@ -1,14 +1,20 @@
-from ast import Num
-from rest_framework import generics,permissions,filters,response,status
+import re
+import pandas 
+
 from .models import *
 from .serializers import *
 from project.services import *
-from django_filters.rest_framework import DjangoFilterBackend
 from project.constaints import *
-from notifications.tasks import send_notification_to_subscribe_event_user,send_to_user
-import re
+from notifications.tasks import *
+
 from django.db.models import Count
-import pandas 
+
+from rest_framework import generics,permissions,filters,response,status
+from django_filters.rest_framework import DjangoFilterBackend
+
+
+
+
 
 class CreateEvent(generics.CreateAPIView,):
     '''class that allows you to create a new event'''
@@ -169,7 +175,7 @@ class PopularIvents(UserEvents):
     queryset = Event.objects.filter(status = 'Planned')
 
     def get_queryset(self):
-        return self.queryset.annotate(count = Count('current_users')).order_by('-count')[:2]
+        return self.queryset.annotate(count = Count('current_users')).order_by('-count')[:10]
 
 class UserPlannedEvents(generics.ListAPIView):
     serializer_class =  EventListSerializer

@@ -1,11 +1,15 @@
-from channels.generic.websocket import AsyncWebsocketConsumer
 import json
-from authentication.models import User,ActiveUser
-from channels.db import database_sync_to_async
+
 from .tasks import *
-from djangochannelsrestframework.observer.generics import ObserverModelInstanceMixin
-from djangochannelsrestframework.observer import model_observer
+from authentication.models import User,ActiveUser
+
 from django.utils import timezone
+
+from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.db import database_sync_to_async
+
+from djangochannelsrestframework.observer.generics import ObserverModelInstanceMixin
+
 
 class UserConsumer(ObserverModelInstanceMixin,AsyncWebsocketConsumer):
     async def connect(self):

@@ -1,11 +1,16 @@
+from .managers import *
+
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
+from django.utils import timezone
+
 from phonenumber_field.modelfields import PhoneNumberField
+
 from rest_framework_simplejwt.tokens import RefreshToken,AccessToken
-from .managers import *
 from rest_framework.serializers import ValidationError
 from rest_framework import status
-from django.utils import timezone
+
+
 
 class Gender(models.TextChoices):
     '''gender choices'''

@@ -1,11 +1,13 @@
-from time import time
-from asgiref.sync import async_to_sync
-from notifications.models import Notification
-from channels.layers import get_channel_layer
 from project.celery import app
+from notifications.models import Notification
 from authentication.models  import ActiveUser
 from authentication.tasks import Util
+
 from django.template.loader import render_to_string
+
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+
 
 def send_to_user(user,notification_text):
     channel_layer = get_channel_layer()

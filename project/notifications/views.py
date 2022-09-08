@@ -1,7 +1,9 @@
 from .serializers import *
 from .models import *
-from rest_framework import generics,permissions,response,status,filters
 from project.services import CustomPagination
+
+from rest_framework import generics,permissions,response,status,filters
+
 
 class NotificationsList(generics.ListAPIView):
     serializer_class = NotificationSerializer

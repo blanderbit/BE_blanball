@@ -1,10 +1,12 @@
-from datetime import datetime
-from rest_framework import serializers,status
 from .models import *
 from project.constaints import *
-import pandas
-from django.utils import timezone
 from authentication.serializers import EventUsersSerializer,EventAuthorSerializer
+
+from django.utils import timezone
+
+from rest_framework import serializers,status
+
+
 
 class CreateUpdateEventSerializer(serializers.ModelSerializer):
     class Meta:
