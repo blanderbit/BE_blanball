@@ -8,8 +8,7 @@ from django.template.loader import render_to_string
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
-
-def send_to_user(user,notification_text):
+def send_to_user(user,notification_text:str):
     channel_layer = get_channel_layer()
     Notification.objects.create(user=user,notification_text=f'{notification_text}')
     if ActiveUser.objects.filter(user = user.id):
@@ -28,6 +27,6 @@ def send_to_user(user,notification_text):
 
 
 
-def send_notification_to_subscribe_event_user(event,notification_text):
+def send_notification_to_subscribe_event_user(event,notification_text:str):
     for user in event.current_users.all():
         send_to_user(user=user,notification_text=notification_text)

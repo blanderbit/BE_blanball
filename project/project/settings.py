@@ -1,9 +1,14 @@
 import os
-from pathlib import Path
-from decouple import config, Csv
 import datetime
 import django
+
 from django.utils.encoding import smart_str
+
+from pathlib import Path
+from decouple import config, Csv
+
+
+
 django.utils.encoding.smart_text = smart_str
 
 
@@ -37,7 +42,7 @@ AUTH_USER_MODEL = config('AUTH_USER_MODEL')
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
 
-INSTALLED_APPS = [
+INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -55,9 +60,17 @@ INSTALLED_APPS = [
     'notifications',
     'reviews',
     'django_inlinecss',
-]
+    'django_elasticsearch_dsl',
+)
 
-MIDDLEWARE = [
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': 'elasticsearch:9200'
+    },
+}
+
+
+MIDDLEWARE = (
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -65,7 +78,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
+)
 
 
 #POSTGRES conected datdabse settings
@@ -85,7 +98,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("redis",6379)],
+            "hosts": (("redis",6379)),
         },
     },
 }
@@ -102,12 +115,12 @@ SWAGGER_SETTINGS = {
     },
     'USE_SESSION_AUTH': config('USE_SESSION_AUTH',cast = bool),
     'JSON_EDITOR': config('JSON_EDITOR',cast = bool),
-    'SUPPORTED_SUBMIT_METHODS': [
+    'SUPPORTED_SUBMIT_METHODS': (
         'get',
         'post',
         'put',
         'delete',
-    ],
+    ),
 }
 
 
@@ -129,7 +142,7 @@ TEMPLATES = [
 ]
 
 
-AUTH_PASSWORD_VALIDATORS = [
+AUTH_PASSWORD_VALIDATORS = (
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
@@ -142,7 +155,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
-]
+)
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

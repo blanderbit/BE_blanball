@@ -1,5 +1,5 @@
 import re
-import pandas 
+import pandas
 
 from .models import *
 from .serializers import *
@@ -105,10 +105,10 @@ class JoinToEvent(generics.GenericAPIView):
         if not user.current_rooms.filter(id=serializer.data['event_id']).exists():
             if event.author_id != user.id:
                 if event.amount_members > event.count_current_users+1:
-                    send_to_user(user = User.objects.get(id = event.author.id),notification_text= '+1 user')
+                    send_to_user.delay(user = User.objects.get(id = event.author.id),notification_text= '+1 user')
                     user.current_rooms.add(event)
                 elif event.amount_members == event.count_current_users+1:
-                    send_to_user(user = User.objects.get(id = event.author.id),notification_text= '+1 user and all places')
+                    send_to_user.delay(user = User.objects.get(id = event.author.id),notification_text= '+1 user and all places')
                     user.current_rooms.add(event)
                 return response.Response(JOIN_EVENT_SUCCES,status=status.HTTP_200_OK)
             return response.Response(EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,status=status.HTTP_400_BAD_REQUEST)
@@ -177,15 +177,10 @@ class PopularIvents(UserEvents):
     def get_queryset(self):
         return self.queryset.annotate(count = Count('current_users')).order_by('-count')[:10]
 
-class UserPlannedEvents(generics.ListAPIView):
-    serializer_class =  EventListSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    filter_backends = (filters.SearchFilter,DjangoFilterBackend)
-    pagination_class = CustomPagination
+class UserPlannedEvents(UserEvents):
     queryset = Event.objects.filter(status = 'Planned')
 
     def list(self, request,pk):
-        pagination_class =  CustomPagination
         try:
             user =  User.objects.get(id=pk)
             num = re.findall(r'\d{1,10}', user.get_planned_events)[0]

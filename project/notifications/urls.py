@@ -12,4 +12,6 @@ urlpatterns = [
     path('client/read/notifications',ReadNotifications.as_view()),
     #endpoint where a user can  delete her her notificaions
     path('client/delete/notifications',DeleteNotifcations.as_view()),
+    #endpoint where a admin can change maintenance
+    path('admin/change/maintenance',ChangeMaintenance.as_view()),
 ]

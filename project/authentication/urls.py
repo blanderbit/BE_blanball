@@ -36,5 +36,6 @@ urlpatterns = [
     path('client/request-change/email',RequetChangeEmail.as_view()),
     #endpoint at which a phone change request
     path('client/request-change/phone',RequestChangePhone.as_view()),
-]
 
+    path('client/search/user/<str:query>/',SearchUsers.as_view()),
+]

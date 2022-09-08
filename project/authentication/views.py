@@ -1,7 +1,9 @@
 import jwt
+import abc
 
 from .models import *
 from .serializers import *
+from .documents import *
 from project.services import *
 from notifications.models import Notification
 from .permisions import IsNotAuthenticated
@@ -11,7 +13,10 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.conf import settings
 
-from rest_framework import generics,filters,permissions,status,response
+
+from elasticsearch_dsl import Q
+
+from rest_framework import generics,filters,permissions,status,response,views
 from django_filters.rest_framework import DjangoFilterBackend
 
 
@@ -43,10 +48,9 @@ class RegisterUser(generics.GenericAPIView):
         profile = Profile.objects.create(**serializer.validated_data['profile'])
         count_age(profile=profile,data = serializer.validated_data['profile'].items())
         serializer.save(profile = profile)
-        # context = ({'list': [1,2,3,4,5,6],'name':profile.name,'surname':profile.last_name})
-        # message = render_to_string("index.html",context)
-        # 'email_body': f'{profile.name},спасибо за регистрацию!' ,
-        Util.send_email.delay(data = {'email_subject': 'Регистарция','email_body':'fdfdfddf','to_email': user['email']})
+        context = ({'name':profile.name,'surname':profile.last_name})
+        message = render_to_string('email_message',context)
+        Util.send_email.delay(data = {'email_subject': 'Регистарция','email_body':message,'to_email': user['email']})
         return response.Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class LoginUser(generics.GenericAPIView):
@@ -223,7 +227,7 @@ class RequetChangeEmail(generics.GenericAPIView):
             code_create(email=request.user.email,k=5,type=EMAIL_CHANGE_CODE_TYPE,
             dop_info = serializer.validated_data['email'])
             return response.Response(SENT_CODE_TO_EMAIL_SUCCESS, status=status.HTTP_200_OK)
-        return response.Response(CHANGE_ERROR.format('email'), status=status.HTTP_400_BAD_REQUEST)
+        return response.Response(THIS_EMAIL_ALREADY_IN_USE_ERROR, status=status.HTTP_400_BAD_REQUEST)
 
 class RequestChangePhone(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -274,3 +278,38 @@ class CheckCode(generics.GenericAPIView):
         self.code.delete()
         data = {'email_subject': email_subject,'email_body': f'{self.user.profile.name}{email_body}!' ,'to_email': self.user.email}
         Util.send_email.delay(data)
+
+
+
+
+class PaginatedElasticSearchAPIView(views.APIView,CustomPagination):
+    serializer_class = None
+    document_class = None
+
+    @abc.abstractmethod
+    def generate_q_expression(self, query):
+        """This method should be overridden
+        and return a Q() expression."""
+
+    def get(self, request, query):
+        try:
+            q = self.generate_q_expression(query)
+            search = self.document_class.search().query(q)
+            response = search.execute()
+            results = self.paginate_queryset(response, request, view=self)
+            serializer = self.serializer_class(results, many=True)
+            return self.get_paginated_response(serializer.data)
+        except Exception as e:
+            return response.Response(e, status=500)
+
+class SearchUsers(PaginatedElasticSearchAPIView):
+    serializer_class = ProfileListSerializer
+    document_class = ProfileDocument
+
+    def generate_q_expression(self, query):
+        return Q(
+                'multi_match', query=query,
+                fields=[
+                    'name',
+                    'last_name',
+                ], fuzziness='auto')
