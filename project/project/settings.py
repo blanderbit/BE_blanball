@@ -2,6 +2,9 @@ import os
 from pathlib import Path
 from decouple import config, Csv
 import datetime
+import django
+from django.utils.encoding import smart_str
+django.utils.encoding.smart_text = smart_str
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -51,6 +54,7 @@ INSTALLED_APPS = [
     'authentication',
     'notifications',
     'reviews',
+    'django_inlinecss',
 ]
 
 MIDDLEWARE = [
@@ -111,7 +115,7 @@ SWAGGER_SETTINGS = {
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

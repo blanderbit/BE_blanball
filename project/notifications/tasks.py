@@ -1,9 +1,12 @@
-from asgiref.sync import async_to_sync
-from notifications.models import Notification
-from channels.layers import get_channel_layer
 from project.celery import app
+from notifications.models import Notification
 from authentication.models  import ActiveUser
 from authentication.tasks import Util
+
+from django.template.loader import render_to_string
+
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
 
 def send_to_user(user,notification_text):
@@ -14,13 +17,14 @@ def send_to_user(user,notification_text):
             user.group_name,
             {
                 'type': 'kafka.message',
-                'message': notification_text
+                'message': notification_text,
             }
         )
     else:
-        Util.send_email.delay(data = {'email_subject': 'Your','email_body': notification_text ,
+        # context = ({'code': list(code.value),'name':user.profile.name,'surname':user.profile.last_name})
+        template = render_to_string('email_message.html')
+        Util.send_email.delay(data = {'email_subject': 'Blanball','email_body': template,
         'to_email': user.email})
-
 
 
 

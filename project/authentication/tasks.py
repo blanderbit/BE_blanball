@@ -1,8 +1,10 @@
-from django.core.mail import EmailMessage
 import threading
+
 from .models import Code,Profile
-from django.utils import timezone
 from project.celery import app
+
+from django.core.mail import EmailMessage
+from django.utils import timezone
 
 class EmailThread(threading.Thread):
 
@@ -20,6 +22,7 @@ class Util:
     def send_email(data):
         email = EmailMessage(
             subject=data['email_subject'], body=data['email_body'], to=[data['to_email']])
+        email.content_subtype = "html"
         EmailThread(email).start()
 
 
@@ -32,7 +35,7 @@ def delete_expire_codes():
 @app.task
 def check_user_age():
     for user_profile in Profile.objects.all():
-        print((timezone.now().date() - user_profile.birthday) / timezone.timedelta(days=1))
+        # print((timezone.now().date() - user_profile.birthday) / timezone.timedelta(days=1))
         if user_profile.birthday == timezone.now().date():
             user_profile.age += 1
             user_profile.save()

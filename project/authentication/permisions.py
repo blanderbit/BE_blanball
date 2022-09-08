@@ -1,5 +1,6 @@
-from rest_framework import permissions
 from authentication.models import Role
+
+from rest_framework import permissions
 
 def CheckRole(role_id,role_names):
     if Role.objects.get(id = role_id).name in role_names:

@@ -1,10 +1,12 @@
-from rest_framework import serializers,status
+import re
+
 from .models import *
 from project.constaints import *
-from django.contrib import auth
 from .validators import CodeValidator
-from phonenumber_field.modelfields import PhoneNumberField
 
+from django.contrib import auth
+
+from rest_framework import serializers,status
 
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
     """
@@ -64,11 +66,16 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
     profile = CreateUpdateProfileSerializer()
     class Meta:
         model = User
-        fields = ('configuration','profile')
+        fields = ('configuration','profile','get_planned_events')
 
     def validate(self,attrs):
         conf =  attrs.get('configuration')
         keys = ['email','phone']
+        planned_events =  attrs.get('get_planned_events')
+        num = re.findall(r'\d{1,10}', planned_events)[0]
+        str = re.findall(r'\D', planned_events)[0]
+        if str not in ['d','m','y']:
+            raise serializers.ValidationError(GET_PLANNED_IVENTS_ERROR,status.HTTP_400_BAD_REQUEST) 
         errors = []
     
         if not conf.keys():
@@ -152,7 +159,8 @@ class UserSerializer(DynamicFieldsModelSerializer):
         slug_field="name", read_only = True)
     class Meta:
         model = User
-        fields = ['id','phone','email','role','raiting','is_verified','profile','configuration','current_rooms']
+        # fields = ['id','phone','email','role','raiting','is_verified','profile','configuration','current_rooms']
+        exclude = ('updated_at','raiting','password')
 
 
 class ResetPasswordRequestSerializer(serializers.Serializer):

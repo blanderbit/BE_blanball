@@ -1,10 +1,19 @@
-from rest_framework import generics,permissions,filters,response,status
+import re
+import pandas 
+
 from .models import *
 from .serializers import *
 from project.services import *
-from django_filters.rest_framework import DjangoFilterBackend
 from project.constaints import *
-from notifications.tasks import send_notification_to_subscribe_event_user,send_to_user
+from notifications.tasks import *
+
+from django.db.models import Count
+
+from rest_framework import generics,permissions,filters,response,status
+from django_filters.rest_framework import DjangoFilterBackend
+
+
+
 
 
 class CreateEvent(generics.CreateAPIView,):
@@ -94,14 +103,45 @@ class JoinToEvent(generics.GenericAPIView):
         event = Event.objects.get(id = serializer.data['event_id'])
         
         if not user.current_rooms.filter(id=serializer.data['event_id']).exists():
-            if event.amount_members > event.count_current_users+1:
-                send_to_user(user = User.objects.get(id = event.author.id),notification_text= '+1 user')
-                user.current_rooms.add(event)
-            elif event.amount_members == event.count_current_users+1:
-                send_to_user(user = User.objects.get(id = event.author.id),notification_text= '+1 user and all places')
-                user.current_rooms.add(event)
+            if event.author_id != user.id:
+                if event.amount_members > event.count_current_users+1:
+                    send_to_user(user = User.objects.get(id = event.author.id),notification_text= '+1 user')
+                    user.current_rooms.add(event)
+                elif event.amount_members == event.count_current_users+1:
+                    send_to_user(user = User.objects.get(id = event.author.id),notification_text= '+1 user and all places')
+                    user.current_rooms.add(event)
+                return response.Response(JOIN_EVENT_SUCCES,status=status.HTTP_200_OK)
+            return response.Response(EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,status=status.HTTP_400_BAD_REQUEST)
+        return response.Response(ALREADY_IN_MEMBERS_LIST_ERROR,status=status.HTTP_400_BAD_REQUEST)
+
+
+class FanJoinToEvent(generics.GenericAPIView):
+    serializer_class = JoinOrRemoveRoomSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = request.user
+        event = Event.objects.get(id = serializer.data['event_id'])
+        if not user.current_views_rooms.filter(id=serializer.data['event_id']).exists():
+            user.current_views_rooms.add(event)
             return response.Response(JOIN_EVENT_SUCCES,status=status.HTTP_200_OK)
-        return response.Response(ALREADY_IN_MEMBER_LIST_ERROR,status=status.HTTP_400_BAD_REQUEST)
+        return response.Response(ALREADY_IN_FANS_LIST_ERROR,status=status.HTTP_400_BAD_REQUEST)
+
+class FanLeaveFromEvent(generics.GenericAPIView):
+    serializer_class = JoinOrRemoveRoomSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = request.user
+        event = Event.objects.get(id = serializer.data['event_id'])
+        if user.current_views_rooms.filter(id = serializer.data['event_id']).exists():
+            user.current_views_rooms.remove(event)
+            return response.Response(DISCONNECT_FROM_EVENT_SUCCESS,status=status.HTTP_200_OK)
+        return response.Response(NO_IN_FANS_LIST_ERROR,status=status.HTTP_400_BAD_REQUEST)
 
 
 class LeaveFromEvent(generics.GenericAPIView):
@@ -114,15 +154,13 @@ class LeaveFromEvent(generics.GenericAPIView):
         user = request.user
         event = Event.objects.get(id = serializer.data['event_id'])
         if user.current_rooms.filter(id = serializer.data['event_id']).exists():
-            if event.status == 'Planned':
-                user.current_rooms.remove(event)
-                return response.Response(DISCONNECT_FROM_EVENT_SUCCESS,status=status.HTTP_200_OK)
-            return response.Response(NO_IN_MEMBER_LIST_ERROR,status=status.HTTP_400_BAD_REQUEST)
-        return response.Response(NO_IN_MEMBER_LIST_ERROR,status=status.HTTP_400_BAD_REQUEST)
+            user.current_rooms.remove(event)
+            return response.Response(DISCONNECT_FROM_EVENT_SUCCESS,status=status.HTTP_200_OK)
+        return response.Response(NO_IN_MEMBERS_LIST_ERROR,status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserEvents(generics.ListAPIView):
-    serializer_class =  EventSerializer
+    serializer_class =  EventListSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = (filters.SearchFilter,DjangoFilterBackend)
     pagination_class = CustomPagination
@@ -132,3 +170,35 @@ class UserEvents(generics.ListAPIView):
 
     def get_queryset(self):
         return self.queryset.filter(author_id = self.request.user) 
+
+class PopularIvents(UserEvents):
+    queryset = Event.objects.filter(status = 'Planned')
+
+    def get_queryset(self):
+        return self.queryset.annotate(count = Count('current_users')).order_by('-count')[:10]
+
+class UserPlannedEvents(generics.ListAPIView):
+    serializer_class =  EventListSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = (filters.SearchFilter,DjangoFilterBackend)
+    pagination_class = CustomPagination
+    queryset = Event.objects.filter(status = 'Planned')
+
+    def list(self, request,pk):
+        pagination_class =  CustomPagination
+        try:
+            user =  User.objects.get(id=pk)
+            num = re.findall(r'\d{1,10}', user.get_planned_events)[0]
+            string = re.findall(r'\D', user.get_planned_events)[0]
+            if string == 'd':
+                num = int(num[0])
+            elif string == 'm':  
+                num = int(num[0])*30 + int(num[0])//2
+            elif string == 'y':
+                num = int(num[0])*365
+            finish_date = timezone.now() + timezone.timedelta(days=int(num))
+            queryset = self.queryset.filter(author_id = user.id,date_and_time__range=[timezone.now(),finish_date])
+            serializer = self.serializer_class(queryset, many=True)
+            return response.Response(serializer.data,status=status.HTTP_200_OK)
+        except:
+            return response.Response(NO_SUCH_USER_ERROR,status=status.HTTP_400_BAD_REQUEST)

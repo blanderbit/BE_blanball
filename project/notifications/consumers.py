@@ -1,10 +1,15 @@
-from channels.generic.websocket import AsyncWebsocketConsumer
 import json
-from authentication.models import User,ActiveUser
-from channels.db import database_sync_to_async
+
 from .tasks import *
+from authentication.models import User,ActiveUser
+
+from django.utils import timezone
+
+from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.db import database_sync_to_async
+
 from djangochannelsrestframework.observer.generics import ObserverModelInstanceMixin
-from djangochannelsrestframework.observer import model_observer
+
 
 class UserConsumer(ObserverModelInstanceMixin,AsyncWebsocketConsumer):
     async def connect(self):
@@ -22,9 +27,11 @@ class UserConsumer(ObserverModelInstanceMixin,AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def check_user(self):
-        user = User.objects.filter(email = self.scope['user'])
-        if user:
+        try:
+            User.objects.get(email = self.scope['user'])
             return True
+        except:
+            return False
 
     @database_sync_to_async
     def check_user_group_name(self):
@@ -53,23 +60,10 @@ class UserConsumer(ObserverModelInstanceMixin,AsyncWebsocketConsumer):
             )
             await self.delete_user_from_active()
 
-    async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-
-        # Send message to room group
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'kafka_message',
-                'message': message
-            }
-        )
-
-
     async def kafka_message(self, event):
         # Send message to WebSocket
         message = event['message']
         await self.send(text_data=json.dumps({
-            'message': message
+            'message': message,
+            'date_time': str(timezone.now())
         }))
