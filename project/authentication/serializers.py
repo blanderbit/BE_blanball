@@ -15,7 +15,7 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
     """
 
     def __init__(self, *args, **kwargs):
-        fields = kwargs.pop('fields', None)
+        fields:dict[any] = kwargs.pop('fields', None)
 
         # Instantiate the superclass normally
         super().__init__(*args, **kwargs)
@@ -31,20 +31,13 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
 class EventUsersProfileSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = Profile
-        fields = ['name','last_name','avatar','position']
-
-class EventAuthorSerializer(serializers.ModelSerializer):
-    profile = EventUsersProfileSerializer(fields=('position',))
-    class Meta:
-        model = User
-        fields = ['phone','profile']
+        fields = ['name','last_name','avatar']
 
 class EventUsersSerializer(serializers.ModelSerializer):
     profile = EventUsersProfileSerializer()
     class Meta:
         model = User
         fields = ['profile']
-
 
 
 class ProfileListSerializer(serializers.ModelSerializer):
@@ -69,14 +62,14 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
         fields = ('configuration','profile','get_planned_events')
 
     def validate(self,attrs):
-        conf =  attrs.get('configuration')
-        keys = ['email','phone']
+        conf:str =  attrs.get('configuration')
+        keys:dict[str] = ['email','phone']
         planned_events =  attrs.get('get_planned_events')
         num = re.findall(r'\d{1,10}', planned_events)[0]
-        str = re.findall(r'\D', planned_events)[0]
-        if str not in ['d','m','y']:
+        string = re.findall(r'\D', planned_events)[0]
+        if string not in ['d','m','y']:
             raise serializers.ValidationError(GET_PLANNED_IVENTS_ERROR,status.HTTP_400_BAD_REQUEST) 
-        errors = []
+        errors:list[str] = []
     
         if not conf.keys():
             raise serializers.ValidationError(CONFIGURATION_IS_REQUIRED_ERROR,status.HTTP_400_BAD_REQUEST) 
@@ -97,15 +90,15 @@ class RegisterSerializer(serializers.ModelSerializer):
         max_length=68, min_length=8, write_only=True)
     re_password = serializers.CharField(
         max_length=68, min_length=8, write_only=True)
-    profile = CreateUpdateProfileSerializer()
+    profile:Profile = CreateUpdateProfileSerializer()
     class Meta:
         model = User
         fields = ['email','phone','password','re_password','role','profile']
 
     def validate(self, attrs):
         '''data validation function'''
-        password = attrs.get('password', '')
-        re_password = attrs.get('re_password', '')
+        password:str = attrs.get('password', '')
+        re_password:str = attrs.get('re_password', '')
         
         if password != re_password :
             raise serializers.ValidationError(PASSWORDS_DO_NOT_MATCH,status.HTTP_400_BAD_REQUEST) 
@@ -139,9 +132,9 @@ class LoginSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         '''data validation function for user authorization'''
-        email = attrs.get('email', '')
-        password = attrs.get('password', '')
-        user = auth.authenticate(email=email, password=password)
+        email:str = attrs.get('email', '')
+        password:str = attrs.get('password', '')
+        user:User = auth.authenticate(email=email, password=password)
         if not user:
             raise serializers.ValidationError(INVALID_CREDENTIALS_ERROR,status.HTTP_400_BAD_REQUEST)
         return {
@@ -154,8 +147,8 @@ class LoginSerializer(serializers.ModelSerializer):
 
 class UserSerializer(DynamicFieldsModelSerializer):
     '''user pricate and public profile serializer'''
-    profile = ProfileSerializer()
-    role = serializers.SlugRelatedField(
+    profile:Profile = ProfileSerializer()
+    role:Role = serializers.SlugRelatedField(
         slug_field="name", read_only = True)
     class Meta:
         model = User
