@@ -60,3 +60,12 @@ CANNOT_HIDE_SHOW_THIS_FIELD_ERROR = 'error : You cannot hide or show fields:{key
 MAX_AGE_VALUE_ERROR = {'error': 'Age must not exceed 100 years old'}
 MIN_AGE_VALUE_ERROR = {'error': 'Age must be at least 6 years old'}
 CONFIGURATION_IS_REQUIRED_ERROR = {'error': 'Configuration is required field'}
+
+
+EMAIL_MESSAGE_TEMPLATE_TITLE = '{type} {key} у додатку Blanball'
+
+INVITE_USER_NOTIFICATION = '@{user_name},запросив вас на подію під номерм: №{event_id}'
+
+SENT_INVATION_SUCCESS = {'success':'Invation was sent'}
+
+SENT_INVATION_ERROR = {'error': 'You cannot invite yourself to the event'} 

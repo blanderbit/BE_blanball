@@ -1,6 +1,7 @@
 from .models import *
 from project.constaints import *
-from authentication.serializers import EventUsersSerializer,EventAuthorSerializer
+from authentication.serializers import EventUsersSerializer
+from authentication.models import User
 
 from django.utils import timezone
 
@@ -8,10 +9,11 @@ from rest_framework import serializers,status
 
 
 
+
 class CreateUpdateEventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
-        exclude = ('author','current_users','status','fans')
+        exclude = ('author','status','fans')
 
     def validate(self,attrs):
         date_and_time =  attrs.get('date_and_time')
@@ -24,7 +26,7 @@ class CreateUpdateEventSerializer(serializers.ModelSerializer):
 
 
 class EventSerializer(serializers.ModelSerializer):
-    author =  EventAuthorSerializer()
+    author =  EventUsersSerializer()
     current_users = EventUsersSerializer(many=True)
     class Meta:
         model = Event
@@ -38,11 +40,11 @@ class EventListSerializer(serializers.ModelSerializer):
         'count_current_users','count_fans') 
 
 class DeleteIventsSerializer(serializers.Serializer):
-    event_id = serializers.ListField(child=serializers.IntegerField(min_value=0))
+    events = serializers.ListField(child=serializers.IntegerField(min_value=0))
 
 
 class JoinOrRemoveRoomSerializer(serializers.Serializer):
-    event_id = serializers.IntegerField(min_value=0)
+    event_id:int = serializers.IntegerField(min_value=0)
 
     class Meta:
         fields = ('event_id',)
@@ -58,3 +60,12 @@ class JoinOrRemoveRoomSerializer(serializers.Serializer):
             return super().validate(attrs)
         except Event.DoesNotExist:
             raise serializers.ValidationError(EVENT_NOT_FOUND_ERROR,status.HTTP_404_NOT_FOUND)
+
+
+class InviteUserToEventSerializer(serializers.Serializer):
+    user_id:User.id = serializers.IntegerField(min_value=0)
+    event_id:Event.id = serializers.IntegerField(min_value=0)
+
+    class Meta:
+        fields = ('event_id','user_id')
+

@@ -42,7 +42,7 @@ class GetDeleteEvent(generics.RetrieveAPIView):
             event = self.queryset.get(id = pk)
             if event.author.id == request.user.id:
                 event.delete()
-                return response.Response(EVENT_DELETE_SUCCESS,status=status.HTTP_200_OK)
+                return response.Response(EVENT_DELETED_SUCCESS,status=status.HTTP_200_OK)
             return response.Response(NO_PERMISSIONS_ERROR,status=status.HTTP_403_FORBIDDEN)
         except:
             return response.Response(EVENT_NOT_FOUND_ERROR,status=status.HTTP_404_NOT_FOUND)
@@ -81,16 +81,25 @@ class DeleteEvents(generics.GenericAPIView):
     '''class that allows you to delete multiple events at once'''
     serializer_class = DeleteIventsSerializer
     permission_classes = [permissions.IsAuthenticated]
+    queryset = Event.objects.all()
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception= True)
-        for i in range(len(serializer.validated_data["event_id"])):
-            v_data = serializer.validated_data["event_id"] 
-            self.queryset.filter(id = serializer.validated_data["event_id"][i]).delete()
-        return response.Response({
-            "deleted": v_data
-        })
+        serializer.is_valid(raise_exception=True)
+        deleted = [] 
+        not_deleted = []
+        for event in serializer.validated_data['events']:
+            notify =  self.queryset.filter(id = event)
+            if notify:
+                notify = self.queryset.get(id = event)
+                if notify.user == request.user:
+                    notify.delete()
+                    deleted.append(event)
+                else:
+                    not_deleted.append(event)
+            else:
+                not_deleted.append(event)
+        return response.Response({"delete success": deleted, "delete error":  not_deleted},status=status.HTTP_200_OK)
 
 class JoinToEvent(generics.GenericAPIView):
     serializer_class = JoinOrRemoveRoomSerializer
@@ -105,14 +114,14 @@ class JoinToEvent(generics.GenericAPIView):
         if not user.current_rooms.filter(id=serializer.data['event_id']).exists():
             if event.author_id != user.id:
                 if event.amount_members > event.count_current_users+1:
-                    send_to_user.delay(user = User.objects.get(id = event.author.id),notification_text= '+1 user')
+                    send_to_user(user = User.objects.get(id = event.author.id),notification_text= '+1 user')
                     user.current_rooms.add(event)
                 elif event.amount_members == event.count_current_users+1:
-                    send_to_user.delay(user = User.objects.get(id = event.author.id),notification_text= '+1 user and all places')
+                    send_to_user(user = User.objects.get(id = event.author.id),notification_text= '+1 user and all places')
                     user.current_rooms.add(event)
                 return response.Response(JOIN_EVENT_SUCCES,status=status.HTTP_200_OK)
             return response.Response(EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,status=status.HTTP_400_BAD_REQUEST)
-        return response.Response(ALREADY_IN_MEMBERS_LIST_ERROR,status=status.HTTP_400_BAD_REQUEST)
+        return response.Response(ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,status=status.HTTP_400_BAD_REQUEST)
 
 
 class FanJoinToEvent(generics.GenericAPIView):
@@ -127,7 +136,7 @@ class FanJoinToEvent(generics.GenericAPIView):
         if not user.current_views_rooms.filter(id=serializer.data['event_id']).exists():
             user.current_views_rooms.add(event)
             return response.Response(JOIN_EVENT_SUCCES,status=status.HTTP_200_OK)
-        return response.Response(ALREADY_IN_FANS_LIST_ERROR,status=status.HTTP_400_BAD_REQUEST)
+        return response.Response(ALREADY_IN_EVENT_FANS_LIST_ERROR,status=status.HTTP_400_BAD_REQUEST)
 
 class FanLeaveFromEvent(generics.GenericAPIView):
     serializer_class = JoinOrRemoveRoomSerializer
@@ -141,7 +150,7 @@ class FanLeaveFromEvent(generics.GenericAPIView):
         if user.current_views_rooms.filter(id = serializer.data['event_id']).exists():
             user.current_views_rooms.remove(event)
             return response.Response(DISCONNECT_FROM_EVENT_SUCCESS,status=status.HTTP_200_OK)
-        return response.Response(NO_IN_FANS_LIST_ERROR,status=status.HTTP_400_BAD_REQUEST)
+        return response.Response(NO_IN_EVENT_FANS_LIST_ERROR,status=status.HTTP_400_BAD_REQUEST)
 
 
 class LeaveFromEvent(generics.GenericAPIView):
@@ -156,7 +165,7 @@ class LeaveFromEvent(generics.GenericAPIView):
         if user.current_rooms.filter(id = serializer.data['event_id']).exists():
             user.current_rooms.remove(event)
             return response.Response(DISCONNECT_FROM_EVENT_SUCCESS,status=status.HTTP_200_OK)
-        return response.Response(NO_IN_MEMBERS_LIST_ERROR,status=status.HTTP_400_BAD_REQUEST)
+        return response.Response(NO_IN_EVENT_MEMBERS_LIST_ERROR,status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserEvents(generics.ListAPIView):
@@ -173,6 +182,7 @@ class UserEvents(generics.ListAPIView):
 
 class PopularIvents(UserEvents):
     queryset = Event.objects.filter(status = 'Planned')
+    pagination_class =  None
 
     def get_queryset(self):
         return self.queryset.annotate(count = Count('current_users')).order_by('-count')[:10]
@@ -197,3 +207,22 @@ class UserPlannedEvents(UserEvents):
             return response.Response(serializer.data,status=status.HTTP_200_OK)
         except:
             return response.Response(NO_SUCH_USER_ERROR,status=status.HTTP_400_BAD_REQUEST)
+
+class InviteUserToEvent(generics.GenericAPIView):
+    serializer_class = InviteUserToEventSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def post(self,request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            invite_user = User.objects.get(id = serializer.validated_data['user_id'])
+            if invite_user.id == request.user.id:
+                return response.Response(SENT_INVATION_ERROR,status=status.HTTP_400_BAD_REQUEST)
+            event = Event.objects.get(id = serializer.validated_data['event_id'])
+            send_to_user(user = invite_user,notification_text=INVITE_USER_NOTIFICATION.format(user_name=request.user.profile.name,event_id=event.id))
+            return response.Response(SENT_INVATION_SUCCESS,status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return response.Response(NO_SUCH_USER_ERROR,status=status.HTTP_404_NOT_FOUND)
+        except Event.DoesNotExist:
+            return response.Response(EVENT_NOT_FOUND_ERROR,status=status.HTTP_404_NOT_FOUND)

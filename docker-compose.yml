@@ -71,7 +71,7 @@ services:
         condition: service_healthy
       api:
         condition: service_started
-      db:
+      elasticsearch:
         condition: service_started
   celery-beat:
     env_file:
@@ -93,6 +93,8 @@ services:
         condition: service_started
       db:
         condition: service_started
+      elasticsearch:
+        condition: service_started
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.8.0
     container_name: elasticsearch
@@ -113,7 +115,18 @@ services:
       memlock:
         soft: -1
         hard: -1
-    
+
+  pgbackups:
+    image: prodrigestivill/postgres-backup-local
+    restart: always
+    volumes:
+      - ./backup:/backups
+    links:
+      - db
+    depends_on:
+      - db
+    env_file:
+      - ./compose/.env
 # networks:
 #   app-network:
 #      driver: bridge    

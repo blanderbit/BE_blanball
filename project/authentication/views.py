@@ -21,14 +21,14 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 
 
-def user_delete(pk):
+def user_delete(pk:User.id):
     Code.objects.filter(user_email = User.objects.get(id = pk).email).delete()
     Event.objects.filter(author_id = pk).delete()
     Notification.objects.filter(user_id = pk).delete()
     Profile.objects.filter(id = pk).delete()
     User.objects.filter(id = pk).delete()
 
-def count_age(profile,data):
+def count_age(profile:Profile,data:dict):
     for item in data:
         if item[0] == 'birthday':
             birthday = item[1]
@@ -48,9 +48,10 @@ class RegisterUser(generics.GenericAPIView):
         profile = Profile.objects.create(**serializer.validated_data['profile'])
         count_age(profile=profile,data = serializer.validated_data['profile'].items())
         serializer.save(profile = profile)
-        context = ({'name':profile.name,'surname':profile.last_name})
-        message = render_to_string('email_message',context)
-        Util.send_email.delay(data = {'email_subject': 'Регистарция','email_body':message,'to_email': user['email']})
+        context = ({'name':profile.name,'surname':profile.last_name,'title':'Успішна регестрація!',
+        'text': ',дякуємо вам за регестрацію в нашому додатку Blanball'})
+        message = render_to_string('email_message.html',context)
+        Util.send_email.delay(data = {'email_subject': 'Blanball','email_body':message,'to_email': user['email']})
         return response.Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class LoginUser(generics.GenericAPIView):
@@ -75,7 +76,7 @@ class AccountDelete(generics.GenericAPIView):
         try:
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms='HS256')
             user = User.objects.get(id=payload['user_id'])
-            Util.send_email.delay(data = {'email_subject': 'Удалание аккаунта','email_body': f'{user.profile.name},аккаунт удален!' ,'to_email': user['email']})
+            Util.send_email.delay(data = {'email_subject': 'Blanball','email_body': f'{user.profile.name},аккаунт удален!' ,'to_email': user['email']})
             user_delete(pk = user.id)
             return  response.Response(ACCOUNT_DELETED_SUCCESS,status=status.HTTP_200_OK)
         except jwt.ExpiredSignatureError:
@@ -89,6 +90,7 @@ class UserOwnerProfile(generics.GenericAPIView):
     pagination_class = None
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
+    
     def get(self,request):
         user = User.objects.get(id=self.request.user.id)
         serializer = UserSerializer(user)
@@ -111,7 +113,7 @@ class UpdateProfile(generics.GenericAPIView):
     queryset = User.objects.all()
 
     def put(self, request):
-        user = self.queryset.get(id=self.request.user.id)
+        user:User = self.queryset.get(id=self.request.user.id)
         serializer = self.serializer_class(user, data=request.data)
         serializer.is_valid(raise_exception = True)
         profile = Profile.objects.filter(id =user.profile_id)
@@ -131,7 +133,7 @@ class UserProfile(generics.GenericAPIView):
     def get(self,request,pk):
         fields = ['configuration']
         try:
-            user = self.queryset.get(id=pk)
+            user:User = self.queryset.get(id=pk)
             for item in user.configuration.items():
                 if item[1] == True:
                     serializer = self.serializer_class(user,fields=(fields))
@@ -174,7 +176,7 @@ class RequestPasswordReset(generics.GenericAPIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
 
-        email = request.data.get('email', '')
+        email:str = request.data.get('email', '')
 
         if User.objects.filter(email=email).exists():
             code_create(email=email,k=5,type=PASSWORD_RESET_CODE_TYPE,dop_info = None)
@@ -214,7 +216,7 @@ class RequestChangePassword(generics.GenericAPIView):
             return response.Response(WRONG_PASSWORD_ERROR, status=status.HTTP_400_BAD_REQUEST)
         else:
             code_create(email=request.user.email,k=5,type=PASSWORD_CHANGE_CODE_TYPE,
-            dop_info =  serializer.validated_data['new_password'])
+            dop_info = serializer.validated_data['new_password'])
             return response.Response(SENT_CODE_TO_EMAIL_SUCCESS, status=status.HTTP_200_OK)
 
 class RequetChangeEmail(generics.GenericAPIView):
@@ -244,8 +246,8 @@ class CheckCode(generics.GenericAPIView):
     '''password reset on a previously sent request'''
     serializer_class = CheckCodeSerializer
     permission_classes = [permissions.IsAuthenticated]
-    user =  None
-    code =  None
+    user:User =  None
+    code:User =  None
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -295,7 +297,9 @@ class PaginatedElasticSearchAPIView(views.APIView,CustomPagination):
         try:
             q = self.generate_q_expression(query)
             search = self.document_class.search().query(q)
+            print(search)
             response = search.execute()
+            print(request)
             results = self.paginate_queryset(response, request, view=self)
             serializer = self.serializer_class(results, many=True)
             return self.get_paginated_response(serializer.data)
@@ -305,6 +309,8 @@ class PaginatedElasticSearchAPIView(views.APIView,CustomPagination):
 class SearchUsers(PaginatedElasticSearchAPIView):
     serializer_class = ProfileListSerializer
     document_class = ProfileDocument
+    filter_backends = (filters.SearchFilter,DjangoFilterBackend)
+    search_fields = ('name','last_name')
 
     def generate_q_expression(self, query):
         return Q(

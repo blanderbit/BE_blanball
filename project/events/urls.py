@@ -28,12 +28,14 @@ urlpatterns = [
     path('client/fan/event/leave',FanLeaveFromEvent.as_view()),
     #endpoint where a user can leaver from event 
     path('client/event/leave',LeaveFromEvent.as_view()),
-    #endpoint where a use can get list of user events
+    #endpoint where a user can get list of user events
     path('client/my/events/list',UserEvents.as_view()),
-    #endpoint where a use can get list of user events
+    #endpoint where a user can get list of user events
     path('client/user/planned/events/list<int:pk>',UserPlannedEvents.as_view()),
-    #endpoint where a use can get list of user events
+    #endpoint where a user can get list of user events
     path('client/user/planned/events/list<int:pk>',UserPlannedEvents.as_view()),
-     #endpoint where a use can get list of events
+     #endpoint where a user can get list of events
     path('client/popular/events/list',PopularIvents.as_view()),
+    #endpoint where a user can invite other user to ivent
+    path('client/invite/user/to/event',InviteUserToEvent.as_view()),
 ]

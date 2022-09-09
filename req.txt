@@ -104,3 +104,4 @@ django-inlinecss==0.3.0
 elasticsearch-dsl==7.4.0
 elasticsearch==7.17.6
 django-elasticsearch-dsl-drf==0.22.5
+django-minio-storage==0.3.10

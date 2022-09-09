@@ -27,11 +27,9 @@ class UserConsumer(ObserverModelInstanceMixin,AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def check_user(self):
-        try:
-            User.objects.get(email = self.scope['user'])
+        user = User.objects.filter(email = self.scope['user'])
+        if user:
             return True
-        except:
-            return False
 
     @database_sync_to_async
     def check_user_group_name(self):
@@ -59,6 +57,35 @@ class UserConsumer(ObserverModelInstanceMixin,AsyncWebsocketConsumer):
                 self.channel_name
             )
             await self.delete_user_from_active()
+
+    async def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        message = text_data_json['message']
+
+        # Send message to room group
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'kafka_message',
+                'message': message
+            }
+        )
+
+
+    async def kafka_message(self, event):
+        # Send message to WebSocket
+        message = event['message']
+        await self.send(text_data=json.dumps({
+            'message': message
+        }))
+
+
+
+
+
+
+
+
 
     async def kafka_message(self, event):
         # Send message to WebSocket

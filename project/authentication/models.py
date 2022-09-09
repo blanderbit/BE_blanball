@@ -3,6 +3,7 @@ from .managers import *
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from django.utils import timezone
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 from phonenumber_field.modelfields import PhoneNumberField
 
@@ -40,8 +41,14 @@ class Profile(models.Model):
     birthday = models.DateField(blank=True,null = True,validators = [validate_birthday])
     avatar = models.ImageField(null=True,blank=True,upload_to = 'media/profile')
     age = models.PositiveSmallIntegerField(null=True,blank=True)
-    height = models.PositiveSmallIntegerField(null=True,blank=True)
-    weight = models.PositiveSmallIntegerField(null=True,blank=True)
+    height = models.PositiveSmallIntegerField(null=True,blank=True,validators=[
+            MinValueValidator(30),
+            MaxValueValidator(210),
+        ])
+    weight = models.PositiveSmallIntegerField(null=True,blank=True,validators=[
+            MinValueValidator(30),
+            MaxValueValidator(210),
+        ])
     position = models.CharField(max_length=50,null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     about_me =  models.TextField(blank=True,null = True)
