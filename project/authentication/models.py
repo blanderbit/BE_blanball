@@ -19,11 +19,10 @@ class Gender(models.TextChoices):
     woomen = 'Woomen'
 
 
-class Role(models.Model):
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
+class Role(models.TextChoices):
+    '''rolechoices'''
+    user = 'User'
+    admin = 'Admin'
 
 def validate_birthday(value):
     if timezone.now().date() - value > timezone.timedelta(days=29200):
@@ -62,7 +61,7 @@ class User(AbstractBaseUser):
     phone = PhoneNumberField(unique=True)
     is_verified = models.BooleanField(default=False)
     get_planned_events = models.CharField(max_length=10,default="1m") 
-    role =  models.ForeignKey(Role,on_delete=models.CASCADE,blank=True,null = True)
+    role =  models.CharField(choices = Role.choices,max_length=10,blank=True,null=True)
     updated_at = models.DateTimeField(auto_now=True)
     raiting = models.FloatField(null = True,blank= True)
     profile = models.ForeignKey(Profile,on_delete=models.CASCADE,blank=True,null = True,related_name='user')
@@ -90,7 +89,8 @@ class User(AbstractBaseUser):
 
 class Code(models.Model):
     value = models.CharField(max_length=5,unique=True)
-    life_time = models.DateTimeField(null = True,blank=True)
+    life_time = models.DateTimeField(null = True,blank=True,default=timezone.now() + 
+        timezone.timedelta(minutes=CODE_EXPIRE_MINUTES_TIME))
     type = models.CharField(max_length=20)
     user_email = models.CharField(max_length=100)
     dop_info = models.CharField(max_length=250,null = True,blank = True)

@@ -71,6 +71,8 @@ services:
         condition: service_healthy
       api:
         condition: service_started
+      db:
+        condition: service_started
       elasticsearch:
         condition: service_started
   celery-beat:
@@ -116,7 +118,10 @@ services:
         soft: -1
         hard: -1
 
-  pgbackups:
+  backup:
+    container_name: backup
+    env_file:
+      - ./compose/.env
     image: prodrigestivill/postgres-backup-local
     restart: always
     volumes:
@@ -125,8 +130,6 @@ services:
       - db
     depends_on:
       - db
-    env_file:
-      - ./compose/.env
 # networks:
 #   app-network:
 #      driver: bridge    

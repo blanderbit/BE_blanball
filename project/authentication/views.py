@@ -164,7 +164,7 @@ class AdminUsersList(generics.ListAPIView):
     queryset = User.objects.all()
 
     def get_queryset(self):
-        return self.queryset.filter(role_id = Role.objects.get(name = ADMIN_ROLE).id)
+        return self.queryset.filter(role = "Admin")
 
 
 

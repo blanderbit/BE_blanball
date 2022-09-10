@@ -93,7 +93,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     profile:Profile = CreateUpdateProfileSerializer()
     class Meta:
         model = User
-        fields = ['email','phone','password','re_password','role','profile']
+        fields = ['email','phone','password','re_password','profile']
 
     def validate(self, attrs):
         '''data validation function'''
@@ -148,8 +148,6 @@ class LoginSerializer(serializers.ModelSerializer):
 class UserSerializer(DynamicFieldsModelSerializer):
     '''user pricate and public profile serializer'''
     profile:Profile = ProfileSerializer()
-    role:Role = serializers.SlugRelatedField(
-        slug_field="name", read_only = True)
     class Meta:
         model = User
         # fields = ['id','phone','email','role','raiting','is_verified','profile','configuration','current_rooms']
