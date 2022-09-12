@@ -29,22 +29,19 @@ class TestAuthenticationModels(SetUpTest):
     def test_create_user(self):
         self.assertEqual(Profile.objects.count(),1)
         self.assertEqual(User.objects.count(),1)
+
+    def test_user_profile_id(self):
         self.assertEqual(self.user.profile_id,self.profile.id)
+
+    def test_user_configuration(self):
+        self.assertEqual(self.user.configuration,{'email': True,'phone':True})
 
     def test_check_user_defalut_fields(self):
         self.assertEqual(self.user.get_planned_events,'1m')
         self.assertEqual(self.user.group_name,'user_1')
         self.assertEqual(self.user.__str__(),'user@example.com')
-        self.assertEqual(self.user.configuration,{'email': True,'phone':True})
-    
+
     def test_user_tokens_method(self):
-        self.client.force_authenticate(self.user.tokens()['access'])
         payload = jwt.decode(self.user.tokens()['access'], settings.SECRET_KEY, algorithms="HS256")
         self.assertEqual(self.user.id,payload['user_id'])
 
-
-    def test_max_birthday_age(self):
-        Profile.objects.create(birthday = '1800-01-01')
-        Profile.objects.create(birthday = '2000-01-01')
-        # self.assertFalse(Profile.objects.create(birthday = '2000-01-01'))
-        print(Profile.objects.count())

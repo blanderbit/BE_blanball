@@ -1,140 +1,134 @@
 version: "3.8"
-services: 
+
+services:
+
   db:
     container_name: db
-    image: postgres:latest
-    ports:
-      - "5432:5432"
-    env_file:
-      - ./compose/.env
-    volumes:
+    image: "postgres:14.5-alpine"
+    volumes: 
       - db-data:/usr/src/blanball/storage/db/data
+    ports: 
+      - "5432:5432"
+    env_file: 
+      - ./compose/.env
     healthcheck:
       test: pg_isready -U postgres -d postgres
       timeout: 40s
       retries: 20
-    # networks:
-    #   - app-network
-      
+
   api:
     container_name: api
-    env_file:
-      - ./compose/.env
     command: bash compose/local/django-start.sh
-    ports:
-      - "8000:8000"
     build: 
       context: .
       dockerfile: compose/Dockerfile
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      elasticsearch:
-        condition: service_started
-    # networks:
-    #   - app-network    
-    links:
-     - redis
-    volumes:
+    volumes: 
       - .:/usr/src/blanball
+    ports: 
+      - "8000:8000"
+    env_file: 
+      - ./compose/.env
+    depends_on:
+      db: 
+        condition: service_healthy
+      redis: 
+        condition: service_healthy
+    links: 
+      - redis
      
   redis:
     container_name: redis
+    image: "redis:7.0.4-alpine"
+    volumes: 
+      - redis-data:/usr/src/blanball/storage/redis/data
     env_file:
       - ./compose/.env
-    image: redis:latest
-    volumes:
-      - redis-data:/usr/src/blanball/storage/redis/data
-    # networks:
-    #   - app-network  
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
       timeout: 3s
       retries: 5
+
   celery-worker:
-    env_file:
-      - ./compose/.env
     container_name: celery-worker
-    build: 
-      context: .
-      dockerfile: compose/Dockerfile
-    restart: always
     command: bash compose/local/celery-worker-start.sh
-    volumes:
-      - .:/usr/src/blanball 
-    # networks:
-    #   - app-network  
-    depends_on:
-      redis:
-        condition: service_healthy
-      api:
-        condition: service_started
-      db:
-        condition: service_started
-      elasticsearch:
-        condition: service_started
-  celery-beat:
-    env_file:
-      - ./compose/.env
-    container_name: celery-beat
     build: 
       context: .
       dockerfile: compose/Dockerfile
-    restart: always 
-    command: bash compose/local/celery-beat-start.sh
-    volumes:
+    volumes: 
       - .:/usr/src/blanball
-    # networks:
-    #   - app-network
+    env_file: 
+      - ./compose/.env 
     depends_on:
-      redis:
-        condition: service_healthy
-      api:
-        condition: service_started
       db:
         condition: service_started
-      elasticsearch:
+      api:
         condition: service_started
+
+  celery-beat:
+    container_name: celery-beat
+    command: bash compose/local/celery-beat-start.sh
+    build: 
+      context: .
+      dockerfile: compose/Dockerfile
+    volumes: 
+      - .:/usr/src/blanball
+    env_file: 
+      - ./compose/.env 
+    depends_on:
+      db:
+        condition: service_started
+      api:
+        condition: service_started  
+        
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.8.0
     container_name: elasticsearch
-    environment:
-      - node.name=elasticsearch
-      - cluster.name=docker-cluster
-      - cluster.initial_master_nodes=elasticsearch
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms256M -Xmx256M"
-      - http.cors.enabled=true
-      - http.cors.allow-origin=*
-      - network.host=_eth0_
-      - xpack.ml.enabled=false 
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.8.0
+    volumes:
+      - elastic-data:/usr/src/blanball/storage/elastic/data
     ports:
       - "9200:9200"
+    environment:
+    - node.name=elasticsearch
+    - cluster.name=docker-cluster
+    - cluster.initial_master_nodes=elasticsearch
+    - bootstrap.memory_lock=true
+    - "ES_JAVA_OPTS=-Xms256M -Xmx256M"
+    - http.cors.enabled=true
+    - http.cors.allow-origin=*
+    - network.host=_eth0_
+    - xpack.ml.enabled=false 
     ulimits:
       nproc: 65535
       memlock:
         soft: -1
         hard: -1
 
-  backup:
-    container_name: backup
-    env_file:
-      - ./compose/.env
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    volumes:
+      - pgadmin-data:/usr/src/blanball/storage/pgadmin/data
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: gameonly1921@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: admin1921
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+
+  db_backup:
+    container_name: db_backup
     image: prodrigestivill/postgres-backup-local
     restart: always
     volumes:
       - ./backup:/backups
-    links:
-      - db
+    env_file: 
+      - ./compose/.env
     depends_on:
-      - db
-# networks:
-#   app-network:
-#      driver: bridge    
-     
+      db:
+        condition: service_started
+
 volumes:
   db-data:
   redis-data:
   elastic-data:
+  pgadmin-data:

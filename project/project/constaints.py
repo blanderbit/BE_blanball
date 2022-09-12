@@ -69,3 +69,5 @@ INVITE_USER_NOTIFICATION = '@{user_name},запросив вас на подію
 SENT_INVATION_SUCCESS = {'success':'Invation was sent'}
 
 SENT_INVATION_ERROR = {'error': 'You cannot invite yourself to the event'} 
+
+NO_PRICE_DESK_ERROR = {'error':'If the price is greater than 0 you must provide a description of what it is for'}

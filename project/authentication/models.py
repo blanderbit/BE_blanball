@@ -34,8 +34,8 @@ def configuration_dict():
     return {'email': True,'phone':True}
 
 class Profile(models.Model):
-    name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
+    name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
     gender = models.CharField(choices =  Gender.choices,max_length=10)
     birthday = models.DateField(blank=True,null = True,validators = [validate_birthday])
     avatar = models.ImageField(null=True,blank=True,upload_to = 'media/profile')
@@ -48,7 +48,7 @@ class Profile(models.Model):
             MinValueValidator(30),
             MaxValueValidator(210),
         ])
-    position = models.CharField(max_length=50,null=True,blank=True)
+    position = models.CharField(max_length=255,null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     about_me =  models.TextField(blank=True,null = True)
     def __str__(self):
@@ -89,8 +89,7 @@ class User(AbstractBaseUser):
 
 class Code(models.Model):
     value = models.CharField(max_length=5,unique=True)
-    life_time = models.DateTimeField(null = True,blank=True,default=timezone.now() + 
-        timezone.timedelta(minutes=CODE_EXPIRE_MINUTES_TIME))
+    life_time = models.DateTimeField(null = True,blank=True)
     type = models.CharField(max_length=20)
     user_email = models.CharField(max_length=100)
     dop_info = models.CharField(max_length=250,null = True,blank = True)

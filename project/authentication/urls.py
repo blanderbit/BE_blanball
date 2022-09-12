@@ -4,38 +4,34 @@ from django.urls import path
 
 
 urlpatterns = [
-    # endpoint where the user can create an account
+    # endpoint where user can register
     path('client/register', RegisterUser.as_view(),name='register'),
-    # endpoint where the user can log into a previously created account
+    # endpoint where user can login
     path('client/login', LoginUser.as_view(),name='login'),
-    # endpoint where client can check all users list
+    # endpoint where user can get users list
     path('client/users/list',UserList.as_view(),name='users-list'),
-    # endpoint where admin can check all admins list
+    # endpoint where user can get admins list
     path('admins/list',AdminUsersList.as_view(),name='admins-list'),
-    # endpoint where the user can see detail information
-    # about your account
+    # endpoint where user can get his profile
     path('client/me', UserOwnerProfile.as_view(),name='my-profile'),
-    # endpoint where the user can see detail information
-    # about any user profile
+    # endpoint where user can get profile of any user
     path('client/profile/<int:pk>', UserProfile.as_view(),name='user-profile'),
-    #endpoint at which a password change request
+    # endpoint where user can request reset password
     path('client/request-reset/password', RequestPasswordReset.as_view(),name='request-reset-password'),
-    #endpoint where the password is reset according
-    # to the data sent to the mail
+    # endpoint where user can confirm password reset
     path('client/password/reset-complete', ResetPassword.as_view(),name='complete-reset-password'),
-    #endpoint at which a password change request
+    # endpoint where user can request change password
     path('client/request-change/password', RequestChangePassword.as_view(),name='request-change-password'),
-
+    # endpoint where user can confirm password chagne,email change,phone change,account verification
     path('client/check/code',CheckCode.as_view(),name='check-code'),
-    #endpoint where user can delete her account
-    path('client/me/delete', AccountDelete.as_view()),
-    # endpoint where the user can see detail information
-    # about your account
-    path('client/me/update', UpdateProfile.as_view()),
-    #endpoint at which a email change request
-    path('client/request-change/email',RequetChangeEmail.as_view()),
-    #endpoint at which a phone change request
-    path('client/request-change/phone',RequestChangePhone.as_view()),
-
+    # endpoint where user can confirm account delete
+    path('client/me/delete', AccountDelete.as_view(),name='delete-my-profile'),
+    # endpoint where user can update his profile
+    path('client/me/update', UpdateProfile.as_view(),name='update-my-profile'),
+    # endpoint where user can request change email
+    path('client/request-change/email',RequetChangeEmail.as_view(),name='request-change-email'),
+    # endpoint where user can request change phone
+    path('client/request-change/phone',RequestChangePhone.as_view(),name='request-change-phone'),
+    # endpoint where user can find any user
     path('client/search/user/<str:query>/',SearchUsers.as_view()),
 ]

@@ -49,18 +49,20 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'rest_framework_swagger',
     'rest_framework',
+    'django_inlinecss',
+    'django_elasticsearch_dsl',
     'drf_yasg',
     'django_filters',
     'phonenumber_field',
     'channels',
-    'events',
-    'authentication',
-    'notifications',
-    'reviews',
-    'django_inlinecss',
-    'django_elasticsearch_dsl',
+
+    'events.apps.EventsConfig',
+    'authentication.apps.AuthenticationConfig',
+    'notifications.apps.NotificationsConfig',
+    'reviews.apps.ReviewsConfig',
 )
 
 ELASTICSEARCH_DSL = {
@@ -164,8 +166,11 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 10,
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_PAGINATION_CLASS': None,
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
 
 SIMPLE_JWT = {

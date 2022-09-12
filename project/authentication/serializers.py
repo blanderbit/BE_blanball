@@ -104,7 +104,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(PASSWORDS_DO_NOT_MATCH,status.HTTP_400_BAD_REQUEST) 
         return attrs
 
-    def create(self, validated_data):
+    def create(self, validated_data)-> User:
         validated_data.pop("re_password")
         '''creating a user with previously validated data'''
         return User.objects.create_user(**validated_data)

@@ -8,22 +8,34 @@ from django.utils import timezone
 from rest_framework import serializers,status
 
 
+class EventDateTimeValidator:
 
-
-class CreateUpdateEventSerializer(serializers.ModelSerializer):
+    def __call__(self,attrs):
+        date_and_time =  attrs.get('date_and_time')
+        price = attrs.get('price')
+        price_desc = attrs.get('price_description')
+        if date_and_time - timezone.now()+timezone.timedelta(hours=1) < timezone.timedelta(hours=1):
+            raise serializers.ValidationError(BAD_EVENT_TIME_CREATE_ERROR,status.HTTP_400_BAD_REQUEST)
+        if price and price > 0 and price_desc == None:
+            raise serializers.ValidationError(NO_PRICE_DESK_ERROR,status.HTTP_400_BAD_REQUEST)
+        if not price and price_desc:
+            raise serializers.ValidationError(NO_PRICE_DESK_ERROR,status.HTTP_400_BAD_REQUEST)
+        return attrs
+class CreateEventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
+        validators = [EventDateTimeValidator()]
         exclude = ('author','status','fans')
 
-    def validate(self,attrs):
-        date_and_time =  attrs.get('date_and_time')
-        if date_and_time - timezone.now()+timezone.timedelta(hours=1) > timezone.timedelta(hours=1):
-            return super().validate(attrs) 
-        raise serializers.ValidationError(BAD_EVENT_TIME_CREATE_ERROR,status.HTTP_400_BAD_REQUEST)
-    
+
+class UpdateEventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        validators = [EventDateTimeValidator()]
+        exclude = ('author','status','fans','current_users')
+
     def update(self, instance, validated_data):
         return super().update(instance,validated_data)
-
 
 class EventSerializer(serializers.ModelSerializer):
     author =  EventUsersSerializer()

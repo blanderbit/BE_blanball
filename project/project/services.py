@@ -15,7 +15,8 @@ from rest_framework.generics import GenericAPIView
 def code_create(email,k,type,dop_info):
     '''create email verification code'''
     verify_code = ''.join(random.choices(string.ascii_uppercase, k=k))
-    code = Code.objects.create(dop_info = dop_info,value = verify_code,user_email = email,type = type)
+    code = Code.objects.create(dop_info = dop_info,value = verify_code,user_email = email,type = type,
+    life_time = timezone.now() + timezone.timedelta(minutes=CODE_EXPIRE_MINUTES_TIME))
     user = User.objects.get(email = email)
     if code.type == PHONE_CHANGE_CODE_TYPE:
         title = EMAIL_MESSAGE_TEMPLATE_TITLE.format(type = 'Зміна',key = 'номеру телефону')
