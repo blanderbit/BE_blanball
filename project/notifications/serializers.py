@@ -19,3 +19,9 @@ class ReadOrDeleteNotificationsSerializer(serializers.Serializer):
 
     class Meta:
         fields = ['notifications']
+
+class ChangeMaintenanceSerializer(serializers.Serializer):
+    isMaintenance = serializers.BooleanField() 
+
+    class Meta:
+        fields = ['isMaintenance']

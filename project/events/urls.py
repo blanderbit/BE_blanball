@@ -6,34 +6,30 @@ from django.urls import path
 
 
 urlpatterns = [
-    #endpoint where a user with admin
-    #role can create a new one event 
-    path('client/event/create',CreateEvent.as_view()),
-    #endpoint where a user with admin
-    #role can get detail info and delete event 
-    path('client/event/<int:pk>',GetDeleteEvent.as_view()),
-    #endpoint where a user with admin
-    #role can get detail info and delete event 
-    path('client/event/update/<int:pk>',UpdateEvent.as_view()),
-    #endpoint where a use can get list of events
-    path('client/events/list',EventList.as_view()),
-    #endpoint where a user with admin
-    #role can delete events
-    path('admin/events/delete',DeleteEvents.as_view()),
-    #endpoint where a user can join to event 
-    path('client/event/join',JoinToEvent.as_view()),
-    #endpoint where a fan can join to event 
-    path('client/fan/event/join',FanJoinToEvent.as_view()),
-    #endpoint where a fan can leave from event 
-    path('client/fan/event/leave',FanLeaveFromEvent.as_view()),
-    #endpoint where a user can leaver from event 
-    path('client/event/leave',LeaveFromEvent.as_view()),
-    #endpoint where a use can get list of user events
-    path('client/my/events/list',UserEvents.as_view()),
-    #endpoint where a use can get list of user events
-    path('client/user/planned/events/list<int:pk>',UserPlannedEvents.as_view()),
-    #endpoint where a use can get list of user events
-    path('client/user/planned/events/list<int:pk>',UserPlannedEvents.as_view()),
-     #endpoint where a use can get list of events
-    path('client/popular/events/list',PopularIvents.as_view()),
+    # endpoint where user can create new event 
+    path('client/event/create',CreateEvent.as_view(),name='event-create'),
+    # endpoint where user can get,delete event
+    path('client/event/<int:pk>',GetDeleteEvent.as_view(),name='get-delete-event'),
+    # endpoint where user can update event
+    path('client/event/update/<int:pk>',UpdateEvent.as_view(),name='update-event'),
+    #endpoint where user can get list of events
+    path('client/events/list',EventList.as_view(),name='events-list'),
+    # endpoint where user can bulk delete events
+    path('admin/events/delete',DeleteEvents.as_view(),name='bulk-delete-events'),
+    # endpoint where user can join to event 
+    path('client/event/join',JoinToEvent.as_view(),name='join-to-event'),
+    # endpoint where user can leave from event 
+    path('client/event/leave',LeaveFromEvent.as_view(),name='leave-from-event'),
+    # endpoint where user can join to event like a spectator
+    path('client/fan/event/join',FanJoinToEvent.as_view(),name='spectator-join-to-event'),
+    # endpoint where spectator can leave from event 
+    path('client/fan/event/leave',FanLeaveFromEvent.as_view(),name='spectator-leave-from-event'),
+    # endpoint where user can get list of your events
+    path('client/my/events/list',UserEvents.as_view(),name='user-events'),
+    # endpoint where a user can get list of other user scheduled events
+    path('client/user/planned/events/list<int:pk>',UserPlannedEvents.as_view(),name='user-planned-events'),
+    # endpoint where a user can get list of the most popular events
+    path('client/popular/events/list',PopularIvents.as_view(),name='popular-events'),
+    #endpoint where a user can invite other user to ivent
+    path('client/invite/user/to/event',InviteUserToEvent.as_view(),name='invite-to-event'),
 ]
