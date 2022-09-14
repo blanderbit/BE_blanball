@@ -1,11 +1,17 @@
+from .managers import *
+
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
+from django.utils import timezone
+from django.core.validators import MaxValueValidator, MinValueValidator
+
 from phonenumber_field.modelfields import PhoneNumberField
+
 from rest_framework_simplejwt.tokens import RefreshToken,AccessToken
-from .managers import *
 from rest_framework.serializers import ValidationError
 from rest_framework import status
-from django.utils import timezone
+
+
 
 class Gender(models.TextChoices):
     '''gender choices'''
@@ -13,11 +19,10 @@ class Gender(models.TextChoices):
     woomen = 'Woomen'
 
 
-class Role(models.Model):
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
+class Role(models.TextChoices):
+    '''rolechoices'''
+    user = 'User'
+    admin = 'Admin'
 
 def validate_birthday(value):
     if timezone.now().date() - value > timezone.timedelta(days=29200):
@@ -29,15 +34,21 @@ def configuration_dict():
     return {'email': True,'phone':True}
 
 class Profile(models.Model):
-    name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
+    name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
     gender = models.CharField(choices =  Gender.choices,max_length=10)
     birthday = models.DateField(blank=True,null = True,validators = [validate_birthday])
     avatar = models.ImageField(null=True,blank=True,upload_to = 'media/profile')
     age = models.PositiveSmallIntegerField(null=True,blank=True)
-    height = models.PositiveSmallIntegerField(null=True,blank=True)
-    weight = models.PositiveSmallIntegerField(null=True,blank=True)
-    position = models.CharField(max_length=50,null=True,blank=True)
+    height = models.PositiveSmallIntegerField(null=True,blank=True,validators=[
+            MinValueValidator(30),
+            MaxValueValidator(210),
+        ])
+    weight = models.PositiveSmallIntegerField(null=True,blank=True,validators=[
+            MinValueValidator(30),
+            MaxValueValidator(210),
+        ])
+    position = models.CharField(max_length=255,null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     about_me =  models.TextField(blank=True,null = True)
     def __str__(self):
@@ -49,7 +60,8 @@ class User(AbstractBaseUser):
     email = models.EmailField(max_length=255, unique=True, db_index=True)
     phone = PhoneNumberField(unique=True)
     is_verified = models.BooleanField(default=False)
-    role =  models.ForeignKey(Role,on_delete=models.CASCADE,blank=True,null = True)
+    get_planned_events = models.CharField(max_length=10,default="1m") 
+    role =  models.CharField(choices = Role.choices,max_length=10,blank=True,null=True)
     updated_at = models.DateTimeField(auto_now=True)
     raiting = models.FloatField(null = True,blank= True)
     profile = models.ForeignKey(Profile,on_delete=models.CASCADE,blank=True,null = True,related_name='user')

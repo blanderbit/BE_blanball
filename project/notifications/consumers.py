@@ -1,10 +1,15 @@
-from channels.generic.websocket import AsyncWebsocketConsumer
 import json
-from authentication.models import User,ActiveUser
-from channels.db import database_sync_to_async
+
 from .tasks import *
+from authentication.models import User,ActiveUser
+
+from django.utils import timezone
+
+from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.db import database_sync_to_async
+
 from djangochannelsrestframework.observer.generics import ObserverModelInstanceMixin
-from djangochannelsrestframework.observer import model_observer
+
 
 class UserConsumer(ObserverModelInstanceMixin,AsyncWebsocketConsumer):
     async def connect(self):
@@ -72,4 +77,20 @@ class UserConsumer(ObserverModelInstanceMixin,AsyncWebsocketConsumer):
         message = event['message']
         await self.send(text_data=json.dumps({
             'message': message
+        }))
+
+
+
+
+
+
+
+
+
+    async def kafka_message(self, event):
+        # Send message to WebSocket
+        message = event['message']
+        await self.send(text_data=json.dumps({
+            'message': message,
+            'date_time': str(timezone.now())
         }))

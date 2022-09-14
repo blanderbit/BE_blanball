@@ -1,7 +1,9 @@
 from .models import Event
 from project.celery import app
-from django.utils import timezone
 from notifications.tasks import send_notification_to_subscribe_event_user
+
+from django.utils import timezone
+
 
 
 @app.task

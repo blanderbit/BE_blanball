@@ -1,5 +1,6 @@
-from rest_framework import serializers
 from .models import Notification
+
+from rest_framework import serializers
 
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -18,3 +19,9 @@ class ReadOrDeleteNotificationsSerializer(serializers.Serializer):
 
     class Meta:
         fields = ['notifications']
+
+class ChangeMaintenanceSerializer(serializers.Serializer):
+    isMaintenance = serializers.BooleanField() 
+
+    class Meta:
+        fields = ['isMaintenance']

@@ -1,11 +1,14 @@
-from rest_framework import status,serializers
-from project.constaints import *
 from .models import Code
+from project.constaints import *
+
 from django.utils import timezone
+
+from rest_framework import status,serializers
+
 
 
 class CodeValidator:
-    def __init__(self,token_type):
+    def __init__(self,token_type:str):
         self.token_type = token_type
 
     def __call__(self, attrs):

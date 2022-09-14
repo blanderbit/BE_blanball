@@ -1,9 +1,5 @@
-from rest_framework import permissions
-from authentication.models import Role
 
-def CheckRole(role_id,role_names):
-    if Role.objects.get(id = role_id).name in role_names:
-        return True
+from rest_framework import permissions
 
 class IsNotAuthenticated(permissions.BasePermission):
     '''allows access only to admin users'''

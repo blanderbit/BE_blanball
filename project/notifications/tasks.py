@@ -1,12 +1,15 @@
-from asgiref.sync import async_to_sync
-from notifications.models import Notification
-from channels.layers import get_channel_layer
 from project.celery import app
-from authentication.models  import ActiveUser
+from notifications.models import Notification
+from authentication.models  import User,ActiveUser
 from authentication.tasks import Util
+from events.models import Event
 
+from django.template.loader import render_to_string
 
-def send_to_user(user,notification_text):
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+
+def send_to_user(user:User,notification_text:str):
     channel_layer = get_channel_layer()
     Notification.objects.create(user=user,notification_text=f'{notification_text}')
     if ActiveUser.objects.filter(user = user.id):
@@ -14,16 +17,19 @@ def send_to_user(user,notification_text):
             user.group_name,
             {
                 'type': 'kafka.message',
-                'message': notification_text
+                'message': notification_text,
             }
         )
     else:
-        Util.send_email.delay(data = {'email_subject': 'Your','email_body': notification_text ,
+        # context = ({'code': list(code.value),'name':user.profile.name,'surname':user.profile.last_name})
+        template = render_to_string('email_message.html')
+        Util.send_email.delay(data = {'email_subject': 'Blanball','email_body': template,
         'to_email': user.email})
 
 
 
-
-def send_notification_to_subscribe_event_user(event,notification_text):
+def send_notification_to_subscribe_event_user(event:Event,notification_text:str):
     for user in event.current_users.all():
         send_to_user(user=user,notification_text=notification_text)
+    for fan in event.fans.all():
+        send_to_user(user=fan,notification_text=notification_text)

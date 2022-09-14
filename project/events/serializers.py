@@ -1,28 +1,44 @@
-from datetime import datetime
-from rest_framework import serializers,status
 from .models import *
 from project.constaints import *
-import pandas
-from django.utils import timezone
-from authentication.serializers import EventUsersSerializer,EventAuthorSerializer
+from authentication.serializers import EventUsersSerializer
+from authentication.models import User
 
-class CreateUpdateEventSerializer(serializers.ModelSerializer):
+from django.utils import timezone
+
+from rest_framework import serializers,status
+
+
+class EventDateTimeValidator:
+
+    def __call__(self,attrs):
+        date_and_time =  attrs.get('date_and_time')
+        price = attrs.get('price')
+        price_desc = attrs.get('price_description')
+        if date_and_time - timezone.now()+timezone.timedelta(hours=1) < timezone.timedelta(hours=1):
+            raise serializers.ValidationError(BAD_EVENT_TIME_CREATE_ERROR,status.HTTP_400_BAD_REQUEST)
+        if price and price > 0 and price_desc == None:
+            raise serializers.ValidationError(NO_PRICE_DESK_ERROR,status.HTTP_400_BAD_REQUEST)
+        if not price and price_desc:
+            raise serializers.ValidationError(NO_PRICE_DESK_ERROR,status.HTTP_400_BAD_REQUEST)
+        return attrs
+class CreateEventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
-        exclude = ('author','current_users','status')
+        validators = [EventDateTimeValidator()]
+        exclude = ('author','status','fans')
 
-    def validate(self,attrs):
-        date_and_time =  attrs.get('date_and_time')
-        if date_and_time - timezone.now()+timezone.timedelta(hours=1) > timezone.timedelta(hours=1):
-            return super().validate(attrs) 
-        raise serializers.ValidationError(BAD_EVENT_TIME_CREATE_ERROR,status.HTTP_400_BAD_REQUEST)
-    
+
+class UpdateEventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        validators = [EventDateTimeValidator()]
+        exclude = ('author','status','fans','current_users')
+
     def update(self, instance, validated_data):
         return super().update(instance,validated_data)
 
-
 class EventSerializer(serializers.ModelSerializer):
-    author =  EventAuthorSerializer()
+    author =  EventUsersSerializer()
     current_users = EventUsersSerializer(many=True)
     class Meta:
         model = Event
@@ -33,14 +49,14 @@ class EventListSerializer(serializers.ModelSerializer):
         model = Event
         fields = ('author','id','name','place','amount_members','status','gender',
         'price','type','need_ball','need_form','date_and_time',
-        'count_current_users')
+        'count_current_users','count_fans') 
 
 class DeleteIventsSerializer(serializers.Serializer):
-    event_id = serializers.ListField(child=serializers.IntegerField(min_value=0))
+    events = serializers.ListField(child=serializers.IntegerField(min_value=0))
 
 
 class JoinOrRemoveRoomSerializer(serializers.Serializer):
-    event_id = serializers.IntegerField(min_value=0)
+    event_id:int = serializers.IntegerField(min_value=0)
 
     class Meta:
         fields = ('event_id',)
@@ -56,3 +72,12 @@ class JoinOrRemoveRoomSerializer(serializers.Serializer):
             return super().validate(attrs)
         except Event.DoesNotExist:
             raise serializers.ValidationError(EVENT_NOT_FOUND_ERROR,status.HTTP_404_NOT_FOUND)
+
+
+class InviteUserToEventSerializer(serializers.Serializer):
+    user_id:User.id = serializers.IntegerField(min_value=0)
+    event_id:Event.id = serializers.IntegerField(min_value=0)
+
+    class Meta:
+        fields = ('event_id','user_id')
+

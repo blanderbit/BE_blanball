@@ -1,19 +1,17 @@
-from django.urls import path
 from .views import *
 
+from django.urls import path
 
 
 urlpatterns = [
-    #endpoint where a use can get list of notifications
-    path('admin/notifications/list', NotificationsList.as_view(),
-        name = 'notification-list'),
-    #endpoint where a use can get list of her notifications
-    path('client/my/notifications/list',UserNotificationsList.as_view(),
-        name = 'user-notifications-list'),
-    #endpoint where a user can red her notificaions
-    path('client/read/notifications',ReadNotifications.as_view(),
-        name = 'user-read-notifications'),
-    #endpoint where a user can  delete her her notificaions
-    path('client/delete/notifications',DeleteNotifcations.as_view(),
-        name = 'user-delete-notifications'),
+    # endpoint where user can get list of notifications
+    path('admin/notifications/list', NotificationsList.as_view(),name='notifications-list'),
+    # endpoint where a use can get list of her notifications
+    path('client/my/notifications/list',UserNotificationsList.as_view(),name='user-notifications-list'),
+    # endpoint where user can bulk read her notificaions
+    path('client/read/notifications',ReadNotifications.as_view(),name='bulk-read-notifications'),
+    # endpoint where user can bulk  delete her her notificaions
+    path('client/delete/notifications',DeleteNotifcations.as_view(),name='bulk-delete-notifications'),
+    # endpoint where admin can change maintenance
+    path('admin/change/maintenance',ChangeMaintenance.as_view(),name='change-maintenance'),
 ]

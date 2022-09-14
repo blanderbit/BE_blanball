@@ -1,7 +1,15 @@
 import os
+import datetime
+import django
+
+from django.utils.encoding import smart_str
+
 from pathlib import Path
 from decouple import config, Csv
-import datetime
+
+
+
+django.utils.encoding.smart_text = smart_str
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -34,26 +42,37 @@ AUTH_USER_MODEL = config('AUTH_USER_MODEL')
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
 
-INSTALLED_APPS = [
+INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'rest_framework_swagger',
     'rest_framework',
+    'django_inlinecss',
+    'django_elasticsearch_dsl',
     'drf_yasg',
     'django_filters',
     'phonenumber_field',
     'channels',
-    'events',
-    'authentication',
-    'notifications',
-    'reviews',
-]
 
-MIDDLEWARE = [
+    'events.apps.EventsConfig',
+    'authentication.apps.AuthenticationConfig',
+    'notifications.apps.NotificationsConfig',
+    'reviews.apps.ReviewsConfig',
+)
+
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': 'elasticsearch:9200'
+    },
+}
+
+
+MIDDLEWARE = (
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -61,7 +80,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
+)
 
 
 #POSTGRES conected datdabse settings
@@ -98,12 +117,12 @@ SWAGGER_SETTINGS = {
     },
     'USE_SESSION_AUTH': config('USE_SESSION_AUTH',cast = bool),
     'JSON_EDITOR': config('JSON_EDITOR',cast = bool),
-    'SUPPORTED_SUBMIT_METHODS': [
+    'SUPPORTED_SUBMIT_METHODS': (
         'get',
         'post',
         'put',
         'delete',
-    ],
+    ),
 }
 
 
@@ -111,7 +130,7 @@ SWAGGER_SETTINGS = {
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -125,7 +144,7 @@ TEMPLATES = [
 ]
 
 
-AUTH_PASSWORD_VALIDATORS = [
+AUTH_PASSWORD_VALIDATORS = (
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
@@ -138,7 +157,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
-]
+)
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -147,8 +166,11 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 10,
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_PAGINATION_CLASS': None,
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
 
 SIMPLE_JWT = {
