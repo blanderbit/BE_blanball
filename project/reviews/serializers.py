@@ -1,5 +1,5 @@
 from .models import *
-from project.constaints import REVIEW_CREATE_ERROR
+from project.constaints import REVIEW_CREATE_ERROR,REVIEW_CREATE_MESSAGE_TYPE
 from notifications.tasks import send_to_user
 
 from rest_framework import serializers,status
@@ -20,7 +20,8 @@ class CreateReviewSerializer(serializers.ModelSerializer):
 
     def create(self,validated_data):
         user = User.objects.get(email = validated_data['user'])
-        send_to_user(user=validated_data['user'],notification_text="Review Create")
+        send_to_user(user=validated_data['user'],notification_text="Review Create",
+        message_type=REVIEW_CREATE_MESSAGE_TYPE)
         review = Review.objects.create(email = self.context['request'].user.email,**validated_data)
         user = User.objects.get(email = validated_data['user'])
         for item in user.reviews.all():

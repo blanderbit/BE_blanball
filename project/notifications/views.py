@@ -86,7 +86,19 @@ class ChangeMaintenance(generics.GenericAPIView):
                         notification_text=MAINTENANCE_TRUE_NOTIFICATION_TEXT.format(username=user.profile.name,last_name=user.profile.last_name)
                     else:
                         notification_text=MAINTENANCE_FALSE_NOTIFICATION_TEXT.format(username=user.profile.name,last_name=user.profile.last_name)
-                    send_to_user(user = user,notification_text=notification_text)
+                    send_to_user(user = user,notification_text=notification_text,message_type=CHANGE_MAINTENANCE_MESSAGE_TYPE)
             return Response(MAINTENANCE_UPDATED_SUCCESS,status=status.HTTP_200_OK)
         except:
-            return Response(MAINTENANCE_CAN_NOT_UPDATE_ERROR,status=status.HTTP_200_OK)
+            return Response(MAINTENANCE_CAN_NOT_UPDATE_ERROR,status=status.HTTP_400_BAD_REQUEST)
+
+
+class GetMaintenance(generics.GenericAPIView):
+    serializer_class = ChangeMaintenanceSerializer
+
+    def get(self,request):
+        try:
+            with open('./project/project/config.json', 'r') as f:
+                data = f.read()
+            return Response(data,status=status.HTTP_200_OK)
+        except:
+            return Response()

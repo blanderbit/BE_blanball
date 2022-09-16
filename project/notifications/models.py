@@ -9,7 +9,7 @@ class Notification(models.Model):
         unread = 'Unread'
         read = 'Read'
 
-    user = models.ForeignKey(User,on_delete=models.PROTECT)
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
     notification_text = models.CharField(max_length=100)
     type = models.CharField(choices = Type.choices,max_length=6,default='Unread')
     time_created = models.DateTimeField(auto_now_add=True)

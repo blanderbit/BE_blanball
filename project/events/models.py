@@ -42,7 +42,7 @@ class Event(models.Model):
         minutes_170 = 170
         minutes_180 = 180
 
-    author = models.ForeignKey(User,on_delete=models.PROTECT)
+    author = models.ForeignKey(User,on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     small_disc = models.CharField(max_length=200)
     full_disc = models.TextField()
@@ -57,6 +57,7 @@ class Event(models.Model):
     price = models.PositiveSmallIntegerField(null = True,blank= True, validators=[MinValueValidator(1)])
     price_description = models.CharField(max_length=500,null = True,blank= True)
     need_form = models.BooleanField()
+    privacy = models.BooleanField()
     duration = models.PositiveSmallIntegerField(choices = Duration.choices)
     forms = models.CharField(choices=CloseType.choices,max_length=15)
     status =  models.CharField(choices=Status.choices,max_length=10,default = "Planned")
@@ -73,3 +74,13 @@ class Event(models.Model):
 
     def __str__(self):
         return self.name
+
+class RequestToParticipation(models.Model):
+    user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='user')
+    time_created =  models.DateTimeField(auto_now_add=True)
+    event = models.ForeignKey(Event,on_delete=models.CASCADE)
+    event_author = models.ForeignKey(User,on_delete=models.CASCADE,related_name='author')
+    uproved = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.user.email

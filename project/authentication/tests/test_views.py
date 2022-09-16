@@ -3,7 +3,6 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from project.constaints import EMAIL_CHANGE_CODE_TYPE
 from authentication.models import *
-from notifications.models import Notification
 
 class SetUpTest(APITestCase):
     def setUp(self):
@@ -142,10 +141,10 @@ class TestAuthenticationViews(SetUpTest):
 
     def test_code(self):
         self.auth()
-        code = Code.objects.create(value='FFFFF',
+        code = Code.objects.create(verify_code='FFFFF',
             user_email=self.user_register_data['email'],type=EMAIL_CHANGE_CODE_TYPE,dop_info='userexample@gmail.com111',life_time= 
             timezone.now() + timezone.timedelta(minutes=CODE_EXPIRE_MINUTES_TIME))
-        response = self.client.post(reverse("check-code"),{"verify_code":code.value})
+        response = self.client.post(reverse("check-code"),{"verify_code":code.verify_code})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 

@@ -81,3 +81,8 @@ class InviteUserToEventSerializer(serializers.Serializer):
     class Meta:
         fields = ('event_id','user_id')
 
+
+class RequestToParticipationSerializer(serializers.Serializer):
+    class Meta:
+        model = RequestToParticipation
+        fields = ('user','time_created')
