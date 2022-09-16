@@ -1,12 +1,11 @@
 version: "3.8"
 
 services:
-
   db:
     container_name: db
     image: "postgres:14.5-alpine"
-    volumes: 
-      - db-data:/usr/src/blanball/storage/db/data
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
     ports: 
       - "5432:5432"
     env_file: 
@@ -15,7 +14,6 @@ services:
       test: pg_isready -U postgres -d postgres
       timeout: 40s
       retries: 20
-
   api:
     container_name: api
     command: bash compose/local/django-start.sh
@@ -35,7 +33,6 @@ services:
         condition: service_healthy
     links: 
       - redis
-     
   redis:
     container_name: redis
     image: "redis:7.0.4-alpine"
@@ -47,7 +44,6 @@ services:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
       timeout: 3s
       retries: 5
-
   celery-worker:
     container_name: celery-worker
     command: bash compose/local/celery-worker-start.sh
@@ -63,7 +59,6 @@ services:
         condition: service_started
       api:
         condition: service_started
-
   celery-beat:
     container_name: celery-beat
     command: bash compose/local/celery-beat-start.sh
@@ -79,7 +74,6 @@ services:
         condition: service_started
       api:
         condition: service_started  
-        
   elasticsearch:
     container_name: elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:7.8.0
@@ -102,7 +96,6 @@ services:
       memlock:
         soft: -1
         hard: -1
-
   pgadmin:
     container_name: pgadmin
     image: dpage/pgadmin4
@@ -114,7 +107,6 @@ services:
       PGADMIN_DEFAULT_EMAIL: gameonly1921@gmail.com
       PGADMIN_DEFAULT_PASSWORD: admin1921
       PGADMIN_CONFIG_SERVER_MODE: 'False'
-
   db_backup:
     container_name: db_backup
     image: prodrigestivill/postgres-backup-local
@@ -128,7 +120,6 @@ services:
         condition: service_started
 
 volumes:
-  db-data:
   redis-data:
   elastic-data:
   pgadmin-data:

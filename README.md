@@ -111,7 +111,6 @@ typing_extensions==4.0.0
 tzdata==2022.1
 update==0.0.1
 uritemplate==4.1.1
-urllib3==1.26.9
 vine==5.0.0
 virtualenv==20.16.2
 wcwidth==0.2.5

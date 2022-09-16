@@ -14,4 +14,6 @@ urlpatterns = [
     path('client/delete/notifications',DeleteNotifcations.as_view(),name='bulk-delete-notifications'),
     # endpoint where admin can change maintenance
     path('admin/change/maintenance',ChangeMaintenance.as_view(),name='change-maintenance'),
+    # endpoint where admin can get maintenance
+    path('admin/get/maintenance',GetMaintenance.as_view(),name='get-maintenance'),
 ]

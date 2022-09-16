@@ -19,8 +19,27 @@ class Gender(models.TextChoices):
     woomen = 'Woomen'
 
 
+class Position(models.TextChoices):
+    GK = 'Вратар'
+    LB = 'Лівий захисник'
+    RB = 'Правий захисник'
+    CB = 'Центральний захисник'
+    LWB = 'Лівий фланговий захисник'
+    RWB = 'Правий фланговий захисник'
+    CDM = 'Центральний опорний півзахисник'
+    CM = 'Центральний півзахисник'
+    CAM = 'Центральний атакуючий півзахисник'
+    RM = 'Правий півзахисник'
+    LM = 'Лівий півзахисник'
+    RW = 'Правий фланговий атакуючий'
+    LW = 'Лівий фланговий атакуючий'
+    RF = 'Правий форвард' 
+    CF = 'Центральний форвард'
+    LF = 'Лівий форвард' 
+    ST = 'Форвард'
+
 class Role(models.TextChoices):
-    '''rolechoices'''
+    '''role choices'''
     user = 'User'
     admin = 'Admin'
 
@@ -31,7 +50,7 @@ def validate_birthday(value):
         raise ValidationError(MIN_AGE_VALUE_ERROR,status.HTTP_400_BAD_REQUEST) 
 
 def configuration_dict():
-    return {'email': True,'phone':True}
+    return {'email': True,'phone':True,'send_email':True}
 
 class Profile(models.Model):
     name = models.CharField(max_length=255)
@@ -48,7 +67,7 @@ class Profile(models.Model):
             MinValueValidator(30),
             MaxValueValidator(210),
         ])
-    position = models.CharField(max_length=255,null=True,blank=True)
+    position = models.CharField(choices = Position.choices,max_length=255,null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     about_me =  models.TextField(blank=True,null = True)
     def __str__(self):
@@ -88,19 +107,19 @@ class User(AbstractBaseUser):
 
 
 class Code(models.Model):
-    value = models.CharField(max_length=5,unique=True)
+    verify_code = models.CharField(max_length=5,unique=True)
     life_time = models.DateTimeField(null = True,blank=True)
     type = models.CharField(max_length=20)
     user_email = models.CharField(max_length=100)
     dop_info = models.CharField(max_length=250,null = True,blank = True)
 
     def __str__(self):  
-        return self.value
+        return self.verify_code
 
 
 class ActiveUser(models.Model):
-    user = models.ForeignKey(User,on_delete=models.PROTECT)
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.user.id
+        return self.user.email
 

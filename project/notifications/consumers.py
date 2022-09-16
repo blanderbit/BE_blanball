@@ -43,11 +43,13 @@ class UserConsumer(ObserverModelInstanceMixin,AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def add_user_to_active(self):
+        self.disconnect(400)
+        ActiveUser.objects.filter(user = User.objects.get(email = self.scope['user']).id).delete()
         ActiveUser.objects.create(user = User.objects.get(email = self.scope['user']))
 
     @database_sync_to_async
     def delete_user_from_active(self):
-        ActiveUser.objects.filter(user = User.objects.get(email = self.scope['user']).id).delete()
+        return ActiveUser.objects.filter(user = User.objects.get(email = self.scope['user']).id).delete()
 
     async def disconnect(self,close_code):
         # Leave room group
@@ -56,41 +58,14 @@ class UserConsumer(ObserverModelInstanceMixin,AsyncWebsocketConsumer):
                 self.room_group_name,
                 self.channel_name
             )
-            await self.delete_user_from_active()
-
-    async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-
-        # Send message to room group
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'kafka_message',
-                'message': message
-            }
-        )
-
+            return await self.delete_user_from_active()
 
     async def kafka_message(self, event):
         # Send message to WebSocket
         message = event['message']
-        await self.send(text_data=json.dumps({
-            'message': message
-        }))
-
-
-
-
-
-
-
-
-
-    async def kafka_message(self, event):
-        # Send message to WebSocket
-        message = event['message']
+        message_type =  event['message_type']
         await self.send(text_data=json.dumps({
             'message': message,
-            'date_time': str(timezone.now())
+            'date_time': str(timezone.now()),
+            'message_type':message_type,
         }))

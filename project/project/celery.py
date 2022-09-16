@@ -17,6 +17,10 @@ app.conf.beat_schedule = {
         'task':'authentication.tasks.delete_expire_codes',
         'schedule': crontab(minute ='*/10')
     },
+    'delete_uproved_requests_to_participation': {
+        'task':'events.tasks.delete_uproved_requests_to_participation',
+        'schedule': crontab(minute ='*/20')
+    },
     'check_event_start_time': {
         'task':'events.tasks.check_event_start_time',
         'schedule': crontab(minute ='*/1')

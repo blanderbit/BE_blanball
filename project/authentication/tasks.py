@@ -1,4 +1,5 @@
 import threading
+from dateutil.relativedelta import relativedelta
 
 from .models import Code,Profile
 from project.celery import app
@@ -35,7 +36,8 @@ def delete_expire_codes():
 @app.task
 def check_user_age():
     for user_profile in Profile.objects.all():
-        print((timezone.now().date() - user_profile.birthday) / timezone.timedelta(days=365))
-        if user_profile.birthday == timezone.now().date():
-            user_profile.age += 1
-            user_profile.save()
+        rdelta = relativedelta(timezone.now().date(), user_profile.birthday)
+        print(rdelta.year)
+        # if type((timezone.now().date() - user_profile.birthday) / timezone.timedelta(days=365) /2) == int:
+        #     user_profile.age += 1
+        #     user_profile.save()
