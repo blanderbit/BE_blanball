@@ -145,7 +145,7 @@ class JoinToEvent(generics.GenericAPIView):
         event = Event.objects.get(id = serializer.data['event_id'])
         if not user.current_rooms.filter(id=event.id).exists():
             if not user.current_views_rooms.filter(id=event.id).exists():
-                # if event.author_id != user.id:
+                if event.author_id != user.id:
                     if event.amount_members != event.count_current_users:
                         if not event.privacy:
                             user.current_rooms.add(event)
@@ -156,8 +156,8 @@ class JoinToEvent(generics.GenericAPIView):
                                 send_to_user(user=event.author,notification_text='new user aproved',message_type ='new_request_approved')
                                 RequestToParticipation.objects.create(user=user,event_id=event.id,event_author=event.author)
                                 return Response(APPLICATION_FOR_PARTICIPATION_SUCCESS,status=status.HTTP_200_OK)
-                            return Response('вы уже отправили запрос',status=status.HTTP_400_BAD_REQUEST)
-                # return Response(EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,status=status.HTTP_400_BAD_REQUEST)
+                            return Response(ALREADY_SENT_REQUEST_TO_PARTICIPATE,status=status.HTTP_400_BAD_REQUEST)
+                return Response(EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,status=status.HTTP_400_BAD_REQUEST)
             return Response(ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR,status=status.HTTP_400_BAD_REQUEST)
         return Response(ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,status=status.HTTP_400_BAD_REQUEST)
 
@@ -215,12 +215,14 @@ class UserEvents(generics.ListAPIView):
         return self.queryset.filter(author_id = self.request.user.id) 
 
 class PopularIvents(UserEvents):
+    serializer_class = PopularIventsListSerializer
     queryset = Event.objects.filter(status = 'Planned')
 
     def get_queryset(self):
         return self.queryset.annotate(count = Count('current_users')).order_by('-count')[:10]
 
 class UserPlannedEvents(UserEvents):
+    serializer_class = PopularIventsListSerializer
     queryset = Event.objects.filter(status = 'Planned')
 
     def list(self, request,pk):
@@ -243,3 +245,49 @@ class UserPlannedEvents(UserEvents):
 
 
     
+class RequestToParticipationsList(generics.ListAPIView):
+    serializer_class = RequestToParticipationSerializer
+    queryset = RequestToParticipation.objects.all().order_by('-id')
+    
+
+    def list(self,request,pk):
+        try:
+            event =  Event.objects.get(id=pk)
+            queryset = self.queryset.filter(event=event)
+            serializer = self.serializer_class(queryset, many=True)
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        except Event.DoesNotExist:
+            return Response(EVENT_NOT_FOUND_ERROR,status=status.HTTP_404_NOT_FOUND)
+
+    
+
+class BulkAcceptOrDeclineRequestToParticipation(generics.GenericAPIView):
+    serializer_class = BulkAcceptOrDeclineRequestToParticipationSerializer
+    queryset = RequestToParticipation.objects.all()
+
+    def post(self,request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        success = []
+        not_success = []
+        for request_id in serializer.validated_data['requests']:
+            request = self.queryset.filter(id = request_id)
+            if request:
+                request = self.queryset.get(id = request_id)
+                if request.event_author.id == request.user.id:
+                    if serializer.validated_data['type'] == True:
+                        send_to_user(user=request.user,notification_text='author accept your request to participation',
+                        message_type='accept_request_to_participation')
+                        success.append(request_id)
+                        request.user.current_rooms.add(request.event)
+                        request.delete()
+                    else:
+                        send_to_user(user=request.user,notification_text='author decline your request to participation',
+                        message_type='decline_request_to_participation')
+                        success.append(request_id)
+                        request.delete()
+                else:
+                    not_success.append(request_id)
+            else:
+                not_success.append(request_id)
+            return Response({"success": success, "error":  not_success},status=status.HTTP_200_OK)

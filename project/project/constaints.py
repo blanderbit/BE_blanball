@@ -89,6 +89,8 @@ ALREADY_VERIFIED_ERROR = {'error':'Your account is already verified'}
 
 APPLICATION_FOR_PARTICIPATION_SUCCESS = {'success':'Your application for participation has been sent to the author of the event'}
 
+ALREADY_SENT_REQUEST_TO_PARTICIPATE = {'error':'You have already sent a request to participate'}
+
 INVITE_USER_TO_EVENT_MESSAGE_TYPE = 'invite_user_to_event'
 EVENT_DELETE_MESSAGE_TYPE = 'event_deleted'
 EVENT_UPDATE_MESSAGE_TYPE = 'event_updated'

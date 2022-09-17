@@ -1,17 +1,10 @@
 import jwt
-import abc
 
 from .models import *
 from .serializers import *
 from .documents import *
 from project.services import *
-from notifications.models import Notification
 from .permisions import IsNotAuthenticated
-from events.models import Event
-
-
-from django.conf import settings
-
 
 from elasticsearch_dsl import Q
 
@@ -111,10 +104,10 @@ class UserList(generics.ListAPIView):
     '''get all users list'''
     serializer_class = UsersListSerializer
     pagination_class = CustomPagination
-    filter_backends = (filters.SearchFilter,DjangoFilterBackend)
-    search_fields = ('profile__name','profile__age','profile__gender','profile__last_name')
-    queryset = User.objects.all()
-
+    filter_backends = (filters.SearchFilter,DjangoFilterBackend,filters.OrderingFilter,)
+    search_fields = ('profile__name','profile__gender','profile__last_name')
+    ordering_fields = ('id','profile__age','raiting')
+    queryset = User.objects.all().order_by('-id')
 
 class AdminUsersList(generics.ListAPIView):
     '''displaying the full list of admin users'''
@@ -126,8 +119,6 @@ class AdminUsersList(generics.ListAPIView):
 
     def get_queryset(self):
         return self.queryset.filter(role = "Admin")
-
-
 
 class RequestPasswordReset(generics.GenericAPIView):
     '''send request to reset user password by email'''
@@ -142,8 +133,6 @@ class RequestPasswordReset(generics.GenericAPIView):
             return Response(SENT_CODE_TO_EMAIL_SUCCESS, status=status.HTTP_200_OK)
         else:
             return Response(NO_SUCH_USER_ERROR,status=status.HTTP_400_BAD_REQUEST)
-
-
 
 class ResetPassword(generics.GenericAPIView):
     '''password reset on a previously sent request'''
@@ -167,8 +156,6 @@ class ResetPassword(generics.GenericAPIView):
             return Response(PASSWORD_RESET_SUCCESS,status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response(NO_SUCH_USER_ERROR,status=status.HTTP_404_NOT_FOUND) 
-
-
 
 class RequestChangePassword(generics.GenericAPIView):
     serializer_class = RequestChangePasswordSerializer
@@ -220,29 +207,35 @@ class CheckCode(generics.GenericAPIView):
         self.code = Code.objects.get(verify_code=verify_code)
         self.user = User.objects.get(id = request.user.id)
         if self.code.user_email != self.user.email:
-            return Response(PASSWORD_CHANGE_ERROR,status=status.HTTP_400_BAD_REQUEST)
+            return Response(NO_PERMISSIONS_ERROR,status=status.HTTP_400_BAD_REQUEST)
         if self.code.type == PASSWORD_CHANGE_CODE_TYPE:
             self.user.set_password(self.code.dop_info)
-            self.success(email_subject='change password',email_body='change password success')
+            self.success(email_body='change password success')
             return Response(CHANGE_PASSWORD_SUCCESS,status=status.HTTP_200_OK) 
         elif self.code.type == EMAIL_CHANGE_CODE_TYPE:
             self.user.email = self.code.dop_info
-            self.success(email_subject='change email',email_body='change email success')
+            self.success(email_body='change email success')
             return Response(CHANGE_EMAIL_SUCCESS,status=status.HTTP_200_OK) 
         elif self.code.type == EMAIL_VERIFY_CODE_TYPE:
             self.user.is_verified = True
-            self.success(email_subject='email verify',email_body='email verify success')
+            self.success(email_body='email verify success')
             return Response(ACTIVATION_SUCCESS,status=status.HTTP_200_OK)
         elif self.code.type == PHONE_CHANGE_CODE_TYPE:
             self.user.phone = self.code.dop_info
-            self.success(email_subject='change phone',email_body='change phone success')
+            self.success(email_body='change phone success')
             return Response(CHANGE_PHONE_SUCCESS,status=status.HTTP_200_OK)
+        # elif self.code.type == ACCOUNT_DELETE_CODE_TYPE:
+        #     print('fdfddf')
+        #     print(self.user.id)
+        #     User.objects.get(id=self.user.id).delete()
+        #     # self.user.delete()
+        #     return Response(ACCOUNT_DELETED_SUCCESS,status=status.HTTP_200_OK)
 
 
-    def success(self,email_subject,email_body):
+    def success(self,email_body):
         self.user.save()
         self.code.delete()
-        data = {'email_subject': email_subject,'email_body': f'{self.user.profile.name}{email_body}!' ,'to_email': self.user.email}
+        data = {'email_subject': 'Blanball','email_body': f'{self.user.profile.name}{email_body}!' ,'to_email': self.user.email}
         Util.send_email.delay(data)
 
 class RequestEmailVerify(generics.GenericAPIView):
@@ -267,9 +260,6 @@ class CheckUserActive(generics.GenericAPIView):
             return Response({True:'User active'})
         except ActiveUser.DoesNotExist:
             return Response({False:'User not active'})
-
-
-
 
 
 from .documents import ProfileDocument

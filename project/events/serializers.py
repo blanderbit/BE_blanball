@@ -44,6 +44,11 @@ class EventSerializer(serializers.ModelSerializer):
         model = Event
         fields = '__all__'
 
+class PopularIventsListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = ('author','id','name','place','gender','date_and_time','type')    
+
 class EventListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
@@ -82,7 +87,16 @@ class InviteUserToEventSerializer(serializers.Serializer):
         fields = ('event_id','user_id')
 
 
-class RequestToParticipationSerializer(serializers.Serializer):
+class RequestToParticipationSerializer(serializers.ModelSerializer):
+    user = EventUsersSerializer()
     class Meta:
         model = RequestToParticipation
-        fields = ('user','time_created')
+        fields = ('id','user','time_created')
+
+class BulkAcceptOrDeclineRequestToParticipationSerializer(serializers.Serializer):
+    requests = serializers.ListField(child=serializers.IntegerField(min_value=0))
+    type = serializers.BooleanField()
+
+    class Meta:
+        fields = ('requests','type')
+

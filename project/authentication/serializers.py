@@ -31,7 +31,7 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
 class EventUsersProfileSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = Profile
-        fields = ['name','last_name','avatar']
+        fields = ['name','last_name','avatar','position']
 
 class EventUsersSerializer(serializers.ModelSerializer):
     profile = EventUsersProfileSerializer()
@@ -146,7 +146,7 @@ class UserSerializer(DynamicFieldsModelSerializer):
 class ProfileListSerializer(serializers.ModelSerializer):
     class Meta:
         model =  Profile
-        fields = ['id','name','last_name','avatar','position']
+        fields = ['id','name','last_name','avatar','position','gender']
 
 class UsersListSerializer(serializers.ModelSerializer):
     profile = ProfileListSerializer()
@@ -195,7 +195,7 @@ class CheckCodeSerializer(serializers.Serializer):
 
     class Meta:
         validators = [CodeValidator(token_type = [PASSWORD_CHANGE_CODE_TYPE,EMAIL_CHANGE_CODE_TYPE,
-        EMAIL_VERIFY_CODE_TYPE,PHONE_CHANGE_CODE_TYPE])]
+        EMAIL_VERIFY_CODE_TYPE,PHONE_CHANGE_CODE_TYPE,ACCOUNT_DELETE_CODE_TYPE])]
         fields = ['verify_code']
 
 

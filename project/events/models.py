@@ -43,10 +43,10 @@ class Event(models.Model):
         minutes_180 = 180
 
     author = models.ForeignKey(User,on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
-    small_disc = models.CharField(max_length=200)
+    name = models.CharField(max_length=255)
+    small_disc = models.CharField(max_length=255)
     full_disc = models.TextField()
-    place = models.CharField(max_length=500)
+    place = models.CharField(max_length=255)
     gender =  models.CharField(choices=Gender.choices,max_length=10)
     date_and_time = models.DateTimeField()
     contact_number = PhoneNumberField(null=True,blank=True)

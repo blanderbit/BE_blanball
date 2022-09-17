@@ -1,4 +1,5 @@
 import json
+from webbrowser import GenericBrowser
 
 from .tasks import send_to_user
 
