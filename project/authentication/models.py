@@ -70,6 +70,7 @@ class Profile(models.Model):
     position = models.CharField(choices = Position.choices,max_length=255,null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     about_me =  models.TextField(blank=True,null = True)
+    
     def __str__(self):
         return self.name
 

@@ -11,17 +11,17 @@ class NotificationSerializer(serializers.ModelSerializer):
 class UserNotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
-        fields = ['notification_text','time_created']
+        fields = ('notification_text','time_created')
 
 
 class ReadOrDeleteNotificationsSerializer(serializers.Serializer):
     notifications = serializers.ListField(child=serializers.IntegerField(min_value=0))
 
     class Meta:
-        fields = ['notifications']
+        fields = ('notifications',)
 
 class ChangeMaintenanceSerializer(serializers.Serializer):
     isMaintenance = serializers.BooleanField() 
 
     class Meta:
-        fields = ['isMaintenance']
+        fields = ('isMaintenance',)

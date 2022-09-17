@@ -31,13 +31,13 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
 class EventUsersProfileSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = Profile
-        fields = ['name','last_name','avatar','position']
+        fields = ('name','last_name','avatar','position')
 
 class EventUsersSerializer(serializers.ModelSerializer):
     profile = EventUsersProfileSerializer()
     class Meta:
         model = User
-        fields = ['profile']
+        fields = ('profile',)
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -140,33 +140,33 @@ class UserSerializer(DynamicFieldsModelSerializer):
     profile:Profile = ProfileSerializer()
     class Meta:
         model = User
-        fields = ['email','role','phone','is_verified','raiting','profile','configuration']
+        fields = ('email','role','phone','is_verified','raiting','profile','configuration')
 
 
 class ProfileListSerializer(serializers.ModelSerializer):
     class Meta:
         model =  Profile
-        fields = ['id','name','last_name','avatar','position','gender']
+        fields = ('id','name','last_name','avatar','position','gender')
 
 class UsersListSerializer(serializers.ModelSerializer):
     profile = ProfileListSerializer()
     class Meta:
         model =  User
-        fields = ['profile','raiting','role']
+        fields = ('profile','raiting','role')
 
 
 class EmailSerializer(serializers.Serializer):
     email:str = serializers.EmailField(min_length=3,max_length=255)
 
     class Meta:
-        fields = ['email']
+        fields = ('email',)
 
         
 class RequestChangePhoneSerializer(serializers.ModelSerializer):
 
     class Meta:
         model =  User
-        fields = ['phone']
+        fields = ('phone',)
 
 class RequestChangePasswordSerializer(serializers.Serializer):
     new_password:str = serializers.CharField(
@@ -175,7 +175,7 @@ class RequestChangePasswordSerializer(serializers.Serializer):
         min_length=8, max_length=68)
 
     class Meta:
-        fields = ['new_password','old_password']
+        fields = ('new_password','old_password')
 
 
 class ResetPasswordSerializer(serializers.Serializer):
@@ -186,7 +186,7 @@ class ResetPasswordSerializer(serializers.Serializer):
 
     class Meta:
         validators = [CodeValidator(token_type = PASSWORD_RESET_CODE_TYPE)]
-        fields = ['verify_code','new_password']
+        fields = ('verify_code','new_password')
 
 
 class CheckCodeSerializer(serializers.Serializer):
@@ -196,7 +196,7 @@ class CheckCodeSerializer(serializers.Serializer):
     class Meta:
         validators = [CodeValidator(token_type = [PASSWORD_CHANGE_CODE_TYPE,EMAIL_CHANGE_CODE_TYPE,
         EMAIL_VERIFY_CODE_TYPE,PHONE_CHANGE_CODE_TYPE,ACCOUNT_DELETE_CODE_TYPE])]
-        fields = ['verify_code']
+        fields = ('verify_code',)
 
 
 class CheckUserActiveSerializer(serializers.Serializer):

@@ -1,66 +1,11 @@
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
 from project.constaints import EMAIL_CHANGE_CODE_TYPE
 from authentication.models import *
-
-class SetUpTest(APITestCase):
-    def setUp(self):
-        self.user_register_data = {
-            "email": "user@example.com",
-            "phone": "+380683861969",
-            "password": "string11",
-            "re_password": "string11",
-            "profile": {
-                "name": "string",
-                "last_name": "string",
-                "gender": "Man",
-                "birthday": "2000-09-10",
-                "height": 30,
-                "weight": 30,
-                "position": "string",
-                "about_me": "string"
-            }
-        } 
-        self.user_register_bad_data = {
-            "email": "user@example.com",
-            "phone": "gffgfgfg",
-            "password": "string12121",
-            "re_password": "string11",
-            "profile": {
-                "name": "string",
-                "last_name": "string",
-                "gender": "Man",
-                "birthday": "2000-09-10",
-                "height": 30,
-                "weight": 30,
-                "position": "string",
-                "about_me": "string"
-            }
-        } 
-        self.user_login_data = {
-            "email": "user@example.com",
-            "password": "string11"
-        }
-
-        self.request_change_password_data = {
-            "new_password": "19211921",
-            "old_password": "string11",
-        }
-
-        self.request_change_password_bad_data = {
-            "new_password": "19211921",
-            "old_password": "string1",
-        }
-
-        self.code_bad_data = {
-            "verify_code": "11111"
-        }
-
-        return super().setUp()
+from .set_up import SetUpAauthenticationViews
 
 
-class TestAuthenticationViews(SetUpTest):
+class TestAuthenticationViews(SetUpAauthenticationViews):
 
     def test_user_register(self):
         response = self.client.post(reverse("register"),self.user_register_data)
@@ -84,6 +29,7 @@ class TestAuthenticationViews(SetUpTest):
 
     def test_login_user(self):
         self.client.post(reverse("register"),self.user_register_data)
+
         response = self.client.post(reverse("login"),self.user_login_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -158,6 +104,7 @@ class TestAuthenticationViews(SetUpTest):
         self.auth()
         request_reset = self.client.post(reverse("request-reset-password"),{"email":register_user.data['email']})
         self.assertEqual(request_reset.status_code, status.HTTP_403_FORBIDDEN)
+
 
 
     def auth(self):
