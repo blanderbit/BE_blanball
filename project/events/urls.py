@@ -32,6 +32,8 @@ urlpatterns = [
     path('client/popular/events/list',PopularIvents.as_view(),name='popular-events'),
     #endpoint where a user can invite other user to ivent
     path('client/invite/user/to/event',InviteUserToEvent.as_view(),name='invite-to-event'),
-    # endpoint where user can get list of your requests-participations
-    # path('client/request/participations/list<int:pk>',RequestToParticipationsList.as_view(),name='request-participations-events'),
+    #endpoint where user can get list of your requests-participations
+    path('client/requests/participations/list<int:pk>',RequestToParticipationsList.as_view(),name='request-participations-list'),
+
+    path('client/accept/or/decline/participations',BulkAcceptOrDeclineRequestToParticipation.as_view(),name='accept-decline-participations'),
 ]

@@ -5,7 +5,7 @@ from django_elasticsearch_dsl.registries import registry
 
 
 @receiver(post_save)
-def update_document(sender, **kwargs):
+def update_document(sender, **kwargs) -> None:
     app_label = sender._meta.app_label
     model_name = sender._meta.model_name
     instance = kwargs['instance']
@@ -18,7 +18,7 @@ def update_document(sender, **kwargs):
 
 
 @receiver(post_delete)
-def delete_document(sender, **kwargs):
+def delete_document(sender, **kwargs) -> None:
     app_label = sender._meta.app_label
     model_name = sender._meta.model_name
     instance = kwargs['instance']

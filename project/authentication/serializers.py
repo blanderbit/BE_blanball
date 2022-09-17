@@ -1,10 +1,14 @@
 import re
+from collections import OrderedDict
 
+from .documents import ProfileDocument
 from .models import *
 from project.constaints import *
 from .validators import CodeValidator
 
 from django.contrib import auth
+
+from django_elasticsearch_dsl_drf.serializers import DocumentSerializer
 
 from rest_framework import serializers,status
 
@@ -14,7 +18,7 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
     controls which fields should be displayed.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         fields:dict[any] = kwargs.pop('fields', None)
 
         # Instantiate the superclass normally
@@ -31,13 +35,13 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
 class EventUsersProfileSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = Profile
-        fields = ['name','last_name','avatar']
+        fields = ('name','last_name','avatar','position')
 
 class EventUsersSerializer(serializers.ModelSerializer):
     profile = EventUsersProfileSerializer()
     class Meta:
         model = User
-        fields = ['profile']
+        fields = ('profile',)
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -57,7 +61,7 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
         model = User
         fields = ('configuration','profile','get_planned_events')
 
-    def validate(self,attrs):
+    def validate(self,attrs) -> OrderedDict or Exception:
         conf:str =  attrs.get('configuration')
         keys:dict[str] = ['email','phone','send_email']
         planned_events =  attrs.get('get_planned_events')
@@ -70,7 +74,7 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
 
         return super().validate(attrs)
 
-    def update(self, instance, validated_data):
+    def update(self, instance, validated_data) -> OrderedDict:
         return super().update(instance,validated_data)
 
 
@@ -85,7 +89,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = User
         fields = ['email','phone','password','re_password','profile']
 
-    def validate(self, attrs):
+    def validate(self, attrs) -> OrderedDict or Exception:
         '''data validation function'''
         password:str = attrs.get('password', '')
         re_password:str = attrs.get('re_password', '')
@@ -108,7 +112,7 @@ class LoginSerializer(serializers.ModelSerializer):
 
     tokens = serializers.SerializerMethodField()
 
-    def get_tokens(self, obj):
+    def get_tokens(self, obj) -> dict:
         '''function that issues jwt tokens for an authorized user'''
         user = User.objects.get(email=obj['email'])
         return {
@@ -120,7 +124,7 @@ class LoginSerializer(serializers.ModelSerializer):
         model = User
         fields = ['email', 'password', 'tokens']
 
-    def validate(self, attrs):
+    def validate(self, attrs) -> OrderedDict or Exception:
         '''data validation function for user authorization'''
         email:str = attrs.get('email', '')
         password:str = attrs.get('password', '')
@@ -140,33 +144,33 @@ class UserSerializer(DynamicFieldsModelSerializer):
     profile:Profile = ProfileSerializer()
     class Meta:
         model = User
-        fields = ['email','role','phone','is_verified','raiting','profile','configuration']
+        fields = ('email','role','phone','is_verified','raiting','profile','configuration')
 
 
 class ProfileListSerializer(serializers.ModelSerializer):
     class Meta:
         model =  Profile
-        fields = ['id','name','last_name','avatar','position']
+        fields = ('id','name','last_name','avatar','position','gender')
 
 class UsersListSerializer(serializers.ModelSerializer):
     profile = ProfileListSerializer()
     class Meta:
         model =  User
-        fields = ['profile','raiting','role']
+        fields = ('profile','raiting','role')
 
 
 class EmailSerializer(serializers.Serializer):
     email:str = serializers.EmailField(min_length=3,max_length=255)
 
     class Meta:
-        fields = ['email']
+        fields = ('email',)
 
         
 class RequestChangePhoneSerializer(serializers.ModelSerializer):
 
     class Meta:
         model =  User
-        fields = ['phone']
+        fields = ('phone',)
 
 class RequestChangePasswordSerializer(serializers.Serializer):
     new_password:str = serializers.CharField(
@@ -175,7 +179,7 @@ class RequestChangePasswordSerializer(serializers.Serializer):
         min_length=8, max_length=68)
 
     class Meta:
-        fields = ['new_password','old_password']
+        fields = ('new_password','old_password')
 
 
 class ResetPasswordSerializer(serializers.Serializer):
@@ -186,7 +190,7 @@ class ResetPasswordSerializer(serializers.Serializer):
 
     class Meta:
         validators = [CodeValidator(token_type = PASSWORD_RESET_CODE_TYPE)]
-        fields = ['verify_code','new_password']
+        fields = ('verify_code','new_password')
 
 
 class CheckCodeSerializer(serializers.Serializer):
@@ -195,8 +199,8 @@ class CheckCodeSerializer(serializers.Serializer):
 
     class Meta:
         validators = [CodeValidator(token_type = [PASSWORD_CHANGE_CODE_TYPE,EMAIL_CHANGE_CODE_TYPE,
-        EMAIL_VERIFY_CODE_TYPE,PHONE_CHANGE_CODE_TYPE])]
-        fields = ['verify_code']
+        EMAIL_VERIFY_CODE_TYPE,PHONE_CHANGE_CODE_TYPE,ACCOUNT_DELETE_CODE_TYPE])]
+        fields = ('verify_code',)
 
 
 class CheckUserActiveSerializer(serializers.Serializer):
@@ -205,7 +209,7 @@ class CheckUserActiveSerializer(serializers.Serializer):
     class Meta:
         fields = ('user_id',)
 
-    def validate(self,attrs):
+    def validate(self,attrs) -> OrderedDict or Exception:
         user_id:int = attrs.get('user_id')
         try:
             User.objects.get(id = user_id)
@@ -213,11 +217,6 @@ class CheckUserActiveSerializer(serializers.Serializer):
         except User.DoesNotExist:
             raise serializers.ValidationError(NO_SUCH_USER_ERROR,status.HTTP_400_BAD_REQUEST)
 
-
-
-from django_elasticsearch_dsl_drf.serializers import DocumentSerializer
-
-from .documents import ProfileDocument
 
 class ProductDocumentSerializer(DocumentSerializer):
     class Meta:

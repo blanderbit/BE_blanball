@@ -1,4 +1,7 @@
+from datetime import date, datetime
 from .managers import *
+
+from PIL import Image
 
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
@@ -43,58 +46,59 @@ class Role(models.TextChoices):
     user = 'User'
     admin = 'Admin'
 
-def validate_birthday(value):
+def validate_birthday(value) -> Exception:
     if timezone.now().date() - value > timezone.timedelta(days=29200):
         raise ValidationError(MAX_AGE_VALUE_ERROR,status.HTTP_400_BAD_REQUEST) 
     if timezone.now().date() - value < timezone.timedelta(days=2191):
         raise ValidationError(MIN_AGE_VALUE_ERROR,status.HTTP_400_BAD_REQUEST) 
 
-def configuration_dict():
+def configuration_dict() -> dict:
     return {'email': True,'phone':True,'send_email':True}
 
 class Profile(models.Model):
-    name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
-    gender = models.CharField(choices =  Gender.choices,max_length=10)
-    birthday = models.DateField(blank=True,null = True,validators = [validate_birthday])
-    avatar = models.ImageField(null=True,blank=True,upload_to = 'media/profile')
-    age = models.PositiveSmallIntegerField(null=True,blank=True)
-    height = models.PositiveSmallIntegerField(null=True,blank=True,validators=[
+    name:str = models.CharField(max_length=255)
+    last_name:str = models.CharField(max_length=255)
+    gender:str = models.CharField(choices = Gender.choices,max_length=10)
+    birthday:date = models.DateField(blank=True,null = True,validators = [validate_birthday])
+    avatar:Image = models.ImageField(null=True,blank=True,upload_to = 'media/profile')
+    age:int = models.PositiveSmallIntegerField(null=True,blank=True)
+    height:int = models.PositiveSmallIntegerField(null=True,blank=True,validators=[
             MinValueValidator(30),
             MaxValueValidator(210),
         ])
-    weight = models.PositiveSmallIntegerField(null=True,blank=True,validators=[
+    weight:int = models.PositiveSmallIntegerField(null=True,blank=True,validators=[
             MinValueValidator(30),
             MaxValueValidator(210),
         ])
-    position = models.CharField(choices = Position.choices,max_length=255,null=True,blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    about_me =  models.TextField(blank=True,null = True)
-    def __str__(self):
+    position:str = models.CharField(choices = Position.choices,max_length=255,null=True,blank=True)
+    created_at:datetime = models.DateTimeField(auto_now_add=True)
+    about_me:str =  models.TextField(blank=True,null = True)
+    
+    def __str__(self) -> str:
         return self.name
 
 
 class User(AbstractBaseUser):
     '''basic user model'''
-    email = models.EmailField(max_length=255, unique=True, db_index=True)
-    phone = PhoneNumberField(unique=True)
-    is_verified = models.BooleanField(default=False)
-    get_planned_events = models.CharField(max_length=10,default="1m") 
-    role =  models.CharField(choices = Role.choices,max_length=10,blank=True,null=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    raiting = models.FloatField(null = True,blank= True)
-    profile = models.ForeignKey(Profile,on_delete=models.CASCADE,blank=True,null = True,related_name='user')
-    configuration = models.JSONField(default = configuration_dict)
+    email:str = models.EmailField(max_length=255, unique=True, db_index=True)
+    phone:str = PhoneNumberField(unique=True)
+    is_verified:bool = models.BooleanField(default=False)
+    get_planned_events:str = models.CharField(max_length=10,default="1m") 
+    role:str = models.CharField(choices = Role.choices,max_length=10,blank=True,null=True)
+    updated_at:str = models.DateTimeField(auto_now=True)
+    raiting:float = models.FloatField(null = True,blank= True)
+    profile:int = models.ForeignKey(Profile,on_delete=models.CASCADE,blank=True,null = True,related_name='user')
+    configuration:dict = models.JSONField(default = configuration_dict)
 
 
     USERNAME_FIELD = 'email'
 
     objects = UserManager()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.email
 
-    def tokens(self):
+    def tokens(self) -> dict:
         refresh = RefreshToken.for_user(self)
         access = AccessToken.for_user(self)
         return {
@@ -102,24 +106,24 @@ class User(AbstractBaseUser):
             'access': str(access)
         }
     @property
-    def group_name(self):
+    def group_name(self) -> str:
         return "user_%s" % self.id
 
 
 class Code(models.Model):
-    verify_code = models.CharField(max_length=5,unique=True)
-    life_time = models.DateTimeField(null = True,blank=True)
-    type = models.CharField(max_length=20)
-    user_email = models.CharField(max_length=100)
-    dop_info = models.CharField(max_length=250,null = True,blank = True)
+    verify_code:str = models.CharField(max_length=5,unique=True)
+    life_time:datetime = models.DateTimeField(null = True,blank=True)
+    type:str = models.CharField(max_length=20)
+    user_email:str = models.CharField(max_length=100)
+    dop_info:str = models.CharField(max_length=250,null = True,blank = True)
 
-    def __str__(self):  
+    def __str__(self) -> str:  
         return self.verify_code
 
 
 class ActiveUser(models.Model):
-    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    user:int = models.ForeignKey(User,on_delete=models.CASCADE)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.user.email
 
