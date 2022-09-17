@@ -9,32 +9,32 @@ from django.utils import timezone
 
 class EmailThread(threading.Thread):
 
-    def __init__(self, email):
-        self.email = email
+    def __init__(self, email:str) -> None:
+        self.email:str = email
         threading.Thread.__init__(self)
 
-    def run(self):
+    def run(self) -> None:
         self.email.send()
 
 
 class Util: 
     @staticmethod
     @app.task
-    def send_email(data:dict):
-        email = EmailMessage(
+    def send_email(data:dict) -> None:
+        email:str = EmailMessage(
             subject=data['email_subject'], body=data['email_body'], to=[data['to_email']])
         email.content_subtype = "html"
         EmailThread(email).start()
 
 
 @app.task
-def delete_expire_codes():
+def delete_expire_codes() -> None:
     for code in Code.objects.all():
         if code.life_time < timezone.now():
             code.delete()
 
 @app.task
-def check_user_age():
+def check_user_age() -> None:
     for user_profile in Profile.objects.all():
         rdelta = relativedelta(timezone.now().date(), user_profile.birthday)
         print(rdelta.year)

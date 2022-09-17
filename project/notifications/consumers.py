@@ -26,7 +26,7 @@ class UserConsumer(ObserverModelInstanceMixin,AsyncWebsocketConsumer):
                 await self.add_user_to_active()
 
     @database_sync_to_async
-    def check_user(self):
+    def check_user(self) -> bool:
         user = User.objects.filter(email = self.scope['user'])
         if user:
             return True
@@ -38,7 +38,7 @@ class UserConsumer(ObserverModelInstanceMixin,AsyncWebsocketConsumer):
             return True
 
     @database_sync_to_async
-    def room_groop_name(self):
+    def room_groop_name(self) -> str:
         return User.objects.get(email = self.scope['user']).group_name
 
     @database_sync_to_async
@@ -58,6 +58,7 @@ class UserConsumer(ObserverModelInstanceMixin,AsyncWebsocketConsumer):
                 self.room_group_name,
                 self.channel_name
             )
+            print(type(await self.delete_user_from_active()))
             return await self.delete_user_from_active()
 
     async def kafka_message(self, event):

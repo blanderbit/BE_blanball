@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from rest_framework.test import APITestCase
 from authentication.models import *
 from events.models import *
@@ -28,7 +30,7 @@ class LoginUserSetUp:
         return self.client.force_authenticate(self.user)
 
 class SetUpAauthenticationViews(APITestCase):
-    def setUp(self):
+    def setUp(self) -> OrderedDict:
         self.user_register_data = {
             "email": "user@example.com",
             "phone": "+380683861969",
@@ -84,7 +86,7 @@ class SetUpAauthenticationViews(APITestCase):
 
     
 class SetUpAuthenticationModels(APITestCase):
-    def setUp(self):
+    def setUp(self) -> OrderedDict:
         self.profile_data = {
             'name':'John',
             'last_name':'Jesus',
@@ -106,7 +108,7 @@ class SetUpAuthenticationModels(APITestCase):
 
 
 class SetUpEventsViews(APITestCase):
-    def setUp(self):
+    def setUp(self) -> OrderedDict:
         self.event_create_data = {
             "name": "string",
             "small_disc": "string",

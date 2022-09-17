@@ -21,14 +21,14 @@ class NotificationsList(generics.ListAPIView):
 
 
 class UserNotificationsList(NotificationsList):     
-    def get_queryset(self):
+    def get_queryset(self) -> list:
         return self.queryset.filter(user_id = self.request.user.id)
 
 class ReadNotifications(generics.GenericAPIView):
     serializer_class = ReadOrDeleteNotificationsSerializer
     queryset = Notification.objects.all()
     
-    def post(self,request):
+    def post(self,request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         read = [] 
@@ -52,7 +52,7 @@ class DeleteNotifcations(generics.GenericAPIView):
     serializer_class = ReadOrDeleteNotificationsSerializer
     queryset = Notification.objects.all()
 
-    def post(self,request):
+    def post(self,request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         deleted = [] 
@@ -75,7 +75,7 @@ class DeleteNotifcations(generics.GenericAPIView):
 class ChangeMaintenance(generics.GenericAPIView):
     serializer_class = ChangeMaintenanceSerializer
 
-    def post(self,request):
+    def post(self,request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = request.data
@@ -96,7 +96,7 @@ class ChangeMaintenance(generics.GenericAPIView):
 class GetMaintenance(generics.GenericAPIView):
     serializer_class = ChangeMaintenanceSerializer
 
-    def get(self,request):
+    def get(self,request) -> Response:
         try:
             with open('./project/project/config.json', 'r') as f:
                 data = f.read()

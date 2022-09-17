@@ -1,4 +1,3 @@
-from email.mime import message
 import re
 import pandas
 
@@ -21,7 +20,7 @@ class CreateEvent(generics.GenericAPIView):
     serializer_class = CreateEventSerializer
     queryset = Event.objects.all()
 
-    def post(self,request):
+    def post(self,request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception= True)
         for user in serializer.validated_data['current_users']:
@@ -34,7 +33,7 @@ class CreateEvent(generics.GenericAPIView):
         return Response(serializer.data,status=status.HTTP_201_CREATED)
         
 
-    def perform_create(self,serializer):
+    def perform_create(self,serializer) -> None:
         serializer.validated_data.pop('current_users')
         try:
             contact_number = serializer.validated_data['contact_number']
@@ -46,7 +45,7 @@ class CreateEvent(generics.GenericAPIView):
 class InviteUserToEvent(generics.GenericAPIView):
     serializer_class = InviteUserToEventSerializer
     
-    def post(self,request):
+    def post(self,request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         try:
@@ -72,7 +71,7 @@ class GetDeleteEvent(generics.RetrieveAPIView):
     serializer_class =  EventSerializer
     queryset = Event.objects.all()
     
-    def delete(self, request,pk: int):
+    def delete(self, request,pk: int) -> Response:
         try:
             event = self.queryset.get(id = pk)
             if event.author.id == request.user.id:
@@ -87,7 +86,7 @@ class UpdateEvent(generics.GenericAPIView):
     serializer_class = UpdateEventSerializer
     queryset = Event.objects.all()
 
-    def put(self, request,pk: int):
+    def put(self, request,pk: int) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception= True)
         try:
@@ -116,7 +115,7 @@ class DeleteEvents(generics.GenericAPIView):
     serializer_class = DeleteIventsSerializer
     queryset = Event.objects.all()
 
-    def post(self, request):
+    def post(self, request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         deleted = [] 
@@ -138,11 +137,11 @@ class DeleteEvents(generics.GenericAPIView):
 class JoinToEvent(generics.GenericAPIView):
     serializer_class = JoinOrRemoveRoomSerializer
 
-    def post(self, request):
+    def post(self, request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = request.user
-        event = Event.objects.get(id = serializer.data['event_id'])
+        user:User = request.user
+        event:Event = Event.objects.get(id = serializer.data['event_id'])
         if not user.current_rooms.filter(id=event.id).exists():
             if not user.current_views_rooms.filter(id=event.id).exists():
                 if event.author_id != user.id:
@@ -153,7 +152,9 @@ class JoinToEvent(generics.GenericAPIView):
                             return Response(JOIN_TO_EVENT_SUCCESS,status=status.HTTP_200_OK)
                         else:
                             if not RequestToParticipation.objects.filter(user=user,event=event.id,event_author=event.author):
-                                send_to_user(user=event.author,notification_text='new user aproved',message_type ='new_request_approved')
+                                send_to_user(user=event.author,notification_text=
+                                NEW_REQUEST_TO_PARTICIPATION.format(author_name=event.author.profile.name,event_id=event.id),
+                                message_type=NEW_REQUEST_TO_PARTICIPATION_MESSAGE_TYPE)
                                 RequestToParticipation.objects.create(user=user,event_id=event.id,event_author=event.author)
                                 return Response(APPLICATION_FOR_PARTICIPATION_SUCCESS,status=status.HTTP_200_OK)
                             return Response(ALREADY_SENT_REQUEST_TO_PARTICIPATE,status=status.HTTP_400_BAD_REQUEST)
@@ -165,7 +166,7 @@ class JoinToEvent(generics.GenericAPIView):
 class FanJoinToEvent(generics.GenericAPIView):
     serializer_class = JoinOrRemoveRoomSerializer
 
-    def post(self, request):
+    def post(self, request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = request.user
@@ -178,7 +179,7 @@ class FanJoinToEvent(generics.GenericAPIView):
 class FanLeaveFromEvent(generics.GenericAPIView):
     serializer_class = JoinOrRemoveRoomSerializer
 
-    def post(self, request):
+    def post(self, request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = request.user
@@ -192,7 +193,7 @@ class FanLeaveFromEvent(generics.GenericAPIView):
 class LeaveFromEvent(generics.GenericAPIView):
     serializer_class = JoinOrRemoveRoomSerializer
 
-    def post(self, request):
+    def post(self, request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = request.user
@@ -211,21 +212,21 @@ class UserEvents(generics.ListAPIView):
     filterset_fields = ['type']
     queryset = Event.objects.all() 
 
-    def get_queryset(self):
+    def get_queryset(self) -> list:
         return self.queryset.filter(author_id = self.request.user.id) 
 
 class PopularIvents(UserEvents):
     serializer_class = PopularIventsListSerializer
     queryset = Event.objects.filter(status = 'Planned')
 
-    def get_queryset(self):
+    def get_queryset(self) -> list:
         return self.queryset.annotate(count = Count('current_users')).order_by('-count')[:10]
 
 class UserPlannedEvents(UserEvents):
     serializer_class = PopularIventsListSerializer
     queryset = Event.objects.filter(status = 'Planned')
 
-    def list(self, request,pk):
+    def list(self, request,pk) -> Response:
         try:
             user =  User.objects.get(id=pk)
             num = re.findall(r'\d{1,10}', user.get_planned_events)[0]
@@ -250,7 +251,7 @@ class RequestToParticipationsList(generics.ListAPIView):
     queryset = RequestToParticipation.objects.all().order_by('-id')
     
 
-    def list(self,request,pk):
+    def list(self,request,pk) -> Response:
         try:
             event =  Event.objects.get(id=pk)
             queryset = self.queryset.filter(event=event)
@@ -265,7 +266,7 @@ class BulkAcceptOrDeclineRequestToParticipation(generics.GenericAPIView):
     serializer_class = BulkAcceptOrDeclineRequestToParticipationSerializer
     queryset = RequestToParticipation.objects.all()
 
-    def post(self,request):
+    def post(self,request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         success = []

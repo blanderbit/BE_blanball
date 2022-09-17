@@ -83,6 +83,9 @@ AFTER_RESET_PASSWORD_EMAIL_TEXT = '{user_name} {user_last_name},ваш паро�
 
 NEW_USER_ON_THE_EVENT_NOTIFICATION = '{author_name},на вашу подію під номером {event_id} долучився {user_type} гравець'
 
+NEW_REQUEST_TO_PARTICIPATION = '{author_name},вам надійшов новий запит на участь у події під номером №{event_id}'
+NEW_REQUEST_TO_PARTICIPATION_MESSAGE_TYPE = 'new_request_to_participation'
+
 NEW_USER_ON_THE_EVENT_MESSAGE_TYPE = 'new_user_on_the_event'
 
 ALREADY_VERIFIED_ERROR = {'error':'Your account is already verified'}
