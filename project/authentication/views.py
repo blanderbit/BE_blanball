@@ -106,6 +106,7 @@ class UserList(generics.ListAPIView):
     serializer_class = UsersListSerializer
     pagination_class = CustomPagination
     filter_backends = (filters.SearchFilter,DjangoFilterBackend,filters.OrderingFilter,)
+    # filterset_class = ProfileAgeRangeFilter
     search_fields = ('profile__name','profile__gender','profile__last_name')
     ordering_fields = ('id','profile__age','raiting')
     queryset = User.objects.all().order_by('-id')
@@ -225,12 +226,9 @@ class CheckCode(generics.GenericAPIView):
             self.user.phone = self.code.dop_info
             self.success(email_body='change phone success')
             return Response(CHANGE_PHONE_SUCCESS,status=status.HTTP_200_OK)
-        # elif self.code.type == ACCOUNT_DELETE_CODE_TYPE:
-        #     print('fdfddf')
-        #     print(self.user.id)
-        #     User.objects.get(id=self.user.id).delete()
-        #     # self.user.delete()
-        #     return Response(ACCOUNT_DELETED_SUCCESS,status=status.HTTP_200_OK)
+        elif self.code.type == ACCOUNT_DELETE_CODE_TYPE:
+            User.objects.filter(id=self.user.id).delete()
+            return Response(ACCOUNT_DELETED_SUCCESS,status=status.HTTP_200_OK)
 
 
     def success(self,email_body) -> None:

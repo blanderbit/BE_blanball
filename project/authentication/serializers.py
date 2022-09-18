@@ -150,7 +150,7 @@ class UserSerializer(DynamicFieldsModelSerializer):
 class ProfileListSerializer(serializers.ModelSerializer):
     class Meta:
         model =  Profile
-        fields = ('id','name','last_name','avatar','position','gender')
+        fields = ('id','name','last_name','avatar','position','gender','age')
 
 class UsersListSerializer(serializers.ModelSerializer):
     profile = ProfileListSerializer()

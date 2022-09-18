@@ -37,7 +37,6 @@ def delete_expire_codes() -> None:
 def check_user_age() -> None:
     for user_profile in Profile.objects.all():
         rdelta = relativedelta(timezone.now().date(), user_profile.birthday)
-        print(rdelta.year)
-        # if type((timezone.now().date() - user_profile.birthday) / timezone.timedelta(days=365) /2) == int:
-        #     user_profile.age += 1
-        #     user_profile.save()
+        if rdelta.months == 0 and rdelta.days == 0:
+            user_profile.age += 1
+            user_profile.save()

@@ -12,7 +12,7 @@ from djangochannelsrestframework.observer.generics import ObserverModelInstanceM
 
 
 class UserConsumer(ObserverModelInstanceMixin,AsyncWebsocketConsumer):
-    async def connect(self):
+    async def connect(self) -> None:
         if await self.check_user():
             self.user_group_name = await self.room_groop_name()
             self.room_group_name = self.user_group_name
@@ -27,13 +27,13 @@ class UserConsumer(ObserverModelInstanceMixin,AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def check_user(self) -> bool:
-        user = User.objects.filter(email = self.scope['user'])
+        user:User = User.objects.filter(email = self.scope['user'])
         if user:
             return True
 
     @database_sync_to_async
     def check_user_group_name(self):
-        user = User.objects.filter(email = self.scope['user'])
+        user:list[User] = User.objects.filter(email = self.scope['user'])
         if user[0].group_name ==  self.room_group_name:
             return True
 
@@ -42,13 +42,13 @@ class UserConsumer(ObserverModelInstanceMixin,AsyncWebsocketConsumer):
         return User.objects.get(email = self.scope['user']).group_name
 
     @database_sync_to_async
-    def add_user_to_active(self):
+    def add_user_to_active(self) -> None:
         self.disconnect(400)
         ActiveUser.objects.filter(user = User.objects.get(email = self.scope['user']).id).delete()
         ActiveUser.objects.create(user = User.objects.get(email = self.scope['user']))
 
     @database_sync_to_async
-    def delete_user_from_active(self):
+    def delete_user_from_active(self) :
         return ActiveUser.objects.filter(user = User.objects.get(email = self.scope['user']).id).delete()
 
     async def disconnect(self,close_code):
@@ -58,10 +58,9 @@ class UserConsumer(ObserverModelInstanceMixin,AsyncWebsocketConsumer):
                 self.room_group_name,
                 self.channel_name
             )
-            print(type(await self.delete_user_from_active()))
             return await self.delete_user_from_active()
 
-    async def kafka_message(self, event):
+    async def kafka_message(self, event) -> None:
         # Send message to WebSocket
         message = event['message']
         message_type =  event['message_type']
