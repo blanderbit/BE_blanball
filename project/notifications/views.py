@@ -31,8 +31,8 @@ class ReadNotifications(generics.GenericAPIView):
     def post(self,request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        read = [] 
-        not_read = []
+        read:list = [] 
+        not_read:list = []
         for notification in serializer.validated_data['notifications']:
             notify = self.queryset.filter(id = notification)
             if notify:
@@ -55,8 +55,8 @@ class DeleteNotifcations(generics.GenericAPIView):
     def post(self,request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        deleted = [] 
-        not_deleted = []
+        deleted:list = [] 
+        not_deleted:list = []
         for notification in serializer.validated_data['notifications']:
             notify =  self.queryset.filter(id = notification)
             if notify:
@@ -94,12 +94,15 @@ class ChangeMaintenance(generics.GenericAPIView):
 
 
 class GetMaintenance(generics.GenericAPIView):
-    serializer_class = ChangeMaintenanceSerializer
+    key:str = 'isMaintenance'
 
     def get(self,request) -> Response:
         try:
             with open('./project/project/config.json', 'r') as f:
                 data = f.read()
-            return Response(data,status=status.HTTP_200_OK)
+            return Response({self.key:json.loads(data)[self.key]},status=status.HTTP_200_OK)
         except:
-            return Response()
+            return Response(CONFIG_FILE_ERROR,status=status.HTTP_400_BAD_REQUEST)
+
+class GetCurrentVersion(GetMaintenance):
+    key:str = 'version'

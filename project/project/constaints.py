@@ -94,6 +94,8 @@ APPLICATION_FOR_PARTICIPATION_SUCCESS = {'success':'Your application for partici
 
 ALREADY_SENT_REQUEST_TO_PARTICIPATE = {'error':'You have already sent a request to participate'}
 
+CONFIG_FILE_ERROR = {'error':'Config file is not available now'}
+
 INVITE_USER_TO_EVENT_MESSAGE_TYPE = 'invite_user_to_event'
 EVENT_DELETE_MESSAGE_TYPE = 'event_deleted'
 EVENT_UPDATE_MESSAGE_TYPE = 'event_updated'

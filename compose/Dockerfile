@@ -10,6 +10,7 @@ ENV DJANGO_ENV=${DJANGO_ENV} \
   # pip:
   PIP_NO_CACHE_DIR=1 \
   PIP_DISABLE_PIP_VERSION_CHECK=1 \
+  PIP_ROOT_USER_ACTION=ignore \
   PIP_DEFAULT_TIMEOUT=100 \
   #poetry 
   POETRY_VERSION=1.2.0 \
@@ -32,13 +33,8 @@ ENV PATH "/root/.poetry/bin:/opt/venv/bin:${PATH}"
 # Cleaning cache:
 RUN apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/* \
-
-
-# RUN poetry run pip install -U pip \
-#     && poetry install
-
-  && echo "$DJANGO_ENV" \
-  && poetry version \
-  #Install deps:
-  &&poetry run pip install -U pip \
-  &&poetry install 
+    && echo "$DJANGO_ENV" \
+    && poetry version \
+    #Install deps:
+    &&poetry run pip install -U pip \
+    &&poetry install 

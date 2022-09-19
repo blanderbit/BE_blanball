@@ -145,7 +145,7 @@ class JoinToEvent(generics.GenericAPIView):
         event:Event = Event.objects.get(id = serializer.data['event_id'])
         if not user.current_rooms.filter(id=event.id).exists():
             if not user.current_views_rooms.filter(id=event.id).exists():
-                if event.author_id != user.id:
+                # if event.author_id != user.id:
                     if event.amount_members != event.count_current_users:
                         if not event.privacy:
                             user.current_rooms.add(event)
@@ -159,7 +159,7 @@ class JoinToEvent(generics.GenericAPIView):
                                 RequestToParticipation.objects.create(user=user,event_id=event.id,event_author=event.author)
                                 return Response(APPLICATION_FOR_PARTICIPATION_SUCCESS,status=status.HTTP_200_OK)
                             return Response(ALREADY_SENT_REQUEST_TO_PARTICIPATE,status=status.HTTP_400_BAD_REQUEST)
-                return Response(EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,status=status.HTTP_400_BAD_REQUEST)
+                # return Response(EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,status=status.HTTP_400_BAD_REQUEST)
             return Response(ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR,status=status.HTTP_400_BAD_REQUEST)
         return Response(ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,status=status.HTTP_400_BAD_REQUEST)
 

@@ -103,10 +103,9 @@ services:
       - pgadmin-data:/usr/src/blanball/storage/pgadmin/data
     ports:
       - "5050:80"
-    environment:
-      PGADMIN_DEFAULT_EMAIL: gameonly1921@gmail.com
-      PGADMIN_DEFAULT_PASSWORD: admin1921
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    env_file: 
+      - ./compose/.env
+    
   db_backup:
     container_name: db_backup
     image: prodrigestivill/postgres-backup-local

@@ -16,4 +16,6 @@ urlpatterns = [
     path('admin/change/maintenance',ChangeMaintenance.as_view(),name='change-maintenance'),
     # endpoint where admin can get maintenance
     path('admin/get/maintenance',GetMaintenance.as_view(),name='get-maintenance'),
+    # endpoint where admin can get maintenance
+    path('admin/get/current/version',GetCurrentVersion.as_view(),name='get-current-version'),
 ]
