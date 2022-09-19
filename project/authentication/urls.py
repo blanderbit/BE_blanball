@@ -2,6 +2,8 @@ from .views import *
 
 from django.urls import path
 
+from rest_framework import routers
+
 
 urlpatterns = [
     # endpoint where user can register
@@ -24,8 +26,6 @@ urlpatterns = [
     path('client/request-change/password', RequestChangePassword.as_view(),name='request-change-password'),
     # endpoint where user can confirm password chagne,email change,phone change,account verification
     path('client/check/code',CheckCode.as_view(),name='check-code'),
-    # endpoint where user can confirm account delete
-    path('client/me/delete', AccountDelete.as_view(),name='delete-my-profile'),
     # endpoint where user can update his profile
     path('client/me/update', UpdateProfile.as_view(),name='update-my-profile'),
     # endpoint where user can request change email
@@ -33,5 +33,9 @@ urlpatterns = [
     # endpoint where user can request change phone
     path('client/request-change/phone',RequestChangePhone.as_view(),name='request-change-phone'),
     # endpoint where user can find any user
-    path('client/search/user/<str:query>/',SearchUsers.as_view()),
+    path('client/search/user/<str:query>/',ProfileSearch.as_view(),name='profile-search'),
+    # endpoint where user can check is another user active
+    path('client/search/user/active',CheckUserActive.as_view(),name='check-user-active'),
+    # endpoint where user can check is another user active
+    path('client/request-verify/email',RequestEmailVerify.as_view(),name='request-email-verify'),
 ]

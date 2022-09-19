@@ -8,11 +8,10 @@ from django.utils import timezone
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 
-from djangochannelsrestframework.observer.generics import ObserverModelInstanceMixin
 
 
-class UserConsumer(ObserverModelInstanceMixin,AsyncWebsocketConsumer):
-    async def connect(self):
+class UserConsumer(AsyncWebsocketConsumer):
+    async def connect(self) -> None:
         if await self.check_user():
             self.user_group_name = await self.room_groop_name()
             self.room_group_name = self.user_group_name
@@ -26,28 +25,30 @@ class UserConsumer(ObserverModelInstanceMixin,AsyncWebsocketConsumer):
                 await self.add_user_to_active()
 
     @database_sync_to_async
-    def check_user(self):
-        user = User.objects.filter(email = self.scope['user'])
+    def check_user(self) -> bool:
+        user:User = User.objects.filter(email = self.scope['user'])
         if user:
             return True
 
     @database_sync_to_async
-    def check_user_group_name(self):
-        user = User.objects.filter(email = self.scope['user'])
+    def check_user_group_name(self) -> bool:
+        user:list[User] = User.objects.filter(email = self.scope['user'])
         if user[0].group_name ==  self.room_group_name:
             return True
 
     @database_sync_to_async
-    def room_groop_name(self):
+    def room_groop_name(self) -> str:
         return User.objects.get(email = self.scope['user']).group_name
 
     @database_sync_to_async
-    def add_user_to_active(self):
+    def add_user_to_active(self) -> None:
+        self.disconnect(400)
+        ActiveUser.objects.filter(user = User.objects.get(email = self.scope['user']).id).delete()
         ActiveUser.objects.create(user = User.objects.get(email = self.scope['user']))
 
     @database_sync_to_async
-    def delete_user_from_active(self):
-        ActiveUser.objects.filter(user = User.objects.get(email = self.scope['user']).id).delete()
+    def delete_user_from_active(self) -> None:
+        return ActiveUser.objects.filter(user = User.objects.get(email = self.scope['user']).id).delete()
 
     async def disconnect(self,close_code):
         # Leave room group
@@ -56,41 +57,14 @@ class UserConsumer(ObserverModelInstanceMixin,AsyncWebsocketConsumer):
                 self.room_group_name,
                 self.channel_name
             )
-            await self.delete_user_from_active()
+            return await self.delete_user_from_active()
 
-    async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-
-        # Send message to room group
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'kafka_message',
-                'message': message
-            }
-        )
-
-
-    async def kafka_message(self, event):
+    async def kafka_message(self, event) -> None:
         # Send message to WebSocket
-        message = event['message']
-        await self.send(text_data=json.dumps({
-            'message': message
-        }))
+        text_data= json.dumps({
+            'message': event['message'],
+            'date_time': str(timezone.now()),
+            'message_type': event['message_type'],
+        },ensure_ascii=False).encode('utf-8')
 
-
-
-
-
-
-
-
-
-    async def kafka_message(self, event):
-        # Send message to WebSocket
-        message = event['message']
-        await self.send(text_data=json.dumps({
-            'message': message,
-            'date_time': str(timezone.now())
-        }))
+        await self.send(text_data.decode())

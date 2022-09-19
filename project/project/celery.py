@@ -11,11 +11,14 @@ app.config_from_object('django.conf:settings',namespace ='CELERY')
 app.autodiscover_tasks()
 
 
-
 app.conf.beat_schedule = {
     'delete_expire_codes': {
         'task':'authentication.tasks.delete_expire_codes',
         'schedule': crontab(minute ='*/10')
+    },
+    'delete_uproved_requests_to_participation': {
+        'task':'events.tasks.delete_uproved_requests_to_participation',
+        'schedule': crontab(minute ='*/20')
     },
     'check_event_start_time': {
         'task':'events.tasks.check_event_start_time',
@@ -23,7 +26,6 @@ app.conf.beat_schedule = {
     },
     'check_user_age': {
         'task':'authentication.tasks.check_user_age',
-        # 'schedule': crontab(minute=0, hour=0)
-        'schedule': crontab(minute ='*/1')
+        'schedule': crontab(minute=0, hour=0)
     },
 }
