@@ -8,10 +8,9 @@ from django.utils import timezone
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 
-from djangochannelsrestframework.observer.generics import ObserverModelInstanceMixin
 
 
-class UserConsumer(ObserverModelInstanceMixin,AsyncWebsocketConsumer):
+class UserConsumer(AsyncWebsocketConsumer):
     async def connect(self) -> None:
         if await self.check_user():
             self.user_group_name = await self.room_groop_name()

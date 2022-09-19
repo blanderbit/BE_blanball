@@ -14,7 +14,7 @@ class UserReviewsList(generics.ListAPIView):
     pagination_class = CustomPagination
     queryset = Review.objects.all()
 
-    def get_queryset(self) -> str:
+    def get_queryset(self) -> list:
         return self.queryset.filter(user_id = self.request.user).order_by('-time_created')
 
 class GetPutDeleteReview(GetPutDeleteAPIView):

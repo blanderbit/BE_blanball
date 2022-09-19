@@ -14,7 +14,6 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
 
-
 class CreateEvent(generics.GenericAPIView):
     '''class that allows you to create a new event'''
     serializer_class = CreateEventSerializer
@@ -105,6 +104,7 @@ class EventList(generics.ListAPIView):
     '''class that allows you to get a complete list of events'''
     serializer_class =  EventListSerializer
     filter_backends = (filters.SearchFilter,DjangoFilterBackend,filters.OrderingFilter,)
+    filterset_class = EventDateTimeRangeFilter
     pagination_class = CustomPagination
     search_fields = ('id','name','small_disc','price','place','date_and_time','amount_members')
     ordering_fields = ('id',)

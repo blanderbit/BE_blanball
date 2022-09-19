@@ -2,6 +2,9 @@ from authentication.tasks import Util
 from authentication.models import User,Code
 from notifications.tasks import send_to_user
 from .constaints import  *
+from events.models import Event
+
+from django_filters import rest_framework as filters
 
 import random
 import string
@@ -35,10 +38,23 @@ def code_create(email,type,dop_info) -> None:
     context:dict = ({'title':check_code_type(code),'code': list(code.verify_code),'name':user.profile.name,'surname':user.profile.last_name})
     template:str = render_to_string("email_confirm.html",context)
     print(verify_code)
-    data:dict = {'email_subject': 'Blanball','email_body': template ,'to_email': email}
+    data:dict = {'email_body': template ,'to_email': email}
     Util.send_email.delay(data)
 
 
+class EventDateTimeRangeFilter(filters.FilterSet):
+    date_and_time = filters.DateFromToRangeFilter()
+
+    class Meta:
+        model = Event
+        fields = ('date_and_time',)
+
+class UserAgeRangeFilter(filters.FilterSet):
+    profile__age = filters.RangeFilter()
+
+    class Meta:
+        model = User
+        fields = ('profile__age',)
 
 
 def send_notification_to_event_author(event) -> None:

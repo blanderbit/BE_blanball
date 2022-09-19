@@ -11,7 +11,6 @@ REVIEW_CREATE_SUCCESS = {'success': 'Review create'}
 ACTIVATION_SUCCESS = {'success': 'Activation by email'}
 ACCOUNT_DELETED_SUCCESS = {'success':  'Account deleted'}
 PASSWORD_RESET_SUCCESS = {'success': 'Password reset'}
-CREATE_EVENT_ERROR = {'error': 'You cannot invite more people than the number of '}
 
 #EVENT
 EVENT_DELETED_SUCCESS = {'success':  'Event deleted'}
@@ -64,6 +63,7 @@ MAX_AGE_VALUE_ERROR = {'error': 'Age must not exceed 100 years old'}
 MIN_AGE_VALUE_ERROR = {'error': 'Age must be at least 6 years old'}
 CONFIGURATION_IS_REQUIRED_ERROR = {'error': 'Сonfiguration should contain fields like: email,phone,send_email'}
 
+BLANBALL = 'Blanball'
 
 EMAIL_MESSAGE_TEMPLATE_TITLE = '{type} {key} у додатку Blanball'
 

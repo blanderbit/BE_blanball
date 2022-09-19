@@ -38,7 +38,7 @@ class RegisterUser(generics.GenericAPIView):
         context:dict = ({'title':'Успішна регестрація!','text':AFTER_REGISTER_SEND_EMAIL_TEXT.format(
             user_name = profile.name,user_last_name=profile.last_name)})
         message:str = render_to_string('email_message.html',context)
-        Util.send_email.delay(data = {'email_subject': 'Blanball','email_body':message,'to_email': user['email']})
+        Util.send_email.delay(data = {'email_body':message,'to_email': user['email']})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class LoginUser(generics.GenericAPIView):
@@ -106,21 +106,15 @@ class UserList(generics.ListAPIView):
     serializer_class = UsersListSerializer
     pagination_class = CustomPagination
     filter_backends = (filters.SearchFilter,DjangoFilterBackend,filters.OrderingFilter,)
-    # filterset_class = ProfileAgeRangeFilter
+    filterset_class = UserAgeRangeFilter
     search_fields = ('profile__name','profile__gender','profile__last_name')
     ordering_fields = ('id','profile__age','raiting')
-    queryset = User.objects.all().order_by('-id')
+    queryset = User.objects.filter(role='User').order_by('-id')
 
-class AdminUsersList(generics.ListAPIView):
+class AdminUsersList(UserList):
     '''displaying the full list of admin users'''
-    serializer_class = UserSerializer
-    pagination_class = CustomPagination
-    filter_backends = (filters.SearchFilter,DjangoFilterBackend)
-    search_fields = ('id','email','phone')
-    queryset = User.objects.all()
-
     def get_queryset(self) -> list:
-        return self.queryset.filter(role = "Admin")
+        return self.queryset.filter(role = 'Admin')
 
 class RequestPasswordReset(generics.GenericAPIView):
     '''send request to reset user password by email'''
@@ -144,17 +138,17 @@ class ResetPassword(generics.GenericAPIView):
     def post(self, request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        verify_code:str = serializer.validated_data["verify_code"]
+        verify_code:str = serializer.validated_data['verify_code']
         try:
             code:Code = Code.objects.get(value=verify_code)
             user:User = User.objects.get(email=code.user_email)
-            user.set_password(serializer.validated_data["new_password"])
+            user.set_password(serializer.validated_data['new_password'])
             user.save()
             code.delete()
             context:dict = ({'title':'Успішна регестрація!','text':AFTER_RESET_PASSWORD_EMAIL_TEXT.format(
                 user_name = user.profile.name,user_last_name=user.profile.last_name)})
             message:str = render_to_string('email_message.html',context)
-            Util.send_email.delay(data = {'email_subject': 'Reset password','email_body':message,'to_email': user.email})
+            Util.send_email.delay(data = {'email_body':message,'to_email': user.email})
             return Response(PASSWORD_RESET_SUCCESS,status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response(NO_SUCH_USER_ERROR,status=status.HTTP_404_NOT_FOUND) 
@@ -165,12 +159,11 @@ class RequestChangePassword(generics.GenericAPIView):
     def post(self, request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        if not request.user.check_password(serializer.data.get("old_password")):
+        if not request.user.check_password(serializer.data.get('old_password')):
             return Response(WRONG_PASSWORD_ERROR, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            code_create(email=request.user.email,type=PASSWORD_CHANGE_CODE_TYPE,
-            dop_info = serializer.validated_data['new_password'])
-            return Response(SENT_CODE_TO_EMAIL_SUCCESS, status=status.HTTP_200_OK)
+        code_create(email=request.user.email,type=PASSWORD_CHANGE_CODE_TYPE,
+        dop_info = serializer.validated_data['new_password'])
+        return Response(SENT_CODE_TO_EMAIL_SUCCESS, status=status.HTTP_200_OK)
 
 class RequetChangeEmail(generics.GenericAPIView):
     serializer_class = EmailSerializer
@@ -234,7 +227,7 @@ class CheckCode(generics.GenericAPIView):
     def success(self,email_body) -> None:
         self.user.save()
         self.code.delete()
-        data:dict = {'email_subject': 'Blanball','email_body': f'{self.user.profile.name}{email_body}!' ,'to_email': self.user.email}
+        data:dict = {'email_body': f'{self.user.profile.name}{email_body}!' ,'to_email': self.user.email}
         Util.send_email.delay(data)
 
 class RequestEmailVerify(generics.GenericAPIView):

@@ -87,7 +87,7 @@ class TestAuthenticationViews(SetUpAauthenticationViews):
 
     def test_code(self) -> None:
         self.auth()
-        code = Code.objects.create(verify_code='FFFFF',
+        code:Code = Code.objects.create(verify_code='FFFFF',
             user_email=self.user_register_data['email'],type=EMAIL_CHANGE_CODE_TYPE,dop_info='userexample@gmail.com111',life_time= 
             timezone.now() + timezone.timedelta(minutes=CODE_EXPIRE_MINUTES_TIME))
         response = self.client.post(reverse("check-code"),{"verify_code":code.verify_code})
@@ -109,5 +109,4 @@ class TestAuthenticationViews(SetUpAauthenticationViews):
     def auth(self) -> NoneType:
         self.client.post(reverse("register"),self.user_register_data)
         user = User.objects.get(email = self.user_register_data['email'])
-        print(type(User))
         return self.client.force_authenticate(user)

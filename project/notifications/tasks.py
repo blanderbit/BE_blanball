@@ -25,7 +25,7 @@ def send_to_user(user:User,notification_text:str,message_type:str) -> None:
         if user.configuration['send_email']:
             # context = ({'code': list(code.verify_code),'name':user.profile.name,'surname':user.profile.last_name})
             template = render_to_string('email_message.html')
-            Util.send_email.delay(data = {'email_subject': 'Blanball','email_body': template,
+            Util.send_email.delay(data = {'email_body': template,
             'to_email': user.email})
 
 

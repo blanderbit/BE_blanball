@@ -1,21 +1,25 @@
 version: "3.8"
 
 services:
+
   db:
     container_name: db
+    env_file: 
+      - ./compose/.env
     image: "postgres:14.5-alpine"
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
     ports: 
       - "5432:5432"
-    env_file: 
-      - ./compose/.env
     healthcheck:
       test: pg_isready -U postgres -d postgres
       timeout: 40s
       retries: 20
+
   api:
     container_name: api
+    env_file: 
+      - ./compose/.env
     command: bash compose/local/django-start.sh
     build: 
       context: .
@@ -24,8 +28,6 @@ services:
       - .:/usr/src/blanball
     ports: 
       - "8000:8000"
-    env_file: 
-      - ./compose/.env
     depends_on:
       db: 
         condition: service_healthy
@@ -33,49 +35,57 @@ services:
         condition: service_healthy
     links: 
       - redis
+
   redis:
     container_name: redis
+    env_file:
+      - ./compose/.env
     image: "redis:7.0.4-alpine"
     volumes: 
       - redis-data:/usr/src/blanball/storage/redis/data
-    env_file:
-      - ./compose/.env
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
       timeout: 3s
       retries: 5
-  celery-worker:
+
+  celery-worker: 
     container_name: celery-worker
+    env_file: 
+      - ./compose/.env
     command: bash compose/local/celery-worker-start.sh
     build: 
       context: .
       dockerfile: compose/Dockerfile
     volumes: 
       - .:/usr/src/blanball
-    env_file: 
-      - ./compose/.env 
     depends_on:
       db:
         condition: service_started
       api:
         condition: service_started
+
   celery-beat:
     container_name: celery-beat
+    env_file: 
+      - ./compose/.env 
     command: bash compose/local/celery-beat-start.sh
     build: 
       context: .
       dockerfile: compose/Dockerfile
     volumes: 
       - .:/usr/src/blanball
-    env_file: 
-      - ./compose/.env 
     depends_on:
       db:
         condition: service_started
       api:
         condition: service_started  
+
   elasticsearch:
+    env_file: 
+      - ./compose/.env 
     container_name: elasticsearch
+    env_file: 
+      - ./compose/.env 
     image: docker.elastic.co/elasticsearch/elasticsearch:7.8.0
     volumes:
       - elastic-data:/usr/src/blanball/storage/elastic/data
@@ -96,18 +106,21 @@ services:
       memlock:
         soft: -1
         hard: -1
+
   pgadmin:
     container_name: pgadmin
+    env_file: 
+      - ./compose/.env
     image: dpage/pgadmin4
     volumes:
       - pgadmin-data:/usr/src/blanball/storage/pgadmin/data
     ports:
       - "5050:80"
-    env_file: 
-      - ./compose/.env
     
   db_backup:
     container_name: db_backup
+    env_file: 
+      - ./compose/.env
     image: prodrigestivill/postgres-backup-local
     restart: always
     volumes:

@@ -7,6 +7,8 @@ from project.celery import app
 from django.core.mail import EmailMessage
 from django.utils import timezone
 
+from project.constaints import BLANBALL
+
 class EmailThread(threading.Thread):
 
     def __init__(self, email:str) -> None:
@@ -22,7 +24,7 @@ class Util:
     @app.task
     def send_email(data:dict) -> None:
         email:str = EmailMessage(
-            subject=data['email_subject'], body=data['email_body'], to=[data['to_email']])
+            subject=BLANBALL,body=data['email_body'], to=[data['to_email']])
         email.content_subtype = "html"
         EmailThread(email).start()
 
