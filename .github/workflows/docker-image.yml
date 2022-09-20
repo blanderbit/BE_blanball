@@ -1,26 +1,20 @@
 name: Deploy
 on:
   push:
-    branches: [ "develop","master"]
+    branches: [ "develop" ]
+  pull_request:
+    branches: [ "develop" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    ${{ if contains(Build.SourceBranch, 'develop') }}:
-      steps:
-        env:
-          DOCKERFILE_PATH: Dockerfile
-          LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY_TEST }}:latest
-          COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY_TEST }}:${{ github.sha }}
-    ${{ else }}:
-      steps:
-        env:
-          DOCKERFILE_PATH: Dockerfile
-          LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY_PROD }}:latest
-          COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY_PROD }}:${{ github.sha }}
-
+    env:
+      DOCKERFILE_PATH: Dockerfile
+      LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:latest
+      COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
     steps:
     - uses: actions/checkout@master
+
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v2
       with:
