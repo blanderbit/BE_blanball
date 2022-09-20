@@ -91,3 +91,5 @@ db.env
 
 celerybeat-schedule
 backup/
+
+postgres-data/

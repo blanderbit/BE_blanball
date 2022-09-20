@@ -3,11 +3,11 @@ version: "3.8"
 services: 
   db:
     container_name: db
-    image: postgres:latest
+    image: "postgres:14.5-alpine"
     env_file:
       - stack.env
     volumes:
-      - db-data:/usr/src/blanball/storage/db/data
+      - ./postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: pg_isready -U postgres -d postgres
       timeout: 40s
@@ -76,13 +76,37 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+
+  pgadmin:
+    container_name: pgadmin
+    env_file:
+      - stack.env
+    image: dpage/pgadmin4
+    volumes:
+      - pgadmin-data:/usr/src/blanball/storage/pgadmin/data
+    ports:
+      - "49201:80"
+    networks:
+      - app-network
+
+  db_backup:
+    container_name: db_backup
+    env_file:
+      - stack.env
+    image: prodrigestivill/postgres-backup-local
+    restart: always
+    volumes:
+      - ./backup:/backups
+    networks:
+      - app-network
+    depends_on:
+      db:
+        condition: service_started
     
 networks:
   app-network:
      driver: bridge    
      
 volumes:
-  db-data:
   redis-data:
-  celery-worker-data:     
-  celery-beat-data: 
+  pgadmin-data:

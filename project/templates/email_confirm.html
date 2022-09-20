@@ -1,33 +1,37 @@
+{% load static %}
 {% load inlinecss %}
-{% inlinecss "css/style.css" %}
+{% inlinecss "css/email_confirm.css" %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@700&display=swap" rel="stylesheet">
   <title>Document</title>
 </head>
 <body>
   <table class="main">
     <tr class="header">
       <td class="logo-block">
-        <div class="logo">
-          <img src="../media/templates/Logo-Icon.png" alt="">
-          BlanBall
+        <div class="main-logo">
+          <div class="logo">
+            <img src="https://i.ibb.co/YQpvxdK/logo.jpg" alt="logo" border="0">
+          </div>
+          <div class="name-wrapper">
+            <div class="name">
+              <span>BlanBall</span>
+            </div>
+          </div>
         </div>
         <div class="socials">
           <a href="#">
-            <img src="../media/templates/facebook-icon.png" alt="">
+            <img src="https://i.ibb.co/d5kmN1X/facebook-icon.png" alt="facebook-icon" border="0">
           </a>
           <a href="#">
-            <img src="../media/templates/instagram-icon.png" alt="">
+            <img src="https://i.ibb.co/m4hG58H/instagram-icon.png" alt="instagram-icon" border="0">
           </a>
           <a href="#">
-            <img src="../media/templates/linkedin-icon.png" alt="">
+            <img src="https://i.ibb.co/ZVqSDST/linkedin-icon.png" alt="linkedin-icon" border="0">
           </a>
         </div>
       </td>
@@ -37,41 +41,65 @@
       <td>
         <div class="body_wrapper">
           <div class="body_title">
-            {{title}}
+            {{body_title}}
           </div>
-          <div class="body_text">
-            Скопіюйте або запам’ятайте наведений нижче код-підтвердження 
-            та введіть його у відповідне поле застосунку <span>BlanBall</span>
-          </div>
-          <div class="code_approve_title">
-            Код підтвердження
-          </div>
-          <div class="code_numbers">
-            {% for i in code %}
-            <div class="number">
-                <div class="number_block">
-                    <span>{{i}}</span>
-                </div>
+          <div class="body-user-section">
+            <div class="user-picture">
+              <img src="../src/assets/img/user.png" alt="">
             </div>
-            {% endfor %}
-          <div class="bottom_line">
-            Якщо ви не надсилали запит, <span>просто проігноруйте це повідомлення.</span>
+            <div class="user-text">
+              <div class="name">{{user_name}} {{user_last_name}}</div>
+              <div class="date">{{date_time}}</div>
+            </div>
+          </div>
+          <div class="main-letter-text">
+            <div class="title">
+              {{title}}
+            </div>
+            {{text}}
           </div>
         </div>
       </td>
     </tr>
-    <tr class="footer">
+    <tr class="social-line-wrapper">
       <td>
-        <div class="main_text">
-          Цей електронний лист надіслано на <a href="#" class="email">gita@email.com</a>. 
-          Якщо ви не бажаєте отримувати електронні листи такого типу, 
-          чи хочете ви, щоб ваш бренд більше не отримував листи? <a href="#">Відписатися</a>.
+        <div class="social-line">
+          <a href="">
+            <img src="https://i.ibb.co/DzMCRP2/twitter.jpg" alt="twitter" border="0">
+          </a>
+          <a href="">
+            <img src="https://i.ibb.co/hs3MFKZ/fb.jpg" alt="fb" border="0">
+          </a>
+          <a href="">
+            <img src="https://i.ibb.co/1ZJ5YVb/l-in.jpg" alt="l-in" border="0">
+          </a>
         </div>
-        <div class="address">
-          915 Wilshire BLVD #1600, Львів, CA 90017-6410, Україна
+      </td>
+    </tr>
+    <tr class="logo-line-wrapper">
+      <td>
+        <div class="logo-line">
+          <div class="logo-icon">
+            <img src="https://i.ibb.co/YQpvxdK/logo.jpg" alt="logo" border="0">
+          </div>
+          <div class="text">
+            BlanBall
+          </div>
         </div>
-        <div class="copyright">
-          © 2022 BlanBall
+      </td>
+    </tr>
+    <tr class="footer-wrapper">
+      <td>
+        <div class="footer">
+          <div class="info1">
+            Blanball © 2022
+          </div>
+          <div class="info1">
+            Govinda’s Rewards & Recognition.
+          </div>
+          <div class="info1">
+            A better company begins with a personalized employee experience.
+          </div>
         </div>
       </td>
     </tr>
@@ -79,14 +107,3 @@
 </body>
 </html>
 {% endinlinecss %}
-
-
-
-
-
-
-
-
-
-
-<

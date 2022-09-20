@@ -1,4 +1,5 @@
 from .models import User
+from collections import OrderedDict
 
 import os
 from datetime import datetime
@@ -19,10 +20,10 @@ django.setup()
 ALGORITHM = "HS256"
 
 @database_sync_to_async
-def get_user(token):
+def get_user(token:str) -> User or AnonymousUser:
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=ALGORITHM)
-    except:
+        payload:dict = jwt.decode(token, settings.SECRET_KEY, algorithms=ALGORITHM)
+    except User.DoesNotExist:
         return AnonymousUser()
 
     token_exp = datetime.fromtimestamp(payload['exp'])
@@ -30,7 +31,7 @@ def get_user(token):
         return AnonymousUser()
 
     try:
-        user = User.objects.get(id=payload['user_id'])
+        user:User = User.objects.get(id=payload['user_id'])
     except User.DoesNotExist:
         return AnonymousUser()
 
@@ -39,7 +40,7 @@ def get_user(token):
 
 class TokenAuthMiddleware(BaseMiddleware):
 
-    async def __call__(self, scope, receive, send):
+    async def __call__(self, scope, receive, send) -> OrderedDict:
         close_old_connections()
         try:
             token_key = (dict((x.split('=') for x in scope['query_string'].decode().split("&")))).get('token', None)

@@ -1,7 +1,10 @@
-from nis import match
 from authentication.tasks import Util
 from authentication.models import User,Code
+from notifications.tasks import send_to_user
 from .constaints import  *
+from events.models import Event
+
+from django_filters import rest_framework as filters
 
 import random
 import string
@@ -9,27 +12,60 @@ import string
 from django.utils import timezone
 from django.template.loader import render_to_string
 
-from rest_framework import mixins,response,pagination
+from rest_framework import mixins,pagination
+from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
 
-def code_create(email,k,type,dop_info):
-    '''create email verification code'''
-    verify_code = ''.join(random.choices(string.ascii_uppercase, k=k))
-    code = Code.objects.create(dop_info = dop_info,value = verify_code,user_email = email,type = type,
-    life_time = timezone.now() + timezone.timedelta(minutes=CODE_EXPIRE_MINUTES_TIME))
-    user = User.objects.get(email = email)
+def check_code_type(code) -> str:
     if code.type == PHONE_CHANGE_CODE_TYPE:
         title = EMAIL_MESSAGE_TEMPLATE_TITLE.format(type = 'Зміна',key = 'номеру телефону')
     elif code.type == EMAIL_CHANGE_CODE_TYPE:
         title = EMAIL_MESSAGE_TEMPLATE_TITLE.format(type = 'Зміна',key = 'електронної адреси')
+    elif code.type == ACCOUNT_DELETE_CODE_TYPE:
+        title = EMAIL_MESSAGE_TEMPLATE_TITLE.format(type = 'Видалення',key = 'аккаунту')
     elif code.type == EMAIL_VERIFY_CODE_TYPE:
         title = EMAIL_MESSAGE_TEMPLATE_TITLE.format(type = 'Підтвердження',key = 'електронної адреси')
     elif code.type in (PASSWORD_CHANGE_CODE_TYPE,PASSWORD_RESET_CODE_TYPE):
         title = EMAIL_MESSAGE_TEMPLATE_TITLE.format(type = 'Зміна',key = 'паролю')
-    context = ({'title':title,'code': list(code.value),'name':user.profile.name,'surname':user.profile.last_name})
-    template = render_to_string("email_confirm.html",context)
-    data = {'email_subject': 'Blanball','email_body': template ,'to_email': email}
+    return title
+
+def code_create(email,type,dop_info) -> None:
+    '''create email verification code'''
+    verify_code:str = ''.join(random.choices(string.ascii_uppercase, k=Code._meta.get_field('verify_code').max_length))
+    code:Code = Code.objects.create(dop_info = dop_info,verify_code = verify_code,user_email = email,type = type,
+    life_time = timezone.now() + timezone.timedelta(minutes=CODE_EXPIRE_MINUTES_TIME))
+    user:User = User.objects.get(email = email)
+    context:dict = ({'title':check_code_type(code),'code': list(code.verify_code),'name':user.profile.name,'surname':user.profile.last_name})
+    template:str = render_to_string("email_code.html",context)
+    print(verify_code)
+    data:dict = {'email_body': template ,'to_email': email}
     Util.send_email.delay(data)
+
+
+class EventDateTimeRangeFilter(filters.FilterSet):
+    date_and_time = filters.DateFromToRangeFilter()
+
+    class Meta:
+        model = Event
+        fields = ('date_and_time',)
+
+class UserAgeRangeFilter(filters.FilterSet):
+    profile__age = filters.RangeFilter()
+
+    class Meta:
+        model = User
+        fields = ('profile__age',)
+
+
+def send_notification_to_event_author(event) -> None:
+    if event.amount_members > event.count_current_users:
+        user_type:str = 'новий'
+    elif event.amount_members == event.count_current_users:
+        user_type:str = 'останній'
+    send_to_user(user = User.objects.get(id = event.author.id),notification_text=
+        NEW_USER_ON_THE_EVENT_NOTIFICATION.format(author_name = event.author.profile.name,user_type=user_type,event_id = event.id),
+        message_type=NEW_USER_ON_THE_EVENT_MESSAGE_TYPE)
+
 
 class GetPutDeleteAPIView(mixins.RetrieveModelMixin,
                                    mixins.UpdateModelMixin,
@@ -55,8 +91,9 @@ class PutAPIView(mixins.UpdateModelMixin,
 
 
 class CustomPagination(pagination.PageNumberPagination):
-    def get_paginated_response(self, data):
-        return response.Response({
+    page_size = 10
+    def get_paginated_response(self, data) -> Response:
+        return Response({
             'links': {
                 'next': self.get_next_link(),
                 'previous': self.get_previous_link()
