@@ -3,11 +3,11 @@ version: "3.8"
 services: 
   db:
     container_name: db
-    image: postgres:latest
+    image: "postgres:latest"
     env_file:
       - stack.env
     volumes:
-      - db-data:/usr/src/blanball/storage/db/data
+      - ./postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: pg_isready -U postgres -d postgres
       timeout: 40s
@@ -19,7 +19,7 @@ services:
     container_name: api
     env_file:
       - stack.env
-    image: registry.it-flumx.com/blanball_be:latest
+    image: registry.it-flumx.com/flumx_test_blanball_be:latest
     command: bash compose/local/django-start.sh
     ports:
       - "49200:8000"
@@ -54,7 +54,7 @@ services:
     image: registry.it-flumx.com/blanball_be:latest
     restart: always
     command: bash compose/local/celery-worker-start.sh
-    volumes:
+    volumes: 
       - celery-worker-data:/usr/src/blanball/storage/celery-worker/data
     networks:
       - app-network  
@@ -66,23 +66,50 @@ services:
     env_file:
       - stack.env
     container_name: celery-beat
-    image: registry.it-flumx.com/blanball_be:latest
+    image: registry.it-flumx.com/flumx_test_blanball_be:latest
     restart: always 
     command: bash compose/local/celery-beat-start.sh
-    volumes:
+    volumes: 
       - celery-beat-data:/usr/src/blanball/storage/celery-beat/data
     networks:
       - app-network
     depends_on:
       redis:
         condition: service_healthy
+
+  # pgadmin:
+  #   container_name: pgadmin
+  #   env_file:
+  #     - stack.env
+  #   image: dpage/pgadmin4
+  #   volumes:
+  #     - pgadmin-data:/usr/src/blanball/storage/pgadmin/data
+  #   ports:
+  #     - "49201:80"
+  #   networks:
+  #     - app-network
+
+  db_backup:
+    container_name: db_backup
+    env_file:
+      - stack.env
+    image: prodrigestivill/postgres-backup-local
+    restart: always
+    volumes:
+      - db-backup-data:/usr/src/blanball/storage/db-backup/data
+    networks:
+      - app-network
+    depends_on:
+      db:
+        condition: service_started
     
 networks:
   app-network:
      driver: bridge    
      
 volumes:
-  db-data:
   redis-data:
-  celery-worker-data:     
-  celery-beat-data: 
+  # pgadmin-data:
+  celery-worker-data:
+  celery-beat-data:
+  db-backup-data:

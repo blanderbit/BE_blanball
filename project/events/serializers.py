@@ -3,6 +3,8 @@ from project.constaints import *
 from authentication.serializers import EventUsersSerializer
 from authentication.models import User
 
+from collections import OrderedDict
+
 from django.utils import timezone
 
 from rest_framework import serializers,status
@@ -10,7 +12,7 @@ from rest_framework import serializers,status
 
 class EventDateTimeValidator:
 
-    def __call__(self,attrs):
+    def __call__(self,attrs) -> OrderedDict:
         date_and_time =  attrs.get('date_and_time')
         price = attrs.get('price')
         price_desc = attrs.get('price_description')
@@ -21,6 +23,7 @@ class EventDateTimeValidator:
         if not price and price_desc:
             raise serializers.ValidationError(NO_PRICE_DESK_ERROR,status.HTTP_400_BAD_REQUEST)
         return attrs
+
 class CreateEventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
@@ -34,7 +37,7 @@ class UpdateEventSerializer(serializers.ModelSerializer):
         validators = [EventDateTimeValidator()]
         exclude = ('author','status','fans','current_users')
 
-    def update(self, instance, validated_data):
+    def update(self, instance, validated_data) -> OrderedDict:
         return super().update(instance,validated_data)
 
 class EventSerializer(serializers.ModelSerializer):
@@ -43,6 +46,11 @@ class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = '__all__'
+
+class PopularIventsListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = ('author','id','name','place','gender','date_and_time','type')    
 
 class EventListSerializer(serializers.ModelSerializer):
     class Meta:
@@ -61,7 +69,7 @@ class JoinOrRemoveRoomSerializer(serializers.Serializer):
     class Meta:
         fields = ('event_id',)
 
-    def validate(self, attrs):
+    def validate(self, attrs) -> OrderedDict:
         event_id = attrs.get('event_id')
         try:
             event = Event.objects.get(id = event_id)
@@ -80,4 +88,18 @@ class InviteUserToEventSerializer(serializers.Serializer):
 
     class Meta:
         fields = ('event_id','user_id')
+
+
+class RequestToParticipationSerializer(serializers.ModelSerializer):
+    user = EventUsersSerializer()
+    class Meta:
+        model = RequestToParticipation
+        fields = ('id','user','time_created')
+
+class BulkAcceptOrDeclineRequestToParticipationSerializer(serializers.Serializer):
+    requests = serializers.ListField(child=serializers.IntegerField(min_value=0))
+    type = serializers.BooleanField()
+
+    class Meta:
+        fields = ('requests','type')
 
