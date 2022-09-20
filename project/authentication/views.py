@@ -23,22 +23,26 @@ def count_age(profile:Profile,data:dict) -> Profile:
             profile.age:int = age
             return profile.save()
 
+def send_email_template(user:User,body_title:str,title:str,text:str) -> None:
+    context = ({'user_name': user.profile.name,'user_last_name':user.profile.last_name,
+    'date_time':timezone.now(),'body_title':body_title,'title':title,'text':text})
+    message:str = render_to_string('email_confirm.html',context)
+    Util.send_email.delay(data = {'email_body':message,'to_email': 'shapranov.nik@gmail.com'})
+
 class RegisterUser(generics.GenericAPIView):
     '''register user'''
     serializer_class = RegisterSerializer
     permission_classes = [IsNotAuthenticated]
 
     def post(self, request) -> Response:
-        user:dict = request.data
+        user = request.data
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
         profile:Profile = Profile.objects.create(**serializer.validated_data['profile'])
         count_age(profile=profile,data = serializer.validated_data['profile'].items())
         serializer.save(profile = profile)
-        context:dict = ({'title':'Успішна регестрація!','text':AFTER_REGISTER_SEND_EMAIL_TEXT.format(
-            user_name = profile.name,user_last_name=profile.last_name)})
-        message:str = render_to_string('email_message.html',context)
-        Util.send_email.delay(data = {'email_body':message,'to_email': user['email']})
+        send_email_template(user=User.objects.get(profile=profile.id),body_title=REGISTER_SUCCESS_BODY_TITLE,title=REGISTER_SUCCESS_TITLE,
+        text=REGISTER_SUCCESS_TEXT)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class LoginUser(generics.GenericAPIView):
@@ -123,7 +127,6 @@ class RequestPasswordReset(generics.GenericAPIView):
 
     def post(self, request) -> Response:
         email:str = request.data.get('email', '')
-
         if User.objects.filter(email=email).exists():
             code_create(email=email,type=PASSWORD_RESET_CODE_TYPE,dop_info = None)
             return Response(SENT_CODE_TO_EMAIL_SUCCESS, status=status.HTTP_200_OK)
@@ -145,10 +148,8 @@ class ResetPassword(generics.GenericAPIView):
             user.set_password(serializer.validated_data['new_password'])
             user.save()
             code.delete()
-            context:dict = ({'title':'Успішна регестрація!','text':AFTER_RESET_PASSWORD_EMAIL_TEXT.format(
-                user_name = user.profile.name,user_last_name=user.profile.last_name)})
-            message:str = render_to_string('email_message.html',context)
-            Util.send_email.delay(data = {'email_body':message,'to_email': user.email})
+            send_email_template(user=user,body_title=REGISTER_SUCCESS_BODY_TITLE,title=REGISTER_SUCCESS_TITLE,
+            text=REGISTER_SUCCESS_TEXT)
             return Response(PASSWORD_RESET_SUCCESS,status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response(NO_SUCH_USER_ERROR,status=status.HTTP_404_NOT_FOUND) 
@@ -224,11 +225,11 @@ class CheckCode(generics.GenericAPIView):
             return Response(ACCOUNT_DELETED_SUCCESS,status=status.HTTP_200_OK)
 
 
-    def success(self,email_body) -> None:
+    def success(self,) -> None:
         self.user.save()
         self.code.delete()
-        data:dict = {'email_body': f'{self.user.profile.name}{email_body}!' ,'to_email': self.user.email}
-        Util.send_email.delay(data)
+        send_email_template(user=self.user,body_title=REGISTER_SUCCESS_BODY_TITLE,title=REGISTER_SUCCESS_TITLE,
+        text=REGISTER_SUCCESS_TEXT)
 
 class RequestEmailVerify(generics.GenericAPIView):
     serializer_class = EmailSerializer

@@ -18,7 +18,6 @@ ENV DJANGO_ENV=${DJANGO_ENV} \
   POETRY_VIRTUALENVS_CREATE=false \
   POETRY_CACHE_DIR='/var/cache/pypoetry' \
   POETRY_HOME='/usr/local'
-  PATH "/root/.poetry/bin:/opt/venv/bin:${PATH}"
 
 
 # VOLUME /db-data
@@ -29,6 +28,8 @@ COPY . /usr/src/blanball
 
 RUN pip install --upgrade pip\
   &&pip install poetry=="$POETRY_VERSION"
+
+ENV PATH "/root/.poetry/bin:/opt/venv/bin:${PATH}"
   
 # Cleaning cache:
 RUN apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \

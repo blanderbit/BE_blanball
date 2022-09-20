@@ -102,3 +102,9 @@ EVENT_UPDATE_MESSAGE_TYPE = 'event_updated'
 CHANGE_MAINTENANCE_MESSAGE_TYPE = 'change_maintenance'
 EVENT_TIME_NOTIFICATION_MESSAGE_TYPE ='event_time_notification'
 REVIEW_CREATE_MESSAGE_TYPE = 'review_creaete'
+
+
+
+REGISTER_SUCCESS_BODY_TITLE = 'Реєстрація пройшла успішно'
+REGISTER_SUCCESS_TITLE = 'Дякуємо за реєстрацію у BlanBall'
+REGISTER_SUCCESS_TEXT = 'Ви отримали це повідомлення, оскільки цю електронну скриньку зареєстровано в Blanball.'

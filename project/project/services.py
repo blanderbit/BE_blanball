@@ -73,7 +73,6 @@ class GetPutDeleteAPIView(mixins.RetrieveModelMixin,
                                    GenericAPIView):
     '''сoncrete view for get,put or deleting a model instance'''
     def get(self, request, *args, **kwargs):
-        print(type(self.retrieve))
         return self.retrieve(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):
