@@ -12,6 +12,8 @@ urlpatterns = [
     path('client/login', LoginUser.as_view(),name='login'),
     # endpoint where user can get users list
     path('client/users/list',UserList.as_view(),name='users-list'),
+    # endpoint where user can get relevant users list
+    path('client/users/relevant/list',UsersRelevantList.as_view(),name='users-relevant-list'),
     # endpoint where user can get admins list
     path('admins/list',AdminUsersList.as_view(),name='admins-list'),
     # endpoint where user can get his profile
@@ -32,8 +34,6 @@ urlpatterns = [
     path('client/request-change/email',RequetChangeEmail.as_view(),name='request-change-email'),
     # endpoint where user can request change phone
     path('client/request-change/phone',RequestChangePhone.as_view(),name='request-change-phone'),
-    # endpoint where user can find any user
-    path('client/search/user/<str:query>/',ProfileSearch.as_view(),name='profile-search'),
     # endpoint where user can check is another user active
     path('client/search/user/active',CheckUserActive.as_view(),name='check-user-active'),
     # endpoint where user can check is another user active

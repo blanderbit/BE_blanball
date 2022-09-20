@@ -9,6 +9,8 @@ services:
     image: "postgres:14.5-alpine"
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-network
     ports: 
       - "5432:5432"
     healthcheck:
@@ -26,6 +28,8 @@ services:
       dockerfile: compose/Dockerfile
     volumes: 
       - .:/usr/src/blanball
+    networks:
+      - app-network
     ports: 
       - "8000:8000"
     depends_on:
@@ -43,6 +47,8 @@ services:
     image: "redis:7.0.4-alpine"
     volumes: 
       - redis-data:/usr/src/blanball/storage/redis/data
+    networks:
+      - app-network
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
       timeout: 3s
@@ -58,6 +64,8 @@ services:
       dockerfile: compose/Dockerfile
     volumes: 
       - .:/usr/src/blanball
+    networks:
+      - app-network
     depends_on:
       db:
         condition: service_started
@@ -74,38 +82,13 @@ services:
       dockerfile: compose/Dockerfile
     volumes: 
       - .:/usr/src/blanball
+    networks:
+      - app-network
     depends_on:
       db:
         condition: service_started
       api:
         condition: service_started  
-
-  elasticsearch:
-    env_file: 
-      - ./compose/.env 
-    container_name: elasticsearch
-    env_file: 
-      - ./compose/.env 
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.8.0
-    volumes:
-      - elastic-data:/usr/src/blanball/storage/elastic/data
-    ports:
-      - "9200:9200"
-    environment:
-    - node.name=elasticsearch
-    - cluster.name=docker-cluster
-    - cluster.initial_master_nodes=elasticsearch
-    - bootstrap.memory_lock=true
-    - "ES_JAVA_OPTS=-Xms256M -Xmx256M"
-    - http.cors.enabled=true
-    - http.cors.allow-origin=*
-    - network.host=_eth0_
-    - xpack.ml.enabled=false 
-    ulimits:
-      nproc: 65535
-      memlock:
-        soft: -1
-        hard: -1
 
   pgadmin:
     container_name: pgadmin
@@ -114,6 +97,8 @@ services:
     image: dpage/pgadmin4
     volumes:
       - pgadmin-data:/usr/src/blanball/storage/pgadmin/data
+    networks:
+      - app-network
     ports:
       - "5050:80"
     
@@ -125,13 +110,16 @@ services:
     restart: always
     volumes:
       - ./backup:/backups
-    env_file: 
-      - ./compose/.env
+    networks:
+      - app-network
     depends_on:
       db:
         condition: service_started
 
+networks:
+  app-network:
+     driver: bridge
+
 volumes:
   redis-data:
-  elastic-data:
   pgadmin-data:

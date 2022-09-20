@@ -3,16 +3,14 @@ from types import NoneType
 
 from .models import *
 from .serializers import *
-from .documents import *
 from project.services import *
 from .permisions import IsNotAuthenticated
 
-from elasticsearch_dsl import Q
-
 from rest_framework import generics,filters,status
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
+
+from rest_fuzzysearch import search
 
 
 def count_age(profile:Profile,data:dict) -> Profile:
@@ -27,7 +25,7 @@ def send_email_template(user:User,body_title:str,title:str,text:str) -> None:
     context = ({'user_name': user.profile.name,'user_last_name':user.profile.last_name,
     'date_time':timezone.now(),'body_title':body_title,'title':title,'text':text})
     message:str = render_to_string('email_confirm.html',context)
-    Util.send_email.delay(data = {'email_body':message,'to_email': 'shapranov.nik@gmail.com'})
+    Util.send_email.delay(data = {'email_body':message,'to_email': user.email})
 
 class RegisterUser(generics.GenericAPIView):
     '''register user'''
@@ -109,11 +107,24 @@ class UserList(generics.ListAPIView):
     '''get all users list'''
     serializer_class = UsersListSerializer
     pagination_class = CustomPagination
-    filter_backends = (filters.SearchFilter,DjangoFilterBackend,filters.OrderingFilter,)
+    filter_backends = (search.RankedFuzzySearchFilter,DjangoFilterBackend,filters.OrderingFilter,)
     filterset_class = UserAgeRangeFilter
     search_fields = ('profile__name','profile__gender','profile__last_name')
     ordering_fields = ('id','profile__age','raiting')
     queryset = User.objects.filter(role='User').order_by('-id')
+
+class UsersRelevantList(generics.ListAPIView):
+    filter_backends = (search.RankedFuzzySearchFilter,)
+    serializer_class = UsersListSerializer
+    queryset = User.objects.filter(role='User')
+    search_fields = ('profile__name','profile__last_name')
+
+    # def list(self,request):
+    #     data = []
+    #     for i in range(5):
+    #         data.append(self.queryset[i])
+    #         return Response(data)
+
 
 class AdminUsersList(UserList):
     '''displaying the full list of admin users'''
@@ -148,8 +159,8 @@ class ResetPassword(generics.GenericAPIView):
             user.set_password(serializer.validated_data['new_password'])
             user.save()
             code.delete()
-            send_email_template(user=user,body_title=REGISTER_SUCCESS_BODY_TITLE,title=REGISTER_SUCCESS_TITLE,
-            text=REGISTER_SUCCESS_TEXT)
+            send_email_template(user=user,body_title=PASS_UPDATE_SUCCESS_BODY_TITLE,title=PASS_UPDATE_SUCCESS_TITLE,
+            text=PASS_UPDATE_SUCCESS_TEXT)
             return Response(PASSWORD_RESET_SUCCESS,status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response(NO_SUCH_USER_ERROR,status=status.HTTP_404_NOT_FOUND) 
@@ -193,9 +204,6 @@ class CheckCode(generics.GenericAPIView):
     '''password reset on a previously sent request'''
     serializer_class = CheckCodeSerializer
 
-    user:User =  None
-    code:User =  None
-
     def post(self, request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -206,30 +214,30 @@ class CheckCode(generics.GenericAPIView):
             return Response(NO_PERMISSIONS_ERROR,status=status.HTTP_400_BAD_REQUEST)
         if self.code.type == PASSWORD_CHANGE_CODE_TYPE:
             self.user.set_password(self.code.dop_info)
-            self.success(email_body='change password success')
+            send_email_template(user=self.user,body_title=PASS_UPDATE_SUCCESS_BODY_TITLE,title=PASS_UPDATE_SUCCESS_TITLE,
+            text=PASS_UPDATE_SUCCESS_TEXT)
             return Response(CHANGE_PASSWORD_SUCCESS,status=status.HTTP_200_OK) 
         elif self.code.type == EMAIL_CHANGE_CODE_TYPE:
             self.user.email = self.code.dop_info
-            self.success(email_body='change email success')
+            send_email_template(user=self.user,body_title=PASS_UPDATE_SUCCESS_BODY_TITLE,title=PASS_UPDATE_SUCCESS_TITLE,
+            text=PASS_UPDATE_SUCCESS_TEXT)
             return Response(CHANGE_EMAIL_SUCCESS,status=status.HTTP_200_OK) 
         elif self.code.type == EMAIL_VERIFY_CODE_TYPE:
             self.user.is_verified = True
-            self.success(email_body='email verify success')
+            send_email_template(user=self.user,body_title=PASS_UPDATE_SUCCESS_BODY_TITLE,title=PASS_UPDATE_SUCCESS_TITLE,
+            text=PASS_UPDATE_SUCCESS_TEXT)
             return Response(ACTIVATION_SUCCESS,status=status.HTTP_200_OK)
         elif self.code.type == PHONE_CHANGE_CODE_TYPE:
             self.user.phone = self.code.dop_info
-            self.success(email_body='change phone success')
+            send_email_template(user=self.user,body_title=PASS_UPDATE_SUCCESS_BODY_TITLE,title=PASS_UPDATE_SUCCESS_TITLE,
+            text=PASS_UPDATE_SUCCESS_TEXT)
             return Response(CHANGE_PHONE_SUCCESS,status=status.HTTP_200_OK)
         elif self.code.type == ACCOUNT_DELETE_CODE_TYPE:
+            send_email_template(user=self.user,body_title=PASS_UPDATE_SUCCESS_BODY_TITLE,title=PASS_UPDATE_SUCCESS_TITLE,
+            text=PASS_UPDATE_SUCCESS_TEXT)
             User.objects.filter(id=self.user.id).delete()
             return Response(ACCOUNT_DELETED_SUCCESS,status=status.HTTP_200_OK)
 
-
-    def success(self,) -> None:
-        self.user.save()
-        self.code.delete()
-        send_email_template(user=self.user,body_title=REGISTER_SUCCESS_BODY_TITLE,title=REGISTER_SUCCESS_TITLE,
-        text=REGISTER_SUCCESS_TEXT)
 
 class RequestEmailVerify(generics.GenericAPIView):
     serializer_class = EmailSerializer
@@ -253,19 +261,3 @@ class CheckUserActive(generics.GenericAPIView):
             return Response({True:'User active'})
         except ActiveUser.DoesNotExist:
             return Response({False:'User not active'})
-
-
-from .documents import ProfileDocument
-from .serializers import ProductDocumentSerializer
-
-class ProfileSearch(APIView):
-    serializer_class = ProductDocumentSerializer
-    document_class = ProfileDocument
-
-    def generate_q_expression(self, query) -> dict:
-        return Q("match", name={"query": query, "fuzziness": "auto"})
-
-    def get(self, request, query):
-        q = self.generate_q_expression(query)
-        search = self.document_class.search().query(q)
-        return Response(self.serializer_class(search.to_queryset(), many=True).data)
