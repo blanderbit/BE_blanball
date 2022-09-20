@@ -3,7 +3,7 @@ version: "3.8"
 services: 
   db:
     container_name: db
-    image: "postgres:14.5-alpine"
+    image: "postgres:latest"
     env_file:
       - stack.env
     volumes:
@@ -77,17 +77,17 @@ services:
       redis:
         condition: service_healthy
 
-  pgadmin:
-    container_name: pgadmin
-    env_file:
-      - stack.env
-    image: dpage/pgadmin4
-    volumes:
-      - pgadmin-data:/usr/src/blanball/storage/pgadmin/data
-    ports:
-      - "49201:80"
-    networks:
-      - app-network
+  # pgadmin:
+  #   container_name: pgadmin
+  #   env_file:
+  #     - stack.env
+  #   image: dpage/pgadmin4
+  #   volumes:
+  #     - pgadmin-data:/usr/src/blanball/storage/pgadmin/data
+  #   ports:
+  #     - "49201:80"
+  #   networks:
+  #     - app-network
 
   db_backup:
     container_name: db_backup
@@ -109,7 +109,7 @@ networks:
      
 volumes:
   redis-data:
-  pgadmin-data:
+  # pgadmin-data:
   celery-worker-data:
   celery-beat-data:
   db-backup-data:
