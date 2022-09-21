@@ -3,16 +3,6 @@ on:
   push:
     branches: [ "dev_test","main_test" ]
 
-stages:
-- stage: One
-  displayName: Build and restore
-  variables:
-  - group: PROD
-  - name: env
-    ${{ if eq(variables['Build.SourceBranchName'], 'dev_test') }}:
-      value: a
-    ${{ if eq(variables['Build.SourceBranchName'], 'main_test') }}:
-      value: b
 
 jobs:
   build:
@@ -23,6 +13,7 @@ jobs:
       COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
     steps:
     - uses: actions/checkout@master
+    - uses: haya14busa/action-cond@v1
 
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v2
