@@ -34,7 +34,6 @@ def get_user(token:str) -> User or AnonymousUser:
         user:User = User.objects.get(id=payload['user_id'])
     except User.DoesNotExist:
         return AnonymousUser()
-
     return user
 
 

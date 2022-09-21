@@ -1,17 +1,22 @@
 name: Deploy
 on:
   push:
-    branches: [ "develop" ]
-  pull_request:
-    branches: [ "develop" ]
+    branches: [ "dev_test","main_test" ]
+variables:
+  isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main_test')]
+  isDevelop: $[eq(variables['Build.SourceBranch'], 'refs/heads/dev_test')]
 
 jobs:
+  - job: dev
+  
   build:
     runs-on: ubuntu-latest
     env:
+      if [ "${isDevelop}" == "true" ]; then
+        LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:latest
+        COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
+      fi
       DOCKERFILE_PATH: Dockerfile
-      LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:latest
-      COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
     steps:
     - uses: actions/checkout@master
 
