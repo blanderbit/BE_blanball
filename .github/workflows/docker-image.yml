@@ -17,12 +17,16 @@ jobs:
         DOCKERFILE_PATH: Dockerfile
         LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY_TEST }}:latest
         COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY_TEST }}:${{ github.sha }}
+      run: |
+        echo "TARGET_URL=prod.mysite.com" >> $GITHUB_ENV
     - name: Set env vars (prod)
       if: github.ref == 'refs/heads/master_test'
       env:
         DOCKERFILE_PATH: Dockerfile
         LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:latest
         COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
+      run: |
+        echo "TARGET_URL=prod.mysite.com" >> $GITHUB_ENV
     - name: Login to GitHub Container Registry (dev)
       if: github.ref == 'refs/heads/dev_test'
       uses: docker/login-action@v2
