@@ -6,8 +6,8 @@ on:
 jobs:  
   build:
     runs-on: ubuntu-latest
-    rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev_test"'
+    - name: 'Run az commands on branch 1'
+      if: ${{ github.ref == 'refs/dev_test' }}
       env:
         LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:latest
         COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
