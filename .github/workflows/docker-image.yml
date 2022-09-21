@@ -17,10 +17,10 @@ jobs:
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v2
       with:
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
         if: ${{ github.ref == 'refs/heads/dev_test' }}
         registry: ${{ secrets.DOCKER_REGISTRY_TEST }}
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
 
     - name: Pull latest image
       run: |
