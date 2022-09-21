@@ -5,12 +5,16 @@ on:
 
 jobs:
   build:
-    if: ${{ github.ref == 'refs/heads/dev_test' }}
     runs-on: ubuntu-latest
     env:
       DOCKERFILE_PATH: Dockerfile
+      if: ${{ github.ref != 'refs/heads/dev_test' }} 
       LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:latest
       COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
+      if: ${{ github.ref != 'refs/heads/dev_test' }} && ${{ LATEST_IMAGE == None }}
+      LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY_PROD }}:latest
+      COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY_PROD }}:${{ github.sha }}
+
     steps:
     - uses: actions/checkout@master
 
