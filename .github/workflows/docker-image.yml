@@ -5,7 +5,7 @@ on:
 
 jobs:
   build_develop:
-    if: ${{ github.ref == 'refs/dev_test' }}
+    if: github.ref == 'refs/heads/dev_test'
     runs-on: ubuntu-latest
     env:
       DOCKERFILE_PATH: Dockerfile
@@ -41,7 +41,7 @@ jobs:
         curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL_TEST }}
 
   build_main:
-    if: ${{ github.ref == 'refs/main_test' }}
+    if: github.ref == 'refs/heads/main_test'
     runs-on: ubuntu-latest
     env:
       DOCKERFILE_PATH: Dockerfile
