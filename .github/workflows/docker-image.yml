@@ -3,6 +3,17 @@ on:
   push:
     branches: [ "dev_test","main_test" ]
 
+stages:
+- stage: One
+  displayName: Build and restore
+  variables:
+  - group: PROD
+  - name: env
+    ${{ if eq(variables['Build.SourceBranchName'], 'dev_test') }}:
+      value: a
+    ${{ if eq(variables['Build.SourceBranchName'], 'main_test') }}:
+      value: b
+
 jobs:
   build:
     runs-on: ubuntu-latest
