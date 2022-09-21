@@ -14,13 +14,13 @@ jobs:
     - name: Set env vars (dev)
       if: github.ref == 'refs/heads/dev_test'
       run: |
-        echo "LATEST_IMAGE=${{ secrets.DOCKER_REGISTRY_TEST }}:latest" >> $GITHUB_ENV
-        echo "COMMIT_IMAGE=${{ secrets.DOCKER_REGISTRY_TEST }}:${{ github.sha }}" >> $GITHUB_ENV
+        echo "LATEST_IMAGE=${{ secrets.DOCKER_REGISTRY_TEST }}:latest"
+        echo "COMMIT_IMAGE=${{ secrets.DOCKER_REGISTRY_TEST }}:${{ github.sha }}"
     - name: Set env vars (prod)
       if: github.ref == 'refs/heads/master_test'
       run: |
-        echo "LATEST_IMAGE=${{ secrets.DOCKER_REGISTRY_PROD }}:latest" >> $GITHUB_ENV
-        echo "COMMIT_IMAGE=${{ secrets.DOCKER_REGISTRY_PROD }}:${{ github.sha }}" >> $GITHUB_ENV
+        echo "LATEST_IMAGE=${{ secrets.DOCKER_REGISTRY_PROD }}:latest"
+        echo "COMMIT_IMAGE=${{ secrets.DOCKER_REGISTRY_PROD }}:${{ github.sha }}"
     - name: Login to GitHub Container Registry (dev)
       if: github.ref == 'refs/heads/dev_test'
       uses: docker/login-action@v2
