@@ -4,8 +4,8 @@ on:
     branches: [ "dev_test" ]
 
 jobs:
-  if: ${{ github.ref == 'refs/heads/dev_test' }}
   build:
+    if: ${{ github.ref == 'refs/heads/dev_test' }}
     runs-on: ubuntu-latest
     env:
       DOCKERFILE_PATH: Dockerfile
