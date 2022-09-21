@@ -11,7 +11,8 @@ jobs:
       if: endsWith(github.ref, '/dev_test')
       run: |
         echo "AZURE_FUNCTIONAPP_NAME=Dockerfile" >> $GITHUB_ENV
-        echo "PUBLISH_PROFILE_VAR_NAME=secrets.DOCKER_REGISTRY" >> $GITHUB_ENV
+        echo "PUBLISH_PROFILE_VAR_NAME=DOCKER_REGISTRY" >> $GITHUB_ENV
+        echo "COMMIT_IMAGE=DOCKER_REGISTRY" >> $GITHUB_ENV
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v2
       with:
@@ -25,7 +26,7 @@ jobs:
     - name: Build image
       working-directory: .
       run: |
-        docker build -f ${{ env.AZURE_FUNCTIONAPP_NAME }} --cache-from  ${{ secrets[env.PUBLISH_PROFILE_VAR_NAME] }}-t ${env.COMMIT_IMAGE} .
+        docker build -f ${{ env.AZURE_FUNCTIONAPP_NAME }} --cache-from  ${{ secrets[env.PUBLISH_PROFILE_VAR_NAME:latest] }}-t {{ secrets[env.COMMIT_IMAGE::${{ github.sha }}] }} .
     - name: Tag latest image
       run: |
         docker tag ${COMMIT_IMAGE} ${LATEST_IMAGE}
