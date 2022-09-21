@@ -26,7 +26,7 @@ jobs:
     - name: Build image
       working-directory: .
       run: |
-        docker build -f ${DOCKERFILE_PATH} --cache-from ${LATEST_IMAGE} -t ${COMMIT_IMAGE} .
+        docker build -f ${DOCKERFILE_PATH} --cache-from ${LATEST_IMAGE} -t ${COMMIT_IMAGE} 
     - name: Tag latest image
       run: |
         docker tag ${COMMIT_IMAGE} ${LATEST_IMAGE}
