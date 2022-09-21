@@ -1,27 +1,18 @@
 name: Deploy
 on:
   push:
-    branches: [ "dev_test","main_test" ]
-
-variables:
-- group: my-global
-- name: env
-  value:
-    ${{ if eq(variables['Build.SourceBranchName'], 'dev_test') }}: 
-      env: a
-    ${{ if eq(variables['Build.SourceBranchName'], 'main_test') }}: 
-      env: b
+    branches: [ "develop" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - uses: haya14busa/action-cond@v1
     env:
       DOCKERFILE_PATH: Dockerfile
       LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:latest
       COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
-    steps:
-    - uses: actions/checkout@master
-
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v2
       with:
