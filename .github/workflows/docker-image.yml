@@ -1,48 +1,25 @@
 name: Deploy
 on:
   push:
-    branches: [ "dev_test","master_test" ]
+    branches: [ "dev_test","main_test" ]
 
 jobs:
-  build:
+  build_dev:
+    if: github.ref == 'refs/heads/dev_test'
     runs-on: ubuntu-latest
     env:
       DOCKERFILE_PATH: Dockerfile
+      LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY_TEST }}:latest
+      COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY_TEST }}:${{ github.sha }}
     steps:
     - uses: actions/checkout@master
 
-    - name: Set env vars (dev)
-      if: github.ref == 'refs/heads/dev_test'
-      env:
-        DOCKERFILE_PATH: Dockerfile
-        LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY_TEST }}:latest
-        COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY_TEST }}:${{ github.sha }}
-      run: |
-        echo "TARGET_URL=prod.mysite.com" >> $GITHUB_ENV
-    - name: Set env vars (prod)
-      if: github.ref == 'refs/heads/master_test'
-      env:
-        DOCKERFILE_PATH: Dockerfile
-        LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY_PROD }}:latest
-        COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY_PROD }}:${{ github.sha }}
-      run: |
-        echo "TARGET_URL=prod.mysite.com" >> $GITHUB_ENV
-    - name: Login to GitHub Container Registry (dev)
-      if: github.ref == 'refs/heads/dev_test'
+    - name: Login to GitHub Container Registry
       uses: docker/login-action@v2
       with:
         registry: ${{ secrets.DOCKER_REGISTRY_TEST }}
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
-
-    - name: Login to GitHub Container Registry (prod)
-      if: github.ref == 'refs/heads/master_test'
-      uses: docker/login-action@v2
-      with:
-        registry: ${{ secrets.DOCKER_REGISTRY_PROD }}
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
-
 
     - name: Pull latest image
       run: |
@@ -58,13 +35,43 @@ jobs:
       run: |
         docker push ${COMMIT_IMAGE}
         docker push ${LATEST_IMAGE}
-
-    - name: Trigger deploy in portainer (dev)
-      if: github.ref == 'refs/heads/dev_test'
+        
+    - name: Trigger deploy in portainer
       run: |
         curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL_TEST }}
-      
-    - name: Trigger deploy in portainer (prod)
-      if: github.ref == 'refs/heads/main_test'
+
+  build_main:
+    if: github.ref == 'refs/heads/main_test'
+    runs-on: ubuntu-latest
+    env:
+      DOCKERFILE_PATH: Dockerfile
+      LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY_PROD }}:latest
+      COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY_PROD }}:${{ github.sha }}
+    steps:
+    - uses: actions/checkout@master
+
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ secrets.DOCKER_REGISTRY_PROD }}
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+
+    - name: Pull latest image
+      run: |
+        docker pull ${LATEST_IMAGE} --ignore-pull-failures || true
+    - name: Build image
+      working-directory: .
+      run: |
+        docker build -f ${DOCKERFILE_PATH} --cache-from ${LATEST_IMAGE} -t ${COMMIT_IMAGE} .
+    - name: Tag latest image
+      run: |
+        docker tag ${COMMIT_IMAGE} ${LATEST_IMAGE}
+    - name: Push images
+      run: |
+        docker push ${COMMIT_IMAGE}
+        docker push ${LATEST_IMAGE}
+        
+    - name: Trigger deploy in portainer
       run: |
         curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL_PROD }}
