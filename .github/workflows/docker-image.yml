@@ -6,9 +6,7 @@ variables:
   isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main_test')]
   isDevelop: $[eq(variables['Build.SourceBranch'], 'refs/heads/dev_test')]
 
-jobs:
-  - job: dev
-  
+jobs:  
   build:
     runs-on: ubuntu-latest
     env:
