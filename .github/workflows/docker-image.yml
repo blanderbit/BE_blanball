@@ -9,11 +9,11 @@ variables:
 jobs:  
   build:
     runs-on: ubuntu-latest
-    env:
-      if [ "${isDevelop}" == "true" ]; then
-      LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:latest
-      COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
-      fi
+    if [ "${isDevelop}" == "true" ]; then
+      env:
+        LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:latest
+        COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
+    fi
       DOCKERFILE_PATH: Dockerfile
     steps:
     - uses: actions/checkout@master
