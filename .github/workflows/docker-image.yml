@@ -10,9 +10,9 @@ jobs:
     - name: Set env vars (dev)
       if: endsWith(github.ref, '/dev_test')
       run: |
-        echo "AZURE_FUNCTIONAPP_NAME=Dockerfile" >> $GITHUB_ENV
-        echo "PUBLISH_PROFILE_VAR_NAME=DOCKER_REGISTRY:latest" >> $GITHUB_ENV
-        echo "COMMIT_IMAGE=DOCKER_REGISTRY:${{ github.sha }}" >> $GITHUB_ENV
+        echo "AZURE_FUNCTIONAPP_NAME=Dockerfile"
+        echo "PUBLISH_PROFILE_VAR_NAME=DOCKER_REGISTRY:latest"
+        echo "COMMIT_IMAGE=DOCKER_REGISTRY:${{ github.sha }}"
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v2
       with:
