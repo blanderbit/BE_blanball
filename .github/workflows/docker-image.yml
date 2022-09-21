@@ -6,7 +6,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: ${{ github.ref != 'refs/heads/dev_test','SKIP SCRIPTS'}} 
+    if: "!contains${{ github.ref == 'refs/heads/dev_test'}}"
     env:
       DOCKERFILE_PATH: Dockerfile
       LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:latest
