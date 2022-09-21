@@ -10,7 +10,7 @@ from rest_framework import generics,filters,status
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
-from rest_fuzzysearch import search
+from .fuzzy_filter import RankedFuzzySearchFilter
 
 
 def count_age(profile:Profile,data:dict) -> Profile:
@@ -33,7 +33,7 @@ class RegisterUser(generics.GenericAPIView):
     permission_classes = [IsNotAuthenticated]
 
     def post(self, request) -> Response:
-        user = request.data
+        user:dict = request.data
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
         profile:Profile = Profile.objects.create(**serializer.validated_data['profile'])
@@ -103,28 +103,22 @@ class UserProfile(generics.GenericAPIView):
         except:
             return Response(NO_SUCH_USER_ERROR,status=status.HTTP_404_NOT_FOUND)
 
+
 class UserList(generics.ListAPIView):
     '''get all users list'''
     serializer_class = UsersListSerializer
     pagination_class = CustomPagination
-    filter_backends = (search.RankedFuzzySearchFilter,DjangoFilterBackend,filters.OrderingFilter,)
+    filter_backends = (filters.SearchFilter,DjangoFilterBackend,filters.OrderingFilter,)
     filterset_class = UserAgeRangeFilter
     search_fields = ('profile__name','profile__gender','profile__last_name')
     ordering_fields = ('id','profile__age','raiting')
     queryset = User.objects.filter(role='User').order_by('-id')
 
 class UsersRelevantList(generics.ListAPIView):
-    filter_backends = (search.RankedFuzzySearchFilter,)
+    filter_backends = (RankedFuzzySearchFilter,)
     serializer_class = UsersListSerializer
     queryset = User.objects.filter(role='User')
     search_fields = ('profile__name','profile__last_name')
-
-    # def list(self,request):
-    #     data = []
-    #     for i in range(5):
-    #         data.append(self.queryset[i])
-    #         return Response(data)
-
 
 class AdminUsersList(UserList):
     '''displaying the full list of admin users'''

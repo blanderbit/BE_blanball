@@ -6,6 +6,7 @@ from .serializers import *
 from project.services import *
 from project.constaints import *
 from notifications.tasks import *
+from authentication.fuzzy_filter import RankedFuzzySearchFilter
 
 from django.db.models import Count
 
@@ -204,6 +205,15 @@ class LeaveFromEvent(generics.GenericAPIView):
             return Response(DISCONNECT_FROM_EVENT_SUCCESS,status=status.HTTP_200_OK)
         return Response(NO_IN_EVENT_MEMBERS_LIST_ERROR,status=status.HTTP_400_BAD_REQUEST)
 
+class EventsRelevantList(generics.ListAPIView):
+    filter_backends = (RankedFuzzySearchFilter,)
+    serializer_class = EventListSerializer
+    queryset = Event.objects.all()
+    search_fields = ('name',)
+
+class UserEventsRelevantList(EventsRelevantList):
+    def get_queryset(self) -> list:
+        return self.queryset.filter(author_id = self.request.user.id) 
 
 class UserEvents(generics.ListAPIView):
     serializer_class =  EventListSerializer
