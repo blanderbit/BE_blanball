@@ -6,18 +6,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      if: "!contains${{ github.ref == 'refs/heads/dev_test'}}"
-      DOCKERFILE_PATH: Dockerfile
-      LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:latest
-      COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
-      if: "!contains${{ github.ref == 'refs/heads/main_test'}}"
-      DOCKERFILE_PATH: Dockerfile
-      LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY_PROD }}:latest
-      COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY_PROD }}:${{ github.sha }}
-
     steps:
     - uses: actions/checkout@master
+      env:
+        DOCKERFILE_PATH: Dockerfile
+        LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:latest
+        COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
 
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v2
