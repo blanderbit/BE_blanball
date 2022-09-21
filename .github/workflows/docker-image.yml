@@ -9,8 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DOCKERFILE_PATH: Dockerfile
-      LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY_TEST }}:latest
-      COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY_TEST }}:${{ github.sha }}
+      # LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY_TEST }}:latest
+      # COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY_TEST }}:${{ github.sha }}
     steps:
     - uses: actions/checkout@master
     - name: Set env vars (dev)
