@@ -17,10 +17,17 @@ jobs:
 
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v2
+      id: reporter
       with:
-        registry: ${{ secrets.DOCKER_REGISTRY }}
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
+        cond: ${{ github.ref == 'refs/heads/dev_test' }}
+        if_true:
+          registry: ${{ secrets.DOCKER_REGISTRY }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+        if_false: 
+          registry: ${{ secrets.DOCKER_REGISTRY }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
     - name: Pull latest image
       run: |
@@ -40,3 +47,4 @@ jobs:
     - name: Trigger deploy in portainer
       run: |
         curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL }}
+
