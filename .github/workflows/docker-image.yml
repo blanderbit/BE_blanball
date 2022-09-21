@@ -9,11 +9,10 @@ variables:
 jobs:  
   build:
     runs-on: ubuntu-latest
-    if [ "${isDevelop}" == "true" ]; then
-      env:
-        LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:latest
-        COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
-    fi
+    env:
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+      LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:latest
+      COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
       DOCKERFILE_PATH: Dockerfile
     steps:
     - uses: actions/checkout@master
