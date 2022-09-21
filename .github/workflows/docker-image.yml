@@ -6,12 +6,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
     - name: 'Run on azure-pipeline branch'
-      if: ${{ github.ref == 'refs/heads/Azure-pipeline' }}
-      env:
-        LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:latest
-        COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
-        DOCKERFILE_PATH: Dockerfile
+      if: ${{ github.ref == 'refs/heads/dev_test' }}
+      DOCKERFILE_PATH: Dockerfile
+      LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:latest
+      COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
     steps:
     - uses: actions/checkout@master
 
