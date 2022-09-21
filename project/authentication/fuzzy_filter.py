@@ -4,7 +4,6 @@ from django.contrib.postgres.search import TrigramSimilarity
 from rest_framework import filters
 from django.db.models.query import QuerySet
 import itertools
-import os
 
 class SearchFilter(filters.SearchFilter):
 
