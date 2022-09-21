@@ -2,10 +2,7 @@ name: Deploy
 on:
   push:
     branches: [ "dev_test","main_test" ]
-variables:
-  isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main_test')]
-  isDevelop: $[eq(variables['Build.SourceBranch'], 'refs/heads/dev_test')]
-
+    
 jobs:  
   build:
     runs-on: ubuntu-latest
