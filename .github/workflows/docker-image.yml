@@ -14,22 +14,17 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - uses: haya14busa/action-cond@v1
+      id: condval
+      with:
+        cond: ${{ github.ref == 'refs/heads/Azure-pipeline' }}
+        if_true: ${{ secrets.DOCKER_REGISTRY }}
+        if_false: ${{ secrets.DOCKER_REGISTRY }}
 
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v2
-      id: reporter
-      with:
-        cond: ${{ github.ref == 'refs/heads/dev_test' }}
-        if_true:
-          uses: docker/login-action@v2
-          registry: ${{ secrets.DOCKER_REGISTRY }}
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
-        if_false: 
-          uses: docker/login-action@v2
-          registry: ${{ secrets.DOCKER_REGISTRY }}
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
+        registry: "${{ steps.condval.outputs.value }}"
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
 
     - name: Pull latest image
       run: |
@@ -49,4 +44,3 @@ jobs:
     - name: Trigger deploy in portainer
       run: |
         curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL }}
-
