@@ -14,13 +14,13 @@ jobs:
     - name: Set env vars (dev)
       if: github.ref == 'refs/heads/dev_test'
       run: |
-        echo "LATEST_IMAGE=${{ secrets.DOCKER_REGISTRY_TEST }}:latest"
-        echo "COMMIT_IMAGE=${{ secrets.DOCKER_REGISTRY_TEST }}:${{ github.sha }}"
+        echo "LATEST_IMAGE=DOCKER_REGISTRY_TEST:latest"
+        echo "COMMIT_IMAGE=DOCKER_REGISTRY_TEST:${{ github.sha }}"
     - name: Set env vars (prod)
       if: github.ref == 'refs/heads/master_test'
       run: |
-        echo "LATEST_IMAGE=${{ secrets.DOCKER_REGISTRY_PROD }}:latest"
-        echo "COMMIT_IMAGE=${{ secrets.DOCKER_REGISTRY_PROD }}:${{ github.sha }}"
+        echo "LATEST_IMAGE=DOCKER_REGISTRY_PROD:latest"
+        echo "COMMIT_IMAGE=DOCKER_REGISTRY_PROD:${{ github.sha }}"
     - name: Login to GitHub Container Registry (dev)
       if: github.ref == 'refs/heads/dev_test'
       uses: docker/login-action@v2
@@ -44,14 +44,14 @@ jobs:
     - name: Build image
       working-directory: .
       run: |
-        docker build -f ${DOCKERFILE_PATH} --cache-from ${LATEST_IMAGE} -t ${COMMIT_IMAGE} .
+        docker build -f ${DOCKERFILE_PATH} --cache-from ${{ secrets[env.LATEST_IMAGE] }} -t ${{ secrets[env.COMMIT_IMAGE] }} .
     - name: Tag latest image
       run: |
-        docker tag ${{env.COMMIT_IMAGE}} ${{env.LATEST_IMAGE}} .
+        docker tag ${{ secrets[env.COMMIT_IMAGE] }} ${{ secrets[env.LATEST_IMAGE] }}
     - name: Push images
       run: |
-        docker push ${COMMIT_IMAGE}
-        docker push ${LATEST_IMAGE}
+        docker push ${{ secrets[env.COMMIT_IMAGE] }}
+        docker push ${{ secrets[env.LATEST_IMAGE] }}
 
     - name: Trigger deploy in portainer (dev)
       if: github.ref == 'refs/heads/dev_test'
