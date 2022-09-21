@@ -16,7 +16,7 @@ jobs:
     - uses: haya14busa/action-cond@v1
       id: condval
       with:
-        cond: ${{ github.ref == 'refs/heads/Azure-pipeline' }}
+        cond: ${{ github.ref == 'refs/heads/dev_test' }}
         if_true: ${{ secrets.DOCKER_REGISTRY }}
         if_false: ${{ secrets.DOCKER_REGISTRY }}
 
