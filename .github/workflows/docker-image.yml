@@ -14,13 +14,13 @@ jobs:
     - name: Set env vars (dev)
       if: github.ref == 'refs/heads/dev_test'
       run: |
-        echo "LATEST_IMAGE=${{ secrets.DOCKER_REGISTRY_TEST }}:latest" >> $GITHUB_ENV
-        echo "COMMIT_IMAGE=${{ secrets.DOCKER_REGISTRY_TEST }}:${{ github.sha }}" >> $GITHUB_ENV
+        echo "LATEST_IMAGE=${{ secrets.DOCKER_REGISTRY }}:latest" >> $GITHUB_ENV
+        echo "COMMIT_IMAGE=${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}" >> $GITHUB_ENV
     - name: Set env vars (prod)
       if: github.ref == 'refs/heads/master_test'
       run: |
-        echo "LATEST_IMAGE=${{ secrets.DOCKER_REGISTRY_PROD }}:latest" >> $GITHUB_ENV
-        echo "COMMIT_IMAGE=${{ secrets.DOCKER_REGISTRY_PROD }}:${{ github.sha }}" >> $GITHUB_ENV
+        echo "LATEST_IMAGE=${{ secrets.DOCKER_REGISTRY }}:latest" >> $GITHUB_ENV
+        echo "COMMIT_IMAGE=${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}" >> $GITHUB_ENV
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v2
       with:
@@ -46,9 +46,9 @@ jobs:
     - name: Trigger deploy in portainer (dev)
       if: github.ref == 'refs/heads/dev_test'
       run: |
-        curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL_TEST }}
+        curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL }}
       
     - name: Trigger deploy in portainer (prod)
       if: github.ref == 'refs/heads/main_test'
       run: |
-        curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL_PROD }}
+        curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL }}
