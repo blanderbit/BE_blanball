@@ -23,12 +23,11 @@ jobs:
       run: |
         echo "LATEST_IMAGE=${{ secrets.DOCKER_REGISTRY_PROD }}:latest" >> $GITHUB_ENV
         echo "COMMIT_IMAGE=${{ secrets.DOCKER_REGISTRY_PROD }}:${{ github.sha }}" >> $GITHUB_ENV
-        echo "REGISTRY=${{ secrets.DOCKER_REGISTRY_PROD }}" >> $GITHUB_ENV
         echo "WEBHOOK=${{ secrets.PORTAINER_WEBHOOK_URL_PROD }}" >> $GITHUB_ENV
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v2
       with:
-        registry: ${{ REGISTRY }}
+        registry: ${{ secrets.DOCKER_REGISTRY }}
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
 
