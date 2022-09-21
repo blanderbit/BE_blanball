@@ -1,22 +1,23 @@
 name: Deploy
 on:
   push:
-    branches: [ "dev_test" ]
+    branches: [ "dev_test","main_test" ]
+
 jobs:
-  build:
+  build_develop:
+    if: ${{ github.ref == 'refs/dev_test' }}
     runs-on: ubuntu-latest
+    env:
+      DOCKERFILE_PATH: Dockerfile
+      LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY_TEST }}:latest
+      COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY_TEST }}:${{ github.sha }}
     steps:
     - uses: actions/checkout@master
-    - name: Set env vars (dev)
-      if: endsWith(github.ref, '/dev_test')
-      run: |
-        echo "AZURE_FUNCTIONAPP_NAME=Dockerfile"
-        echo "PUBLISH_PROFILE_VAR_NAME=DOCKER_REGISTRY:latest"
-        echo "COMMIT_IMAGE=DOCKER_REGISTRY:${{ github.sha }}"
+
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v2
       with:
-        registry: ${{ secrets.DOCKER_REGISTRY }}
+        registry: ${{ secrets.DOCKER_REGISTRY_TEST }}
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
 
@@ -26,7 +27,7 @@ jobs:
     - name: Build image
       working-directory: .
       run: |
-        docker build -f ${AZURE_FUNCTIONAPP_NAME} --cache-from  ${{ secrets[env.PUBLISH_PROFILE_VAR_NAME] }}-t {{ secrets[env.COMMIT_IMAGE] }} .
+        docker build -f ${DOCKERFILE_PATH} --cache-from ${LATEST_IMAGE} -t ${COMMIT_IMAGE} .
     - name: Tag latest image
       run: |
         docker tag ${COMMIT_IMAGE} ${LATEST_IMAGE}
@@ -37,7 +38,40 @@ jobs:
         
     - name: Trigger deploy in portainer
       run: |
-        curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL }}
+        curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL_TEST }}
 
+  build_main:
+    if: ${{ github.ref == 'refs/main_test' }}
+    runs-on: ubuntu-latest
+    env:
+      DOCKERFILE_PATH: Dockerfile
+      LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY_PROD }}:latest
+      COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY_PROD  }}:${{ github.sha }}
+    steps:
+    - uses: actions/checkout@master
 
-      # if: ${{ github.ref == 'refs/dev_test' }}
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ secrets.DOCKER_REGISTRY_PROD  }}
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+
+    - name: Pull latest image
+      run: |
+        docker pull ${LATEST_IMAGE} --ignore-pull-failures || true
+    - name: Build image
+      working-directory: .
+      run: |
+        docker build -f ${DOCKERFILE_PATH} --cache-from ${LATEST_IMAGE} -t ${COMMIT_IMAGE} .
+    - name: Tag latest image
+      run: |
+        docker tag ${COMMIT_IMAGE} ${LATEST_IMAGE}
+    - name: Push images
+      run: |
+        docker push ${COMMIT_IMAGE}
+        docker push ${LATEST_IMAGE}
+        
+    - name: Trigger deploy in portainer
+      run: |
+        curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL_PROD  }}
