@@ -11,8 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       if [ "${isDevelop}" == "true" ]; then
-        LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:latest
-        COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
+      LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:latest
+      COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
       fi
       DOCKERFILE_PATH: Dockerfile
     steps:
