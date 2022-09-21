@@ -1,59 +1,22 @@
 name: Deploy
 on:
   push:
-    branches: [ "dev_test","main_test" ]
+    branches: [ "dev_test" ]
 
 jobs:
-  build_dev:
-    if: github.ref == 'refs/heads/dev_test'
+  build:
     runs-on: ubuntu-latest
     env:
       DOCKERFILE_PATH: Dockerfile
-      LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY_TEST }}:latest
-      COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY_TEST }}:${{ github.sha }}
+      LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:latest
+      COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
     steps:
     - uses: actions/checkout@master
 
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v2
       with:
-        registry: ${{ secrets.DOCKER_REGISTRY_TEST }}
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
-
-    - name: Pull latest image
-      run: |
-        docker pull ${LATEST_IMAGE} --ignore-pull-failures || true
-    - name: Build image
-      working-directory: .
-      run: |
-        docker build -f ${DOCKERFILE_PATH} .
-    - name: Tag latest imageW
-      run: |
-        docker tag ${COMMIT_IMAGE} ${LATEST_IMAGE}
-    - name: Push images
-      run: |
-        docker push ${COMMIT_IMAGE}
-        docker push ${LATEST_IMAGE}
-        
-    - name: Trigger deploy in portainer
-      run: |
-        curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL_TEST }}
-
-  build_main:
-    if: github.ref == 'refs/heads/main_test'
-    runs-on: ubuntu-latest
-    env:
-      DOCKERFILE_PATH: Dockerfile
-      LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY_PROD }}:latest
-      COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY_PROD }}:${{ github.sha }}
-    steps:
-    - uses: actions/checkout@master
-
-    - name: Login to GitHub Container Registry
-      uses: docker/login-action@v2
-      with:
-        registry: ${{ secrets.DOCKER_REGISTRY_PROD }}
+        registry: ${{ secrets.DOCKER_REGISTRY }}
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
 
@@ -74,4 +37,4 @@ jobs:
         
     - name: Trigger deploy in portainer
       run: |
-        curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL_PROD }}
+        curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL }}
