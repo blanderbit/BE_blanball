@@ -8,12 +8,11 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DOCKERFILE_PATH: Dockerfile
+      LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY_PROD }}:latest
+      COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY_PROD }}:${{ github.sha }}
       if: ${{ github.ref == 'refs/heads/dev_test' }}
       LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY_TEST }}:latest
       COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY_TEST }}:${{ github.sha }}
-      if: ${{ github.ref == 'refs/heads/main_test' }}
-      LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY_PROD }}:latest
-      COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY_PROD }}:${{ github.sha }}
     steps:
     - uses: actions/checkout@master
 
@@ -22,10 +21,9 @@ jobs:
       with:
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
+        registry: ${{ secrets.DOCKER_REGISTRY_PROD }}
         if: ${{ github.ref == 'refs/heads/dev_test' }}
         registry: ${{ secrets.DOCKER_REGISTRY_TEST }}
-        if: ${{ github.ref == 'refs/heads/main_test' }}
-        registry: ${{ secrets.DOCKER_REGISTRY_PROD }}
 
     - name: Pull latest image
       run: |
