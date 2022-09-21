@@ -1,16 +1,20 @@
 name: Deploy
 on:
   push:
-    branches: [ "dev_test" ]
+    branches: [ "dev_test","main_test" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: "!contains${{ github.ref == 'refs/heads/dev_test'}}"
     env:
+      if: "!contains${{ github.ref == 'refs/heads/dev_test'}}"
       DOCKERFILE_PATH: Dockerfile
       LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:latest
       COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
+      if: "!contains${{ github.ref == 'refs/heads/main_test'}}"
+      DOCKERFILE_PATH: Dockerfile
+      LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY_PROD }}:latest
+      COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY_PROD }}:${{ github.sha }}
 
     steps:
     - uses: actions/checkout@master
