@@ -2,15 +2,16 @@ name: Deploy
 on:
   push:
     branches: [ "dev_test","main_test" ]
-    
+
 jobs:  
   build:
     runs-on: ubuntu-latest
-    env:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
-      LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:latest
-      COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
-      DOCKERFILE_PATH: Dockerfile
+    rules:
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev_test"'
+      env:
+        LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:latest
+        COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
+        DOCKERFILE_PATH: Dockerfile
     steps:
     - uses: actions/checkout@master
 
