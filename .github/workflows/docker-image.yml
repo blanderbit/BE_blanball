@@ -26,7 +26,7 @@ jobs:
     - name: Build image
       working-directory: .
       run: |
-        docker build -f ${{ env.AZURE_FUNCTIONAPP_NAME }} --cache-from  ${{ secrets[env.PUBLISH_PROFILE_VAR_NAME] }}-t {{ secrets[env.COMMIT_IMAGE] }} .
+        docker build -f ${ env.AZURE_FUNCTIONAPP_NAME } --cache-from  ${{ secrets[env.PUBLISH_PROFILE_VAR_NAME] }}-t {{ secrets[env.COMMIT_IMAGE] }} .
     - name: Tag latest image
       run: |
         docker tag ${COMMIT_IMAGE} ${LATEST_IMAGE}
