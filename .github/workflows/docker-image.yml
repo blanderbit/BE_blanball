@@ -9,15 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DOCKERFILE_PATH: Dockerfile
-      # LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY_TEST }}:latest
-      # COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY_TEST }}:${{ github.sha }}
-    steps:
-    - uses: actions/checkout@master
-    - name: Set env vars (dev)
-      run: |
-        echo "LATEST_IMAGE=${{ secrets.DOCKER_REGISTRY_PROD }}:latest"
-        echo "COMMIT_IMAGE=${{ secrets.DOCKER_REGISTRY_PROD  }}:${{ github.sha }}"
-
+      LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY_TEST }}:latest
+      COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY_TEST }}:${{ github.sha }}
+      
     - name: Login to GitHub Container Registry (TEST)
       uses: docker/login-action@v2
       with:

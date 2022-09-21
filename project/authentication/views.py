@@ -108,21 +108,17 @@ class UserList(generics.ListAPIView):
     '''get all users list'''
     serializer_class = UsersListSerializer
     pagination_class = CustomPagination
-    filter_backends = (DjangoFilterBackend,filters.OrderingFilter,)
+    filter_backends = (filters.SearchFilter,DjangoFilterBackend,filters.OrderingFilter,)
     filterset_class = UserAgeRangeFilter
     search_fields = ('profile__name','profile__gender','profile__last_name')
     ordering_fields = ('id','profile__age','raiting')
     queryset = User.objects.filter(role='User').order_by('-id')
-
 
 class UsersRelevantList(generics.ListAPIView):
     filter_backends = (RankedFuzzySearchFilter,)
     serializer_class = UsersListSerializer
     queryset = User.objects.filter(role='User')
     search_fields = ('profile__name','profile__last_name')
-
-    def get_queryset(self) -> list:
-        return self.queryset.all()
 
 class AdminUsersList(UserList):
     '''displaying the full list of admin users'''
