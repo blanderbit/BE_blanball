@@ -3,11 +3,11 @@ on:
   push:
     branches: [ "dev_test","main_test" ]
 
-jobs:  
+jobs:
   build:
     runs-on: ubuntu-latest
-    - name: 'Run az commands on branch 1'
-      if: ${{ github.ref == 'refs/dev_test' }}
+    - name: 'Run on azure-pipeline branch'
+      if: ${{ github.ref == 'refs/heads/Azure-pipeline' }}
       env:
         LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:latest
         COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
