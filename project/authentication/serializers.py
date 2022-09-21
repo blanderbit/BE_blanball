@@ -1,14 +1,12 @@
 import re
+
 from collections import OrderedDict
 
-from .documents import ProfileDocument
 from .models import *
 from project.constaints import *
 from .validators import CodeValidator
 
 from django.contrib import auth
-
-from django_elasticsearch_dsl_drf.serializers import DocumentSerializer
 
 from rest_framework import serializers,status
 
@@ -216,9 +214,3 @@ class CheckUserActiveSerializer(serializers.Serializer):
             return super().validate(attrs)
         except User.DoesNotExist:
             raise serializers.ValidationError(NO_SUCH_USER_ERROR,status.HTTP_400_BAD_REQUEST)
-
-
-class ProductDocumentSerializer(DocumentSerializer):
-    class Meta:
-        document = ProfileDocument
-        fields = ("id", "name", "age", "gender")

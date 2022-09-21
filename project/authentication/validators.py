@@ -13,7 +13,6 @@ class CodeValidator:
 
     def __call__(self, attrs) -> OrderedDict:
         self.verify_code = attrs.get('verify_code')
-        print(self.verify_code)
         self.code = Code.objects.filter(verify_code = self.verify_code)
         if not self.code:
             raise serializers.ValidationError(BAD_CODE_ERROR,status.HTTP_400_BAD_REQUEST)

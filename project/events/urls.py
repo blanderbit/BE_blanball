@@ -2,9 +2,6 @@ from .views import *
 
 from django.urls import path
 
-
-
-
 urlpatterns = [
     # endpoint where user can create new event 
     path('client/event/create',CreateEvent.as_view(),name='event-create'),
@@ -25,7 +22,11 @@ urlpatterns = [
     # endpoint where spectator can leave from event 
     path('client/fan/event/leave',FanLeaveFromEvent.as_view(),name='spectator-leave-from-event'),
     # endpoint where user can get list of your events
-    path('client/my/events/list',UserEvents.as_view(),name='user-events'),
+    path('client/my/events/list',UserEvents.as_view(),name='user-events-list'),
+    # endpoint where user can get relevant list of events
+    path('client/relevant/events/list',EventsRelevantList.as_view(),name='relevant-event-list'),
+    # endpoint where user can get relevant list of events
+    path('client/my/relevant/events/list',UserEventsRelevantList.as_view(),name='relevant-event-list'),
     # endpoint where a user can get list of other user scheduled events
     path('client/user/planned/events/list<int:pk>',UserPlannedEvents.as_view(),name='user-planned-events'),
     # endpoint where a user can get list of the most popular events
@@ -34,6 +35,6 @@ urlpatterns = [
     path('client/invite/user/to/event',InviteUserToEvent.as_view(),name='invite-to-event'),
     #endpoint where user can get list of your requests-participations
     path('client/requests/participations/list<int:pk>',RequestToParticipationsList.as_view(),name='request-participations-list'),
-
+    #
     path('client/accept/or/decline/participations',BulkAcceptOrDeclineRequestToParticipation.as_view(),name='accept-decline-participations'),
 ]

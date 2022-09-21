@@ -3,16 +3,14 @@ from types import NoneType
 
 from .models import *
 from .serializers import *
-from .documents import *
 from project.services import *
 from .permisions import IsNotAuthenticated
 
-from elasticsearch_dsl import Q
-
 from rest_framework import generics,filters,status
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
+
+from .fuzzy_filter import RankedFuzzySearchFilter
 
 
 def count_age(profile:Profile,data:dict) -> Profile:
@@ -22,6 +20,12 @@ def count_age(profile:Profile,data:dict) -> Profile:
             age:int = (timezone.now().date() - birthday) // timezone.timedelta(days=365)
             profile.age:int = age
             return profile.save()
+
+def send_email_template(user:User,body_title:str,title:str,text:str) -> None:
+    context = ({'user_name': user.profile.name,'user_last_name':user.profile.last_name,
+    'date_time':timezone.now(),'body_title':body_title,'title':title,'text':text})
+    message:str = render_to_string('email_confirm.html',context)
+    Util.send_email.delay(data = {'email_body':message,'to_email': user.email})
 
 class RegisterUser(generics.GenericAPIView):
     '''register user'''
@@ -35,10 +39,8 @@ class RegisterUser(generics.GenericAPIView):
         profile:Profile = Profile.objects.create(**serializer.validated_data['profile'])
         count_age(profile=profile,data = serializer.validated_data['profile'].items())
         serializer.save(profile = profile)
-        context:dict = ({'title':'Успішна регестрація!','text':AFTER_REGISTER_SEND_EMAIL_TEXT.format(
-            user_name = profile.name,user_last_name=profile.last_name)})
-        message:str = render_to_string('email_message.html',context)
-        Util.send_email.delay(data = {'email_body':message,'to_email': user['email']})
+        send_email_template(user=User.objects.get(profile=profile.id),body_title=REGISTER_SUCCESS_BODY_TITLE,title=REGISTER_SUCCESS_TITLE,
+        text=REGISTER_SUCCESS_TEXT)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class LoginUser(generics.GenericAPIView):
@@ -101,6 +103,7 @@ class UserProfile(generics.GenericAPIView):
         except:
             return Response(NO_SUCH_USER_ERROR,status=status.HTTP_404_NOT_FOUND)
 
+
 class UserList(generics.ListAPIView):
     '''get all users list'''
     serializer_class = UsersListSerializer
@@ -110,6 +113,12 @@ class UserList(generics.ListAPIView):
     search_fields = ('profile__name','profile__gender','profile__last_name')
     ordering_fields = ('id','profile__age','raiting')
     queryset = User.objects.filter(role='User').order_by('-id')
+
+class UsersRelevantList(generics.ListAPIView):
+    filter_backends = (RankedFuzzySearchFilter,)
+    serializer_class = UsersListSerializer
+    queryset = User.objects.filter(role='User')
+    search_fields = ('profile__name','profile__last_name')
 
 class AdminUsersList(UserList):
     '''displaying the full list of admin users'''
@@ -123,7 +132,6 @@ class RequestPasswordReset(generics.GenericAPIView):
 
     def post(self, request) -> Response:
         email:str = request.data.get('email', '')
-
         if User.objects.filter(email=email).exists():
             code_create(email=email,type=PASSWORD_RESET_CODE_TYPE,dop_info = None)
             return Response(SENT_CODE_TO_EMAIL_SUCCESS, status=status.HTTP_200_OK)
@@ -145,10 +153,8 @@ class ResetPassword(generics.GenericAPIView):
             user.set_password(serializer.validated_data['new_password'])
             user.save()
             code.delete()
-            context:dict = ({'title':'Успішна регестрація!','text':AFTER_RESET_PASSWORD_EMAIL_TEXT.format(
-                user_name = user.profile.name,user_last_name=user.profile.last_name)})
-            message:str = render_to_string('email_message.html',context)
-            Util.send_email.delay(data = {'email_body':message,'to_email': user.email})
+            send_email_template(user=user,body_title=PASS_UPDATE_SUCCESS_BODY_TITLE,title=PASS_UPDATE_SUCCESS_TITLE,
+            text=PASS_UPDATE_SUCCESS_TEXT)
             return Response(PASSWORD_RESET_SUCCESS,status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response(NO_SUCH_USER_ERROR,status=status.HTTP_404_NOT_FOUND) 
@@ -192,9 +198,6 @@ class CheckCode(generics.GenericAPIView):
     '''password reset on a previously sent request'''
     serializer_class = CheckCodeSerializer
 
-    user:User =  None
-    code:User =  None
-
     def post(self, request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -205,30 +208,30 @@ class CheckCode(generics.GenericAPIView):
             return Response(NO_PERMISSIONS_ERROR,status=status.HTTP_400_BAD_REQUEST)
         if self.code.type == PASSWORD_CHANGE_CODE_TYPE:
             self.user.set_password(self.code.dop_info)
-            self.success(email_body='change password success')
+            send_email_template(user=self.user,body_title=PASS_UPDATE_SUCCESS_BODY_TITLE,title=PASS_UPDATE_SUCCESS_TITLE,
+            text=PASS_UPDATE_SUCCESS_TEXT)
             return Response(CHANGE_PASSWORD_SUCCESS,status=status.HTTP_200_OK) 
         elif self.code.type == EMAIL_CHANGE_CODE_TYPE:
             self.user.email = self.code.dop_info
-            self.success(email_body='change email success')
+            send_email_template(user=self.user,body_title=PASS_UPDATE_SUCCESS_BODY_TITLE,title=PASS_UPDATE_SUCCESS_TITLE,
+            text=PASS_UPDATE_SUCCESS_TEXT)
             return Response(CHANGE_EMAIL_SUCCESS,status=status.HTTP_200_OK) 
         elif self.code.type == EMAIL_VERIFY_CODE_TYPE:
             self.user.is_verified = True
-            self.success(email_body='email verify success')
+            send_email_template(user=self.user,body_title=PASS_UPDATE_SUCCESS_BODY_TITLE,title=PASS_UPDATE_SUCCESS_TITLE,
+            text=PASS_UPDATE_SUCCESS_TEXT)
             return Response(ACTIVATION_SUCCESS,status=status.HTTP_200_OK)
         elif self.code.type == PHONE_CHANGE_CODE_TYPE:
             self.user.phone = self.code.dop_info
-            self.success(email_body='change phone success')
+            send_email_template(user=self.user,body_title=PASS_UPDATE_SUCCESS_BODY_TITLE,title=PASS_UPDATE_SUCCESS_TITLE,
+            text=PASS_UPDATE_SUCCESS_TEXT)
             return Response(CHANGE_PHONE_SUCCESS,status=status.HTTP_200_OK)
         elif self.code.type == ACCOUNT_DELETE_CODE_TYPE:
+            send_email_template(user=self.user,body_title=PASS_UPDATE_SUCCESS_BODY_TITLE,title=PASS_UPDATE_SUCCESS_TITLE,
+            text=PASS_UPDATE_SUCCESS_TEXT)
             User.objects.filter(id=self.user.id).delete()
             return Response(ACCOUNT_DELETED_SUCCESS,status=status.HTTP_200_OK)
 
-
-    def success(self,email_body) -> None:
-        self.user.save()
-        self.code.delete()
-        data:dict = {'email_body': f'{self.user.profile.name}{email_body}!' ,'to_email': self.user.email}
-        Util.send_email.delay(data)
 
 class RequestEmailVerify(generics.GenericAPIView):
     serializer_class = EmailSerializer
@@ -252,19 +255,3 @@ class CheckUserActive(generics.GenericAPIView):
             return Response({True:'User active'})
         except ActiveUser.DoesNotExist:
             return Response({False:'User not active'})
-
-
-from .documents import ProfileDocument
-from .serializers import ProductDocumentSerializer
-
-class ProfileSearch(APIView):
-    serializer_class = ProductDocumentSerializer
-    document_class = ProfileDocument
-
-    def generate_q_expression(self, query) -> dict:
-        return Q("match", name={"query": query, "fuzziness": "auto"})
-
-    def get(self, request, query):
-        q = self.generate_q_expression(query)
-        search = self.document_class.search().query(q)
-        return Response(self.serializer_class(search.to_queryset(), many=True).data)

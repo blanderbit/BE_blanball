@@ -36,7 +36,7 @@ def code_create(email,type,dop_info) -> None:
     life_time = timezone.now() + timezone.timedelta(minutes=CODE_EXPIRE_MINUTES_TIME))
     user:User = User.objects.get(email = email)
     context:dict = ({'title':check_code_type(code),'code': list(code.verify_code),'name':user.profile.name,'surname':user.profile.last_name})
-    template:str = render_to_string("email_confirm.html",context)
+    template:str = render_to_string("email_code.html",context)
     print(verify_code)
     data:dict = {'email_body': template ,'to_email': email}
     Util.send_email.delay(data)
@@ -73,7 +73,6 @@ class GetPutDeleteAPIView(mixins.RetrieveModelMixin,
                                    GenericAPIView):
     '''сoncrete view for get,put or deleting a model instance'''
     def get(self, request, *args, **kwargs):
-        print(type(self.retrieve))
         return self.retrieve(request, *args, **kwargs)
 
     def put(self, request, *args, **kwargs):

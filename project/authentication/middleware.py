@@ -20,7 +20,7 @@ django.setup()
 ALGORITHM = "HS256"
 
 @database_sync_to_async
-def get_user(token:str) -> User or Exception:
+def get_user(token:str) -> User or AnonymousUser:
     try:
         payload:dict = jwt.decode(token, settings.SECRET_KEY, algorithms=ALGORITHM)
     except User.DoesNotExist:

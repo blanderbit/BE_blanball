@@ -63,7 +63,7 @@ MAX_AGE_VALUE_ERROR = {'error': 'Age must not exceed 100 years old'}
 MIN_AGE_VALUE_ERROR = {'error': 'Age must be at least 6 years old'}
 CONFIGURATION_IS_REQUIRED_ERROR = {'error': 'Сonfiguration should contain fields like: email,phone,send_email'}
 
-BLANBALL = 'Blanball'
+BLANBALL = 'BlanBall'
 
 EMAIL_MESSAGE_TEMPLATE_TITLE = '{type} {key} у додатку Blanball'
 
@@ -102,3 +102,13 @@ EVENT_UPDATE_MESSAGE_TYPE = 'event_updated'
 CHANGE_MAINTENANCE_MESSAGE_TYPE = 'change_maintenance'
 EVENT_TIME_NOTIFICATION_MESSAGE_TYPE ='event_time_notification'
 REVIEW_CREATE_MESSAGE_TYPE = 'review_creaete'
+
+
+
+REGISTER_SUCCESS_BODY_TITLE = 'Реєстрація пройшла успішно'
+REGISTER_SUCCESS_TITLE = 'Дякуємо за реєстрацію у BlanBall'
+REGISTER_SUCCESS_TEXT = 'Ви отримали це повідомлення, оскільки цю електронну скриньку зареєстровано в додатку BlanBall.'
+
+PASS_UPDATE_SUCCESS_BODY_TITLE  = 'Зміна пароля пройшла успішно'
+PASS_UPDATE_SUCCESS_TITLE = 'Ваш пароль змінено'
+PASS_UPDATE_SUCCESS_TEXT = 'Ви отримали це повідомлення, оскільки ваш пароль було змінено в додатку BlanBall.'
