@@ -2,14 +2,13 @@ name: Deploy
 on:
   push:
     branches: [ "dev_test" ]
-if: ${{ github.ref == 'refs/dev_test' }}
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
     - name: Set env vars (dev)
-      if: endsWith(github.ref, '/dev')
+      if: ${{ github.ref == 'refs/dev_test' }}
       run: |
         echo "DOCKERFILE_PATH=Dockerfile" >> $GITHUB_ENV
         echo "LATEST_IMAGE=${{ secrets.DOCKER_REGISTRY }}:latest" >> $GITHUB_ENV
