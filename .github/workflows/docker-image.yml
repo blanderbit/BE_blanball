@@ -42,7 +42,13 @@ jobs:
       run: |
         docker push ${COMMIT_IMAGE}
         docker push ${LATEST_IMAGE}
-        
-    - name: Trigger deploy in portainer
+
+    - name: Trigger deploy in portainer (dev)
+      if: github.ref == 'refs/heads/dev_test'
       run: |
-        curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL }}
+        curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL_TEST }}
+      
+    - name: Trigger deploy in portainer (prod)
+      if: github.ref == 'refs/heads/main_test'
+      run: |
+        curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL_PROD }}
