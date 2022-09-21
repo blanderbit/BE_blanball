@@ -19,10 +19,10 @@ jobs:
         echo "COMMIT_IMAGE=DOCKER_REGISTRY_TEST:${{ github.sha }}" >> $GITHUB_ENV
     - name: Set env vars (prod)
       if: github.ref == 'refs/heads/master_test'
-      run: |
-        echo "DOCKERFILE_PATH=Dockerfile" >> $GITHUB_ENV
-        echo "LATEST_IMAGE=DOCKER_REGISTRY_PROD:latest" >> $GITHUB_ENV
-        echo "COMMIT_IMAGE=DOCKER_REGISTRY_PROD:${{ github.sha }}"  >> $GITHUB_ENV
+      env:
+        DOCKERFILE_PATH: Dockerfile
+        LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:latest
+        COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY }}:${{ github.sha }}
     - name: Login to GitHub Container Registry (dev)
       if: github.ref == 'refs/heads/dev_test'
       uses: docker/login-action@v2
