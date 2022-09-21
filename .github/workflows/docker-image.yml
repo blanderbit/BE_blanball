@@ -8,9 +8,14 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DOCKERFILE_PATH: Dockerfile
-      if: ${{ github.ref == 'refs/heads/dev_test' , SKIP SCRIPTS' }}
-      LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY_TEST }}:latest
-      COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY_TEST }}:${{ github.sha }}
+      with:
+        cond: ${{ github.ref == 'refs/heads/dev_test' }}
+        if_true:
+          LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY_TEST }}:latest
+          COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY_TEST }}:${{ github.sha }}
+        if_false:
+          LATEST_IMAGE: ${{ secrets.DOCKER_REGISTRY_PROD }}:latest
+          COMMIT_IMAGE: ${{ secrets.DOCKER_REGISTRY_PROD }}:${{ github.sha }}
     steps:
     - uses: actions/checkout@master
 
