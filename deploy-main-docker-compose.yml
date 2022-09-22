@@ -112,3 +112,4 @@ volumes:
   # pgadmin-data:
   celery-worker-data:
   celery-beat-data:
+  db-backup-data:
