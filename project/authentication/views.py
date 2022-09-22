@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .fuzzy_filter import RankedFuzzySearchFilter
+import os
 
 
 def count_age(profile:Profile,data:dict) -> Profile:
