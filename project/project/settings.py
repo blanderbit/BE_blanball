@@ -3,6 +3,7 @@ import datetime
 import django
 
 from django.utils.encoding import smart_str
+from elasticsearch import RequestsHttpConnection
 
 from pathlib import Path
 from decouple import config, Csv
@@ -14,6 +15,7 @@ django.utils.encoding.smart_text = smart_str
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Internationalization
 LANGUAGE_CODE = config('LANGUAGE_CODE')
 
 TIME_ZONE = config('TIME_ZONE')
@@ -22,8 +24,11 @@ USE_TZ = config('USE_TZ',cast = bool,default = True)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+# Static files
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR,'static')
+STATICFILES_DIRS = []
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR,'media')
@@ -41,8 +46,9 @@ AUTH_USER_MODEL = config('AUTH_USER_MODEL')
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
-
+# Application definition:
 INSTALLED_APPS = (
+    # Default django apps:
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -50,15 +56,18 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # Other libs apps:
     'rest_framework_swagger',
     'rest_framework',
     'django_inlinecss',
     'django_elasticsearch_dsl',
+    'django_elasticsearch_dsl_drf',
     'drf_yasg',
     'django_filters',
     'phonenumber_field',
     'channels',
 
+    #My apps:
     'events.apps.EventsConfig',
     'authentication.apps.AuthenticationConfig',
     'notifications.apps.NotificationsConfig',
@@ -67,10 +76,9 @@ INSTALLED_APPS = (
 
 ELASTICSEARCH_DSL = {
     'default': {
-        'hosts': 'elasticsearch:9200'
-    },
+        'hosts': 'elasticsearch:9200',
+    }
 }
-
 
 MIDDLEWARE = (
     'django.middleware.security.SecurityMiddleware',
@@ -100,7 +108,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("redis",6379)],
+            "hosts": [("redis",config('REDIS_PORT'))],
         },
     },
 }
@@ -169,7 +177,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
-    'DEFAULT_PAGINATION_CLASS': None,
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
 
@@ -195,3 +202,5 @@ CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND')
 CELERY_ACCEPT_CONTENT = {'application/json'}
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+CELERY_ACKS_LATE = True
+CELERY_PREFETCH_MULTIPLIER = 1

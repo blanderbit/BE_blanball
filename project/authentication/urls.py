@@ -2,7 +2,6 @@ from .views import *
 
 from django.urls import path
 
-
 urlpatterns = [
     # endpoint where user can register
     path('client/register', RegisterUser.as_view(),name='register'),
@@ -10,6 +9,8 @@ urlpatterns = [
     path('client/login', LoginUser.as_view(),name='login'),
     # endpoint where user can get users list
     path('client/users/list',UserList.as_view(),name='users-list'),
+    # endpoint where user can get relevant users list
+    path('client/users/relevant/list',UsersRelevantList.as_view(),name='users-relevant-list'),
     # endpoint where user can get admins list
     path('admins/list',AdminUsersList.as_view(),name='admins-list'),
     # endpoint where user can get his profile
@@ -24,14 +25,14 @@ urlpatterns = [
     path('client/request-change/password', RequestChangePassword.as_view(),name='request-change-password'),
     # endpoint where user can confirm password chagne,email change,phone change,account verification
     path('client/check/code',CheckCode.as_view(),name='check-code'),
-    # endpoint where user can confirm account delete
-    path('client/me/delete', AccountDelete.as_view(),name='delete-my-profile'),
     # endpoint where user can update his profile
     path('client/me/update', UpdateProfile.as_view(),name='update-my-profile'),
     # endpoint where user can request change email
     path('client/request-change/email',RequetChangeEmail.as_view(),name='request-change-email'),
     # endpoint where user can request change phone
     path('client/request-change/phone',RequestChangePhone.as_view(),name='request-change-phone'),
-    # endpoint where user can find any user
-    path('client/search/user/<str:query>/',SearchUsers.as_view()),
+    # endpoint where user can check is another user active
+    path('client/search/user/active',CheckUserActive.as_view(),name='check-user-active'),
+    # endpoint where user can check is another user active
+    path('client/request-verify/email',RequestEmailVerify.as_view(),name='request-email-verify'),
 ]

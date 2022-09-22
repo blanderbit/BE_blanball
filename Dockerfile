@@ -10,6 +10,7 @@ ENV DJANGO_ENV=${DJANGO_ENV} \
   # pip:
   PIP_NO_CACHE_DIR=1 \
   PIP_DISABLE_PIP_VERSION_CHECK=1 \
+  PIP_ROOT_USER_ACTION=ignore \
   PIP_DEFAULT_TIMEOUT=100 \
   #poetry 
   POETRY_VERSION=1.2.0 \
@@ -18,24 +19,21 @@ ENV DJANGO_ENV=${DJANGO_ENV} \
   POETRY_CACHE_DIR='/var/cache/pypoetry' \
   POETRY_HOME='/usr/local'
 
+
 WORKDIR /usr/src/blanball
 
 COPY . /usr/src/blanball
 
-RUN pip install --upgrade pip
+RUN pip install --upgrade pip\
+  &&pip install poetry=="$POETRY_VERSION"
 
-RUN pip install poetry=="$POETRY_VERSION"
 ENV PATH "/root/.poetry/bin:/opt/venv/bin:${PATH}"
+  
 # Cleaning cache:
-
-RUN poetry run pip install -U pip \
-    && poetry install
-
 RUN apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
-    && apt-get clean -y && rm -rf /var/lib/apt/lists/* 
-
-# RUN echo "$DJANGO_ENV" \
-#   && poetry version \
-  # Install deps:
-# RUN poetry run pip install -U pip \
-# RUN poetry install 
+    && apt-get clean -y && rm -rf /var/lib/apt/lists/* \
+    && echo "$DJANGO_ENV" \
+    && poetry version \
+    #Install deps:
+    &&poetry run pip install -U pip \
+    &&poetry install 
