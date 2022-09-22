@@ -20,8 +20,6 @@ ENV DJANGO_ENV=${DJANGO_ENV} \
   POETRY_HOME='/usr/local'
 
 
-# VOLUME /db-data
-
 WORKDIR /usr/src/blanball
 
 COPY . /usr/src/blanball

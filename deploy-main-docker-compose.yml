@@ -54,8 +54,6 @@ services:
     image: registry.it-flumx.com/blanball_be:latest
     restart: always
     command: bash compose/local/celery-worker-start.sh
-    volumes: 
-      - celery-worker-data:/usr/src/blanball/storage/celery-worker/data
     networks:
       - app-network  
     depends_on:
@@ -69,8 +67,6 @@ services:
     image: registry.it-flumx.com/flumx_test_blanball_be:latest
     restart: always 
     command: bash compose/local/celery-beat-start.sh
-    volumes: 
-      - celery-beat-data:/usr/src/blanball/storage/celery-beat/data
     networks:
       - app-network
     depends_on:
@@ -110,5 +106,4 @@ networks:
 volumes:
   redis-data:
   # pgadmin-data:
-  celery-worker-data:
-  celery-beat-data:
+  db-backup-data:
