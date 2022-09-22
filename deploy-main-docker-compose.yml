@@ -2,7 +2,7 @@ version: "3.8"
 
 services: 
   db:
-    container_name: db
+    container_name: db-prod
     image: "postgres:latest"
     env_file:
       - stack.env
@@ -16,7 +16,7 @@ services:
       - app-network
       
   api:
-    container_name: api
+    container_name: api-prod
     env_file:
       - stack.env
     image: registry.it-flumx.com/flumx_test_blanball_be:latest
@@ -34,7 +34,7 @@ services:
      - redis
      
   redis:
-    container_name: redis
+    container_name: redis-prod
     env_file:
       - stack.env
     image: redis:latest
@@ -50,10 +50,12 @@ services:
   celery-worker:
     env_file:
       - stack.env
-    container_name: celery-worker
+    container_name: celery-worker-prod
     image: registry.it-flumx.com/blanball_be:latest
     restart: always
     command: bash compose/local/celery-worker-start.sh
+    volumes: 
+      - celery-worker-data:/usr/src/blanball/storage/celery-worker/data
     networks:
       - app-network  
     depends_on:
@@ -63,10 +65,12 @@ services:
   celery-beat:
     env_file:
       - stack.env
-    container_name: celery-beat
+    container_name: celery-beat-prod
     image: registry.it-flumx.com/flumx_test_blanball_be:latest
     restart: always 
     command: bash compose/local/celery-beat-start.sh
+    volumes: 
+      - celery-beat-data:/usr/src/blanball/storage/celery-beat/data
     networks:
       - app-network
     depends_on:
@@ -86,7 +90,7 @@ services:
   #     - app-network
 
   db_backup:
-    container_name: db_backup
+    container_name: db-backup-prod
     env_file:
       - stack.env
     image: prodrigestivill/postgres-backup-local
@@ -106,4 +110,5 @@ networks:
 volumes:
   redis-data:
   # pgadmin-data:
-  db-backup-data:
+  celery-worker-data:
+  celery-beat-data:
