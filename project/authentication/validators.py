@@ -8,7 +8,7 @@ from rest_framework import status,serializers
 
 
 class CodeValidator:
-    def __init__(self,token_type:str) -> None:
+    def __init__(self,token_type:list[str]) -> None:
         self.token_type = token_type
 
     def __call__(self, attrs) -> OrderedDict:

@@ -87,7 +87,7 @@ class User(AbstractBaseUser):
     role:str = models.CharField(choices = Role.choices,max_length=10,blank=True,null=True)
     updated_at:str = models.DateTimeField(auto_now=True)
     raiting:float = models.FloatField(null = True,blank= True)
-    profile:int = models.ForeignKey(Profile,on_delete=models.CASCADE,blank=True,null = True,related_name='user')
+    profile:Profile = models.ForeignKey(Profile,on_delete=models.CASCADE,blank=True,null = True,related_name='user')
     configuration:dict = models.JSONField(default = configuration_dict)
 
 
@@ -122,7 +122,7 @@ class Code(models.Model):
 
 
 class ActiveUser(models.Model):
-    user:int = models.ForeignKey(User,on_delete=models.CASCADE)
+    user:User = models.ForeignKey(User,on_delete=models.CASCADE)
 
     def __str__(self) -> str:
         return self.user.email

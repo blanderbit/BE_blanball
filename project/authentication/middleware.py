@@ -26,7 +26,7 @@ def get_user(token:str) -> User:
     except User.DoesNotExist:
         return AnonymousUser()
 
-    token_exp = datetime.fromtimestamp(payload['exp'])
+    token_exp:datetime = datetime.fromtimestamp(payload['exp'])
     if token_exp < datetime.utcnow():
         return AnonymousUser()
 

@@ -43,7 +43,7 @@ class Event(models.Model):
         minutes_170 = 170
         minutes_180 = 180
 
-    author:int = models.ForeignKey(User,on_delete=models.CASCADE)
+    author:User = models.ForeignKey(User,on_delete=models.CASCADE)
     name:str = models.CharField(max_length=255)
     small_disc:str = models.CharField(max_length=255)
     full_disc:str = models.TextField()
@@ -62,8 +62,8 @@ class Event(models.Model):
     duration:int = models.PositiveSmallIntegerField(choices = Duration.choices)
     forms:list = models.CharField(choices=CloseType.choices,max_length=15)
     status:str =  models.CharField(choices=Status.choices,max_length=10,default = "Planned")
-    current_users:list = models.ManyToManyField(User, related_name="current_rooms",blank=True)
-    fans:list = models.ManyToManyField(User, related_name="current_views_rooms",blank=True)
+    current_users:User = models.ManyToManyField(User, related_name="current_rooms",blank=True)
+    fans:User = models.ManyToManyField(User, related_name="current_views_rooms",blank=True)
 
     @property
     def count_current_users(self) -> int:
@@ -77,10 +77,10 @@ class Event(models.Model):
         return self.name
 
 class RequestToParticipation(models.Model):
-    user:int = models.ForeignKey(User,on_delete=models.CASCADE,related_name='user')
+    user:User = models.ForeignKey(User,on_delete=models.CASCADE,related_name='user')
     time_created:date =  models.DateTimeField(auto_now_add=True)
-    event:int = models.ForeignKey(Event,on_delete=models.CASCADE)
-    event_author:int = models.ForeignKey(User,on_delete=models.CASCADE,related_name='author')
+    event:Event = models.ForeignKey(Event,on_delete=models.CASCADE)
+    event_author:User = models.ForeignKey(User,on_delete=models.CASCADE,related_name='author')
     uproved:bool = models.BooleanField(default=False)
 
     def __str__(self) -> str:

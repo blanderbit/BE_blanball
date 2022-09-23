@@ -43,10 +43,10 @@ class TestEventsViews(SetUpEventsViews,LoginUserSetUp):
         self.auth()
         self.client.post(reverse("event-create"),self.event_create_data)
         self.assertEqual(Event.objects.count(),1)
-        response=self.client.get(reverse("user-events"))
+        response=self.client.get(reverse("user-events-list"))
         self.assertEqual(response.data['total_count'],1)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_user_events_list_with_no_auth(self) -> None:
-        response=self.client.get(reverse("user-events"))
+        response=self.client.get(reverse("user-events-list"))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

@@ -1,4 +1,5 @@
 from django.utils import timezone
+import threading
 
 from dateutil.relativedelta import relativedelta
 
@@ -10,14 +11,23 @@ from django.core.mail import EmailMessage
 from project.constaints import BLANBALL
 
 
+class EmailThread(threading.Thread):
+
+    def __init__(self, email:str) -> None:
+        self.email:str = email
+        threading.Thread.__init__(self)
+
+    def run(self) -> None:
+        self.email.send()
+
 class Util: 
     @staticmethod
     @app.task
     def send_email(data:dict) -> None:
-        email:str = EmailMessage(
+        send:EmailMessage = EmailMessage(
             subject=BLANBALL,body=data['email_body'], to=[data['to_email']])
-        email.content_subtype = "html"
-        EmailThread(email).start()
+        send.content_subtype = "html"
+        EmailThread(send).start()
 
 
 @app.task

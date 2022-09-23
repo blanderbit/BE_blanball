@@ -27,6 +27,7 @@ Pillow = "^9.2.0"
 phonenumberslite = "^8.12.55"
 djangochannelsrestframework = "^1.1.0"
 django-rest-fuzzysearch = "^0.5.1"
+mypy = "^0.971"
 
 [tool.poetry.dev-dependencies]
 

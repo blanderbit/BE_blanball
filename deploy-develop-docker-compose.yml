@@ -73,17 +73,21 @@ services:
       redis:
         condition: service_healthy
 
-  # pgadmin:
-  #   container_name: pgadmin
-  #   env_file:
-  #     - stack.env
-  #   image: dpage/pgadmin4
-  #   volumes:
-  #     - pgadmin-data:/usr/src/blanball/storage/pgadmin/data
-  #   ports:
-  #     - "49201:80"
-  #   networks:
-  #     - app-network
+  pgadmin:
+    container_name: pgadmin
+    env_file:
+      - stack.env
+    image: dpage/pgadmin4
+    volumes:
+      - pgadmin-data:/usr/src/blanball/storage/pgadmin/data
+    ports:
+      - "49270:80"
+    networks:
+      - app-network
+    environment:
+      PGADMIN_DEFAULT_EMAIL: gameonly1921@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: admin1921
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
 
   db_backup:
     container_name: db_backup

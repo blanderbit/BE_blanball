@@ -1,6 +1,5 @@
 from datetime import date
 from types import NoneType
-import threading
 from django.utils import timezone
 from .models import *
 from django.template.loader import render_to_string
@@ -9,15 +8,6 @@ import random
 import string
 
 
-
-class EmailThread(threading.Thread):
-
-    def __init__(self, email:str) -> None:
-        self.email:str = email
-        threading.Thread.__init__(self)
-
-    def run(self) -> None:
-        self.email.send()
 
 def count_age(profile:Profile,data:dict) -> Profile:
     '''calculation of age after registration by the birthday parameter'''
