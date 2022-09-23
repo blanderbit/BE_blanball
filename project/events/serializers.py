@@ -12,7 +12,7 @@ from rest_framework import serializers,status
 
 class EventDateTimeValidator:
 
-    def __call__(self,attrs) -> OrderedDict:
+    def __call__(self,attrs:OrderedDict) -> OrderedDict:
         date_and_time =  attrs.get('date_and_time')
         price = attrs.get('price')
         price_desc = attrs.get('price_description')
@@ -60,7 +60,7 @@ class EventListSerializer(serializers.ModelSerializer):
         'count_current_users','count_fans') 
 
 class DeleteIventsSerializer(serializers.Serializer):
-    events = serializers.ListField(child=serializers.IntegerField(min_value=0))
+    events:list[int] = serializers.ListField(child=serializers.IntegerField(min_value=0))
 
 
 class JoinOrRemoveRoomSerializer(serializers.Serializer):
@@ -69,10 +69,10 @@ class JoinOrRemoveRoomSerializer(serializers.Serializer):
     class Meta:
         fields = ('event_id',)
 
-    def validate(self, attrs) -> OrderedDict:
-        event_id = attrs.get('event_id')
+    def validate(self, attrs:OrderedDict) -> OrderedDict:
+        event_id:int = attrs.get('event_id')
         try:
-            event = Event.objects.get(id = event_id)
+            event:Event = Event.objects.get(id = event_id)
             if event.status != 'Planned':
                 raise serializers.ValidationError(EVENT_TIME_EXPIRED_ERROR ,status.HTTP_400_BAD_REQUEST)
             if event.amount_members < event.count_current_users+1:
@@ -83,8 +83,8 @@ class JoinOrRemoveRoomSerializer(serializers.Serializer):
 
 
 class InviteUserToEventSerializer(serializers.Serializer):
-    user_id:User.id = serializers.IntegerField(min_value=0)
-    event_id:Event.id = serializers.IntegerField(min_value=0)
+    user_id:int = serializers.IntegerField(min_value=0)
+    event_id:int = serializers.IntegerField(min_value=0)
 
     class Meta:
         fields = ('event_id','user_id')
@@ -97,8 +97,8 @@ class RequestToParticipationSerializer(serializers.ModelSerializer):
         fields = ('id','user','time_created')
 
 class BulkAcceptOrDeclineRequestToParticipationSerializer(serializers.Serializer):
-    requests = serializers.ListField(child=serializers.IntegerField(min_value=0))
-    type = serializers.BooleanField()
+    requests:list[int] = serializers.ListField(child=serializers.IntegerField(min_value=0))
+    type:bool = serializers.BooleanField()
 
     class Meta:
         fields = ('requests','type')

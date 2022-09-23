@@ -1,6 +1,7 @@
 import re
 
 from collections import OrderedDict
+from typing import Union
 
 from .models import *
 from project.constaints import *
@@ -17,7 +18,7 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
     """
 
     def __init__(self, *args, **kwargs) -> None:
-        fields:dict[any] = kwargs.pop('fields', None)
+        fields:tuple[str] = kwargs.pop('fields', None)
 
         # Instantiate the superclass normally
         super().__init__(*args, **kwargs)
@@ -59,7 +60,7 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
         model = User
         fields = ('configuration','profile','get_planned_events')
 
-    def validate(self,attrs) -> OrderedDict or Exception:
+    def validate(self,attrs:OrderedDict) -> Union[ValidationError,OrderedDict]:
         conf:str =  attrs.get('configuration')
         keys:dict[str] = ['email','phone','send_email']
         planned_events =  attrs.get('get_planned_events')
@@ -87,7 +88,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = User
         fields = ['email','phone','password','re_password','profile']
 
-    def validate(self, attrs) -> OrderedDict or Exception:
+    def validate(self, attrs:OrderedDict) -> Union[ValidationError,OrderedDict]:
         '''data validation function'''
         password:str = attrs.get('password', '')
         re_password:str = attrs.get('re_password', '')
@@ -96,7 +97,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(PASSWORDS_DO_NOT_MATCH,status.HTTP_400_BAD_REQUEST) 
         return attrs
 
-    def create(self, validated_data)-> User:
+    def create(self, validated_data:dict[str,any]) -> User:
         validated_data.pop("re_password")
         '''creating a user with previously validated data'''
         return User.objects.create_user(**validated_data)
@@ -122,7 +123,7 @@ class LoginSerializer(serializers.ModelSerializer):
         model = User
         fields = ['email', 'password', 'tokens']
 
-    def validate(self, attrs) -> OrderedDict or Exception:
+    def validate(self, attrs:OrderedDict) -> Union[ValidationError,dict[str,str],OrderedDict]:
         '''data validation function for user authorization'''
         email:str = attrs.get('email', '')
         password:str = attrs.get('password', '')
@@ -154,7 +155,7 @@ class UsersListSerializer(serializers.ModelSerializer):
     profile = ProfileListSerializer()
     class Meta:
         model =  User
-        fields = ('profile','raiting','role')
+        fields:tuple[str] = ('profile','raiting','role')
 
 
 class EmailSerializer(serializers.Serializer):
@@ -165,7 +166,6 @@ class EmailSerializer(serializers.Serializer):
 
         
 class RequestChangePhoneSerializer(serializers.ModelSerializer):
-
     class Meta:
         model =  User
         fields = ('phone',)
@@ -207,7 +207,7 @@ class CheckUserActiveSerializer(serializers.Serializer):
     class Meta:
         fields = ('user_id',)
 
-    def validate(self,attrs) -> OrderedDict or Exception:
+    def validate(self,attrs:OrderedDict) -> OrderedDict or Exception:
         user_id:int = attrs.get('user_id')
         try:
             User.objects.get(id = user_id)

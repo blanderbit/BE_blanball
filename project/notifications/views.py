@@ -1,7 +1,6 @@
 import json
 
 from .tasks import send_to_user
-
 from .serializers import *
 from .models import *
 from project.constaints import *
@@ -11,6 +10,7 @@ from django.db.models.query import QuerySet
 
 from rest_framework import generics,status,filters
 from rest_framework.response import Response
+from rest_framework.request import Request
 
 
 class NotificationsList(generics.ListAPIView):
@@ -29,7 +29,7 @@ class ReadNotifications(generics.GenericAPIView):
     serializer_class = ReadOrDeleteNotificationsSerializer
     queryset = Notification.objects.all()
     
-    def post(self,request) -> Response:
+    def post(self,request:Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         read:list = [] 
@@ -53,7 +53,7 @@ class DeleteNotifcations(generics.GenericAPIView):
     serializer_class = ReadOrDeleteNotificationsSerializer
     queryset = Notification.objects.all()
 
-    def post(self,request) -> Response:
+    def post(self,request:Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         deleted:list = [] 
@@ -76,10 +76,10 @@ class DeleteNotifcations(generics.GenericAPIView):
 class ChangeMaintenance(generics.GenericAPIView):
     serializer_class = ChangeMaintenanceSerializer
 
-    def post(self,request) -> Response:
+    def post(self,request:Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        data = request.data
+        data:dict[str,any] = request.data
         try:
             with open('./project/project/config.json', 'w') as f:
                 json.dump(data,f)
@@ -97,7 +97,7 @@ class ChangeMaintenance(generics.GenericAPIView):
 class GetMaintenance(generics.GenericAPIView):
     key:str = 'isMaintenance'
 
-    def get(self,request) -> Response:
+    def get(self,request:Request) -> Response:
         try:
             with open('./project/project/config.json', 'r') as f:
                 data = f.read()

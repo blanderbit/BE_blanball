@@ -8,7 +8,7 @@ from django.utils import timezone
 
 
 @app.task
-def check_event_start_time():
+def check_event_start_time() -> None:
     for event in Event.objects.all():
         if event.date_and_time - timezone.now() == timezone.timedelta(minutes=1440):
             send_notification_to_subscribe_event_user(event = event,notification_text = '24 hours',
@@ -28,7 +28,7 @@ def check_event_start_time():
 
 
 @app.task
-def delete_uproved_requests_to_participation():
+def delete_uproved_requests_to_participation() -> None:
     for request in RequestToParticipation.objects.all():
         if request.event.status == 'Finished':
             request.delete()

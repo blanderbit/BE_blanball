@@ -1,4 +1,5 @@
 
+from typing import Any,List
 from .models import *
 from .serializers import *
 from project.services import *
@@ -8,6 +9,7 @@ from django.db.models.query import QuerySet
 
 from rest_framework import generics,filters,status
 from rest_framework.response import Response
+from rest_framework.request import Request
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .fuzzy_filter import RankedFuzzySearchFilter
@@ -19,8 +21,8 @@ class RegisterUser(generics.GenericAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [IsNotAuthenticated]
 
-    def post(self, request) -> Response:
-        user:dict = request.data
+    def post(self, request:Request) -> Response:
+        user:dict[str,Any] = request.data
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
         profile:Profile = Profile.objects.create(**serializer.validated_data['profile'])
@@ -35,7 +37,7 @@ class LoginUser(generics.GenericAPIView):
     serializer_class = LoginSerializer
     permission_classes = [IsNotAuthenticated]
 
-    def post(self, request) -> Response:
+    def post(self, request:Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -44,13 +46,13 @@ class LoginUser(generics.GenericAPIView):
 class UserOwnerProfile(generics.GenericAPIView):
     serializer_class = UserSerializer
     
-    def get(self,request) -> Response: 
+    def get(self,request:Request) -> Response: 
         '''get detailed information about your profile'''
         user:User = User.objects.get(id=self.request.user.id)
         serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def delete(self,request) -> Response:
+    def delete(self,request:Request) -> Response:
         '''submitting an account deletion request'''
         code_create(email=request.user.email,type=ACCOUNT_DELETE_CODE_TYPE,
         dop_info = request.user.email)
@@ -60,7 +62,7 @@ class UpdateProfile(generics.GenericAPIView):
     serializer_class = UpdateProfileSerializer
     queryset = User.objects.all()
 
-    def put(self, request) -> Response: 
+    def put(self, request:Request) -> Response: 
         '''changing profile information'''
         user:User = self.queryset.get(id=self.request.user.id)
         serializer = self.serializer_class(user, data=request.data)
@@ -78,7 +80,7 @@ class UserProfile(generics.GenericAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.all()
 
-    def get(self,request,pk) -> Response:
+    def get(self,request:Request,pk:int) -> Response:
         '''getting a public user profile'''
         fields:list = ['configuration']
         try:
@@ -120,7 +122,7 @@ class RequestPasswordReset(generics.GenericAPIView):
     serializer_class = EmailSerializer
     permission_classes = [IsNotAuthenticated]
 
-    def post(self, request) -> Response:
+    def post(self, request:Request) -> Response:
         '''send request to reset user password by email'''
         email:str = request.data.get('email', '')
         if User.objects.filter(email=email).exists():
@@ -134,7 +136,7 @@ class ResetPassword(generics.GenericAPIView):
     serializer_class = ResetPasswordSerializer
     permission_classes = [IsNotAuthenticated]
 
-    def post(self, request) -> Response:
+    def post(self, request:Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         verify_code:str = serializer.validated_data['verify_code']
@@ -153,7 +155,7 @@ class ResetPassword(generics.GenericAPIView):
 class RequestChangePassword(generics.GenericAPIView):
     serializer_class = RequestChangePasswordSerializer
 
-    def post(self, request) -> Response:
+    def post(self, request:Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         if not request.user.check_password(serializer.data.get('old_password')):
@@ -165,7 +167,7 @@ class RequestChangePassword(generics.GenericAPIView):
 class RequetChangeEmail(generics.GenericAPIView):
     serializer_class = EmailSerializer
 
-    def post(self,request) -> Response:
+    def post(self,request:Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         if not User.objects.filter(email = serializer.validated_data['email']):
@@ -177,7 +179,7 @@ class RequetChangeEmail(generics.GenericAPIView):
 class RequestChangePhone(generics.GenericAPIView):
     serializer_class = RequestChangePhoneSerializer
 
-    def post(self,request) -> Response:
+    def post(self,request:Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         code_create(email=request.user.email,type=PHONE_CHANGE_CODE_TYPE,
@@ -189,7 +191,7 @@ class CheckCode(generics.GenericAPIView):
     '''password reset on a previously sent request'''
     serializer_class = CheckCodeSerializer
 
-    def post(self, request) -> Response:
+    def post(self, request:Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         verify_code:str = serializer.validated_data["verify_code"]
@@ -227,7 +229,7 @@ class CheckCode(generics.GenericAPIView):
 class RequestEmailVerify(generics.GenericAPIView):
     serializer_class = EmailSerializer
 
-    def get(self,request) -> Response:
+    def get(self,request:Request) -> Response:
         user:User = request.user
         if user.is_verified:
             return Response(ALREADY_VERIFIED_ERROR,status=status.HTTP_400_BAD_REQUEST)
@@ -238,7 +240,7 @@ class RequestEmailVerify(generics.GenericAPIView):
 class CheckUserActive(generics.GenericAPIView):
     serializer_class = CheckUserActiveSerializer
 
-    def post(self,request) -> Response:
+    def post(self,request:Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         try:
