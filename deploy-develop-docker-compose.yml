@@ -109,5 +109,5 @@ networks:
      
 volumes:
   redis-data:
-  # pgadmin-data:
+  pgadmin-data:
   db-backup-data:
