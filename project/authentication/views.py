@@ -1,10 +1,10 @@
-from datetime import date
-from types import NoneType
 
 from .models import *
 from .serializers import *
 from project.services import *
 from .permisions import IsNotAuthenticated
+
+from django.db.models.query import QuerySet
 
 from rest_framework import generics,filters,status
 from rest_framework.response import Response
@@ -12,20 +12,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from .fuzzy_filter import RankedFuzzySearchFilter
 
-
-def count_age(profile:Profile,data:dict) -> Profile:
-    for item in data:
-        if item[0] == 'birthday':
-            birthday:date = item[1]
-            age:int = (timezone.now().date() - birthday) // timezone.timedelta(days=365)
-            profile.age:int = age
-            return profile.save()
-
-def send_email_template(user:User,body_title:str,title:str,text:str) -> None:
-    context = ({'user_name': user.profile.name,'user_last_name':user.profile.last_name,
-    'date_time':timezone.now(),'body_title':body_title,'title':title,'text':text})
-    message:str = render_to_string('email_confirm.html',context)
-    Util.send_email.delay(data = {'email_body':message,'to_email': user.email})
+from .services import count_age,send_email_template,code_create
 
 class RegisterUser(generics.GenericAPIView):
     '''register user'''
@@ -55,15 +42,16 @@ class LoginUser(generics.GenericAPIView):
 
 
 class UserOwnerProfile(generics.GenericAPIView):
-    '''get put delete private user profile'''
     serializer_class = UserSerializer
     
-    def get(self,request) -> Response:
+    def get(self,request) -> Response: 
+        '''get detailed information about your profile'''
         user:User = User.objects.get(id=self.request.user.id)
         serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self,request) -> Response:
+        '''submitting an account deletion request'''
         code_create(email=request.user.email,type=ACCOUNT_DELETE_CODE_TYPE,
         dop_info = request.user.email)
         return Response(SENT_CODE_TO_EMAIL_SUCCESS,status=status.HTTP_200_OK)
@@ -72,7 +60,8 @@ class UpdateProfile(generics.GenericAPIView):
     serializer_class = UpdateProfileSerializer
     queryset = User.objects.all()
 
-    def put(self, request) -> Response:
+    def put(self, request) -> Response: 
+        '''changing profile information'''
         user:User = self.queryset.get(id=self.request.user.id)
         serializer = self.serializer_class(user, data=request.data)
         serializer.is_valid(raise_exception = True)
@@ -90,6 +79,7 @@ class UserProfile(generics.GenericAPIView):
     queryset = User.objects.all()
 
     def get(self,request,pk) -> Response:
+        '''getting a public user profile'''
         fields:list = ['configuration']
         try:
             user:User = self.queryset.get(id=pk)
@@ -115,6 +105,7 @@ class UserList(generics.ListAPIView):
     queryset = User.objects.filter(role='User').order_by('-id')
 
 class UsersRelevantList(generics.ListAPIView):
+    '''getting the 5 most relevant users for your query'''
     filter_backends = (RankedFuzzySearchFilter,)
     serializer_class = UsersListSerializer
     queryset = User.objects.filter(role='User')
@@ -122,15 +113,15 @@ class UsersRelevantList(generics.ListAPIView):
 
 class AdminUsersList(UserList):
     '''displaying the full list of admin users'''
-    def get_queryset(self) -> list:
+    def get_queryset(self) -> QuerySet:
         return self.queryset.filter(role = 'Admin')
 
 class RequestPasswordReset(generics.GenericAPIView):
-    '''send request to reset user password by email'''
     serializer_class = EmailSerializer
     permission_classes = [IsNotAuthenticated]
 
     def post(self, request) -> Response:
+        '''send request to reset user password by email'''
         email:str = request.data.get('email', '')
         if User.objects.filter(email=email).exists():
             code_create(email=email,type=PASSWORD_RESET_CODE_TYPE,dop_info = None)

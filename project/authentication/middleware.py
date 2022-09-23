@@ -20,7 +20,7 @@ django.setup()
 ALGORITHM = "HS256"
 
 @database_sync_to_async
-def get_user(token:str) -> User or AnonymousUser:
+def get_user(token:str) -> User:
     try:
         payload:dict = jwt.decode(token, settings.SECRET_KEY, algorithms=ALGORITHM)
     except User.DoesNotExist:
@@ -43,7 +43,7 @@ class TokenAuthMiddleware(BaseMiddleware):
     async def __call__(self, scope, receive, send) -> OrderedDict:
         close_old_connections()
         try:
-            token_key = (dict((x.split('=') for x in scope['query_string'].decode().split("&")))).get('token', None)
+            token_key:str = (dict((x.split('=') for x in scope['query_string'].decode().split("&")))).get('token', None)
         except ValueError:
             token_key = None
     

@@ -9,6 +9,8 @@ from notifications.tasks import *
 from authentication.fuzzy_filter import RankedFuzzySearchFilter
 
 from django.db.models import Count
+from django.db.models.query import QuerySet
+
 
 from rest_framework import generics,filters,status
 from rest_framework.response import Response
@@ -72,7 +74,7 @@ class GetDeleteEvent(generics.RetrieveAPIView):
     serializer_class =  EventSerializer
     queryset = Event.objects.all()
     
-    def delete(self, request,pk: int) -> Response:
+    def delete(self, request,pk:int) -> Response:
         try:
             event:Event = self.queryset.get(id = pk)
             if event.author.id == request.user.id:
@@ -212,7 +214,7 @@ class EventsRelevantList(generics.ListAPIView):
     search_fields = ('name',)
 
 class UserEventsRelevantList(EventsRelevantList):
-    def get_queryset(self) -> list:
+    def get_queryset(self) -> QuerySet:
         return self.queryset.filter(author_id = self.request.user.id) 
 
 class UserEvents(generics.ListAPIView):
@@ -223,21 +225,21 @@ class UserEvents(generics.ListAPIView):
     filterset_fields = ['type']
     queryset = Event.objects.all() 
 
-    def get_queryset(self) -> list:
+    def get_queryset(self) -> QuerySet:
         return self.queryset.filter(author_id = self.request.user.id) 
 
 class PopularIvents(UserEvents):
     serializer_class = PopularIventsListSerializer
     queryset = Event.objects.filter(status = 'Planned')
 
-    def get_queryset(self) -> list:
+    def get_queryset(self) -> QuerySet:
         return self.queryset.annotate(count = Count('current_users')).order_by('-count')[:10]
 
 class UserPlannedEvents(UserEvents):
     serializer_class = PopularIventsListSerializer
     queryset = Event.objects.filter(status = 'Planned')
 
-    def list(self, request,pk) -> Response:
+    def list(self, request,pk:int) -> Response:
         try:
             user:User =  User.objects.get(id=pk)
             num = re.findall(r'\d{1,10}', user.get_planned_events)[0]
@@ -262,7 +264,7 @@ class RequestToParticipationsList(generics.ListAPIView):
     queryset = RequestToParticipation.objects.all().order_by('-id')
     
 
-    def list(self,request,pk) -> Response:
+    def list(self,request,pk:int) -> Response:
         try:
             event:Event =  Event.objects.get(id=pk)
             queryset = self.queryset.filter(event=event)
@@ -283,21 +285,23 @@ class BulkAcceptOrDeclineRequestToParticipation(generics.GenericAPIView):
         success:list = []
         not_success:list = []
         for request_id in serializer.validated_data['requests']:
-            request = self.queryset.filter(id = request_id)
-            if request:
-                request = self.queryset.get(id = request_id)
-                if request.event_author.id == request.user.id:
+            request_to_p = self.queryset.filter(id = request_id)
+            if request_to_p:
+                request_to_p = self.queryset.get(id = request_id)
+                if request_to_p.event_author.id == request.user.id:
                     if serializer.validated_data['type'] == True:
-                        send_to_user(user=request.user,notification_text='author accept your request to participation',
-                        message_type='accept_request_to_participation')
+                        send_to_user(user=request_to_p.user,notification_text=RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION.format(
+                            user_name=request_to_p.user.profile.name,event_id=request_to_p.event.id,response_type='прийнято'),
+                            message_type=RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_MESSAGE_TYPE)
                         success.append(request_id)
-                        request.user.current_rooms.add(request.event)
-                        request.delete()
+                        request_to_p.user.current_rooms.add(request_to_p.event)
+                        request_to_p.delete()
                     else:
-                        send_to_user(user=request.user,notification_text='author decline your request to participation',
-                        message_type='decline_request_to_participation')
+                        send_to_user(user=request_to_p.user,notification_text=RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION.format(
+                            user_name=request_to_p.user.profile.name,event_id=request_to_p.event.id,response_type='відхилено'),
+                            message_type=RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_MESSAGE_TYPE)
                         success.append(request_id)
-                        request.delete()
+                        request_to_p.delete()
                 else:
                     not_success.append(request_id)
             else:

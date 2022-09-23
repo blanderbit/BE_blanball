@@ -46,7 +46,7 @@ class Role(models.TextChoices):
     user = 'User'
     admin = 'Admin'
 
-def validate_birthday(value) -> Exception:
+def validate_birthday(value:date) -> ValidationError:
     if timezone.now().date() - value > timezone.timedelta(days=29200):
         raise ValidationError(MAX_AGE_VALUE_ERROR,status.HTTP_400_BAD_REQUEST) 
     if timezone.now().date() - value < timezone.timedelta(days=2191):
@@ -99,8 +99,8 @@ class User(AbstractBaseUser):
         return self.email
 
     def tokens(self) -> dict:
-        refresh = RefreshToken.for_user(self)
-        access = AccessToken.for_user(self)
+        refresh:RefreshToken = RefreshToken.for_user(self)
+        access:AccessToken = AccessToken.for_user(self)
         return {
             'refresh': str(refresh),
             'access': str(access)

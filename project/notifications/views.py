@@ -1,5 +1,4 @@
 import json
-from webbrowser import GenericBrowser
 
 from .tasks import send_to_user
 
@@ -7,6 +6,8 @@ from .serializers import *
 from .models import *
 from project.constaints import *
 from project.services import CustomPagination
+
+from django.db.models.query import QuerySet
 
 from rest_framework import generics,status,filters
 from rest_framework.response import Response
@@ -21,7 +22,7 @@ class NotificationsList(generics.ListAPIView):
 
 
 class UserNotificationsList(NotificationsList):     
-    def get_queryset(self) -> list:
+    def get_queryset(self) -> QuerySet:
         return self.queryset.filter(user_id = self.request.user.id)
 
 class ReadNotifications(generics.GenericAPIView):

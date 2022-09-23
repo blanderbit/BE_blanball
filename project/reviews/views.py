@@ -1,6 +1,7 @@
 from .serializers import *
 from .models import *
 from project.services import CustomPagination,GetPutDeleteAPIView
+from django.db.models.query import QuerySet
 
 from rest_framework import generics
 
@@ -14,7 +15,7 @@ class UserReviewsList(generics.ListAPIView):
     pagination_class = CustomPagination
     queryset = Review.objects.all()
 
-    def get_queryset(self) -> list:
+    def get_queryset(self) -> QuerySet:
         return self.queryset.filter(user_id = self.request.user).order_by('-time_created')
 
 class GetPutDeleteReview(GetPutDeleteAPIView):

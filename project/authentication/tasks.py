@@ -1,22 +1,13 @@
-import threading
+from django.utils import timezone
+
 from dateutil.relativedelta import relativedelta
 
 from .models import Code,Profile
 from project.celery import app
 
 from django.core.mail import EmailMessage
-from django.utils import timezone
 
 from project.constaints import BLANBALL
-
-class EmailThread(threading.Thread):
-
-    def __init__(self, email:str) -> None:
-        self.email:str = email
-        threading.Thread.__init__(self)
-
-    def run(self) -> None:
-        self.email.send()
 
 
 class Util: 

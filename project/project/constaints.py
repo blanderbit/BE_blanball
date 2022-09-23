@@ -112,3 +112,7 @@ REGISTER_SUCCESS_TEXT = 'Ви отримали це повідомлення, о
 PASS_UPDATE_SUCCESS_BODY_TITLE  = 'Зміна пароля пройшла успішно'
 PASS_UPDATE_SUCCESS_TITLE = 'Ваш пароль змінено'
 PASS_UPDATE_SUCCESS_TEXT = 'Ви отримали це повідомлення, оскільки ваш пароль було змінено в додатку BlanBall.'
+
+
+RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION = '{user_name},ваша заявка на участь у події № {event_id} було {response_type}'
+RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_MESSAGE_TYPE = 'response_to_request_for_participation' 
