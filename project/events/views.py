@@ -206,6 +206,9 @@ class LeaveFromEvent(generics.GenericAPIView):
         event:Event = Event.objects.get(id = serializer.data['event_id'])
         if user.current_rooms.filter(id = serializer.data['event_id']).exists():
             user.current_rooms.remove(event)
+            send_to_user(user=event.author,notification_text=
+                LEAVE_USER_FROM_THE_EVENT_NOTIFICATION.format(author_name=event.author.profile.name,event_id=event.id),
+                message_type=NEW_REQUEST_TO_PARTICIPATION_MESSAGE_TYPE)
             return Response(DISCONNECT_FROM_EVENT_SUCCESS,status=status.HTTP_200_OK)
         return Response(NO_IN_EVENT_MEMBERS_LIST_ERROR,status=status.HTTP_400_BAD_REQUEST)
 

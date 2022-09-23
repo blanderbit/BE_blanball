@@ -101,6 +101,9 @@ services:
       - app-network
     ports:
       - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: gameonly1921@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: admin1921
     
   db_backup:
     container_name: db_backup
