@@ -5,20 +5,26 @@ from PIL import Image
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from django.utils import timezone
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import(
+    MaxValueValidator, 
+    MinValueValidator,
+)
 from django.contrib.auth.models import BaseUserManager
 
-from project.constaints import *
 from phonenumber_field.modelfields import PhoneNumberField
 
-from rest_framework_simplejwt.tokens import RefreshToken,AccessToken
+from rest_framework_simplejwt.tokens import(
+    RefreshToken,
+    AccessToken,
+)
 from rest_framework.serializers import ValidationError
-from rest_framework import status
+from rest_framework.status import HTTP_400_BAD_REQUEST
 
+from project.constaints import MIN_AGE_VALUE_ERROR,MAX_AGE_VALUE_ERROR
 
 class UserManager(BaseUserManager):
     '''user manager'''
-    def create_user(self, email:str,phone:str, password=None,*agrs,**kwargs):
+    def create_user(self, email: str,phone: str, password=None,*agrs,**kwargs):
         user = self.model(phone=phone,email=self.normalize_email(email),*agrs,**kwargs)
         user.set_password(password)
         user.role = "User"
@@ -58,16 +64,16 @@ class Role(models.TextChoices):
 
 def validate_birthday(value: date) -> ValidationError:
     if timezone.now().date() - value > timezone.timedelta(days=29200):
-        raise ValidationError(MAX_AGE_VALUE_ERROR,status.HTTP_400_BAD_REQUEST) 
+        raise ValidationError(MAX_AGE_VALUE_ERROR,HTTP_400_BAD_REQUEST) 
     if timezone.now().date() - value < timezone.timedelta(days=2191):
-        raise ValidationError(MIN_AGE_VALUE_ERROR,status.HTTP_400_BAD_REQUEST) 
+        raise ValidationError(MIN_AGE_VALUE_ERROR,HTTP_400_BAD_REQUEST) 
 
 def configuration_dict() -> dict:
     return {'email': True,'phone':True,'send_email':True}
 
 class Profile(models.Model):
-    name: str = models.CharField(max_length=255)
-    last_name: str = models.CharField(max_length=255)
+    name: str = models.CharField(max_length=255,)
+    last_name: str = models.CharField(max_length=255,)
     gender: str = models.CharField(choices = Gender.choices,max_length=10)
     birthday: date = models.DateField(blank=True,null = True,validators = [validate_birthday])
     avatar: Image = models.ImageField(null=True,blank=True,upload_to = 'media/profile')
@@ -91,14 +97,14 @@ class Profile(models.Model):
 class User(AbstractBaseUser):
     '''basic user model'''
     email: str = models.EmailField(max_length=255, unique=True, db_index=True)
-    phone: str = PhoneNumberField(unique=True)
-    is_verified: bool = models.BooleanField(default=False)
+    phone: str = PhoneNumberField(unique=True,)
+    is_verified: bool = models.BooleanField(default=False,)
     get_planned_events: str = models.CharField(max_length=10,default="1m") 
     role: str = models.CharField(choices = Role.choices,max_length=10,blank=True,null=True)
-    updated_at: str = models.DateTimeField(auto_now=True)
+    updated_at: str = models.DateTimeField(auto_now=True,)
     raiting: float = models.FloatField(null = True,blank= True)
     profile: Profile = models.ForeignKey(Profile,on_delete=models.CASCADE,blank=True,null = True,related_name='user')
-    configuration: dict = models.JSONField(default = configuration_dict)
+    configuration: dict = models.JSONField(default = configuration_dict,)
 
     USERNAME_FIELD = 'email'
 
@@ -123,8 +129,8 @@ class Code(models.Model):
     verify_code: str = models.CharField(max_length=5,unique=True)
     life_time: datetime = models.DateTimeField(null = True,blank=True)
     type: str = models.CharField(max_length=20)
-    user_email: str = models.CharField(max_length=100)
-    dop_info: str = models.CharField(max_length=250,null = True,blank = True)
+    user_email: str = models.CharField(max_length=255,)
+    dop_info: str = models.CharField(max_length=255,null = True,blank = True)
 
     def __str__(self) -> str:  
         return self.verify_code

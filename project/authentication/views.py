@@ -85,7 +85,7 @@ class UserOwnerProfile(GenericAPIView):
         serializer = self.serializer_class(user)
         return Response(serializer.data, status=HTTP_200_OK)
 
-    def delete(self,request:Request) -> Response:
+    def delete(self,request: Request) -> Response:
         '''submitting an account deletion request'''
         code_create(email=request.user.email,type=ACCOUNT_DELETE_CODE_TYPE,
         dop_info = request.user.email)
