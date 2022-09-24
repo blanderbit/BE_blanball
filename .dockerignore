@@ -1,0 +1,9 @@
+.idea/
+.vscode/
+__pycache__/
+venv/
+.mypy_cache/
+project/static/admin/
+project/static/drf-yasg/
+project/static/rest-framework/
+project/static/rest_framework_swagger/

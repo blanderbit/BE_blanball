@@ -1,11 +1,9 @@
-from authentication.middleware import  JwtAuthMiddlewareStack
-
 import os
 
 from django.core.asgi import get_asgi_application
-
 from channels.routing import ProtocolTypeRouter, URLRouter
 
+from authentication.middleware import  JwtAuthMiddlewareStack
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
 # Initialize Django ASGI application early to ensure the AppRegistry
