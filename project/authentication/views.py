@@ -1,3 +1,4 @@
+from nis import match
 from typing import Any
 from project.services import *
 
@@ -126,6 +127,7 @@ class UserProfile(GenericAPIView):
 
 class UserList(ListAPIView):
     '''get all users list'''
+    permission_classes = [IsNotAuthenticated]
     serializer_class = UsersListSerializer
     pagination_class = CustomPagination
     filter_backends = (DjangoFilterBackend,SearchFilter,OrderingFilter,)
@@ -229,7 +231,6 @@ class RequestChangePhone(GenericAPIView):
         code_create(email=request.user.email,type=PHONE_CHANGE_CODE_TYPE,
         dop_info = serializer.validated_data['phone'])
         return Response(SENT_CODE_TO_EMAIL_SUCCESS, status=HTTP_200_OK)
-
 
 class CheckCode(GenericAPIView):
     '''password reset on a previously sent request'''

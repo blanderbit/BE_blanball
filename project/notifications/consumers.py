@@ -1,4 +1,5 @@
 import json
+from typing import Any
 
 from .tasks import *
 from authentication.models import User,ActiveUser
@@ -32,7 +33,7 @@ class UserConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def check_user_group_name(self) -> bool:
-        user:User = User.objects.filter(email = self.scope['user'])
+        user: User = User.objects.filter(email = self.scope['user'])
         if user[0].group_name ==  self.room_group_name:
             return True
 
@@ -50,7 +51,7 @@ class UserConsumer(AsyncWebsocketConsumer):
     def delete_user_from_active(self) -> None:
         return ActiveUser.objects.filter(user = User.objects.get(email = self.scope['user']).id).delete()
 
-    async def disconnect(self,close_code:int) -> None:
+    async def disconnect(self,close_code: int) -> None:
         # Leave room group
         if await self.check_user():
             await self.channel_layer.group_discard(
@@ -59,9 +60,9 @@ class UserConsumer(AsyncWebsocketConsumer):
             )
             return await self.delete_user_from_active()
 
-    async def kafka_message(self, event:dict) -> None:
+    async def kafka_message(self, event: dict[str,Any]) -> None:
         # Send message to WebSocket
-        text_data:bytes = json.dumps({
+        text_data: bytes = json.dumps({
             'message': event['message'],
             'date_time': str(timezone.now()),
             'message_type': event['message_type'],

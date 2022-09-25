@@ -60,6 +60,8 @@ INSTALLED_APPS: tuple[str] = (
     'django_filters',
     'phonenumber_field',
     'channels',
+    
+    'debug_toolbar',
 
     #My apps:
     'events.apps.EventsConfig',
@@ -77,6 +79,7 @@ MIDDLEWARE: tuple[str] = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 
@@ -193,3 +196,9 @@ CELERY_TASK_SERIALIZER: str = 'json'
 CELERY_RESULT_SERIALIZER: str = 'json'
 CELERY_ACKS_LATE: bool = True
 CELERY_PREFETCH_MULTIPLIER: int = 1
+
+INTERNAL_IPS = ['localhost', '0.0.0.0', '127.0.0.1', '178.151.201.167']
+
+DEBUG_TOOLBAR_CONFIG = {
+    "SHOW_TOOLBAR_CALLBACK": lambda request: True,
+}

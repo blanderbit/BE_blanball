@@ -72,23 +72,24 @@ class DeleteNotifcations(generics.GenericAPIView):
         return Response({"delete success": deleted, "delete error":  not_deleted},status=status.HTTP_200_OK)
 
 
+def update_maintenance(data: dict[str,str]):
+    with open('./project/project/config.json', 'w') as f:
+        json.dump(data,f)
+        for user in User.objects.all():
+            if data["isMaintenance"] == True:
+                notification_text=MAINTENANCE_TRUE_NOTIFICATION_TEXT.format(username=user.profile.name,last_name=user.profile.last_name)
+            else:
+                notification_text=MAINTENANCE_FALSE_NOTIFICATION_TEXT.format(username=user.profile.name,last_name=user.profile.last_name)
+            send_to_user(user = user,notification_text=notification_text,message_type=CHANGE_MAINTENANCE_MESSAGE_TYPE)
 
 class ChangeMaintenance(generics.GenericAPIView):
     serializer_class = ChangeMaintenanceSerializer
 
-    def post(self,request:Request) -> Response:
+    def post(self,request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        data:dict[str,any] = request.data
         try:
-            with open('./project/project/config.json', 'w') as f:
-                json.dump(data,f)
-                for user in User.objects.all():
-                    if data["isMaintenance"] == True:
-                        notification_text=MAINTENANCE_TRUE_NOTIFICATION_TEXT.format(username=user.profile.name,last_name=user.profile.last_name)
-                    else:
-                        notification_text=MAINTENANCE_FALSE_NOTIFICATION_TEXT.format(username=user.profile.name,last_name=user.profile.last_name)
-                    send_to_user(user = user,notification_text=notification_text,message_type=CHANGE_MAINTENANCE_MESSAGE_TYPE)
+            update_maintenance(data=request.data)
             return Response(MAINTENANCE_UPDATED_SUCCESS,status=status.HTTP_200_OK)
         except:
             return Response(MAINTENANCE_CAN_NOT_UPDATE_ERROR,status=status.HTTP_400_BAD_REQUEST)
@@ -97,7 +98,7 @@ class ChangeMaintenance(generics.GenericAPIView):
 class GetMaintenance(generics.GenericAPIView):
     key:str = 'isMaintenance'
 
-    def get(self,request:Request) -> Response:
+    def get(self,request: Request) -> Response:
         try:
             with open('./project/project/config.json', 'r') as f:
                 data = f.read()

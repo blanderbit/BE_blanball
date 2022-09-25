@@ -5,6 +5,7 @@ from django.template.loader import render_to_string
 from .tasks import Util
 import random
 import string
+from project.constaints import *
 
 from rest_framework.serializers import Serializer
 
