@@ -110,10 +110,11 @@ class GetDeleteEvent(RetrieveAPIView):
     '''a class that allows you to get, update, delete an event'''
     serializer_class =  EventSerializer
     queryset = Event.objects.all()
+    permission_classes = [IsNotAuthenticated]
     
     def delete(self, request:Request,pk:int) -> Response:
         try:
-            event: Event = self.queryset.get(id = pk)
+            event: Event = self.queryset.filter(id = pk)
             if event.author.id == request.user.id:
                 event.delete()
                 return Response(EVENT_DELETED_SUCCESS,status=HTTP_200_OK)
@@ -130,7 +131,7 @@ class UpdateEvent(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception= True)
         try:
-            event:Event = self.queryset.filter(id = pk)
+            event: Event = self.queryset.filter(id = pk).select_related('author').prefetch_related('current_users','fans')
             if event[0].author.id == request.user.id:
                 send_notification_to_subscribe_event_user(event = event[0],
                 notification_text='event_updated',message_type=EVENT_UPDATE_MESSAGE_TYPE)
@@ -142,7 +143,6 @@ class UpdateEvent(GenericAPIView):
   
 class EventList(ListAPIView):
     '''class that allows you to get a complete list of events'''
-    permission_classes = [IsNotAuthenticated]
     serializer_class =  EventListSerializer
     filter_backends = (DjangoFilterBackend,OrderingFilter,SearchFilter,)
     filterset_class = EventDateTimeRangeFilter
@@ -150,7 +150,7 @@ class EventList(ListAPIView):
     search_fields = ('id','name','small_disc','price','place','date_and_time','amount_members')
     ordering_fields = ('id',)
     filterset_fields = ('type', 'need_ball','gender','status','duration')
-    queryset = Event.objects.all().select_related('author').prefetch_related('current_users').order_by('-id')
+    queryset = Event.objects.all().select_related('author').prefetch_related('current_users','fans').order_by('-id')
 
 class DeleteEvents(GenericAPIView):
     '''class that allows you to delete multiple events at once'''
@@ -235,7 +235,7 @@ class EventsRelevantList(ListAPIView):
 
 class UserEventsRelevantList(EventsRelevantList):
     def get_queryset(self) -> QuerySet:
-        return self.queryset.filter(author_id = self.request.user.id) 
+        return self.queryset.filter(author_id = self.request.user.id)
 
 class UserEvents(ListAPIView):
     serializer_class =  EventListSerializer
@@ -243,13 +243,14 @@ class UserEvents(ListAPIView):
     pagination_class = CustomPagination
     search_fields = ['id','name','small_disc','price','place','date_and_time','amount_members']
     filterset_fields = ['type']
-    queryset = Event.objects.all() 
+    queryset = Event.objects.all()
 
     def get_queryset(self) -> QuerySet:
         return self.queryset.filter(author_id = self.request.user.id) 
 
 class PopularIvents(UserEvents):
     serializer_class = PopularIventsListSerializer
+    # .select_related('author').prefetch_related('current_users','fans')
     queryset = Event.objects.filter(status = 'Planned')
 
     def get_queryset(self) -> QuerySet:

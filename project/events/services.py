@@ -44,6 +44,7 @@ def bulk_delete_events(serializer: Serializer,queryset: QuerySet,user: User) -> 
     deleted: list[int] = [] 
     not_deleted: list[int] = []
     for event_id in serializer.validated_data['events']:
+        print(serializer.validated_data['events'])
         event: Event = queryset.filter(id = event_id)
         if event:
             event = queryset.get(id = event_id)
@@ -54,7 +55,7 @@ def bulk_delete_events(serializer: Serializer,queryset: QuerySet,user: User) -> 
                 not_deleted.append(event_id)
         else:
             not_deleted.append(event_id)
-        return {"delete success": deleted, "delete error":  not_deleted}
+    return {"delete success": deleted, "delete error":  not_deleted}
 
 def bulk_accpet_or_decline(serializer: Serializer,queryset: QuerySet,user: User) -> dict[str,list[int]]:
     success: list[int] = []

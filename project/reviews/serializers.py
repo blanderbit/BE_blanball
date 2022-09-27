@@ -1,4 +1,5 @@
-from .models import *
+from reviews.models import Review
+from authentication.models import User
 from project.constaints import REVIEW_CREATE_ERROR,REVIEW_CREATE_MESSAGE_TYPE
 from notifications.tasks import send_to_user
 from collections import OrderedDict
@@ -35,7 +36,7 @@ class CreateReviewSerializer(serializers.ModelSerializer):
 class ReviewListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        exclude = ('user',)
+        fields = '__all__'
 
 class ReviewUpdateSerializer(serializers.ModelSerializer):
     class Meta:

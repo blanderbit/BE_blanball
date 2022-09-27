@@ -203,6 +203,7 @@ class UsersListSerializer(serializers.ModelSerializer):
     class Meta:
         model =  User
         fields= (
+            'id',
             'profile',
             'raiting',
             'role',

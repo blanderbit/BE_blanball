@@ -20,6 +20,9 @@ from rest_framework_simplejwt.tokens import(
 from rest_framework.serializers import ValidationError
 from rest_framework.status import HTTP_400_BAD_REQUEST
 
+# from storages.backends.ftp import FTPStorage
+
+
 from project.constaints import MIN_AGE_VALUE_ERROR,MAX_AGE_VALUE_ERROR
 
 class UserManager(BaseUserManager):
@@ -30,7 +33,6 @@ class UserManager(BaseUserManager):
         user.role = "User"
         user.save()
         return user
-
 
 class Gender(models.TextChoices):
     '''gender choices'''
@@ -76,7 +78,7 @@ class Profile(models.Model):
     last_name: str = models.CharField(max_length=255,)
     gender: str = models.CharField(choices = Gender.choices,max_length=10)
     birthday: date = models.DateField(blank=True,null = True,validators = [validate_birthday])
-    avatar: Image = models.ImageField(null=True,blank=True,upload_to = 'media/profile')
+    avatar: Image = models.ImageField(null=True,blank=True,upload_to='srv/sftp/')
     age: int = models.PositiveSmallIntegerField(null=True,blank=True)
     height: int = models.PositiveSmallIntegerField(null=True,blank=True,validators=[
             MinValueValidator(30),

@@ -37,6 +37,7 @@ services:
         condition: service_healthy
       redis: 
         condition: service_healthy
+
     links: 
       - redis
 
@@ -118,6 +119,17 @@ services:
     depends_on:
       db:
         condition: service_started
+  # ftp-server:
+  #   container_name: ftp-server
+  #   environment:
+  #     - FTP_USER=user
+  #     - FTP_PASS=pass
+  #   image: garethflowers/ftp-server
+  #   ports:
+  #     - '20-21:20-21/tcp'
+  #     - '40000-40009:40000-40009/tcp'
+  #   volumes:
+  #     - '/data:/home/user'
 
 networks:
   app-network:

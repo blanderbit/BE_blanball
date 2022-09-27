@@ -63,7 +63,7 @@ def profile_update(user:User,serializer: Serializer) -> None:
 
 def reset_password(serializer: Serializer) -> None:
     verify_code: str = serializer.validated_data['verify_code']
-    code: Code = Code.objects.get(value=verify_code)
+    code: Code = Code.objects.get(verify_code=verify_code)
     user: User = User.objects.get(email=code.user_email)
     user.set_password(serializer.validated_data['new_password'])
     user.save()

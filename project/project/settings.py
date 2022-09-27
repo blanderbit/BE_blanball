@@ -60,6 +60,7 @@ INSTALLED_APPS: tuple[str] = (
     'django_filters',
     'phonenumber_field',
     'channels',
+    'storages',
     
     'debug_toolbar',
 
@@ -197,8 +198,11 @@ CELERY_RESULT_SERIALIZER: str = 'json'
 CELERY_ACKS_LATE: bool = True
 CELERY_PREFETCH_MULTIPLIER: int = 1
 
-INTERNAL_IPS = ['localhost', '0.0.0.0', '127.0.0.1', '178.151.201.167']
+INTERNAL_IPS: list[str] = config('ALLOWED_HOSTS', cast=Csv())
 
 DEBUG_TOOLBAR_CONFIG = {
     "SHOW_TOOLBAR_CALLBACK": lambda request: True,
 }
+
+# DEFAULT_FILE_STORAGE = 'storages.backends.ftp.FTPStorage'
+# FTP_STORAGE_LOCATION = 'ftp://user:pass@ftp-server:40009'

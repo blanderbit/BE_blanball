@@ -127,20 +127,19 @@ class UserProfile(GenericAPIView):
 
 class UserList(ListAPIView):
     '''get all users list'''
-    permission_classes = [IsNotAuthenticated]
     serializer_class = UsersListSerializer
     pagination_class = CustomPagination
     filter_backends = (DjangoFilterBackend,SearchFilter,OrderingFilter,)
     filterset_class = UserAgeRangeFilter
     search_fields = ('profile__name','profile__gender','profile__last_name')
     ordering_fields = ('id','profile__age','raiting')
-    queryset = User.objects.filter(role='User').order_by('-id')
+    queryset = User.objects.filter(role='User').select_related('profile').order_by('-id')
 
 class UsersRelevantList(ListAPIView):
     '''getting the 5 most relevant users for your query'''
     filter_backends = (RankedFuzzySearchFilter,)
     serializer_class = UsersListSerializer
-    queryset = User.objects.filter(role='User')
+    queryset = User.objects.filter(role='User').select_related('profile')
     search_fields = ('profile__name','profile__last_name')
 
 class AdminUsersList(UserList):
@@ -248,21 +247,25 @@ class CheckCode(GenericAPIView):
             self.user.set_password(self.code.dop_info)
             send_email_template(user=self.user,body_title=PASS_UPDATE_SUCCESS_BODY_TITLE,title=PASS_UPDATE_SUCCESS_TITLE,
             text=PASS_UPDATE_SUCCESS_TEXT)
+            self.user.save()
             return Response(CHANGE_PASSWORD_SUCCESS,status=HTTP_200_OK) 
         elif self.code.type == EMAIL_CHANGE_CODE_TYPE:
             self.user.email = self.code.dop_info
             send_email_template(user=self.user,body_title=PASS_UPDATE_SUCCESS_BODY_TITLE,title=PASS_UPDATE_SUCCESS_TITLE,
             text=PASS_UPDATE_SUCCESS_TEXT)
+            self.user.save()
             return Response(CHANGE_EMAIL_SUCCESS,status=HTTP_200_OK) 
         elif self.code.type == EMAIL_VERIFY_CODE_TYPE:
             self.user.is_verified = True
             send_email_template(user=self.user,body_title=PASS_UPDATE_SUCCESS_BODY_TITLE,title=PASS_UPDATE_SUCCESS_TITLE,
             text=PASS_UPDATE_SUCCESS_TEXT)
+            self.user.save()
             return Response(ACTIVATION_SUCCESS,status=HTTP_200_OK)
         elif self.code.type == PHONE_CHANGE_CODE_TYPE:
             self.user.phone = self.code.dop_info
             send_email_template(user=self.user,body_title=PASS_UPDATE_SUCCESS_BODY_TITLE,title=PASS_UPDATE_SUCCESS_TITLE,
             text=PASS_UPDATE_SUCCESS_TEXT)
+            self.user.save()
             return Response(CHANGE_PHONE_SUCCESS,status=HTTP_200_OK)
         elif self.code.type == ACCOUNT_DELETE_CODE_TYPE:
             send_email_template(user=self.user,body_title=PASS_UPDATE_SUCCESS_BODY_TITLE,title=PASS_UPDATE_SUCCESS_TITLE,

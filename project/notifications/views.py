@@ -18,7 +18,7 @@ class NotificationsList(generics.ListAPIView):
     pagination_class = CustomPagination
     filter_backends = (filters.OrderingFilter,)
     ordering_fields = ('id',)
-    queryset = Notification.objects.all().order_by('-id')
+    queryset = Notification.objects.all().select_related('user').order_by('-id')
 
 
 class UserNotificationsList(NotificationsList):     

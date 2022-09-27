@@ -1,10 +1,6 @@
-from project.celery import app
 from notifications.models import Notification
 from authentication.models  import User,ActiveUser
-from authentication.tasks import Util
 from events.models import Event
-
-from django.template.loader import render_to_string
 
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
