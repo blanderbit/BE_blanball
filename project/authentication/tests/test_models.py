@@ -1,6 +1,10 @@
 import jwt
-from authentication.models import *
+from authentication.models import (
+    Profile,
+    User,
+)
 from django.conf import settings
+
 from .set_up import SetUpAuthenticationModels
 
 
@@ -19,6 +23,7 @@ class TestAuthenticationModels(SetUpAuthenticationModels):
     def test_check_user_defalut_fields(self) -> None:
         self.assertEqual(self.user.get_planned_events,'1m')
         self.assertEqual(self.user.group_name,'user_1')
+        self.assertEqual(self.user.role,'User')
         self.assertEqual(self.user.__str__(),'user@example.com')
 
     def test_user_tokens_method(self) -> None:

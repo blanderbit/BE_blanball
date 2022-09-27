@@ -18,13 +18,13 @@ from notifications.tasks import send_to_user
 
 def validate_user_before_join_to_event(user: User,event: Event) -> None:
     if user.current_rooms.filter(id=event.id).exists():
-        return ValidationError(ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,status=HTTP_400_BAD_REQUEST)
+        return ValidationError(ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,HTTP_400_BAD_REQUEST)
     if user.current_views_rooms.filter(id=event.id).exists():
-        raise ValidationError(ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR,status=HTTP_400_BAD_REQUEST)
-    if event.author_id != user.id:
-        return ValidationError(EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,status=HTTP_400_BAD_REQUEST)
+        raise ValidationError(ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR,HTTP_400_BAD_REQUEST)
+    if event.author_id == user.id:
+        return ValidationError(EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,HTTP_400_BAD_REQUEST)
     if not RequestToParticipation.objects.filter(user=user,event=event.id,event_author=event.author):
-        return ValidationError(ALREADY_SENT_REQUEST_TO_PARTICIPATE,status=HTTP_400_BAD_REQUEST)
+        return ValidationError(ALREADY_SENT_REQUEST_TO_PARTICIPATE,HTTP_400_BAD_REQUEST)
 
 def filter_event_by_user_planned_events_time(pk: int,queryset: QuerySet) -> QuerySet:
     user:User =  User.objects.get(id=pk)
