@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from types import NoneType
 
 from rest_framework.test import APITestCase
 from authentication.models import *
@@ -7,7 +8,7 @@ from django.urls import reverse
 
 
 class LoginUserSetUp:
-    def auth(self):
+    def auth(self) -> NoneType:
         data = {
             "email": "user@example.com",
             "phone": "+380683861969",

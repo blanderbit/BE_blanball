@@ -11,7 +11,6 @@ REVIEW_CREATE_SUCCESS = {'success': 'Review create'}
 ACTIVATION_SUCCESS = {'success': 'Activation by email'}
 ACCOUNT_DELETED_SUCCESS = {'success':  'Account deleted'}
 PASSWORD_RESET_SUCCESS = {'success': 'Password reset'}
-CREATE_EVENT_ERROR = {'error': 'You cannot invite more people than the number of '}
 
 #EVENT
 EVENT_DELETED_SUCCESS = {'success':  'Event deleted'}
@@ -64,6 +63,7 @@ MAX_AGE_VALUE_ERROR = {'error': 'Age must not exceed 100 years old'}
 MIN_AGE_VALUE_ERROR = {'error': 'Age must be at least 6 years old'}
 CONFIGURATION_IS_REQUIRED_ERROR = {'error': 'Сonfiguration should contain fields like: email,phone,send_email'}
 
+BLANBALL = 'BlanBall'
 
 EMAIL_MESSAGE_TEMPLATE_TITLE = '{type} {key} у додатку Blanball'
 
@@ -83,6 +83,8 @@ AFTER_RESET_PASSWORD_EMAIL_TEXT = '{user_name} {user_last_name},ваш паро�
 
 NEW_USER_ON_THE_EVENT_NOTIFICATION = '{author_name},на вашу подію під номером {event_id} долучився {user_type} гравець'
 
+LEAVE_USER_FROM_THE_EVENT_NOTIFICATION = '{author_name},з вашої події під {event_id} відключився гравець'
+
 NEW_REQUEST_TO_PARTICIPATION = '{author_name},вам надійшов новий запит на участь у події під номером №{event_id}'
 NEW_REQUEST_TO_PARTICIPATION_MESSAGE_TYPE = 'new_request_to_participation'
 
@@ -94,9 +96,25 @@ APPLICATION_FOR_PARTICIPATION_SUCCESS = {'success':'Your application for partici
 
 ALREADY_SENT_REQUEST_TO_PARTICIPATE = {'error':'You have already sent a request to participate'}
 
+CONFIG_FILE_ERROR = {'error':'Config file is not available now'}
+
 INVITE_USER_TO_EVENT_MESSAGE_TYPE = 'invite_user_to_event'
 EVENT_DELETE_MESSAGE_TYPE = 'event_deleted'
 EVENT_UPDATE_MESSAGE_TYPE = 'event_updated'
 CHANGE_MAINTENANCE_MESSAGE_TYPE = 'change_maintenance'
 EVENT_TIME_NOTIFICATION_MESSAGE_TYPE ='event_time_notification'
 REVIEW_CREATE_MESSAGE_TYPE = 'review_creaete'
+
+
+
+REGISTER_SUCCESS_BODY_TITLE = 'Реєстрація пройшла успішно'
+REGISTER_SUCCESS_TITLE = 'Дякуємо за реєстрацію у BlanBall'
+REGISTER_SUCCESS_TEXT = 'Ви отримали це повідомлення, оскільки цю електронну скриньку зареєстровано в додатку BlanBall.'
+
+PASS_UPDATE_SUCCESS_BODY_TITLE  = 'Зміна пароля пройшла успішно'
+PASS_UPDATE_SUCCESS_TITLE = 'Ваш пароль змінено'
+PASS_UPDATE_SUCCESS_TEXT = 'Ви отримали це повідомлення, оскільки ваш пароль було змінено в додатку BlanBall.'
+
+
+RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION = '{user_name},ваша заявка на участь у події № {event_id} було {response_type}'
+RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_MESSAGE_TYPE = 'response_to_request_for_participation' 

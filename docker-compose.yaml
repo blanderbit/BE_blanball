@@ -1,0 +1,140 @@
+version: "3.8"
+
+services:
+
+  db:
+    container_name: db
+    env_file: 
+      - ./compose/.env
+    image: "postgres:latest"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    ports: 
+      - "5432:5432"
+    healthcheck:
+      test: pg_isready -U postgres -d postgres
+      timeout: 40s
+      retries: 20
+
+  api:
+    container_name: api
+    env_file: 
+      - ./compose/.env
+    command: bash compose/local/django-start.sh
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    volumes: 
+      - .:/usr/src/blanball
+    networks:
+      - app-network
+    ports: 
+      - "8000:8000"
+    depends_on:
+      db: 
+        condition: service_healthy
+      redis: 
+        condition: service_healthy
+
+    links: 
+      - redis
+
+  redis:
+    container_name: redis
+    env_file:
+      - ./compose/.env
+    image: "redis:7.0.4-alpine"
+    volumes: 
+      - redis-data:/usr/src/blanball/storage/redis/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      timeout: 3s
+      retries: 5
+
+  celery-worker: 
+    container_name: celery-worker
+    env_file: 
+      - ./compose/.env
+    command: bash compose/local/celery-worker-start.sh
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    volumes: 
+      - .:/usr/src/blanball
+    networks:
+      - app-network
+    depends_on:
+      db:
+        condition: service_started
+      api:
+        condition: service_started
+
+  celery-beat:
+    container_name: celery-beat
+    env_file: 
+      - ./compose/.env 
+    command: bash compose/local/celery-beat-start.sh
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    volumes: 
+      - .:/usr/src/blanball
+    networks:
+      - app-network
+    depends_on:
+      db:
+        condition: service_started
+      api:
+        condition: service_started  
+
+  pgadmin:
+    container_name: pgadmin
+    env_file: 
+      - ./compose/.env
+    image: dpage/pgadmin4
+    volumes:
+      - pgadmin-data:/usr/src/blanball/storage/pgadmin/data
+    networks:
+      - app-network
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: gameonly1921@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: admin1921
+    
+  db_backup:
+    container_name: db_backup
+    env_file: 
+      - ./compose/.env
+    image: prodrigestivill/postgres-backup-local
+    restart: always
+    volumes:
+      - ./backup:/backups
+    networks:
+      - app-network
+    depends_on:
+      db:
+        condition: service_started
+  # ftp-server:
+  #   container_name: ftp-server
+  #   environment:
+  #     - FTP_USER=user
+  #     - FTP_PASS=pass
+  #   image: garethflowers/ftp-server
+  #   ports:
+  #     - '20-21:20-21/tcp'
+  #     - '40000-40009:40000-40009/tcp'
+  #   volumes:
+  #     - '/data:/home/user'
+
+networks:
+  app-network:
+     driver: bridge
+
+volumes:
+  redis-data:
+  pgadmin-data:

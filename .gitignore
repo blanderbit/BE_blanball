@@ -93,3 +93,8 @@ celerybeat-schedule
 backup/
 
 postgres-data/
+
+project/static/admin/
+project/static/drf-yasg/
+project/static/rest-framework/
+project/static/rest_framework_swagger/

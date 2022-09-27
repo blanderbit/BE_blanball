@@ -1,15 +1,16 @@
 import json
-from webbrowser import GenericBrowser
 
 from .tasks import send_to_user
-
 from .serializers import *
 from .models import *
 from project.constaints import *
 from project.services import CustomPagination
 
+from django.db.models.query import QuerySet
+
 from rest_framework import generics,status,filters
 from rest_framework.response import Response
+from rest_framework.request import Request
 
 
 class NotificationsList(generics.ListAPIView):
@@ -17,22 +18,22 @@ class NotificationsList(generics.ListAPIView):
     pagination_class = CustomPagination
     filter_backends = (filters.OrderingFilter,)
     ordering_fields = ('id',)
-    queryset = Notification.objects.all().order_by('-id')
+    queryset = Notification.objects.all().select_related('user').order_by('-id')
 
 
 class UserNotificationsList(NotificationsList):     
-    def get_queryset(self) -> list:
+    def get_queryset(self) -> QuerySet:
         return self.queryset.filter(user_id = self.request.user.id)
 
 class ReadNotifications(generics.GenericAPIView):
     serializer_class = ReadOrDeleteNotificationsSerializer
     queryset = Notification.objects.all()
     
-    def post(self,request) -> Response:
+    def post(self,request:Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        read = [] 
-        not_read = []
+        read:list = [] 
+        not_read:list = []
         for notification in serializer.validated_data['notifications']:
             notify = self.queryset.filter(id = notification)
             if notify:
@@ -52,11 +53,11 @@ class DeleteNotifcations(generics.GenericAPIView):
     serializer_class = ReadOrDeleteNotificationsSerializer
     queryset = Notification.objects.all()
 
-    def post(self,request) -> Response:
+    def post(self,request:Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        deleted = [] 
-        not_deleted = []
+        deleted:list = [] 
+        not_deleted:list = []
         for notification in serializer.validated_data['notifications']:
             notify =  self.queryset.filter(id = notification)
             if notify:
@@ -71,35 +72,39 @@ class DeleteNotifcations(generics.GenericAPIView):
         return Response({"delete success": deleted, "delete error":  not_deleted},status=status.HTTP_200_OK)
 
 
+def update_maintenance(data: dict[str,str]):
+    with open('./project/project/config.json', 'w') as f:
+        json.dump(data,f)
+        for user in User.objects.all():
+            if data["isMaintenance"] == True:
+                notification_text=MAINTENANCE_TRUE_NOTIFICATION_TEXT.format(username=user.profile.name,last_name=user.profile.last_name)
+            else:
+                notification_text=MAINTENANCE_FALSE_NOTIFICATION_TEXT.format(username=user.profile.name,last_name=user.profile.last_name)
+            send_to_user(user = user,notification_text=notification_text,message_type=CHANGE_MAINTENANCE_MESSAGE_TYPE)
 
 class ChangeMaintenance(generics.GenericAPIView):
     serializer_class = ChangeMaintenanceSerializer
 
-    def post(self,request) -> Response:
+    def post(self,request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        data = request.data
         try:
-            with open('./project/project/config.json', 'w') as f:
-                json.dump(data,f)
-                for user in User.objects.all():
-                    if data["isMaintenance"] == True:
-                        notification_text=MAINTENANCE_TRUE_NOTIFICATION_TEXT.format(username=user.profile.name,last_name=user.profile.last_name)
-                    else:
-                        notification_text=MAINTENANCE_FALSE_NOTIFICATION_TEXT.format(username=user.profile.name,last_name=user.profile.last_name)
-                    send_to_user(user = user,notification_text=notification_text,message_type=CHANGE_MAINTENANCE_MESSAGE_TYPE)
+            update_maintenance(data=request.data)
             return Response(MAINTENANCE_UPDATED_SUCCESS,status=status.HTTP_200_OK)
         except:
             return Response(MAINTENANCE_CAN_NOT_UPDATE_ERROR,status=status.HTTP_400_BAD_REQUEST)
 
 
 class GetMaintenance(generics.GenericAPIView):
-    serializer_class = ChangeMaintenanceSerializer
+    key:str = 'isMaintenance'
 
-    def get(self,request) -> Response:
+    def get(self,request: Request) -> Response:
         try:
             with open('./project/project/config.json', 'r') as f:
                 data = f.read()
-            return Response(data,status=status.HTTP_200_OK)
+            return Response({self.key:json.loads(data)[self.key]},status=status.HTTP_200_OK)
         except:
-            return Response()
+            return Response(CONFIG_FILE_ERROR,status=status.HTTP_400_BAD_REQUEST)
+
+class GetCurrentVersion(GetMaintenance):
+    key:str = 'version'

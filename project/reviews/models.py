@@ -9,8 +9,8 @@ class Review(models.Model):
     text:str =  models.CharField(max_length=200)
     time_created:datetime = models.DateTimeField(auto_now_add=True)
     stars:int =  models.PositiveSmallIntegerField(validators=[MinValueValidator(1),MaxValueValidator(5)])
-    user:int =  models.ForeignKey(User,on_delete=models.PROTECT,related_name='reviews')
+    user:User =  models.ForeignKey(User,on_delete=models.PROTECT,related_name='reviews')
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.email
         

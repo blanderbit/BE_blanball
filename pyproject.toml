@@ -26,6 +26,11 @@ python-decouple = "^3.6"
 Pillow = "^9.2.0"
 phonenumberslite = "^8.12.55"
 djangochannelsrestframework = "^1.1.0"
+django-rest-fuzzysearch = "^0.5.1"
+mypy = "^0.971"
+django-debug-toolbar = "^3.6.0"
+django-storages = "^1.13.1"
+paramiko = "^2.11.0"
 
 [tool.poetry.dev-dependencies]
 

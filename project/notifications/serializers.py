@@ -1,4 +1,4 @@
-from .models import Notification
+from notifications.models import Notification
 
 from rest_framework import serializers
 
@@ -11,7 +11,10 @@ class NotificationSerializer(serializers.ModelSerializer):
 class UserNotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
-        fields = ('notification_text','time_created')
+        fields = (
+            'notification_text',
+            'time_created',
+        )
 
 
 class ReadOrDeleteNotificationsSerializer(serializers.Serializer):
