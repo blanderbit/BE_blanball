@@ -1,15 +1,11 @@
-from project.celery import app
 from notifications.models import Notification
 from authentication.models  import User,ActiveUser
-from authentication.tasks import Util
 from events.models import Event
-
-from django.template.loader import render_to_string
 
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
-def send_to_user(user:User,notification_text:str,message_type:str) -> None:
+def send_to_user(user: User,notification_text: str,message_type: str) -> None:
     channel_layer = get_channel_layer()
     Notification.objects.create(user=user,notification_text=f'{notification_text}')
     if ActiveUser.objects.filter(user = user.id):

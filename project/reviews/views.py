@@ -1,23 +1,22 @@
 from .serializers import *
 from .models import *
-from project.services import CustomPagination,GetPutDeleteAPIView
+from project.services import CustomPagination
 from django.db.models.query import QuerySet
 
-from rest_framework import generics
+from rest_framework.generics import (
+    CreateAPIView,
+    ListAPIView,
+)
 
 
-class ReviewCreate(generics.CreateAPIView):
+class ReviewCreate(CreateAPIView):
     serializer_class = CreateReviewSerializer
-    queryset = Review.objects.all()
+    queryset = Review.objects.all().select_related('user')
 
-class UserReviewsList(generics.ListAPIView):
+class UserReviewsList(ListAPIView):
     serializer_class =  ReviewListSerializer
     pagination_class = CustomPagination
-    queryset = Review.objects.all()
+    queryset = Review.objects.all().select_related('user')
 
     def get_queryset(self) -> QuerySet:
-        return self.queryset.filter(user_id = self.request.user).order_by('-time_created')
-
-class GetPutDeleteReview(GetPutDeleteAPIView):
-    serializer_class =  ReviewUpdateSerializer
-    queryset = Review.objects.all()
+        return self.queryset.filter(user = self.request.user.id).order_by('-time_created')

@@ -10,7 +10,6 @@ app = Celery('project')
 app.config_from_object('django.conf:settings',namespace ='CELERY')
 app.autodiscover_tasks()
 
-
 app.conf.beat_schedule = {
     'delete_expire_codes': {
         'task':'authentication.tasks.delete_expire_codes',

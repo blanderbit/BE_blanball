@@ -5,49 +5,45 @@ import django
 from django.utils.encoding import smart_str
 
 from typing import Union,Any
-
 from pathlib import Path
 from decouple import config, Csv
 
-
-
 django.utils.encoding.smart_text = smart_str
-
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Internationalization
-LANGUAGE_CODE:str = config('LANGUAGE_CODE')
+LANGUAGE_CODE: str = config('LANGUAGE_CODE')
 
-TIME_ZONE:str = config('TIME_ZONE')
-USE_I18N:bool = config('USE_I18N',cast = bool,default = True)
-USE_TZ:bool = config('USE_TZ',cast = bool,default = True)
+TIME_ZONE: str = config('TIME_ZONE')
+USE_I18N: bool = config('USE_I18N',cast = bool,default = True)
+USE_TZ: bool = config('USE_TZ',cast = bool,default = True)
 
-DEFAULT_AUTO_FIELDL:str = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELDL: str = 'django.db.models.BigAutoField'
 
 
 # Static files
-STATIC_URL:str = '/static/'
-STATIC_ROOT:str = os.path.join(BASE_DIR,'static')
+STATIC_URL: str = '/static/'
+STATIC_ROOT: str = os.path.join(BASE_DIR,'static')
 
-MEDIA_URL:str = '/media/'
-MEDIA_ROOT:str = os.path.join(BASE_DIR,'media')
+MEDIA_URL: str = '/media/'
+MEDIA_ROOT: str = os.path.join(BASE_DIR,'media')
 
-SECRET_KEY:str = config('SECRET_KEY')
+SECRET_KEY: str = config('SECRET_KEY')
 
-WSGI_APPLICATION:str = 'project.wsgi.application'
-ASGI_APPLICATION:str = 'project.asgi.application'
+WSGI_APPLICATION: str = 'project.wsgi.application'
+ASGI_APPLICATION: str = 'project.asgi.application'
 
-ROOT_URLCONF:str = 'project.urls'
+ROOT_URLCONF: str = 'project.urls'
 
-DEBUG:bool = config('DEBUG',cast = bool,default = True)
+DEBUG: bool = config('DEBUG',cast = bool,default = True)
 
-AUTH_USER_MODEL:str = config('AUTH_USER_MODEL')
+AUTH_USER_MODEL: str = config('AUTH_USER_MODEL')
 
-ALLOWED_HOSTS:list[str] = config('ALLOWED_HOSTS', cast=Csv())
+ALLOWED_HOSTS: list[str] = config('ALLOWED_HOSTS', cast=Csv())
 
 # Application definition:
-INSTALLED_APPS:tuple[str] = (
+INSTALLED_APPS: tuple[str] = (
     # Default django apps:
     'django.contrib.admin',
     'django.contrib.auth',
@@ -60,12 +56,13 @@ INSTALLED_APPS:tuple[str] = (
     'rest_framework_swagger',
     'rest_framework',
     'django_inlinecss',
-    'django_elasticsearch_dsl',
-    'django_elasticsearch_dsl_drf',
     'drf_yasg',
     'django_filters',
     'phonenumber_field',
     'channels',
+    'storages',
+    
+    'debug_toolbar',
 
     #My apps:
     'events.apps.EventsConfig',
@@ -74,13 +71,8 @@ INSTALLED_APPS:tuple[str] = (
     'reviews.apps.ReviewsConfig',
 )
 
-ELASTICSEARCH_DSL:dict[str,Any] = {
-    'default': {
-        'hosts': 'elasticsearch:9200',
-    }
-}
 
-MIDDLEWARE:tuple[str] = (
+MIDDLEWARE: tuple[str] = (
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -88,14 +80,15 @@ MIDDLEWARE:tuple[str] = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 
 #POSTGRES conected datdabse settings
 
-DATABASES:dict[str,Any] = {
+DATABASES: dict[str,Any] = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': config('DB_ENGINE'),
         'NAME':  config('POSTGRES_DB'),
         'USER': config('POSTGRES_USER'),
         'PASSWORD': config('POSTGRES_PASSWORD'),
@@ -104,7 +97,7 @@ DATABASES:dict[str,Any] = {
     }
 }
 
-CHANNEL_LAYERS:dict[str,Any] = {
+CHANNEL_LAYERS: dict[str,Any] = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
@@ -114,7 +107,7 @@ CHANNEL_LAYERS:dict[str,Any] = {
 }
 
 
-SWAGGER_SETTINGS:dict[str,Union[str,dict[str,Any]]] = {
+SWAGGER_SETTINGS: dict[str,Union[str,dict[str,Any]]] = {
     'SHOW_REQUEST_HEADERS': config('SHOW_REQUEST_HEADERS',cast = bool),
     'SECURITY_DEFINITIONS': {
         'Bearer': {
@@ -135,7 +128,7 @@ SWAGGER_SETTINGS:dict[str,Union[str,dict[str,Any]]] = {
 
 
 
-TEMPLATES:list[dict[str,Any]] = [
+TEMPLATES: list[dict[str,Any]] = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(BASE_DIR, 'templates')],
@@ -152,7 +145,7 @@ TEMPLATES:list[dict[str,Any]] = [
 ]
 
 
-AUTH_PASSWORD_VALIDATORS:tuple[dict[str,str]] = (
+AUTH_PASSWORD_VALIDATORS: tuple[dict[str,str]] = (
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
@@ -167,7 +160,7 @@ AUTH_PASSWORD_VALIDATORS:tuple[dict[str,str]] = (
     },
 )
 
-REST_FRAMEWORK:dict[str,Any]  = {
+REST_FRAMEWORK: dict[str,Any]  = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
@@ -180,7 +173,7 @@ REST_FRAMEWORK:dict[str,Any]  = {
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
 
-SIMPLE_JWT:dict[str,Any] = {
+SIMPLE_JWT: dict[str,Any] = {
     'AUTH_HEADER_TYPES': (config('AUTH_HEADER_TYPES')),
     'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=config('ACCESS_TOKEN_LIFETIME',cast = int)),
     'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=config('REFRESH_TOKEN_LIFETIME',cast = int)),
@@ -188,19 +181,28 @@ SIMPLE_JWT:dict[str,Any] = {
 
 
 #conected smpt gmail settings
-EMAIL_BACKEND:str='django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST:str = config('EMAIL_HOST')
-EMAIL_PORT:int = config('EMAIL_PORT',cast = int)
-EMAIL_USE_TLS:bool = config('EMAIL_USE_TLS',cast = bool)
-EMAIL_HOST_USER:str = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD:str = config('EMAIL_HOST_PASSWORD')
+EMAIL_BACKEND: str = config('EMAIL_BACKEND')
+EMAIL_HOST: str = config('EMAIL_HOST')
+EMAIL_PORT: int = config('EMAIL_PORT',cast = int)
+EMAIL_USE_TLS: bool = config('EMAIL_USE_TLS',cast = bool)
+EMAIL_HOST_USER: str = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD: str = config('EMAIL_HOST_PASSWORD')
 
 #celery framework settings
-CELERY_BROKER_URL:str = config('CELERY_BROKER_URL')
-CELERY_BROKER_TRANSPORT_OPTIONS:dict[str,int] = {'visibility_timeout': 3600}
-CELERY_RESULT_BACKEND:str = config('CELERY_RESULT_BACKEND')
+CELERY_BROKER_URL: str = config('CELERY_BROKER_URL')
+CELERY_BROKER_TRANSPORT_OPTIONS: dict[str,int] = {'visibility_timeout': 3600}
+CELERY_RESULT_BACKEND: str = config('CELERY_RESULT_BACKEND')
 CELERY_ACCEPT_CONTENT = {'application/json'}
-CELERY_TASK_SERIALIZER:str = 'json'
-CELERY_RESULT_SERIALIZER:str = 'json'
-CELERY_ACKS_LATE:bool = True
-CELERY_PREFETCH_MULTIPLIER:int = 1
+CELERY_TASK_SERIALIZER: str = 'json'
+CELERY_RESULT_SERIALIZER: str = 'json'
+CELERY_ACKS_LATE: bool = True
+CELERY_PREFETCH_MULTIPLIER: int = 1
+
+INTERNAL_IPS: list[str] = config('ALLOWED_HOSTS', cast=Csv())
+
+DEBUG_TOOLBAR_CONFIG = {
+    "SHOW_TOOLBAR_CALLBACK": lambda request: True,
+}
+
+# DEFAULT_FILE_STORAGE = 'storages.backends.ftp.FTPStorage'
+# FTP_STORAGE_LOCATION = 'ftp://user:pass@ftp-server:40009'

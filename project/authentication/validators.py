@@ -1,17 +1,15 @@
-from .models import Code
+from authentication.models import Code
 from project.constaints import *
 from collections import OrderedDict
 from django.utils import timezone
 
 from rest_framework import status,serializers
 
-
-
 class CodeValidator:
-    def __init__(self,token_type:list[str]) -> None:
+    def __init__(self,token_type: list[str]) -> None:
         self.token_type = token_type
 
-    def __call__(self, attrs) -> OrderedDict:
+    def __call__(self, attrs: OrderedDict) -> OrderedDict:
         self.verify_code = attrs.get('verify_code')
         self.code = Code.objects.filter(verify_code = self.verify_code)
         if not self.code:

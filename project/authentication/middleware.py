@@ -1,18 +1,19 @@
-from .models import User
-from collections import OrderedDict
-
 import os
-from datetime import datetime
 import django
 import jwt
+
+from datetime import datetime
+from typing import Any,Union
+from collections import OrderedDict
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.db import close_old_connections
 
-
 from channels.db import database_sync_to_async
 from channels.middleware import BaseMiddleware
+
+from authentication.models import User
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
@@ -20,9 +21,9 @@ django.setup()
 ALGORITHM = "HS256"
 
 @database_sync_to_async
-def get_user(token:str) -> User:
+def get_user(token: str) -> Union[AnonymousUser,User]:
     try:
-        payload:dict = jwt.decode(token, settings.SECRET_KEY, algorithms=ALGORITHM)
+        payload:dict[str,Any] = jwt.decode(token, settings.SECRET_KEY, algorithms=ALGORITHM)
     except User.DoesNotExist:
         return AnonymousUser()
 
@@ -40,10 +41,10 @@ def get_user(token:str) -> User:
 
 class TokenAuthMiddleware(BaseMiddleware):
 
-    async def __call__(self, scope, receive, send) -> OrderedDict:
+    async def __call__(self, scope: dict, receive, send) -> Union[ValueError,OrderedDict]:
         close_old_connections()
         try:
-            token_key:str = (dict((x.split('=') for x in scope['query_string'].decode().split("&")))).get('token', None)
+            token_key: str = (dict((x.split('=') for x in scope['query_string'].decode().split("&")))).get('token', None)
         except ValueError:
             token_key = None
     

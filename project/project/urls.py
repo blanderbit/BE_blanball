@@ -1,17 +1,21 @@
 from .yasg import urlpatterns as doc_urls
+import debug_toolbar
 
 from django.urls import path,include
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('events/api/v1/', include('events.urls')),
-    path('authentication/api/v1/', include('authentication.urls')),
-    path('notifications/api/v1/',include('notifications.urls')),
-    path('reviews/api/v1/',include('reviews.urls')),
+    path('events/api/v1/', include('events.urls'),name='events'),
+    path('authentication/api/v1/', include('authentication.urls'),name='authentication'),
+    path('notifications/api/v1/',include('notifications.urls'),name='notifications'),
+    path('reviews/api/v1/',include('reviews.urls'),name='reviews'),
 ]
 
 if settings.DEBUG:
+    urlpatterns = [ 
+        path('__debug__/', include(debug_toolbar.urls)),
+    ] + urlpatterns
     urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
 
 urlpatterns += doc_urls
