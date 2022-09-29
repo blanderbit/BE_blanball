@@ -68,5 +68,6 @@ def reset_password(serializer: Serializer) -> None:
     user.set_password(serializer.validated_data['new_password'])
     user.save()
     code.delete()
-    send_email_template(user=user,body_title=PASS_UPDATE_SUCCESS_BODY_TITLE,title=PASS_UPDATE_SUCCESS_TITLE,
-        text=PASS_UPDATE_SUCCESS_TEXT)
+    send_email_template(user=user,body_title=TEMPLATE_SUCCESS_BODY_TITLE.format(body='паролю'),
+            title=TEMPLATE_SUCCESS_TITLE.format(body='пароль'),
+            text=TEMPLATE_SUCCESS_TEXT.format(body='оскільки ваш пароль було змінено'))

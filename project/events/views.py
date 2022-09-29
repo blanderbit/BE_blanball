@@ -195,7 +195,7 @@ class FanJoinToEvent(GenericAPIView):
         if not user.current_views_rooms.filter(id=serializer.data['event_id']).exists():
             user.current_views_rooms.add(event)
             return Response(JOIN_TO_EVENT_SUCCESS,status=HTTP_200_OK)
-        return Response(ALREADY_IN_EVENT_FANS_LIST_ERROR,status=HTTP_400_BAD_REQUEST)
+        return Response(ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,status=HTTP_400_BAD_REQUEST)
 
 class FanLeaveFromEvent(GenericAPIView):
     serializer_class = JoinOrRemoveRoomSerializer

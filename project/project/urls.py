@@ -1,5 +1,4 @@
 from .yasg import urlpatterns as doc_urls
-import debug_toolbar
 
 from django.urls import path,include
 from django.conf import settings
@@ -13,9 +12,11 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-    urlpatterns = [ 
-        path('__debug__/', include(debug_toolbar.urls)),
-    ] + urlpatterns
+    # import debug_toolbar
+
+    # urlpatterns += [
+    #     path('__debug__/', include(debug_toolbar.urls)),
+    # ]
     urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
 
 urlpatterns += doc_urls
