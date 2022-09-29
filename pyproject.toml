@@ -31,6 +31,7 @@ mypy = "^0.971"
 django-debug-toolbar = "^3.6.0"
 django-storages = "^1.13.1"
 paramiko = "^2.11.0"
+freezegun = "^1.2.2"
 
 [tool.poetry.dev-dependencies]
 

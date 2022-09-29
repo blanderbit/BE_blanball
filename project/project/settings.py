@@ -62,7 +62,7 @@ INSTALLED_APPS: tuple[str] = (
     'channels',
     'storages',
     
-    'debug_toolbar',
+    # 'debug_toolbar',
 
     #My apps:
     'events.apps.EventsConfig',
@@ -80,7 +80,7 @@ MIDDLEWARE: tuple[str] = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 
@@ -204,5 +204,8 @@ DEBUG_TOOLBAR_CONFIG = {
     "SHOW_TOOLBAR_CALLBACK": lambda request: True,
 }
 
-# DEFAULT_FILE_STORAGE = 'storages.backends.ftp.FTPStorage'
-# FTP_STORAGE_LOCATION = 'ftp://user:pass@ftp-server:40009'
+DEFAULT_FILE_STORAGE = config('FILE_STORAGE')
+FTP_USER = config('FTP_USER')
+FTP_PASS = config('FTP_PASS')
+FTP_PORT = config('FTP_PORT', cast = int)
+FTP_STORAGE_LOCATION = f'ftp://{FTP_USER}:{FTP_PASS }@ftp-server:{FTP_PORT}'
