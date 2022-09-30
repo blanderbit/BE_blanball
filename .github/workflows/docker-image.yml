@@ -10,8 +10,25 @@ jobs:
       matrix:
         python-version: ["3.10.7"]
         poetry-version: ["1.2.0"]
+    services:
+      db:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: 19211921
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      redis:
+        image: "redis:7.0.4-alpine"
+        ports:
+          - 6379:6379
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@master
       with: 
         clean: 'false'
     - name: Set up Python ${{ matrix.python-version }}
@@ -29,10 +46,12 @@ jobs:
     - name: Run tests
       run: |
         echo $ENV_FILE | base64 --decode > .env
-        poetry run python3 project/manage.py test
+        cd project
+        poetry run python3 manage.py makemigrations
+        poetry run python3 manage.py migrate
+        poetry run python3 manage.py test --no-input
 
   auto_deploy:
-    needs: [run_tests]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/dev_test' || github.ref == 'refs/heads/master_test'
     steps:
@@ -78,4 +97,4 @@ jobs:
         
     - name: Trigger deploy in portainer
       run: |
-        curl -X POST ${{ env.WEBHOOK }}
+        curl -X POST ${{ env.WEBHOOK }} 
