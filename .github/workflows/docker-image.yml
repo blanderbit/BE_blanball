@@ -1,14 +1,44 @@
 on:
   push:
-    branches: ["develop","main"]
 
 jobs:
-  deploy:
+  run_tests:
     runs-on: ubuntu-latest
+    env:
+      ENV_FILE: ${{ secrets.ENV_FILE }}
+    strategy:
+      matrix:
+        python-version: ["3.10.7"]
+        poetry-version: ["1.2.0"]
+    steps:
+    - uses: actions/checkout@v2
+      with: 
+        clean: 'false'
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install poetry
+      run: |
+        pip install --upgrade pip
+        pip install poetry==${{ matrix.poetry-version }}
+    - name: Install deps
+      run: |
+        poetry run pip install -U pip 
+        poetry install 
+    - name: Run tests
+      run: |
+        echo $ENV_FILE | base64 --decode > .env
+        poetry run python3 project/manage.py test
+
+  auto_deploy:
+    needs: [run_tests]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/dev_test' || github.ref == 'refs/heads/master_test'
     steps:
     - uses: actions/checkout@master
     - name: Set env vars (TEST)
-      if: github.ref == 'refs/heads/develop'
+      if: github.ref == 'refs/heads/dev_test'
       run: |
         echo "DOCKERFILE_PATH=Dockerfile" >> $GITHUB_ENV
         echo "WEBHOOK=${{ secrets.PORTAINER_WEBHOOK_URL_TEST }}" >> $GITHUB_ENV
@@ -16,7 +46,7 @@ jobs:
         echo "LATEST_IMAGE=${{ secrets.DOCKER_REGISTRY_TEST }}":latest >> $GITHUB_ENV
         echo "COMMIT_IMAGE=${{ secrets.DOCKER_REGISTRY_TEST }}":${{ github.sha }} >> $GITHUB_ENV
     - name: Set env vars (PROD)
-      if: github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/master_test'
       run: |
         echo "DOCKERFILE_PATH=Dockerfile" >> $GITHUB_ENV
         echo "REGISTRY=${{ secrets.DOCKER_REGISTRY_TEST }}" >> $GITHUB_ENV
@@ -37,7 +67,7 @@ jobs:
     - name: Build image
       working-directory: .
       run: |
-        docker build -f ${{ env.DOCKERFILE_PATH }} --cache-from ${{ env.LATEST_IMAGE }} -t ${{ env.COMMIT_IMAGE }}  .
+        docker build -f ${{ env.DOCKERFILE_PATH }} -t api --cache-from ${{ env.LATEST_IMAGE }} -t ${{ env.COMMIT_IMAGE }} .
     - name: Tag latest image
       run: |
         docker tag ${{ env.COMMIT_IMAGE }} ${{ env.LATEST_IMAGE }} 
@@ -49,5 +79,3 @@ jobs:
     - name: Trigger deploy in portainer
       run: |
         curl -X POST ${{ env.WEBHOOK }}
-
-  
