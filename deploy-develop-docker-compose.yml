@@ -101,6 +101,19 @@ services:
     depends_on:
       db:
         condition: service_started
+  ftp-server:
+    container_name: ftp-server
+    environment:
+      - FTP_USER=user
+      - FTP_PASS=pass
+    image: garethflowers/ftp-server
+    ports:
+      - '20-21:20-21/tcp'
+      - '49280:49280/tcp'
+    volumes:
+      - '/data:/home/user'
+    networks:
+      - app-network
     
 networks:
   app-network:
