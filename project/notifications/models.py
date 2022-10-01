@@ -5,6 +5,7 @@ from django.db import models
 
 
 class Notification(models.Model):
+
     class Type(models.TextChoices):
         '''gender choices'''
         unread: str = 'Unread'
@@ -17,3 +18,6 @@ class Notification(models.Model):
 
     def __str__(self) -> str:
         return self.notification_text
+
+    class Meta:
+        db_table = 'notification'

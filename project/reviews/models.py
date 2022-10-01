@@ -14,3 +14,5 @@ class Review(models.Model):
     def __str__(self) -> str:
         return self.email
         
+    class Meta:
+        db_table = 'review'

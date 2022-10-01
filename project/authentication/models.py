@@ -94,6 +94,9 @@ class Profile(models.Model):
     
     def __str__(self) -> str:
         return self.name
+    
+    class Meta:
+        db_table = 'user_profile'
 
 
 class User(AbstractBaseUser):
@@ -126,6 +129,9 @@ class User(AbstractBaseUser):
     def group_name(self) -> str:
         return "user_%s" % self.id
 
+    class Meta:
+        db_table = 'user'
+
 
 class Code(models.Model):
     verify_code: str = models.CharField(max_length=5,unique=True)
@@ -136,6 +142,9 @@ class Code(models.Model):
 
     def __str__(self) -> str:  
         return self.verify_code
+    
+    class Meta:
+        db_table = 'code'
 
 
 class ActiveUser(models.Model):
@@ -143,4 +152,7 @@ class ActiveUser(models.Model):
 
     def __str__(self) -> str:
         return self.user.email
+    
+    class Meta:
+        db_table = 'active_user'
 

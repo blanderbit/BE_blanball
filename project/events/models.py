@@ -75,6 +75,9 @@ class Event(models.Model):
 
     def __str__(self) -> str:
         return self.name
+    
+    class Meta:
+        db_table = 'event'
 
 class RequestToParticipation(models.Model):
     user: User = models.ForeignKey(User,on_delete=models.CASCADE,related_name='user')
@@ -85,3 +88,6 @@ class RequestToParticipation(models.Model):
 
     def __str__(self) -> str:
         return self.user.email
+    
+    class Meta:
+        db_table = 'request_to_participation'
