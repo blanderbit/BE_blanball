@@ -1,3 +1,5 @@
+
+
 on:
   push:
 
@@ -6,8 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ENV_FILE: ${{ secrets.ENV_FILE }}
-      PYTHON-VERSION: "3.10.7"
-      POETRY-VERSION: "1.2.0"
+      PYTHON_VERSION: "3.10.7"
+      POETRY_VERSION: "1.2.0"
     services:
       db:
         image: postgres:latest
@@ -27,35 +29,33 @@ jobs:
           - 6379:6379
     steps:
     - uses: actions/checkout@master
-      with: 
-        clean: 'false'
-    - name: Set up Python $PYTHON-VERSION
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: ${{ env.PYTHON_VERSION }}
     - name: Install poetry
       run: |
         pip install --upgrade pip
-        pip install poetry==$POETRY-VERSION
+        pip install poetry==${{ env.POETRY_VERSION }}
+      env:
+        PATH: "/root/.poetry/bin:/opt/venv/bin:${PATH}" 
     - name: Install deps
       run: |
         poetry run pip install -U pip 
-        poetry install 
+        poetry install
     - name: Run tests
       run: |
         echo $ENV_FILE | base64 --decode > .env
         cd project
-        poetry run python3 manage.py makemigrations
         poetry run python3 manage.py migrate
         poetry run python3 manage.py test --no-input
-
   auto_deploy:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/dev_test' || github.ref == 'refs/heads/main'
     steps:
     - uses: actions/checkout@master
     - name: Set env vars (TEST)
-      if: github.ref == 'refs/heads/develop'
+      if: github.ref == 'refs/heads/dev_test'
       run: |
         echo "DOCKERFILE_PATH=Dockerfile" >> $GITHUB_ENV
         echo "WEBHOOK=${{ secrets.PORTAINER_WEBHOOK_URL_TEST }}" >> $GITHUB_ENV
@@ -70,7 +70,6 @@ jobs:
         echo "WEBHOOK=${{ secrets.PORTAINER_WEBHOOK_URL_PROD }}" >> $GITHUB_ENV
         echo "LATEST_IMAGE=${{ secrets.DOCKER_REGISTRY_PROD }}":latest >> $GITHUB_ENV
         echo "COMMIT_IMAGE=${{ secrets.DOCKER_REGISTRY_PROD }}":${{ github.sha }} >> $GITHUB_ENV
-
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v2
       with:

@@ -45,7 +45,6 @@ ALLOWED_HOSTS: list[str] = config('ALLOWED_HOSTS', cast=Csv())
 # Application definition:
 INSTALLED_APPS: tuple[str] = (
     # Default django apps:
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -84,20 +83,11 @@ MIDDLEWARE: tuple[str] = (
 )
 
 
-#POSTGRES conected datdabse settings
-
-DATABASES: dict[str,Any] = {
-    'default': {
-        'ENGINE': config('DB_ENGINE'),
-        'NAME':  config('POSTGRES_DB'),
-        'USER': config('POSTGRES_USER'),
-        'PASSWORD': config('POSTGRES_PASSWORD'),
-        'HOST': config('POSTGRES_HOST'),
-        'PORT': config('POSTGRES_PORT'),
-    }
-}
+#conected datdabse settings
 
 if os.environ.get('GITHUB_WORKFLOW'):
+    CELERY_BROKER_URL: str = 'redis://127.0.0.1:6379'
+    CELERY_RESULT_BACKEND: str = 'redis://127.0.0.1:6379'
     DATABASES: dict[str,Any]= {
         'default': {
            'ENGINE': 'django.db.backends.postgresql',
@@ -109,23 +99,34 @@ if os.environ.get('GITHUB_WORKFLOW'):
         }
     }
     CHANNEL_LAYERS: dict[str,Any] = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [('127.0.0.1',6379)],
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [('127.0.0.1',6379)],
+            },
         },
-    },
-}
-
-
-CHANNEL_LAYERS: dict[str,Any] = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("redis",config('REDIS_PORT'))],
+    }
+else:
+    CELERY_BROKER_URL: str = config('CELERY_BROKER_URL')
+    CELERY_RESULT_BACKEND: str = config('CELERY_RESULT_BACKEND')
+    DATABASES: dict[str,Any] = {
+        'default': {
+            'ENGINE': config('DB_ENGINE'),
+            'NAME':  config('POSTGRES_DB'),
+            'USER': config('POSTGRES_USER'),
+            'PASSWORD': config('POSTGRES_PASSWORD'),
+            'HOST': config('POSTGRES_HOST'),
+            'PORT': config('POSTGRES_PORT'),
+        }
+    }
+    CHANNEL_LAYERS: dict[str,Any] = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [("redis",config('REDIS_PORT'))],
+            },
         },
-    },
-}
+    }
 
 
 
@@ -211,9 +212,7 @@ EMAIL_HOST_USER: str = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD: str = config('EMAIL_HOST_PASSWORD')
 
 #celery framework settings
-CELERY_BROKER_URL: str = config('CELERY_BROKER_URL')
 CELERY_BROKER_TRANSPORT_OPTIONS: dict[str,int] = {'visibility_timeout': 3600}
-CELERY_RESULT_BACKEND: str = config('CELERY_RESULT_BACKEND')
 CELERY_ACCEPT_CONTENT = {'application/json'}
 CELERY_TASK_SERIALIZER: str = 'json'
 CELERY_RESULT_SERIALIZER: str = 'json'
