@@ -6,16 +6,14 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ENV_FILE: ${{ secrets.ENV_FILE }}
-    strategy:
-      matrix:
-        python-version: ["3.10.7"]
-        poetry-version: ["1.2.0"]
+      PYTHON-VERSION: "3.10.7"
+      POETRY-VERSION: "1.2.0"
     services:
       db:
         image: postgres:latest
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: 19211921
+          POSTGRES_USER: postgres_test
+          POSTGRES_PASSWORD: postgres_test
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -31,14 +29,14 @@ jobs:
     - uses: actions/checkout@master
       with: 
         clean: 'false'
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+    - name: Set up Python $PYTHON-VERSION
+      uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install poetry
       run: |
         pip install --upgrade pip
-        pip install poetry==${{ matrix.poetry-version }}
+        pip install poetry==$POETRY-VERSION
     - name: Install deps
       run: |
         poetry run pip install -U pip 

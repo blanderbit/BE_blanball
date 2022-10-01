@@ -96,7 +96,7 @@ class ChangeMaintenance(generics.GenericAPIView):
 
 
 class GetMaintenance(generics.GenericAPIView):
-    key:str = 'isMaintenance'
+    key: str = 'isMaintenance'
 
     def get(self,request: Request) -> Response:
         try:
@@ -107,4 +107,4 @@ class GetMaintenance(generics.GenericAPIView):
             return Response(CONFIG_FILE_ERROR,status=status.HTTP_400_BAD_REQUEST)
 
 class GetCurrentVersion(GetMaintenance):
-    key:str = 'version'
+    key: str = 'version'

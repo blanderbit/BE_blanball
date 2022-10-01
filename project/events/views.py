@@ -250,7 +250,6 @@ class UserEvents(ListAPIView):
 
 class PopularIvents(UserEvents):
     serializer_class = PopularIventsListSerializer
-    # .select_related('author').prefetch_related('current_users','fans')
     queryset = Event.objects.filter(status = 'Planned')
 
     def get_queryset(self) -> QuerySet:
@@ -269,8 +268,6 @@ class UserPlannedEvents(UserEvents):
         except User.DoesNotExist:
             return Response(NO_SUCH_USER_ERROR,status=HTTP_400_BAD_REQUEST)
 
-
-    
 class RequestToParticipationsList(ListAPIView):
     serializer_class = RequestToParticipationSerializer
     queryset = RequestToParticipation.objects.all().order_by('-id')

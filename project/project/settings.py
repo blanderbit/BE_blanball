@@ -97,6 +97,27 @@ DATABASES: dict[str,Any] = {
     }
 }
 
+if os.environ.get('GITHUB_WORKFLOW'):
+    DATABASES: dict[str,Any]= {
+        'default': {
+           'ENGINE': 'django.db.backends.postgresql',
+           'NAME': 'postgres_test',
+           'USER': 'postgres_test',
+           'PASSWORD': 'postgres_test',
+           'HOST': '127.0.0.1',
+           'PORT': '5432',
+        }
+    }
+    CHANNEL_LAYERS: dict[str,Any] = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [('127.0.0.1',6379)],
+        },
+    },
+}
+
+
 CHANNEL_LAYERS: dict[str,Any] = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
@@ -105,6 +126,7 @@ CHANNEL_LAYERS: dict[str,Any] = {
         },
     },
 }
+
 
 
 SWAGGER_SETTINGS: dict[str,Union[str,dict[str,Any]]] = {
@@ -207,5 +229,5 @@ DEBUG_TOOLBAR_CONFIG = {
 DEFAULT_FILE_STORAGE = config('FILE_STORAGE')
 FTP_USER = config('FTP_USER')
 FTP_PASS = config('FTP_PASS')
-FTP_PORT = config('FTP_PORT', cast = int)
-FTP_STORAGE_LOCATION = f'ftp://{FTP_USER}:{FTP_PASS }@ftp-server:{FTP_PORT}'
+FTP_PORT = config('FTP_PORT')
+FTP_STORAGE_LOCATION = 'ftp://'+FTP_USER+':'+FTP_PASS+'@ftp-server:'+FTP_PORT
