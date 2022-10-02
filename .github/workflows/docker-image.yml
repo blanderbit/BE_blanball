@@ -1,7 +1,4 @@
-
-
-on:
-  push:
+on: ['push','workflow_dispatch']
 
 jobs:
   run_tests:
@@ -49,13 +46,14 @@ jobs:
         cd project
         poetry run python3 manage.py migrate
         poetry run python3 manage.py test --no-input
+        
   auto_deploy:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/dev_test' || github.ref == 'refs/heads/main'
+    needs: run_tests
     steps:
     - uses: actions/checkout@master
     - name: Set env vars (TEST)
-      if: github.ref == 'refs/heads/dev_test'
+      if: github.event_name == 'push' && github.ref == 'refs/heads/dev_test' || github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
       run: |
         echo "DOCKERFILE_PATH=Dockerfile" >> $GITHUB_ENV
         echo "WEBHOOK=${{ secrets.PORTAINER_WEBHOOK_URL_TEST }}" >> $GITHUB_ENV
