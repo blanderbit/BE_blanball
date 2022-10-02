@@ -1,19 +1,34 @@
 import json
 
-from .tasks import send_to_user
-from .serializers import *
-from .models import *
+from notifications.tasks import send_to_user
+from notifications.serializers import (
+    NotificationSerializer,
+    ReadOrDeleteNotificationsSerializer,
+    ChangeMaintenanceSerializer,
+)
+from notifications.models import Notification
 from project.constaints import *
 from project.services import CustomPagination
 
 from django.db.models.query import QuerySet
 
-from rest_framework import generics,status,filters
+from rest_framework import generics,filters
 from rest_framework.response import Response
 from rest_framework.request import Request
 
+from rest_framework.views import APIView
+from rest_framework.status import (
+    HTTP_200_OK,
+    HTTP_400_BAD_REQUEST,
+)
+from rest_framework.generics import (
+    ListAPIView,
+    GenericAPIView,
+)
+from authentication.models import User
 
-class NotificationsList(generics.ListAPIView):
+
+class NotificationsList(ListAPIView):
     serializer_class = NotificationSerializer
     pagination_class = CustomPagination
     filter_backends = (filters.OrderingFilter,)
@@ -25,7 +40,7 @@ class UserNotificationsList(NotificationsList):
     def get_queryset(self) -> QuerySet:
         return self.queryset.filter(user_id = self.request.user.id)
 
-class ReadNotifications(generics.GenericAPIView):
+class ReadNotifications(GenericAPIView):
     serializer_class = ReadOrDeleteNotificationsSerializer
     queryset = Notification.objects.all()
     
@@ -46,10 +61,10 @@ class ReadNotifications(generics.GenericAPIView):
                     not_read.append(notification) 
             else:
                 not_read.append(notification)        
-        return Response({"read success": read, "read error": not_read},status=status.HTTP_200_OK)
+        return Response({"read success": read, "read error": not_read},status=HTTP_200_OK)
             
 
-class DeleteNotifcations(generics.GenericAPIView):
+class DeleteNotifcations(GenericAPIView):
     serializer_class = ReadOrDeleteNotificationsSerializer
     queryset = Notification.objects.all()
 
@@ -69,7 +84,7 @@ class DeleteNotifcations(generics.GenericAPIView):
                     not_deleted.append(notification)
             else:
                 not_deleted.append(notification)
-        return Response({"delete success": deleted, "delete error":  not_deleted},status=status.HTTP_200_OK)
+        return Response({"delete success": deleted, "delete error":  not_deleted},status=HTTP_200_OK)
 
 
 def update_maintenance(data: dict[str,str]):
@@ -82,7 +97,7 @@ def update_maintenance(data: dict[str,str]):
                 notification_text=MAINTENANCE_FALSE_NOTIFICATION_TEXT.format(username=user.profile.name,last_name=user.profile.last_name)
             send_to_user(user = user,notification_text=notification_text,message_type=CHANGE_MAINTENANCE_MESSAGE_TYPE)
 
-class ChangeMaintenance(generics.GenericAPIView):
+class ChangeMaintenance(GenericAPIView):
     serializer_class = ChangeMaintenanceSerializer
 
     def post(self,request: Request) -> Response:
@@ -90,21 +105,21 @@ class ChangeMaintenance(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         try:
             update_maintenance(data=request.data)
-            return Response(MAINTENANCE_UPDATED_SUCCESS,status=status.HTTP_200_OK)
+            return Response(MAINTENANCE_UPDATED_SUCCESS,status=HTTP_200_OK)
         except:
-            return Response(MAINTENANCE_CAN_NOT_UPDATE_ERROR,status=status.HTTP_400_BAD_REQUEST)
+            return Response(MAINTENANCE_CAN_NOT_UPDATE_ERROR,status=HTTP_400_BAD_REQUEST)
 
 
-class GetMaintenance(generics.GenericAPIView):
+class GetMaintenance(APIView):
     key: str = 'isMaintenance'
 
     def get(self,request: Request) -> Response:
         try:
             with open('./project/project/config.json', 'r') as f:
                 data = f.read()
-            return Response({self.key:json.loads(data)[self.key]},status=status.HTTP_200_OK)
+            return Response({self.key:json.loads(data)[self.key]},status=HTTP_200_OK)
         except:
-            return Response(CONFIG_FILE_ERROR,status=status.HTTP_400_BAD_REQUEST)
+            return Response(CONFIG_FILE_ERROR,status=HTTP_400_BAD_REQUEST)
 
 class GetCurrentVersion(GetMaintenance):
     key: str = 'version'
