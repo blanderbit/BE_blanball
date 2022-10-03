@@ -45,6 +45,7 @@ ENV PATH "/root/.poetry/bin:/opt/venv/bin:${PATH}"
 RUN apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/* \
     && poetry version 
+RUN ls -l 
     #Install deps:
 RUN target="$POETRY_CACHE_DIR" \
     &&poetry run pip install -U pip \
