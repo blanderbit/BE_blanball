@@ -24,7 +24,8 @@ DEFAULT_AUTO_FIELDL: str = 'django.db.models.BigAutoField'
 
 # Static files
 STATIC_URL: str = '/static/'
-STATIC_ROOT: str = os.path.join(BASE_DIR,'static')
+STATIC_ROOT: str = os.path.join(BASE_DIR,'static/')
+
 
 MEDIA_URL: str = '/media/'
 MEDIA_ROOT: str = os.path.join(BASE_DIR,'media')

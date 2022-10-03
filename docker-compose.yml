@@ -26,7 +26,7 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
-    volumes: 
+    volumes:
       - .:/usr/src/blanball
     networks:
       - app-network
@@ -100,7 +100,7 @@ services:
     networks:
       - app-network
     ports:
-      - "5050:80"
+      - "5050:81"
     environment:
       PGADMIN_DEFAULT_EMAIL: gameonly1921@gmail.com
       PGADMIN_DEFAULT_PASSWORD: admin1921
@@ -131,14 +131,6 @@ services:
       - '/data:/home/user'
     networks:
       - app-network
-  # nginx:
-  #   build: ./compose/nginx
-  #   volumes:
-  #     - static_volume:/home/api/staticfiles
-  #   ports:
-  #     - 1337:80
-  #   depends_on:
-  #     - api
 
 networks:
   app-network:
@@ -146,5 +138,4 @@ networks:
 
 volumes:
   redis-data:
-  static_volume:
   pgadmin-data:

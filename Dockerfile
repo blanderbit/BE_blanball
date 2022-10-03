@@ -1,7 +1,5 @@
 FROM python:3.10
 
-WORKDIR /usr/src/blanball
-
 # `DJANGO_ENV` arg is used to make prod / dev builds:
 ARG DJANGO_ENV \
   # Needed for fixing permissions of files created by Docker:
@@ -9,6 +7,7 @@ ARG DJANGO_ENV \
   GID=1000
 
 ENV DEBUG=true \
+  APP_PATH='/usr/src/blanball' \
   # python:
   PYTHONFAULTHANDLER=1 \
   PYTHONUNBUFFERED=1 \
@@ -26,19 +25,22 @@ ENV DEBUG=true \
   POETRY_CACHE_DIR='/var/cache/pypoetry' \
   POETRY_HOME='/usr/local'
 
+COPY . $APP_PATH
+
 RUN if [ "$DEBUG" = 'true' ]; then apt-get update && apt-get upgrade -y \
   && apt-get install --no-install-recommends -y \
   && groupadd -g "${GID}" -r web \
-  && useradd -d '/usr/src/blanball' -g web -l -r -u "${UID}" web \
-  && chown web:web -R '/usr/src/blanball'; fi
+  && useradd -d $APP_PATH -g web -l -r -u "${UID}" web \
+  && chown web:web -R $APP_PATH; fi
 
-COPY . /usr/src/blanball
+
+WORKDIR $APP_PATH
 
 RUN pip install --upgrade pip\
   &&pip install poetry=="$POETRY_VERSION" 
 
 ENV PATH "/root/.poetry/bin:/opt/venv/bin:${PATH}"
-  
+
 # Cleaning cache:
 RUN apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/* \
