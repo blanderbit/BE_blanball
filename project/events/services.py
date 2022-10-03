@@ -26,6 +26,16 @@ def validate_user_before_join_to_event(user: User,event: Event) -> None:
     if RequestToParticipation.objects.filter(user=user,event=event.id,event_author=event.author):
         raise ValidationError(ALREADY_SENT_REQUEST_TO_PARTICIPATE,HTTP_400_BAD_REQUEST)
 
+def send_notification_to_event_author(event: Event) -> None:
+    if event.amount_members > event.count_current_users:
+        user_type:str = 'новий'
+    elif event.amount_members == event.count_current_users:
+        user_type:str = 'останній'
+    send_to_user(user = User.objects.get(id = event.author.id),notification_text=
+        NEW_USER_ON_THE_EVENT_NOTIFICATION.format(author_name = event.author.profile.name,user_type=user_type,event_id = event.id),
+        message_type=NEW_USER_ON_THE_EVENT_MESSAGE_TYPE)
+
+
 def filter_event_by_user_planned_events_time(pk: int,queryset: QuerySet) -> QuerySet:
     user:User =  User.objects.get(id=pk)
     num = re.findall(r'\d{1,10}', user.get_planned_events)[0]
@@ -82,3 +92,4 @@ def bulk_accpet_or_decline(serializer: Serializer,queryset: QuerySet,user: User)
         else:
             not_success.append(request_id)
     return {"success": success, "error":  not_success}
+

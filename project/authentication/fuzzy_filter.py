@@ -7,12 +7,17 @@ from django.db.models import (
 )
 from django.db.models.functions import Concat
 from django.contrib.postgres.search import TrigramSimilarity
+from django_filters import rest_framework as filters
 from rest_framework.filters import SearchFilter
 from django.db.models.query import QuerySet
 
+from rest_framework.request import Request
+
+from authentication.models import User
+
 class MySearchFilter(SearchFilter):
 
-    def get_search_terms(self, request):
+    def get_search_terms(self, request: Request) -> str:
         params: str = ' '.join(request.query_params.getlist(self.search_param))
         return params.replace(',', ' ').split()
 
@@ -36,7 +41,7 @@ class RankedFuzzySearchFilter(MySearchFilter):
 
         return queryset[:5]
 
-    def filter_queryset(self, request, queryset, view) -> QuerySet:
+    def filter_queryset(self, request: Request, queryset, view) -> QuerySet:
         search_fields:tuple = getattr(view, 'search_fields', None)
         search_terms = ' '.join(self.get_search_terms(request))
 
@@ -48,3 +53,11 @@ class RankedFuzzySearchFilter(MySearchFilter):
             queryset: QuerySet = queryset.annotate(rank=Value(1.0, output_field=FloatField()))
 
         return queryset[:5]
+
+
+class UserAgeRangeFilter(filters.FilterSet):
+    profile__age = filters.RangeFilter()
+
+    class Meta:
+        model = User
+        fields = ('profile__age',)

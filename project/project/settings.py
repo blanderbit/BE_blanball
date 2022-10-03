@@ -61,9 +61,7 @@ INSTALLED_APPS: tuple[str] = (
     'phonenumber_field',
     'channels',
     'storages',
-    
     # 'debug_toolbar',
-
     #My apps:
     'events.apps.EventsConfig',
     'authentication.apps.AuthenticationConfig',
@@ -131,7 +129,7 @@ else:
 
 
 
-SWAGGER_SETTINGS: dict[str,Union[str,dict[str,Any]]] = {
+SWAGGER_SETTINGS: dict[str,Any] = {
     'SHOW_REQUEST_HEADERS': config('SHOW_REQUEST_HEADERS',cast = bool),
     'SECURITY_DEFINITIONS': {
         'Bearer': {
@@ -213,8 +211,6 @@ EMAIL_HOST_USER: str = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD: str = config('EMAIL_HOST_PASSWORD')
 
 #celery framework settings
-CELERY_BROKER_TRANSPORT_OPTIONS: dict[str,int] = {'visibility_timeout': 3600}
-CELERY_ACCEPT_CONTENT = {'application/json'}
 CELERY_TASK_SERIALIZER: str = 'json'
 CELERY_RESULT_SERIALIZER: str = 'json'
 CELERY_ACKS_LATE: bool = True
@@ -226,8 +222,8 @@ DEBUG_TOOLBAR_CONFIG = {
     "SHOW_TOOLBAR_CALLBACK": lambda request: True,
 }
 
-DEFAULT_FILE_STORAGE = config('FILE_STORAGE')
-FTP_USER = config('FTP_USER')
-FTP_PASS = config('FTP_PASS')
-FTP_PORT = config('FTP_PORT')
+DEFAULT_FILE_STORAGE: str = config('FILE_STORAGE')
+FTP_USER: str = config('FTP_USER')
+FTP_PASS: str = config('FTP_PASS')
+FTP_PORT: str = config('FTP_PORT')
 FTP_STORAGE_LOCATION = 'ftp://'+FTP_USER+':'+FTP_PASS+'@ftp-server:'+FTP_PORT

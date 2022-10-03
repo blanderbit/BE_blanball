@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from typing import Any
 
 from PIL import Image
 
@@ -24,7 +25,7 @@ from project.constaints import MIN_AGE_VALUE_ERROR,MAX_AGE_VALUE_ERROR
 
 class UserManager(BaseUserManager):
     '''user manager'''
-    def create_user(self, email: str,phone: str, password=None,*agrs,**kwargs):
+    def create_user(self, email: str,phone: str, password: None = None,*agrs: Any,**kwargs: Any):
         user = self.model(phone=phone,email=self.normalize_email(email),*agrs,**kwargs)
         user.set_password(password)
         user.role = "User"

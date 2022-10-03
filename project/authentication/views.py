@@ -24,7 +24,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework.serializers import ValidationError
 
-
 from authentication.models import (User,
     Profile,
     Code,
@@ -51,8 +50,10 @@ from authentication.services import (
     reset_password,
 )
 from authentication.permisions import IsNotAuthenticated
-from authentication.fuzzy_filter import RankedFuzzySearchFilter
-
+from authentication.fuzzy_filter import (
+    RankedFuzzySearchFilter,
+    UserAgeRangeFilter,
+)
 
 class RegisterUser(GenericAPIView):
     '''register user'''
@@ -76,7 +77,7 @@ class LoginUser(GenericAPIView):
     permission_classes = (IsNotAuthenticated, )
 
     def post(self, request: Request) -> Response:
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data, status=HTTP_200_OK)
 
@@ -112,7 +113,7 @@ class UserProfile(GenericAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.all()
 
-    def get(self,request:Request,pk:int) -> Response:
+    def get(self,request: Request,pk: int) -> Response:
         '''getting a public user profile'''
         fields: list = ['configuration']
         try:
@@ -152,7 +153,7 @@ class AdminUsersList(UserList):
 
 class RequestPasswordReset(GenericAPIView):
     serializer_class = EmailSerializer
-    permission_classes = [IsNotAuthenticated]
+    permission_classes = (IsNotAuthenticated, )
 
     def post(self, request: Request) -> Response:
         '''send request to reset user password by email'''
@@ -166,7 +167,7 @@ class RequestPasswordReset(GenericAPIView):
 class ResetPassword(GenericAPIView):
     '''password reset on a previously sent request'''
     serializer_class = ResetPasswordSerializer
-    permission_classes = [IsNotAuthenticated]
+    permission_classes = (IsNotAuthenticated, )
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)

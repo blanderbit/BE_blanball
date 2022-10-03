@@ -1,4 +1,5 @@
 from datetime import date
+from typing import Any
 from django.utils import timezone
 from .models import *
 from django.template.loader import render_to_string
@@ -9,7 +10,7 @@ from project.constaints import *
 
 from rest_framework.serializers import Serializer
 
-def count_age(profile: Profile,data: dict) -> Profile:
+def count_age(profile: Profile,data: dict[str,Any]) -> Profile:
     '''calculation of age after registration by the birthday parameter'''
     for item in data:
         if item[0] == 'birthday':

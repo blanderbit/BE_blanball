@@ -25,7 +25,7 @@ services:
     command: uwsgi --ini uwsgi.ini
     build: ./project
     volumes:
-      - ./project:/usr/src/blanball
+      - app:/usr/src/blanball
     networks:
       - app-network
     ports: 
@@ -43,7 +43,7 @@ services:
     ports:
       - 1337:80
     volumes:
-      - ./project:/usr/src/blanball
+      - app:/usr/src/blanball
 
   redis:
     container_name: redis
@@ -136,3 +136,4 @@ volumes:
   redis-data:
   pgadmin-data:
   ftp-server-data:
+  app:
