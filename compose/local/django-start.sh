@@ -1,5 +1,7 @@
-python3 project/manage.py collectstatic --noinput
-python3 project/manage.py makemigrations 
-python3 project/manage.py migrate
-python3 project/manage.py test
-python3 project/manage.py runserver 0.0.0.0:8000
+cd project
+python manage.py collectstatic --noinput
+python manage.py makemigrations 
+python manage.py migrate
+# python manage.py test
+# gunicorn project.wsgi:application --bind 0.0.0.0:8000
+# python3 manage.py runserver 0.0.0.0:8000
