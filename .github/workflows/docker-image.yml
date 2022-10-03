@@ -38,6 +38,7 @@ jobs:
         PATH: "/root/.poetry/bin:/opt/venv/bin:${PATH}" 
     - name: Install deps
       run: |
+        cd project
         poetry run pip install -U pip 
         poetry install
     - name: Run tests
