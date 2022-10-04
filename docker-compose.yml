@@ -1,7 +1,6 @@
 version: "3.8"
-
+# command: uwsgi --ini uwsgi.ini
 services:
-
   db:
     container_name: db
     env_file: 
@@ -17,15 +16,14 @@ services:
       test: pg_isready -U postgres -d postgres
       timeout: 5s
       retries: 20
-
   api:
     container_name: api
     env_file: 
       - ./compose/.env
-    command: uwsgi --ini uwsgi.ini
-    build: ./project
+    command: bash compose/local/django-start.sh
+    build: .
     volumes:
-      - app:/usr/src/blanball
+      - .:/usr/src/blanball
     networks:
       - app-network
     ports: 
@@ -41,10 +39,9 @@ services:
     container_name: nginx
     build: ./nginx
     ports:
-      - 1337:80
+      - 1337:81
     volumes:
-      - app:/usr/src/blanball
-
+      - .:/usr/src/blanball
   redis:
     container_name: redis
     env_file:
@@ -58,13 +55,12 @@ services:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
       timeout: 5s
       retries: 20
-
   celery-worker: 
     container_name: celery-worker
     env_file: 
       - ./compose/.env
     command: bash compose/local/celery-worker-start.sh
-    build: ./project
+    build: .
     volumes: 
       - .:/usr/src/blanball
     networks:
@@ -74,13 +70,12 @@ services:
         condition: service_started
       api:
         condition: service_started
-
   celery-beat:
     container_name: celery-beat
     env_file: 
       - ./compose/.env 
     command: bash compose/local/celery-beat-start.sh
-    build: ./project
+    build: .
     volumes: 
       - .:/usr/src/blanball
     networks:
@@ -90,7 +85,6 @@ services:
         condition: service_started
       api:
         condition: service_started  
-
   pgadmin:
     container_name: pgadmin
     env_file: 
@@ -101,7 +95,7 @@ services:
     networks:
       - app-network
     ports:
-      - 5050:81
+      - 5050:80
     
   db-backup:
     container_name: db-backup
@@ -127,7 +121,7 @@ services:
       - ftp-server-data:/home/user
     networks:
       - app-network
-
+      
 networks:
   app-network:
     driver: bridge
@@ -136,4 +130,3 @@ volumes:
   redis-data:
   pgadmin-data:
   ftp-server-data:
-  app:

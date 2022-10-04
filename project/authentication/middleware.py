@@ -23,7 +23,7 @@ ALGORITHM = "HS256"
 @database_sync_to_async
 def get_user(token: str) -> Union[AnonymousUser,User]:
     try:
-        payload:dict[str,Any] = jwt.decode(token, settings.SECRET_KEY, algorithms=ALGORITHM)
+        payload: dict[str, Any] = jwt.decode(token, settings.SECRET_KEY, algorithms=ALGORITHM)
     except User.DoesNotExist:
         return AnonymousUser()
 
@@ -32,7 +32,7 @@ def get_user(token: str) -> Union[AnonymousUser,User]:
         return AnonymousUser()
 
     try:
-        user:User = User.objects.get(id=payload['user_id'])
+        user: User = User.objects.get(id=payload['user_id'])
     except User.DoesNotExist:
         return AnonymousUser()
 
