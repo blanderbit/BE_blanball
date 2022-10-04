@@ -4,7 +4,7 @@ services:
   db:
     container_name: db
     env_file:
-      - stack.env
+      - ./compose/.env
     image: postgres:latest
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
@@ -18,13 +18,13 @@ services:
   api:
     container_name: api
     env_file:
-      - stack.env
+      - ./compose/.env
     image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
     command: bash compose/local/django-start.sh
     ports:
       - 49200:8000
-    volumes:
-      - api-data:/usr/src/blanball
+    # volumes:
+    #   - .:/usr/src/blanball
     depends_on:
       db:
         condition: service_healthy
@@ -37,14 +37,14 @@ services:
   nginx:
     container_name: nginx
     env_file:
-      - stack.env
+      - ./compose/.env
     image: nginx:latest
     ports:
       - 49281:81
     networks:
       - app-network
     volumes:
-      - api-data:/usr/src/blanball
+      # - .:/usr/src/blanball
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
     depends_on:
       api:
@@ -52,7 +52,7 @@ services:
   redis:
     container_name: redis
     env_file:
-      - stack.env
+      - ./compose/.env
     image: redis:latest
     volumes:
       - redis-data:/usr/src/blanball/storage/redis/data
@@ -65,7 +65,7 @@ services:
 
   celery-worker:
     env_file:
-      - stack.env
+      - ./compose/.env
     container_name: celery-worker
     image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
     restart: always
@@ -79,7 +79,7 @@ services:
   celery-beat:
     container_name: celery-beat
     env_file:
-      - stack.env
+      - ./compose/.env
     image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
     restart: always 
     command: bash compose/local/celery-beat-start.sh
@@ -92,7 +92,7 @@ services:
   pgadmin:
     container_name: pgadmin
     env_file:
-      - stack.env
+      - ./compose/.env
     image: dpage/pgadmin4
     volumes:
       - pgadmin-data:/usr/src/blanball/storage/pgadmin/data
@@ -104,7 +104,7 @@ services:
   db_backup:
     container_name: db_backup
     env_file:
-      - stack.env
+      - ./compose/.env
     image: prodrigestivill/postgres-backup-local
     restart: always
     volumes:
@@ -116,7 +116,7 @@ services:
         condition: service_started
   ftp-server:
     env_file:
-      - stack.env
+      - ./compose/.env
     container_name: ftp-server
     image: garethflowers/ftp-server
     ports:
@@ -135,5 +135,4 @@ volumes:
   pgadmin-data:
   db-backup-data:
   ftp-server-data:
-  api-data:
 
