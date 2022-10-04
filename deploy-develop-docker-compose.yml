@@ -37,7 +37,7 @@ services:
   nginx:
     container_name: nginx
     env_file:
-      - ./compose/.env
+      - stack.env
     image: nginx:latest
     ports:
       - 49281:81
