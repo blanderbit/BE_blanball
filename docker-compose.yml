@@ -43,6 +43,7 @@ services:
     networks:
       - app-network
     volumes:
+      - .:/usr/src/blanball
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
   redis:
     container_name: redis
