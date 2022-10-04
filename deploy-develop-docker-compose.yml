@@ -99,9 +99,9 @@ services:
       db:
         condition: service_started
   ftp-server:
+    env_file:
+      - stack.env
     container_name: ftp-server
-    env_file: 
-      - ./compose/.env
     image: garethflowers/ftp-server
     ports:
       - '49221:21/tcp'
