@@ -51,3 +51,5 @@ REVIEW_CREATE_MESSAGE_TYPE = 'review_creaete'
 
 RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION = '{user_name},ваша заявка на участь у події № {event_id} було {response_type}'
 RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_MESSAGE_TYPE = 'response_to_request_for_participation' 
+
+REVIEW_CREATE_ERROR = ''
