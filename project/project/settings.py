@@ -8,19 +8,24 @@ from typing import Union,Any
 from pathlib import Path
 from decouple import config, Csv
 
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+
 django.utils.encoding.smart_text = smart_str
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Internationalization
 LANGUAGE_CODE: str = config('LANGUAGE_CODE')
 
+ALGORITHM: str = "HS256"
+
 TIME_ZONE: str = config('TIME_ZONE')
 USE_I18N: bool = config('USE_I18N',cast = bool,default = True)
 USE_TZ: bool = config('USE_TZ',cast = bool,default = True)
 
 DEFAULT_AUTO_FIELDL: str = 'django.db.models.BigAutoField'
-
 
 # Static files
 STATIC_URL: str = '/static/'
@@ -87,7 +92,7 @@ MIDDLEWARE: tuple[str] = (
 if os.environ.get('GITHUB_WORKFLOW'):
     CELERY_BROKER_URL: str = 'redis://127.0.0.1:6379'
     CELERY_RESULT_BACKEND: str = 'redis://127.0.0.1:6379'
-    DATABASES: dict[str,Any]= {
+    DATABASES: dict[str, Any]= {
         'default': {
            'ENGINE': 'django.db.backends.postgresql',
            'NAME': 'postgres_test',
@@ -97,11 +102,11 @@ if os.environ.get('GITHUB_WORKFLOW'):
            'PORT': '5432',
         }
     }
-    CHANNEL_LAYERS: dict[str,Any] = {
-        "default": {
-            "BACKEND": "channels_redis.core.RedisChannelLayer",
+    CHANNEL_LAYERS: dict[str, Any] = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
             "CONFIG": {
-                "hosts": [('127.0.0.1',6379)],
+                'hosts': [('127.0.0.1', 6379)],
             },
         },
     }
@@ -118,18 +123,18 @@ else:
             'PORT': config('POSTGRES_PORT'),
         }
     }
-    CHANNEL_LAYERS: dict[str,Any] = {
-        "default": {
-            "BACKEND": "channels_redis.core.RedisChannelLayer",
-            "CONFIG": {
-                "hosts": [("redis",config('REDIS_PORT'))],
+    CHANNEL_LAYERS: dict[str, Any] = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                'hosts': [('redis', config('REDIS_PORT'))],
             },
         },
     }
 
 
 
-SWAGGER_SETTINGS: dict[str,Any] = {
+SWAGGER_SETTINGS: dict[str, Any] = {
     'SHOW_REQUEST_HEADERS': config('SHOW_REQUEST_HEADERS',cast = bool),
     'SECURITY_DEFINITIONS': {
         'Bearer': {
@@ -138,8 +143,8 @@ SWAGGER_SETTINGS: dict[str,Any] = {
             'in': 'Header'
         }
     },
-    'USE_SESSION_AUTH': config('USE_SESSION_AUTH',cast = bool),
-    'JSON_EDITOR': config('JSON_EDITOR',cast = bool),
+    'USE_SESSION_AUTH': config('USE_SESSION_AUTH', cast = bool),
+    'JSON_EDITOR': config('JSON_EDITOR', cast = bool),
     'SUPPORTED_SUBMIT_METHODS': (
         'get',
         'post',
@@ -150,7 +155,7 @@ SWAGGER_SETTINGS: dict[str,Any] = {
 
 
 
-TEMPLATES: list[dict[str,Any]] = [
+TEMPLATES: list[dict[str, Any]] = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(BASE_DIR, 'templates')],
@@ -167,7 +172,7 @@ TEMPLATES: list[dict[str,Any]] = [
 ]
 
 
-AUTH_PASSWORD_VALIDATORS: tuple[dict[str,str]] = (
+AUTH_PASSWORD_VALIDATORS: tuple[dict[str, str]] = (
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
@@ -182,7 +187,7 @@ AUTH_PASSWORD_VALIDATORS: tuple[dict[str,str]] = (
     },
 )
 
-REST_FRAMEWORK: dict[str,Any]  = {
+REST_FRAMEWORK: dict[str, Any]  = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
@@ -195,18 +200,18 @@ REST_FRAMEWORK: dict[str,Any]  = {
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
 
-SIMPLE_JWT: dict[str,Any] = {
+SIMPLE_JWT: dict[str, Any] = {
     'AUTH_HEADER_TYPES': (config('AUTH_HEADER_TYPES')),
-    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=config('ACCESS_TOKEN_LIFETIME',cast = int)),
-    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=config('REFRESH_TOKEN_LIFETIME',cast = int)),
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days = config('ACCESS_TOKEN_LIFETIME', cast = int)),
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days = config('REFRESH_TOKEN_LIFETIME', cast = int)),
 }
 
 
 #conected smpt gmail settings
 EMAIL_BACKEND: str = config('EMAIL_BACKEND')
 EMAIL_HOST: str = config('EMAIL_HOST')
-EMAIL_PORT: int = config('EMAIL_PORT',cast = int)
-EMAIL_USE_TLS: bool = config('EMAIL_USE_TLS',cast = bool)
+EMAIL_PORT: int = config('EMAIL_PORT', cast = int)
+EMAIL_USE_TLS: bool = config('EMAIL_USE_TLS', cast = bool)
 EMAIL_HOST_USER: str = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD: str = config('EMAIL_HOST_PASSWORD')
 
@@ -226,4 +231,18 @@ DEFAULT_FILE_STORAGE: str = config('FILE_STORAGE')
 FTP_USER: str = config('FTP_USER')
 FTP_PASS: str = config('FTP_PASS')
 FTP_PORT: str = config('FTP_PORT')
-FTP_STORAGE_LOCATION = 'ftp://'+FTP_USER+':'+FTP_PASS+'@ftp-server:'+FTP_PORT
+FTP_STORAGE_LOCATION = 'ftp://' + FTP_USER + ':' + FTP_PASS + '@ftp-server:' + FTP_PORT
+
+
+class CustomPagination(PageNumberPagination):
+    page_size = 10
+    def get_paginated_response(self, data: dict[str, Any]) -> Response:
+        return Response({
+            'links': {
+                'next': self.get_next_link(),
+                'previous': self.get_previous_link()
+            },
+            'total_count': self.page.paginator.count,
+            'total_pages': self.page.paginator.num_pages,
+            'results': data
+        })

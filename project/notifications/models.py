@@ -11,9 +11,9 @@ class Notification(models.Model):
         unread: str = 'Unread'
         read: str = 'Read'
 
-    user: User = models.ForeignKey(User,on_delete=models.CASCADE)
-    notification_text: str = models.CharField(max_length=100)
-    type: str = models.CharField(choices = Type.choices,max_length=6,default='Unread')
+    user: User = models.ForeignKey(User, on_delete = models.CASCADE)
+    notification_text: str = models.CharField(max_length = 100)
+    type: str = models.CharField(choices = Type.choices, max_length = 6,default = 'Unread')
     time_created: datetime = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:

@@ -6,4 +6,4 @@ class EventDateTimeRangeFilter(filters.FilterSet):
 
     class Meta:
         model = Event
-        fields = ('date_and_time',)
+        fields = ('date_and_time', )

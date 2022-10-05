@@ -29,7 +29,6 @@ WORKDIR $APP_PATH
 
 COPY ./poetry.lock ./pyproject.toml $APP_PATH/
 
-COPY ./compose/local/  $APP_PATH/project/
 
 RUN if [ "$DEBUG" = 'true' ]; then apt-get update && apt-get upgrade -y \
   && apt-get install --no-install-recommends -y \
