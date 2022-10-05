@@ -24,15 +24,15 @@ class MySearchFilter(SearchFilter):
 class RankedFuzzySearchFilter(MySearchFilter):
 
     @staticmethod
-    def search_queryset(queryset, search_fields: tuple[str,], search_terms, min_rank) -> QuerySet:
-        full_text_vector:tuple = sum(itertools.zip_longest(search_fields, (), fillvalue=Value(' ')), ())
+    def search_queryset(queryset: QuerySet, search_fields: tuple[str], search_terms, min_rank) -> QuerySet:
+        full_text_vector: tuple = sum(itertools.zip_longest(search_fields, (), fillvalue=Value(' ')), ())
         if len(search_fields) > 1:
             full_text_vector = full_text_vector[:-1]
 
-        full_text_expr:Concat = Concat(*full_text_vector, output_field=TextField())
+        full_text_expr: Concat = Concat(*full_text_vector, output_field=TextField())
 
-        similarity:TrigramSimilarity = TrigramSimilarity(full_text_expr, search_terms)
-        queryset:QuerySet = queryset.annotate(rank=similarity)
+        similarity: TrigramSimilarity = TrigramSimilarity(full_text_expr, search_terms)
+        queryset: QuerySet = queryset.annotate(rank=similarity)
 
         if min_rank is None:
             queryset = queryset.filter(rank__gt=0.0)
@@ -41,9 +41,9 @@ class RankedFuzzySearchFilter(MySearchFilter):
 
         return queryset[:5]
 
-    def filter_queryset(self, request: Request, queryset, view) -> QuerySet:
-        search_fields:tuple = getattr(view, 'search_fields', None)
-        search_terms = ' '.join(self.get_search_terms(request))
+    def filter_queryset(self, request: Request, queryset: QuerySet, view) -> QuerySet:
+        search_fields: tuple[str] = getattr(view, 'search_fields', None)
+        search_terms: str = ' '.join(self.get_search_terms(request))
 
         if search_fields and search_terms:
             min_rank = getattr(view, 'min_rank', None)
