@@ -1,12 +1,12 @@
-on: ['push','workflow_dispatch']
+on: [push,workflow_dispatch]
 
 jobs:
   run_tests:
     runs-on: ubuntu-latest
     env:
       ENV_FILE: ${{ secrets.ENV_FILE }}
-      PYTHON_VERSION: "3.10.7"
-      POETRY_VERSION: "1.2.0"
+      PYTHON_VERSION: 3.10.7
+      POETRY_VERSION: 1.2.0
     services:
       db:
         image: postgres:latest
@@ -21,7 +21,7 @@ jobs:
         ports:
           - 5432:5432
       redis:
-        image: "redis:7.0.4-alpine"
+        image: redis:7.0.4-alpine
         ports:
           - 6379:6379
     steps:
@@ -35,7 +35,7 @@ jobs:
         pip install --upgrade pip
         pip install poetry==${{ env.POETRY_VERSION }}
       env:
-        PATH: "/root/.poetry/bin:/opt/venv/bin:${PATH}" 
+        PATH: /root/.poetry/bin:/opt/venv/bin:${PATH}
     - name: Install deps
       run: |
         cd project
@@ -47,14 +47,13 @@ jobs:
         cd project
         poetry run python3 manage.py migrate
         poetry run python3 manage.py test --no-input
-
   auto_deploy:
     runs-on: ubuntu-latest
     needs: run_tests
     steps:
     - uses: actions/checkout@master
     - name: Set env vars (TEST)
-      if: github.event_name == 'push' && github.ref == 'refs/heads/develop' || github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+      if: github.event_name == push && github.ref == refs/heads/develop || github.event_name == workflow_dispatch && github.ref != refs/heads/main
       run: |
         echo "DOCKERFILE_PATH=Dockerfile" >> $GITHUB_ENV
         echo "WEBHOOK=${{ secrets.PORTAINER_WEBHOOK_URL_TEST }}" >> $GITHUB_ENV
@@ -62,7 +61,7 @@ jobs:
         echo "LATEST_IMAGE=${{ secrets.DOCKER_REGISTRY_TEST }}":latest >> $GITHUB_ENV
         echo "COMMIT_IMAGE=${{ secrets.DOCKER_REGISTRY_TEST }}":${{ github.sha }} >> $GITHUB_ENV
     - name: Set env vars (PROD)
-      if: github.ref == 'refs/heads/main'
+      if: github.ref == refs/heads/main
       run: |
         echo "DOCKERFILE_PATH=Dockerfile" >> $GITHUB_ENV
         echo "REGISTRY=${{ secrets.DOCKER_REGISTRY_PROD }}" >> $GITHUB_ENV
@@ -93,4 +92,4 @@ jobs:
         
     - name: Trigger deploy in portainer
       run: |
-        curl -X POST ${{ env.WEBHOOK }} 
+        curl -X POST ${{ env.WEBHOOK }}
