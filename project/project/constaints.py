@@ -29,7 +29,7 @@ PASSWORD_CHANGE_ERROR = {'error': 'Password not change'}
 GET_PLANNED_IVENTS_ERROR = {'error': 'Get planned ivents can only contain: day(d), month(m) and year(y)'}
 NO_EVENT_PLACE_ERROR = {'error': 'No place'}
 ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR = {'error':'You cannot join the event as a player because you are already a member of the event as a spectator'}
-
+EVENT_TIME_NOTIFICATION_TEXT = 'До початку події під номером {event_id} лишилося {time}. Не забудьте взяти участь!'
 
 #CODE
 BAD_CODE_ERROR = {'error': 'Bad verify code'}

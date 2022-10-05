@@ -55,7 +55,7 @@ class Event(models.Model):
     small_disc: str = models.CharField(max_length = 255)
     full_disc: str = models.TextField()
     place: str = models.CharField(max_length = 255)
-    gender: str = models.CharField(choices=Gender.choices, max_length = 10)
+    gender: str = models.CharField(choices = Gender.choices, max_length = 10)
     date_and_time: datetime = models.DateTimeField()
     contact_number: str = PhoneNumberField(null = True, blank = True)
     need_ball: bool = models.BooleanField()
