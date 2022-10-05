@@ -8,7 +8,7 @@ from notifications.serializers import (
 )
 from notifications.models import Notification
 from project.constaints import *
-from project.services import CustomPagination
+from project.settings import CustomPagination
 
 from django.db.models.query import QuerySet
 

@@ -27,7 +27,6 @@ from events.services import (
 )
 from events.filters import EventDateTimeRangeFilter
 
-from project.services import *
 from project.constaints import *
 from notifications.tasks import *
 from authentication.fuzzy_filter import RankedFuzzySearchFilter

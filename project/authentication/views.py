@@ -1,6 +1,6 @@
 from nis import match
 from typing import Any
-from project.services import *
+from project.settings import CustomPagination
 
 from django.db.models.query import QuerySet
 
