@@ -26,9 +26,9 @@ from project.constaints import MIN_AGE_VALUE_ERROR,MAX_AGE_VALUE_ERROR
 class UserManager(BaseUserManager):
     '''user manager'''
     def create_user(self, email: str, phone: str, password: None = None, *agrs: Any, **kwargs: Any):
-        user = self.model(phone=phone,email=self.normalize_email(email),*agrs,**kwargs)
+        user = self.model(phone=phone,email=self.normalize_email(email), *agrs, **kwargs)
         user.set_password(password)
-        user.role = "User"
+        user.role = 'User'
         user.save()
         return user
 
@@ -39,23 +39,23 @@ class Gender(models.TextChoices):
 
 
 class Position(models.TextChoices):
-    GK: str = 'Вратар'
-    LB: str = 'Лівий захисник'
-    RB: str = 'Правий захисник'
-    CB: str = 'Центральний захисник'
-    LWB: str = 'Лівий фланговий захисник'
-    RWB: str = 'Правий фланговий захисник'
-    CDM: str = 'Центральний опорний півзахисник'
-    CM: str = 'Центральний півзахисник'
-    CAM: str = 'Центральний атакуючий півзахисник'
-    RM: str = 'Правий півзахисник'
-    LM: str = 'Лівий півзахисник'
-    RW: str = 'Правий фланговий атакуючий'
-    LW: str = 'Лівий фланговий атакуючий'
-    RF: str = 'Правий форвард' 
-    CF: str = 'Центральний форвард'
-    LF: str = 'Лівий форвард' 
-    ST: str = 'Форвард'
+    GK: str = 'GK'
+    LB: str = 'LB'
+    RB: str = 'RB'
+    CB: str = 'CB'
+    LWB: str = 'LWB'
+    RWB: str = 'RWB'
+    CDM: str = 'CDM'
+    CM: str = 'CM'
+    CAM: str = 'CAM'
+    RM: str = 'RM'
+    LM: str = 'LM'
+    RW: str = 'RW'
+    LW: str = 'LW'
+    RF: str = 'RF' 
+    CF: str = 'CF'
+    LF: str = 'LF' 
+    ST: str = 'ST'
 
 class Role(models.TextChoices):
     '''role choices'''

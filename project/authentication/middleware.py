@@ -18,12 +18,10 @@ from authentication.models import User
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
 
-ALGORITHM: str = "HS256"
-
 @database_sync_to_async
 def get_user(token: str) -> Union[AnonymousUser, User]:
     try:
-        payload: dict[str, Any] = jwt.decode(token, settings.SECRET_KEY, algorithms=ALGORITHM)
+        payload: dict[str, Any] = jwt.decode(token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
     except User.DoesNotExist:
         return AnonymousUser()
 

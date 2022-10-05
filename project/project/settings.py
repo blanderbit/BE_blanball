@@ -19,6 +19,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Internationalization
 LANGUAGE_CODE: str = config('LANGUAGE_CODE')
 
+ALGORITHM: str = "HS256"
+
 TIME_ZONE: str = config('TIME_ZONE')
 USE_I18N: bool = config('USE_I18N',cast = bool,default = True)
 USE_TZ: bool = config('USE_TZ',cast = bool,default = True)
