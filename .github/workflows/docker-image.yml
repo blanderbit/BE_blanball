@@ -61,7 +61,7 @@ jobs:
         echo "LATEST_IMAGE=${{ secrets.DOCKER_REGISTRY_TEST }}":latest >> $GITHUB_ENV
         echo "COMMIT_IMAGE=${{ secrets.DOCKER_REGISTRY_TEST }}":${{ github.sha }} >> $GITHUB_ENV
     - name: Set env vars (PROD)
-      if: github.ref == refs/heads/main
+      if: github.ref == 'refs/heads/main'
       run: |
         echo "DOCKERFILE_PATH=Dockerfile" >> $GITHUB_ENV
         echo "REGISTRY=${{ secrets.DOCKER_REGISTRY_PROD }}" >> $GITHUB_ENV
