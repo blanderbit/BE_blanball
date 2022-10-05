@@ -27,7 +27,6 @@ from events.services import (
 )
 from events.filters import EventDateTimeRangeFilter
 
-from project.constaints import *
 from project.settings import CustomPagination
 from notifications.tasks import *
 from authentication.fuzzy_filter import RankedFuzzySearchFilter
@@ -57,6 +56,19 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from authentication.permisions import *
 
+from events.constaints import (
+    SENT_INVATION_ERROR, INVITE_USER_TO_EVENT_MESSAGE_TYPE, INVITE_USER_NOTIFICATION, SENT_INVATION_SUCCESS,
+    ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, EVENT_NOT_FOUND_ERROR, EVENT_DELETED_SUCCESS, EVENT_UPDATE_MESSAGE_TYPE,
+    EVENT_UPDATE_SUCCESS, JOIN_TO_EVENT_SUCCESS, NEW_REQUEST_TO_PARTICIPATION_MESSAGE_TYPE, NEW_REQUEST_TO_PARTICIPATION, 
+    APPLICATION_FOR_PARTICIPATION_SUCCESS, NO_IN_EVENT_FANS_LIST_ERROR, DISCONNECT_FROM_EVENT_SUCCESS, 
+    LEAVE_USER_FROM_THE_EVENT_NOTIFICATION, NO_IN_EVENT_MEMBERS_LIST_ERROR
+
+)
+from authentication.constaints import (
+    NO_SUCH_USER_ERROR, NO_PERMISSIONS_ERROR
+)
+
+
 class CreateEvent(GenericAPIView):
     '''class that allows you to create a new event'''
     serializer_class = CreateEventSerializer
@@ -72,7 +84,7 @@ class CreateEvent(GenericAPIView):
             user_name = request.user.profile.name, event_name = serializer.validated_data['name']),
             message_type = INVITE_USER_TO_EVENT_MESSAGE_TYPE)
         self.perform_create(serializer = serializer)
-        return Response(serializer.data, status=HTTP_201_CREATED)
+        return Response(serializer.data, status = HTTP_201_CREATED)
         
 
     def perform_create(self, serializer: CreateEventSerializer) -> None:

@@ -6,10 +6,15 @@ from django.template.loader import render_to_string
 from .tasks import Util
 import random
 import string
-from project.constaints import *
 
 from rest_framework.serializers import Serializer
 
+from authentication.constaints import (
+    PHONE_CHANGE_CODE_TYPE, EMAIL_MESSAGE_TEMPLATE_TITLE, EMAIL_CHANGE_CODE_TYPE, ACCOUNT_DELETE_CODE_TYPE, 
+    PASSWORD_CHANGE_CODE_TYPE, EMAIL_VERIFY_CODE_TYPE, PASSWORD_RESET_CODE_TYPE, CODE_EXPIRE_MINUTES_TIME,
+    TEMPLATE_SUCCESS_BODY_TITLE, TEMPLATE_SUCCESS_TITLE, TEMPLATE_SUCCESS_TEXT,
+)
+    
 def count_age(profile: Profile, data: dict[str, Any]) -> Profile:
     '''calculation of age after registration by the birthday parameter'''
     for item in data:
@@ -31,15 +36,15 @@ def send_email_template(user: User, body_title: str, title: str, text: str) -> N
 
 def check_code_type(code: Code) -> str:
     if code.type == PHONE_CHANGE_CODE_TYPE:
-        title = EMAIL_MESSAGE_TEMPLATE_TITLE.format(type = 'Зміна', key = 'номеру телефону')
+        title = EMAIL_MESSAGE_TEMPLATE_TITLE.format(type = 'Change', key = 'phone number')
     elif code.type == EMAIL_CHANGE_CODE_TYPE:
-        title = EMAIL_MESSAGE_TEMPLATE_TITLE.format(type = 'Зміна', key = 'електронної адреси')
+        title = EMAIL_MESSAGE_TEMPLATE_TITLE.format(type = 'Change', key = 'email address')
     elif code.type == ACCOUNT_DELETE_CODE_TYPE:
-        title = EMAIL_MESSAGE_TEMPLATE_TITLE.format(type = 'Видалення', key = 'аккаунту')
+        title = EMAIL_MESSAGE_TEMPLATE_TITLE.format(type = 'Removal', key = 'account')
     elif code.type == EMAIL_VERIFY_CODE_TYPE:
-        title = EMAIL_MESSAGE_TEMPLATE_TITLE.format(type = 'Підтвердження', key = 'електронної адреси')
+        title = EMAIL_MESSAGE_TEMPLATE_TITLE.format(type = 'Confirmation', key = 'email address')
     elif code.type in (PASSWORD_CHANGE_CODE_TYPE,PASSWORD_RESET_CODE_TYPE):
-        title = EMAIL_MESSAGE_TEMPLATE_TITLE.format(type = 'Зміна', key = 'паролю')
+        title = EMAIL_MESSAGE_TEMPLATE_TITLE.format(type = 'Change', key = 'password')
     return title
 
 def code_create(email: str, type: str, dop_info: str) -> None:
@@ -71,6 +76,6 @@ def reset_password(serializer: Serializer) -> None:
     user.set_password(serializer.validated_data['new_password'])
     user.save()
     code.delete()
-    send_email_template(user = user, body_title = TEMPLATE_SUCCESS_BODY_TITLE.format(body = 'паролю'),
-        title = TEMPLATE_SUCCESS_TITLE.format(body = 'пароль'),
-        text = TEMPLATE_SUCCESS_TEXT.format(body = 'оскільки ваш пароль було змінено'))
+    send_email_template(user = user, body_title = TEMPLATE_SUCCESS_BODY_TITLE.format(body = 'password'),
+        title = TEMPLATE_SUCCESS_TITLE.format(body = 'password'),
+        text = TEMPLATE_SUCCESS_TEXT.format(body = 'because your password has been changed'))

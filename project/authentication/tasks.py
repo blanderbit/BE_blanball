@@ -9,7 +9,7 @@ from project.celery import app
 
 from django.core.mail import EmailMessage
 
-from project.constaints import BLANBALL
+from authentication.constaints import BLANBALL
 
 
 class EmailThread(threading.Thread):

@@ -2,7 +2,6 @@ from events.models import (
     Event,
     RequestToParticipation,
 )
-from project.constaints import *
 from authentication.serializers import EventUsersSerializer
 
 from collections import OrderedDict
@@ -16,6 +15,9 @@ from rest_framework.status import (
 
 from events.validators import EventDateTimeValidator
 
+from events.constaints import (
+    EVENT_TIME_EXPIRED_ERROR, NO_EVENT_PLACE_ERROR, EVENT_NOT_FOUND_ERROR
+)
 
 class CreateEventSerializer(serializers.ModelSerializer):
     class Meta:

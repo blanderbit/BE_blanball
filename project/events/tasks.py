@@ -4,7 +4,7 @@ from events.models import (
 )
 from project.celery import app
 from events.services import send_notification_to_subscribe_event_user
-from project.constaints import (
+from events.constaints import (
     EVENT_TIME_NOTIFICATION_MESSAGE_TYPE,EVENT_TIME_NOTIFICATION_TEXT)
 
 from django.utils import timezone
@@ -15,17 +15,17 @@ def check_event_start_time() -> None:
         if event.date_and_time - timezone.now() == timezone.timedelta(minutes = 1440):
             send_notification_to_subscribe_event_user(event = event, 
             notification_text = EVENT_TIME_NOTIFICATION_TEXT.format(event_id = event.id, 
-            time = '24 години'),
+            time = '24 hours'),
             message_type = EVENT_TIME_NOTIFICATION_MESSAGE_TYPE)
         elif event.date_and_time - timezone.now() == timezone.timedelta(minutes = 120):
             send_notification_to_subscribe_event_user(event = event, 
             notification_text = EVENT_TIME_NOTIFICATION_TEXT.format(event_id = event.id),
-            time = '2 години',
+            time = '2 hours',
             message_type = EVENT_TIME_NOTIFICATION_MESSAGE_TYPE)
         elif event.date_and_time - timezone.now() == timezone.timedelta(minutes = 10):
             send_notification_to_subscribe_event_user(event = event, 
             notification_text = EVENT_TIME_NOTIFICATION_TEXT.format(event_id = event.id),
-            time = '10 хвилин',
+            time = '10 minutes',
             message_type = EVENT_TIME_NOTIFICATION_MESSAGE_TYPE)
         elif event.date_and_time == timezone.now():
             event.status = 'Active'

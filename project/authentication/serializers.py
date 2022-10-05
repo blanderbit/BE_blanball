@@ -12,8 +12,12 @@ from authentication.models import (
     User,
     Profile,
 )
-from project.constaints import *
 from authentication.validators import CodeValidator
+
+from authentication.constaints import (PASSWORD_CHANGE_CODE_TYPE, EMAIL_CHANGE_CODE_TYPE, EMAIL_VERIFY_CODE_TYPE, PHONE_CHANGE_CODE_TYPE, 
+    ACCOUNT_DELETE_CODE_TYPE, PASSWORD_RESET_CODE_TYPE, INVALID_CREDENTIALS_ERROR, PASSWORDS_DO_NOT_MATCH, CONFIGURATION_IS_REQUIRED_ERROR,
+    GET_PLANNED_IVENTS_ERROR, NO_SUCH_USER_ERROR, GET_PLANNED_IVENTS_ERROR
+)
 
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
     """

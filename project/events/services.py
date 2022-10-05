@@ -13,7 +13,11 @@ from events.models import (
     Event,
     RequestToParticipation,
 )
-from project.constaints import *
+from events.constaints import (
+    ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR, EVENT_AUTHOR_CAN_NOT_JOIN_ERROR, 
+    ALREADY_SENT_REQUEST_TO_PARTICIPATE, NEW_USER_ON_THE_EVENT_NOTIFICATION, NEW_USER_ON_THE_EVENT_MESSAGE_TYPE,
+    RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION, RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_MESSAGE_TYPE
+)
 from notifications.tasks import send_to_user
 
 def send_notification_to_subscribe_event_user(event: Event, notification_text: str, message_type: str) -> None:
@@ -83,14 +87,14 @@ def bulk_accpet_or_decline(serializer: Serializer,queryset: QuerySet,user: User)
             if request_to_p.event_author.id == user.id:
                 if serializer.validated_data['type'] == True:
                     send_to_user(user = request_to_p.user, notification_text = RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION.format(
-                        user_name = request_to_p.user.profile.name, event_id = request_to_p.event.id, response_type = 'прийнято'),
+                        user_name = request_to_p.user.profile.name, event_id = request_to_p.event.id, response_type = 'accepted'),
                         message_type = RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_MESSAGE_TYPE)
                     success.append(request_id)
                     request_to_p.user.current_rooms.add(request_to_p.event)
                     request_to_p.delete()
                 else:
                     send_to_user(user = request_to_p.user, notification_text = RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION.format(
-                        user_name = request_to_p.user.profile.name,event_id = request_to_p.event.id,response_type = 'відхилено'),
+                        user_name = request_to_p.user.profile.name,event_id = request_to_p.event.id,response_type = 'rejected'),
                         message_type = RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_MESSAGE_TYPE)
                     success.append(request_id)
                     request_to_p.delete()

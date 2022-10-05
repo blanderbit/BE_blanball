@@ -1,47 +1,4 @@
-#ROLES
-ADMIN_ROLE = "Admin"
-USER_ROLE = "User"
 
-#CHANGE & CREATE & RESET
-THIS_EMAIL_ALREADY_IN_USE_ERROR = {'error': 'This email is already in use'}
-CHANGE_PHONE_SUCCESS = {'succes' : 'Phone change'}
-CHANGE_EMAIL_SUCCESS = {'succes' : 'Email change'}
-CHANGE_PASSWORD_SUCCESS = {'succes' : 'Password change'}
-REVIEW_CREATE_SUCCESS = {'success': 'Review create'}
-ACTIVATION_SUCCESS = {'success': 'Activation by email'}
-ACCOUNT_DELETED_SUCCESS = {'success':  'Account deleted'}
-PASSWORD_RESET_SUCCESS = {'success': 'Password reset'}
-
-#EVENT
-EVENT_DELETED_SUCCESS = {'success':  'Event deleted'}
-EVENT_UPDATE_SUCCESS = {'success': 'Event updated'}
-JOIN_TO_EVENT_SUCCESS = {'success': 'Join to event'}
-DISCONNECT_FROM_EVENT_SUCCESS = {'success': 'Dicsonnect from event'}
-EVENT_NOT_FOUND_ERROR = {'error': 'Event not found'}
-EVENT_AUTHOR_CAN_NOT_JOIN_ERROR = {'error': 'Author can`t join to your event'}
-EVENT_TIME_EXPIRED_ERROR = {'error': 'Event time expired'}
-BAD_EVENT_TIME_CREATE_ERROR = {'error': 'The time of the event must differ from the minimum by an hour'}
-ALREADY_IN_EVENT_MEMBERS_LIST_ERROR = {'error': 'Already in the event members list'}
-ALREADY_IN_EVENT_FANS_LIST_ERROR = {'error': 'You are already in the event fans list'}
-NO_IN_EVENT_MEMBERS_LIST_ERROR = {'error': 'You are not in event members list'}
-NO_IN_EVENT_FANS_LIST_ERROR = {'error': 'You are not in event fans list'}
-PASSWORD_CHANGE_ERROR = {'error': 'Password not change'}
-GET_PLANNED_IVENTS_ERROR = {'error': 'Get planned ivents can only contain: day(d), month(m) and year(y)'}
-NO_EVENT_PLACE_ERROR = {'error': 'No place'}
-ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR = {'error':'You cannot join the event as a player because you are already a member of the event as a spectator'}
-EVENT_TIME_NOTIFICATION_TEXT = 'До початку події під номером {event_id} лишилося {time}. Не забудьте взяти участь!'
-
-#CODE
-BAD_CODE_ERROR = {'error': 'Bad verify code'}
-CODE_EXPIRED_ERROR = {'error': 'This code expired'} 
-PASSWORD_RESET_CODE_TYPE  = 'password_reset'
-EMAIL_VERIFY_CODE_TYPE = 'email_verify'
-PASSWORD_CHANGE_CODE_TYPE = 'password_change'
-EMAIL_CHANGE_CODE_TYPE = 'email_change'
-PHONE_CHANGE_CODE_TYPE = 'phone_change'
-ACCOUNT_DELETE_CODE_TYPE = 'accoount_delete'
-CODE_EXPIRE_MINUTES_TIME = 5
-SENT_CODE_TO_EMAIL_SUCCESS = {'success': 'We have sent you a code to email'}
 
 #MAINTENANCE
 MAINTENANCE_UPDATED_SUCCESS = {'success': 'Maintenance updated success'}
@@ -50,20 +7,6 @@ MAINTENANCE_TRUE_NOTIFICATION_TEXT = '{username} {last_name}, tech roboty True'
 MAINTENANCE_FALSE_NOTIFICATION_TEXT = '{username} {last_name}, tech roboty False'
 
 #VALIDATION 
-WRONG_PASSWORD_ERROR = {'error': 'Wrong old password'}
-PASSWORDS_DO_NOT_MATCH = {'error': 'Passwords do not match'}
-NO_EMAIL_REGISTRATION_ERROR = {'error': 'Users should have a Email'}
-INVALID_CREDENTIALS_ERROR =  {'error': 'Invalid credentials, try again'}
-NOT_VERIFIED_BY_EMAIL_ERROR = {'error': 'Email is not verified'}
-NO_SUCH_USER_ERROR = {'error': 'No such user'}
-NO_PERMISSIONS_ERROR = {'error': 'You have no permissions to do this'}
-REVIEW_CREATE_ERROR = {'error':'You cant leave a review for yourself'}
-CANNOT_HIDE_SHOW_THIS_FIELD_ERROR = 'error : You cannot hide or show fields:{key}'
-MAX_AGE_VALUE_ERROR = {'error': 'Age must not exceed 100 years old'}
-MIN_AGE_VALUE_ERROR = {'error': 'Age must be at least 6 years old'}
-CONFIGURATION_IS_REQUIRED_ERROR = {'error': 'Сonfiguration should contain fields like: email,phone,send_email'}
-
-BLANBALL = 'BlanBall'
 
 EMAIL_MESSAGE_TEMPLATE_TITLE = '{type} {key} у додатку Blanball'
 
@@ -81,11 +24,11 @@ AFTER_ACCOUNT_DELETED_EMAIL_TEXT = '{user_name} {user_last_name},ваш акка
 
 AFTER_RESET_PASSWORD_EMAIL_TEXT = '{user_name} {user_last_name},ваш пароль було успішно змінено!'
 
-NEW_USER_ON_THE_EVENT_NOTIFICATION = '{author_name},на вашу подію під номером {event_id} долучився {user_type} гравець'
+NEW_USER_ON_THE_EVENT_NOTIFICATION = '{author_name}, for your event under the number {event_id} joined {user_type} player'
 
-LEAVE_USER_FROM_THE_EVENT_NOTIFICATION = '{author_name},з вашої події під {event_id} відключився гравець'
+LEAVE_USER_FROM_THE_EVENT_NOTIFICATION = '{author_name}, from your event under {event_id} player disconnected'
 
-NEW_REQUEST_TO_PARTICIPATION = '{author_name},вам надійшов новий запит на участь у події під номером №{event_id}'
+NEW_REQUEST_TO_PARTICIPATION = '{author_name}, you have received a new request to participate in the event under the number №{event_id}'
 NEW_REQUEST_TO_PARTICIPATION_MESSAGE_TYPE = 'new_request_to_participation'
 
 NEW_USER_ON_THE_EVENT_MESSAGE_TYPE = 'new_user_on_the_event'
@@ -104,21 +47,6 @@ EVENT_UPDATE_MESSAGE_TYPE = 'event_updated'
 CHANGE_MAINTENANCE_MESSAGE_TYPE = 'change_maintenance'
 EVENT_TIME_NOTIFICATION_MESSAGE_TYPE ='event_time_notification'
 REVIEW_CREATE_MESSAGE_TYPE = 'review_creaete'
-
-
-
-REGISTER_SUCCESS_BODY_TITLE = 'Реєстрація пройшла успішно'
-REGISTER_SUCCESS_TITLE = 'Дякуємо за реєстрацію у BlanBall'
-REGISTER_SUCCESS_TEXT = 'Ви отримали це повідомлення, оскільки цю електронну скриньку зареєстровано в додатку BlanBall.'
-
-TEMPLATE_SUCCESS_BODY_TITLE  = 'Зміна {body} пройшла успішно'
-TEMPLATE_SUCCESS_TITLE = 'Ваш {body} змінено!'
-TEMPLATE_SUCCESS_TEXT = 'Ви отримали це повідомлення, {body} в додатку BlanBall.'
-
-EMAIL_VERIFY_SUCCESS_BODY_TITLE = 'Верифікація пройшла успішно!'
-EMAIL_VERIFY_SUCCESS_TITLE = 'Ваш обліковий запис було активовано!'
-
-
 
 
 RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION = '{user_name},ваша заявка на участь у події № {event_id} було {response_type}'

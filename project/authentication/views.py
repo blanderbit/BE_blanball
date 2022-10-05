@@ -1,4 +1,3 @@
-from nis import match
 from typing import Any
 from project.settings import CustomPagination
 
@@ -24,7 +23,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework.serializers import ValidationError
 
-from authentication.models import (User,
+from authentication.models import (
+    User,
     Profile,
     Code,
     ActiveUser,
@@ -54,6 +54,16 @@ from authentication.fuzzy_filter import (
     RankedFuzzySearchFilter,
     UserAgeRangeFilter,
 )
+
+from authentication.constaints import (
+    REGISTER_SUCCESS_BODY_TITLE, REGISTER_SUCCESS_TITLE, REGISTER_SUCCESS_TEXT, SENT_CODE_TO_EMAIL_SUCCESS, ACCOUNT_DELETE_CODE_TYPE,
+    PASSWORD_RESET_CODE_TYPE, NO_SUCH_USER_ERROR, PASSWORD_CHANGE_CODE_TYPE, WRONG_PASSWORD_ERROR, PASSWORD_RESET_SUCCESS,
+    EMAIL_VERIFY_CODE_TYPE, ALREADY_VERIFIED_ERROR, PHONE_CHANGE_CODE_TYPE, EMAIL_CHANGE_CODE_TYPE, THIS_EMAIL_ALREADY_IN_USE_ERROR,
+    TEMPLATE_SUCCESS_BODY_TITLE, TEMPLATE_SUCCESS_BODY_TITLE, NO_PERMISSIONS_ERROR, TEMPLATE_SUCCESS_TITLE, TEMPLATE_SUCCESS_TEXT,
+    ACTIVATION_SUCCESS, CHANGE_PHONE_SUCCESS, CHANGE_PASSWORD_SUCCESS,EMAIL_VERIFY_SUCCESS_BODY_TITLE, EMAIL_VERIFY_SUCCESS_TITLE,
+    CHANGE_EMAIL_SUCCESS, ACCOUNT_DELETED_SUCCESS
+)
+
 
 class RegisterUser(GenericAPIView):
     '''register user'''
@@ -221,7 +231,7 @@ class RequetChangeEmail(GenericAPIView):
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
         if not User.objects.filter(email = serializer.validated_data['email']):
-            code_create(email = request.user.email, type=EMAIL_CHANGE_CODE_TYPE,
+            code_create(email = request.user.email, type = EMAIL_CHANGE_CODE_TYPE,
             dop_info = serializer.validated_data['email'])
             return Response(SENT_CODE_TO_EMAIL_SUCCESS, status = HTTP_200_OK)
         return Response(THIS_EMAIL_ALREADY_IN_USE_ERROR, status = HTTP_400_BAD_REQUEST)
@@ -251,39 +261,38 @@ class CheckCode(GenericAPIView):
 
         if self.code.type == PASSWORD_CHANGE_CODE_TYPE:
             self.user.set_password(self.code.dop_info)
-            send_email_template(user=self.user,body_title=TEMPLATE_SUCCESS_BODY_TITLE.format(body='паролю'),
-            title=TEMPLATE_SUCCESS_TITLE.format(body = 'пароль'),
-            text=TEMPLATE_SUCCESS_TEXT.format(body = 'оскільки ваш пароль було змінено'))
+            send_email_template(user=self.user,body_title = TEMPLATE_SUCCESS_BODY_TITLE.format(body = 'password'),
+            title = TEMPLATE_SUCCESS_TITLE.format(body = 'password'),
+            text = TEMPLATE_SUCCESS_TEXT.format(body = 'because your password has been changed'))
             self.user.save()
-            return Response(CHANGE_PASSWORD_SUCCESS,status=HTTP_200_OK) 
-
+            return Response(CHANGE_PASSWORD_SUCCESS, status = HTTP_200_OK) 
+ 
         elif self.code.type == PHONE_CHANGE_CODE_TYPE:
             self.user.phone = self.code.dop_info
-            send_email_template(user=self.user,body_title=TEMPLATE_SUCCESS_BODY_TITLE.format(body='номеру телефону'),
-            title=TEMPLATE_SUCCESS_TITLE.format(body='номер телефону'),
-            text=TEMPLATE_SUCCESS_TEXT.format(body='оскільки ваш номер телефону було змінено'))
+            send_email_template(user=self.user,body_title = TEMPLATE_SUCCESS_BODY_TITLE.format(body = 'phone number'),
+            title = TEMPLATE_SUCCESS_TITLE.format(body = 'phone number'),
+            text = TEMPLATE_SUCCESS_TEXT.format(body = 'because your phone number has been changed'))
             self.user.save()
-            return Response(CHANGE_PHONE_SUCCESS,status=HTTP_200_OK)
+            return Response(CHANGE_PHONE_SUCCESS, status = HTTP_200_OK)
 
         elif self.code.type == EMAIL_VERIFY_CODE_TYPE:
             self.user.is_verified = True
-            send_email_template(user=self.user,body_title=EMAIL_VERIFY_SUCCESS_BODY_TITLE,title=EMAIL_VERIFY_SUCCESS_TITLE,
-            text=TEMPLATE_SUCCESS_TEXT.format(body='оскільки ваш eмейл було активовано'))
+            send_email_template(user=self.user,body_title = EMAIL_VERIFY_SUCCESS_BODY_TITLE, title = EMAIL_VERIFY_SUCCESS_TITLE,
+            text = TEMPLATE_SUCCESS_TEXT.format(body = 'because your email has been activated'))
             self.user.save()
-            return Response(ACTIVATION_SUCCESS,status=HTTP_200_OK)
+            return Response(ACTIVATION_SUCCESS, status = HTTP_200_OK)
             
         elif self.code.type == EMAIL_CHANGE_CODE_TYPE:
             self.user.email = self.code.dop_info
-            send_email_template(user=self.user,body_title=TEMPLATE_SUCCESS_BODY_TITLE.format(body='паролю'),
-            title=TEMPLATE_SUCCESS_TITLE.format(body='пароль'),
-            text=TEMPLATE_SUCCESS_TEXT.format(body='оскільки ваш пароль було змінено'))
+            send_email_template(user=self.user,body_title = TEMPLATE_SUCCESS_BODY_TITLE.format(body = 'password'),
+            title = TEMPLATE_SUCCESS_TITLE.format(body = 'password'),
+            text = TEMPLATE_SUCCESS_TEXT.format(body = 'because your password has been changed'))
             self.user.save()
-            return Response(CHANGE_EMAIL_SUCCESS,status=HTTP_200_OK) 
+            return Response(CHANGE_EMAIL_SUCCESS, status=HTTP_200_OK) 
 
-    
         elif self.code.type == ACCOUNT_DELETE_CODE_TYPE:
             # send_email_template(user=self.user,body_title=PASS_UPDATE_SUCCESS_BODY_TITLE,title=PASS_UPDATE_SUCCESS_TITLE,
             # text=TEMPLATE_SUCCESS_TEXT.format(body='оскільки ваш акаунт було видалено'))
-            User.objects.filter(id=self.user.id).delete()
-            return Response(ACCOUNT_DELETED_SUCCESS,status=HTTP_200_OK)
+            User.objects.filter(id = self.user.id).delete()
+            return Response(ACCOUNT_DELETED_SUCCESS, status=HTTP_200_OK)
 
