@@ -16,6 +16,12 @@ from events.models import (
 from project.constaints import *
 from notifications.tasks import send_to_user
 
+def send_notification_to_subscribe_event_user(event: Event, notification_text: str, message_type: str) -> None:
+    for user in event.current_users.all():
+        send_to_user(user = user, notification_text = notification_text, message_type = message_type)
+    for fan in event.fans.all():
+        send_to_user(user = fan, notification_text = notification_text, message_type = message_type)
+
 def validate_user_before_join_to_event(user: User, event: Event) -> None:
     if user.current_rooms.filter(id = event.id).exists():
         raise ValidationError(ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, HTTP_400_BAD_REQUEST)

@@ -1,5 +1,5 @@
 from events.models import Event
-from notifications.tasks import send_notification_to_subscribe_event_user
+from events.services import send_notification_to_subscribe_event_user
 from project.constaints import EVENT_DELETE_MESSAGE_TYPE
 
 from django.db.models.signals import pre_delete

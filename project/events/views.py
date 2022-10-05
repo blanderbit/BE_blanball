@@ -23,6 +23,7 @@ from events.services import (
     bulk_accpet_or_decline,
     bulk_delete_events,
     send_notification_to_event_author,
+    send_notification_to_subscribe_event_user,
 )
 from events.filters import EventDateTimeRangeFilter
 
@@ -106,8 +107,6 @@ class InviteUserToEvent(GenericAPIView):
         except Event.DoesNotExist:
             return Response(EVENT_NOT_FOUND_ERROR, status = HTTP_404_NOT_FOUND)
 
-
-
 class GetDeleteEvent(RetrieveAPIView):
     '''a class that allows you to get, update, delete an event'''
     serializer_class =  EventSerializer
@@ -143,6 +142,7 @@ class UpdateEvent(GenericAPIView):
         except Event.DoesNotExist:
             return Response(EVENT_NOT_FOUND_ERROR, status = HTTP_404_NOT_FOUND)
   
+
 class EventList(ListAPIView):
     '''class that allows you to get a complete list of events'''
     serializer_class =  EventListSerializer
@@ -153,6 +153,7 @@ class EventList(ListAPIView):
     ordering_fields = ('id', )
     filterset_fields = ('type', 'need_ball', 'gender', 'status', 'duration')
     queryset = Event.objects.all().select_related('author').prefetch_related('current_users','fans').order_by('-id')
+
 
 class DeleteEvents(GenericAPIView):
     '''class that allows you to delete multiple events at once'''

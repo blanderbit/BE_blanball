@@ -18,7 +18,7 @@ from authentication.models import User
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
 
-ALGORITHM = "HS256"
+ALGORITHM: str = "HS256"
 
 @database_sync_to_async
 def get_user(token: str) -> Union[AnonymousUser, User]:
