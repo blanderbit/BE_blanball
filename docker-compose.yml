@@ -36,6 +36,20 @@ services:
         condition: service_healthy
     links: 
       - redis
+  daphne:
+    container_name: daphne
+    env_file: 
+      - ./compose/.env 
+    entrypoint: compose/entrypoint.sh
+    command: daphne-start
+    build: .
+    networks:
+      - app-network
+    depends_on:
+      db:
+        condition: service_started
+      api:
+        condition: service_started
   nginx:
     container_name: nginx
     build: ./nginx

@@ -9,6 +9,11 @@ Backend()
     uwsgi --ini uwsgi.ini
 }
 
+Daphne()
+{
+    daphne project.asgi:application --port 3000 --bind 0.0.0.0 -v2
+}
+
 CeleryWorker()
 {
     celery -A project worker --loglevel=INFO --concurrency=8 -O fair -P prefork -n cel_app_worker
@@ -26,5 +31,6 @@ in
     api-start) Backend ;;
     celery-worker-start) CeleryWorker ;;
     celery-beat-start) CeleryBeat ;;
+    daphne-start) Daphne;;
     *) exit 1 ;;
 esac
