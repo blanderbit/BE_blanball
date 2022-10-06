@@ -71,9 +71,9 @@ jobs:
         echo "WEBHOOK=${{ secrets.PORTAINER_WEBHOOK_URL_PROD }}" >> $GITHUB_ENV
         echo "LATEST_IMAGE=${{ secrets.DOCKER_REGISTRY_PROD }}":latest >> $GITHUB_ENV
         echo "COMMIT_IMAGE=${{ secrets.DOCKER_REGISTRY_PROD }}":${{ github.sha }} >> $GITHUB_ENV
-    strategy:
-      matrix:
-        DOCKERFILE_PATH: [Dockerfile, nginx/Dockerfile]
+      strategy:
+        matrix:
+          DOCKERFILE_PATH: [Dockerfile, nginx/Dockerfile]
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v2
       with:
