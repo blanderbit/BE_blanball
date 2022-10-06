@@ -35,16 +35,6 @@ services:
         condition: service_healthy
     links: 
       - redis
-  nginx:
-    container_name: nginx
-    image: nginx:latest
-    ports:
-      - 1337:81
-    networks:
-      - app-network
-    volumes:
-      - .:/usr/src/blanball
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
   redis:
     container_name: redis
     env_file:
