@@ -57,7 +57,7 @@ jobs:
     needs: run_tests
     strategy:
       matrix:
-        img: [ ${{ env.REGISTRY }}, ${{ env.PROXY_LATEST_IMAGE }}]
+        test-group: [content]
     steps:
     - uses: actions/checkout@master
     - name: Set env vars (TEST)
