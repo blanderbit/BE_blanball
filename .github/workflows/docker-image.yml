@@ -57,7 +57,6 @@ jobs:
     needs: run_tests
     strategy:
       matrix:
-        path: [Dockerfile, nginx/Dockerfile]
         img: [ ${{ env.REGISTRY }}, ${{ env.PROXY_LATEST_IMAGE }}]
     steps:
     - uses: actions/checkout@master
