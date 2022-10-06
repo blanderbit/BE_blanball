@@ -57,7 +57,7 @@ jobs:
     needs: run_tests
     strategy:
       matrix:
-        test-group: [content]
+        img: [ ${{ env.REGISTRY }}, ${{ env.PROXY_LATEST_IMAGE }}]
     steps:
     - uses: actions/checkout@master
     - name: Set env vars (TEST)
@@ -97,7 +97,7 @@ jobs:
         docker tag ${{ env.COMMIT_IMAGE }} ${{ env.LATEST_IMAGE }} 
     - name: Tag latest image (PROXY)
       run: |
-        docker tag ${{ env.PROXY_COMMIT_IMAGE }} ${{ env.PROXY_LATEST_IMAGE }
+        docker tag ${{ env.PROXY_COMMIT_IMAGE }} ${{ env.PROXY_LATEST_IMAGE }}
     - name: Push images (API)
       run: |
         docker push ${{ env.COMMIT_IMAGE }}
