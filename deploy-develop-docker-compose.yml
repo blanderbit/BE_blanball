@@ -21,6 +21,8 @@ services:
       - stack.env
     image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
     command: bash compose/local/django-start.sh
+    volumes:
+      - .:/usr/src/blanball
     ports:
       - 49200:8000
     depends_on:
@@ -32,6 +34,18 @@ services:
       - app-network    
     links:
      - redis
+  nginx:
+    container_name: nginx
+    env_file: 
+      - stack.env
+    image: registry.it-flumx.com/blanball-proxy:latest
+    ports:
+      - 49299:81
+    networks:
+      - app-network
+    depends_on:
+      api:
+        condition: service_started
   redis:
     container_name: redis
     env_file: 

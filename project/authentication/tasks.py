@@ -1,3 +1,4 @@
+from typing import Any
 from django.utils import timezone
 import threading
 
@@ -8,13 +9,13 @@ from project.celery import app
 
 from django.core.mail import EmailMessage
 
-from project.constaints import BLANBALL
+from authentication.constaints import BLANBALL
 
 
 class EmailThread(threading.Thread):
 
-    def __init__(self, email:str) -> None:
-        self.email:str = email
+    def __init__(self, email: str) -> None:
+        self.email: str = email
         threading.Thread.__init__(self)
 
     def run(self) -> None:
@@ -23,10 +24,10 @@ class EmailThread(threading.Thread):
 class Util: 
     @staticmethod
     @app.task
-    def send_email(data:dict) -> None:
-        send:EmailMessage = EmailMessage(
-            subject=BLANBALL,body=data['email_body'], to=[data['to_email']])
-        send.content_subtype = "html"
+    def send_email(data: dict[str,Any]) -> None:
+        send: EmailMessage = EmailMessage(
+        subject = BLANBALL,body = data['email_body'], to = [data['to_email']])
+        send.content_subtype = 'html'
         EmailThread(send).start()
 
 

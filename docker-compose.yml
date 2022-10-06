@@ -1,5 +1,5 @@
 version: "3.8"
-# command: uwsgi --ini uwsgi.ini
+
 services:
   db:
     container_name: db
@@ -20,7 +20,8 @@ services:
     container_name: api
     env_file: 
       - ./compose/.env
-    command: bash compose/local/django-start.sh
+    entrypoint: compose/entrypoint.sh
+    command: api-start
     build: .
     volumes:
       - .:/usr/src/blanball
@@ -35,6 +36,15 @@ services:
         condition: service_healthy
     links: 
       - redis
+  nginx:
+    container_name: nginx
+    build: ./nginx
+    ports:
+      - 1337:81
+    networks:
+      - app-network
+    volumes:
+      - .:/usr/src/blanball
   redis:
     container_name: redis
     env_file:
@@ -52,7 +62,8 @@ services:
     container_name: celery-worker
     env_file: 
       - ./compose/.env
-    command: bash compose/local/celery-worker-start.sh
+    entrypoint: compose/entrypoint.sh
+    command: celery-worker-start
     build: .
     volumes: 
       - .:/usr/src/blanball
@@ -63,11 +74,13 @@ services:
         condition: service_started
       api:
         condition: service_started
+
   celery-beat:
     container_name: celery-beat
     env_file: 
       - ./compose/.env 
-    command: bash compose/local/celery-beat-start.sh
+    entrypoint: compose/entrypoint.sh
+    command: celery-beat-start
     build: .
     volumes: 
       - .:/usr/src/blanball

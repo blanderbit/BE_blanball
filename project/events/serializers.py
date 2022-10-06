@@ -1,31 +1,23 @@
-from datetime import datetime
 from events.models import (
     Event,
     RequestToParticipation,
 )
-from project.constaints import *
 from authentication.serializers import EventUsersSerializer
 
 from collections import OrderedDict
 
-from django.utils import timezone
+from rest_framework import serializers
 
-from rest_framework import serializers,status
+from rest_framework.status import (
+    HTTP_404_NOT_FOUND,
+    HTTP_400_BAD_REQUEST,
+)
 
+from events.validators import EventDateTimeValidator
 
-class EventDateTimeValidator:
-
-    def __call__(self,attrs: OrderedDict) -> OrderedDict:
-        date_and_time: datetime =  attrs.get('date_and_time')
-        price: int = attrs.get('price')
-        price_desc: str = attrs.get('price_description')
-        if date_and_time - timezone.now()+timezone.timedelta(hours=1) < timezone.timedelta(hours=1):
-            raise serializers.ValidationError(BAD_EVENT_TIME_CREATE_ERROR,status.HTTP_400_BAD_REQUEST)
-        if price and price > 0 and price_desc == None:
-            raise serializers.ValidationError(NO_PRICE_DESK_ERROR,status.HTTP_400_BAD_REQUEST)
-        if not price and price_desc:
-            raise serializers.ValidationError(NO_PRICE_DESK_ERROR,status.HTTP_400_BAD_REQUEST)
-        return attrs
+from events.constaints import (
+    EVENT_TIME_EXPIRED_ERROR, NO_EVENT_PLACE_ERROR, EVENT_NOT_FOUND_ERROR
+)
 
 class CreateEventSerializer(serializers.ModelSerializer):
     class Meta:
@@ -36,7 +28,6 @@ class CreateEventSerializer(serializers.ModelSerializer):
             'status',
             'fans',
         )
-
 
 class UpdateEventSerializer(serializers.ModelSerializer):
     class Meta:
@@ -50,7 +41,7 @@ class UpdateEventSerializer(serializers.ModelSerializer):
         )
 
     def update(self, instance, validated_data: dict) -> OrderedDict:
-        return super().update(instance,validated_data)
+        return super().update(instance, validated_data)
 
 class EventSerializer(serializers.ModelSerializer):
     author =  EventUsersSerializer()
@@ -93,31 +84,30 @@ class EventListSerializer(serializers.ModelSerializer):
         ) 
 
 class DeleteIventsSerializer(serializers.Serializer):
-    events:list[int] = serializers.ListField(child=serializers.IntegerField(min_value=0))
+    events: list[int] = serializers.ListField(child = serializers.IntegerField(min_value = 0))
 
 
 class JoinOrRemoveRoomSerializer(serializers.Serializer):
-    event_id:int = serializers.IntegerField(min_value=0)
+    event_id: int = serializers.IntegerField(min_value = 0)
 
     class Meta:
-        fields = ('event_id',)
+        fields = ('event_id', )
 
     def validate(self, attrs: OrderedDict) -> OrderedDict:
-        event_id:int = attrs.get('event_id')
+        event_id: int = attrs.get('event_id')
         try:
             event: Event = Event.objects.get(id = event_id)
             if event.status != 'Planned':
-                raise serializers.ValidationError(EVENT_TIME_EXPIRED_ERROR ,status.HTTP_400_BAD_REQUEST)
-            if event.amount_members < event.count_current_users+1:
-                raise serializers.ValidationError(NO_EVENT_PLACE_ERROR,status.HTTP_400_BAD_REQUEST)
+                raise serializers.ValidationError(EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST)
+            if event.amount_members < event.count_current_users + 1:
+                raise serializers.ValidationError(NO_EVENT_PLACE_ERROR, HTTP_400_BAD_REQUEST)
             return super().validate(attrs)
         except Event.DoesNotExist:
-            raise serializers.ValidationError(EVENT_NOT_FOUND_ERROR,status.HTTP_404_NOT_FOUND)
-
+            raise serializers.ValidationError(EVENT_NOT_FOUND_ERROR, HTTP_404_NOT_FOUND)
 
 class InviteUserToEventSerializer(serializers.Serializer):
-    user_id: int = serializers.IntegerField(min_value=0)
-    event_id: int = serializers.IntegerField(min_value=0)
+    user_id: int = serializers.IntegerField(min_value = 0)
+    event_id: int = serializers.IntegerField(min_value = 0)
 
     class Meta:
         fields = (
@@ -137,7 +127,7 @@ class RequestToParticipationSerializer(serializers.ModelSerializer):
         )
 
 class BulkAcceptOrDeclineRequestToParticipationSerializer(serializers.Serializer):
-    requests: list[int] = serializers.ListField(child=serializers.IntegerField(min_value=0))
+    requests: list[int] = serializers.ListField(child=serializers.IntegerField(min_value = 0))
     type: bool = serializers.BooleanField()
 
     class Meta:
