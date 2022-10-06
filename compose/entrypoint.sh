@@ -11,7 +11,7 @@ Backend()
 
 Daphne()
 {
-    daphne project.asgi:application --port 3000 --bind 0.0.0.0 -v2
+    daphne -u /usr/src/blanball/daphne.sock project.asgi:application --port 3000 --bind 0.0.0.0 -v2
 }
 
 CeleryWorker()

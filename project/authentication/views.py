@@ -1,5 +1,5 @@
 from typing import Any
-from project.settings import CustomPagination
+from project.pagination import CustomPagination
 
 from django.db.models.query import QuerySet
 

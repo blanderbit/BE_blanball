@@ -1,3 +1,5 @@
+
+
 from typing import Any
 from authentication.models import (
     User,
@@ -17,7 +19,7 @@ class SetUpAuthenticationModels(APITestCase):
             'birthday': '2000-09-09',
             'height': 30,
             'weight': 30,
-            'position': 'postion'
+            'position': 'ST'
         }
         self.user_data = {
             'email': 'user@example.com',
@@ -43,7 +45,7 @@ class SetUpAauthenticationViews(APITestCase):
                 'birthday': '2000-09-10',
                 'height': 30,
                 'weight': 30,
-                'position': 'Вратар',
+                'position': 'ST',
                 'about_me': 'string'
             }
         } 
@@ -59,7 +61,7 @@ class SetUpAauthenticationViews(APITestCase):
                 'birthday': '2000-09-10',
                 'height': 30,
                 'weight': 30,
-                'position': 'Вратар',
+                'position': 'ST',
                 'about_me': 'string'
             }
         } 
@@ -75,7 +77,7 @@ class SetUpAauthenticationViews(APITestCase):
                 'birthday': '2017-09-10',
                 'height': 30,
                 'weight': 30,
-                'position': 'Вратар',
+                'position': 'ST',
                 'about_me': 'string'
             }
         }
