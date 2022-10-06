@@ -32,20 +32,6 @@ services:
       - app-network    
     links:
      - redis
-  nginx:
-    container_name: nginx
-    env_file: 
-      - stack.env
-    image: nginx:latest
-    ports:
-      - 49299:81
-    networks:
-      - app-network
-    volumes:
-      - .:/usr/src/blanball
-    depends_on:
-      api:
-        condition: service_started
   redis:
     container_name: redis
     env_file: 
