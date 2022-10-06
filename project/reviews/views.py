@@ -1,6 +1,6 @@
 from .serializers import *
 from .models import *
-from project.settings import CustomPagination
+from project.pagination import CustomPagination
 from django.db.models.query import QuerySet
 
 from rest_framework.generics import (

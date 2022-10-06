@@ -27,7 +27,7 @@ from events.services import (
 )
 from events.filters import EventDateTimeRangeFilter
 
-from project.settings import CustomPagination
+from project.pagination import CustomPagination
 from notifications.tasks import *
 from authentication.fuzzy_filter import RankedFuzzySearchFilter
 

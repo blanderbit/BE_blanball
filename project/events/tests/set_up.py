@@ -60,7 +60,7 @@ class SetUpEventsViews(APITestCase):
                 "birthday": "2000-09-10",
                 "height": 30,
                 "weight": 30,
-                "position": "Вратар",
+                "position": "ST",
                 "about_me": "string"
             }
         }
@@ -77,7 +77,7 @@ class SetUpEventsViews(APITestCase):
                 "birthday": "2000-09-10",
                 "height": 30,
                 "weight": 30,
-                "position": "Вратар",
+                "position": "ST",
                 "about_me": "string"
             }
         }
