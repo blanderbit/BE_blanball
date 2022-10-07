@@ -23,12 +23,9 @@ DEFAULT_AUTO_FIELDL: str = 'django.db.models.BigAutoField'
 
 # Static files
 STATIC_URL: str = '/static/'
-STATIC_ROOT: str = os.path.join(BASE_DIR,'static/')
+STATIC_ROOT: str = os.path.join(BASE_DIR, 'static/')
 
 CUSTOM_PAGINATION_PAGE_SIZE = 10
-
-MEDIA_URL: str = '/media/'
-MEDIA_ROOT: str = os.path.join(BASE_DIR,'media')
 
 SECRET_KEY: str = config('SECRET_KEY')
 
@@ -44,7 +41,7 @@ AUTH_USER_MODEL: str = config('AUTH_USER_MODEL')
 ALLOWED_HOSTS: list[str] = config('ALLOWED_HOSTS', cast=Csv())
 
 # Application definition:
-INSTALLED_APPS: tuple[str] = (
+INSTALLED_APPS: tuple[str] = [
     # Default django apps:
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -61,16 +58,15 @@ INSTALLED_APPS: tuple[str] = (
     'phonenumber_field',
     'channels',
     'storages',
-    # 'debug_toolbar',
     #My apps:
     'events.apps.EventsConfig',
     'authentication.apps.AuthenticationConfig',
     'notifications.apps.NotificationsConfig',
     'reviews.apps.ReviewsConfig',
-)
+]
 
 
-MIDDLEWARE: tuple[str] = (
+MIDDLEWARE: tuple[str] = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -78,12 +74,9 @@ MIDDLEWARE: tuple[str] = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
-)
-
+]
 
 #conected datdabse settings
-
 if os.environ.get('GITHUB_WORKFLOW'):
     CELERY_BROKER_URL: str = 'redis://127.0.0.1:6379'
     CELERY_RESULT_BACKEND: str = 'redis://127.0.0.1:6379'
@@ -218,9 +211,6 @@ CELERY_PREFETCH_MULTIPLIER: int = 1
 
 INTERNAL_IPS: list[str] = config('ALLOWED_HOSTS', cast=Csv())
 
-DEBUG_TOOLBAR_CONFIG = {
-    "SHOW_TOOLBAR_CALLBACK": lambda request: True,
-}
 
 DEFAULT_FILE_STORAGE: str = config('FILE_STORAGE')
 FTP_USER: str = config('FTP_USER')

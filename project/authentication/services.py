@@ -30,7 +30,6 @@ def send_email_template(user: User, body_title: str, title: str, text: str) -> N
     context = ({'user_name': user.profile.name, 'user_last_name': user.profile.last_name,
     'date_time': timezone.now(), 'body_title': body_title, 'title': title, 'text': text})
     message: str = render_to_string('email_confirm.html',context)
-    print(type(message))
     Util.send_email.delay(data = {'email_body': message, 'to_email': user.email})
 
 
