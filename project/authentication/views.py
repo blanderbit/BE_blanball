@@ -50,7 +50,7 @@ from authentication.services import (
     reset_password,
 )
 from authentication.permisions import IsNotAuthenticated
-from authentication.fuzzy_filter import (
+from authentication.filters import (
     RankedFuzzySearchFilter,
     UserAgeRangeFilter,
 )
@@ -210,7 +210,7 @@ class RequestEmailVerify(GenericAPIView):
             return Response(ALREADY_VERIFIED_ERROR, status = HTTP_400_BAD_REQUEST)
         code_create(email = user.email, type = EMAIL_VERIFY_CODE_TYPE,
         dop_info = user.email)
-        return Response(SENT_CODE_TO_EMAIL_SUCCESS,status = HTTP_200_OK)
+        return Response(SENT_CODE_TO_EMAIL_SUCCESS, status = HTTP_200_OK)
 
 class CheckUserActive(GenericAPIView):
     serializer_class = CheckUserActiveSerializer

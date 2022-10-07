@@ -26,5 +26,5 @@ class TestAuthenticationModels(SetUpAuthenticationModels):
         self.assertEqual(self.user.__str__(), 'user@example.com')
 
     def test_user_tokens_method(self) -> None:
-        payload = jwt.decode(self.user.tokens()['access'], settings.SECRET_KEY, algorithms="HS256")
+        payload = jwt.decode(self.user.tokens()['access'], settings.SECRET_KEY, settings.ALGORITHM)
         self.assertEqual(self.user.id,payload['user_id'])

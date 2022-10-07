@@ -1,12 +1,12 @@
 FROM python:3.10
 
 # `DJANGO_ENV` arg is used to make prod / dev builds:
-ARG DJANGO_ENV \
+ARG DEPLOY \
   # Needed for fixing permissions of files created by Docker:
   UID=1000 \
   GID=1000
 
-ENV DEBUG=true \
+ENV DEPLOY=${DEPLOY} \
   APP_PATH='/usr/src/blanball' \
   # python:
   PYTHONFAULTHANDLER=1 \
@@ -30,11 +30,11 @@ WORKDIR $APP_PATH
 COPY ./poetry.lock ./pyproject.toml $APP_PATH/
 
 
-RUN if [ "$DEBUG" = 'true' ]; then apt-get update && apt-get upgrade -y \
+RUN apt-get update && apt-get upgrade -y \
   && apt-get install --no-install-recommends -y \
-  && groupadd -g "${GID}" -r web \
-  && useradd -d $APP_PATH -g web -l -r -u "${UID}" web \
-  && chown web:web -R $APP_PATH; fi
+  && groupadd -g "${GID}" -r deploy \
+  && useradd -d $APP_PATH -g deploy -l -r -u "${UID}" deploy \
+  && chown deploy:deploy -R $APP_PATH
 
 RUN pip install --upgrade pip\
   &&pip install poetry=="$POETRY_VERSION" 
@@ -49,7 +49,7 @@ RUN apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false
 RUN target="$POETRY_CACHE_DIR" \
     &&poetry run pip install -U pip \
     &&poetry install \
-      $(if [ "$DEBUG" = 'true' ]; then echo '--no-root --only main'; fi) \
+      $(if [ "$DEPLOY" = 'true' ]; then echo '--no-root --only main'; fi) \
       --no-interaction --no-ansi
 
 COPY . $APP_PATH

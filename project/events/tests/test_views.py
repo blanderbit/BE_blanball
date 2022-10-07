@@ -87,7 +87,6 @@ class TestEventsViews(SetUpEventsViews):
     def test_get_events_list(self):
         self.auth()
         get_all_users_list = self.client.get(reverse("events-list"))
-        # print(get_all_users_list.data)
         # self.assertEqual(get_all_users_list.data['total_count'], Event.objects.count())
 
 

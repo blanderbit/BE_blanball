@@ -16,12 +16,13 @@ services:
       test: pg_isready -U postgres -d postgres
       timeout: 5s
       retries: 20
+
   api:
     container_name: api
     env_file: 
       - ./compose/.env
     entrypoint: compose/entrypoint.sh
-    command: api-start
+    command: api
     build: .
     volumes:
       - .:/usr/src/blanball
@@ -36,15 +37,7 @@ services:
         condition: service_healthy
     links: 
       - redis
-  nginx:
-    container_name: nginx
-    build: ./nginx
-    ports:
-      - 1337:81
-    networks:
-      - app-network
-    volumes:
-      - .:/usr/src/blanball
+
   redis:
     container_name: redis
     env_file:
@@ -58,12 +51,13 @@ services:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
       timeout: 5s
       retries: 20
+
   celery-worker: 
     container_name: celery-worker
     env_file: 
       - ./compose/.env
     entrypoint: compose/entrypoint.sh
-    command: celery-worker-start
+    command: celery-worker
     build: .
     volumes: 
       - .:/usr/src/blanball
@@ -80,7 +74,7 @@ services:
     env_file: 
       - ./compose/.env 
     entrypoint: compose/entrypoint.sh
-    command: celery-beat-start
+    command: celery-beat
     build: .
     volumes: 
       - .:/usr/src/blanball
@@ -90,32 +84,8 @@ services:
       db:
         condition: service_started
       api:
-        condition: service_started  
-  pgadmin:
-    container_name: pgadmin
-    env_file: 
-      - ./compose/.env
-    image: dpage/pgadmin4
-    volumes:
-      - pgadmin-data:/usr/src/blanball/storage/pgadmin/data
-    networks:
-      - app-network
-    ports:
-      - 5050:80
-    
-  db-backup:
-    container_name: db-backup
-    env_file: 
-      - ./compose/.env
-    image: prodrigestivill/postgres-backup-local
-    restart: always
-    volumes:
-      - ./backup:/backups
-    networks:
-      - app-network
-    depends_on:
-      db:
         condition: service_started
+
   ftp-server:
     container_name: ftp-server
     env_file: 
@@ -134,5 +104,4 @@ networks:
 
 volumes:
   redis-data:
-  pgadmin-data:
   ftp-server-data:
