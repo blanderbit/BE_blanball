@@ -58,7 +58,9 @@ services:
       - redis
   nginx:
     container_name: nginx
-    build: ./nginx
+    build: 
+      context: .
+      dockerfile: Dockerfile.nginx
     ports:
       - 1337:81
     networks:
