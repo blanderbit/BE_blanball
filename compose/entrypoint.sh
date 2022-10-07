@@ -7,7 +7,6 @@ Backend()
     python manage.py makemigrations 
     python manage.py migrate
     uwsgi --ini uwsgi.ini
-    daphne -u project.asgi:application --port 8000 --bind 0.0.0.0 -v2
 }
 
 Daphne()
