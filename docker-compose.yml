@@ -36,6 +36,26 @@ services:
         condition: service_healthy
     links: 
       - redis
+  daphne:
+    container_name: daphne
+    env_file: 
+      - ./compose/.env
+    entrypoint: compose/entrypoint.sh
+    command: daphne-start
+    build: .
+    volumes:
+      - .:/usr/src/blanball
+    networks:
+      - app-network
+    ports: 
+      - 9000:9000
+    depends_on:
+      db: 
+        condition: service_healthy
+      redis: 
+        condition: service_healthy
+    links: 
+      - redis
   nginx:
     container_name: nginx
     build: ./nginx

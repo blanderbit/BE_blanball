@@ -7,7 +7,7 @@ from project.constaints import (
     CHANGE_MAINTENANCE_MESSAGE_TYPE,MAINTENANCE_FALSE_NOTIFICATION_TEXT,MAINTENANCE_TRUE_NOTIFICATION_TEXT)
 
 def update_maintenance(data: dict[str, str]) -> None:
-    with open('./project/project/config.json', 'w') as f:
+    with open('./project/config.json', 'w') as f:
         json.dump(data,f)
         for user in User.objects.all():
             if data["isMaintenance"] == True:

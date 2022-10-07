@@ -227,3 +227,5 @@ FTP_USER: str = config('FTP_USER')
 FTP_PASS: str = config('FTP_PASS')
 FTP_PORT: str = config('FTP_PORT')
 FTP_STORAGE_LOCATION = 'ftp://'+FTP_USER+':'+FTP_PASS+'@ftp-server:'+FTP_PORT
+
+ALGORITHM = 'HS256'
