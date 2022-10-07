@@ -1,7 +1,7 @@
 on: [push,workflow_dispatch]
 
 env:
-  PROXY_DOCKERFILE_PATH: Dockerfile.nginx
+  PROXY_DOCKERFILE_PATH: nginx/Dockerfile
   PROXY_LATEST_IMAGE: ${{ secrets.DOCKER_PROXY_REGISTRY }}:latest
   PROXY_COMMIT_IMAGE: ${{ secrets.DOCKER_PROXY_REGISTRY }}:${{ github.sha }}
 

@@ -1,12 +1,18 @@
 #!/bin/bash -x
 cd project
 
-Backend()
+BackendDeploy()
 {
-    python manage.py collectstatic --noinput
-    python manage.py makemigrations 
     python manage.py migrate
     uwsgi --ini uwsgi.ini
+}
+
+Backend()
+{
+    python manage.py makemigrations
+    python manage.py migrate
+    python manage.py collectstatic --noinput
+    python manage.py runserver 0.0.0.0:8000
 }
 
 Daphne()
@@ -30,9 +36,10 @@ CeleryBeat()
 
 case $1
 in
-    api-start) Backend ;;
-    celery-worker-start) CeleryWorker ;;
-    celery-beat-start) CeleryBeat ;;
-    daphne-start) Daphne;;
+    api) Backend ;;
+    api-deploy) BackendDeploy;;
+    celery-worker) CeleryWorker ;;
+    celery-beat) CeleryBeat ;;
+    daphne) Daphne;;
     *) exit 1 ;;
 esac
