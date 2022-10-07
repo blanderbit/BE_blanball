@@ -1,7 +1,7 @@
 on: [push,workflow_dispatch]
 
 env:
-  PROXY_DOCKERFILE_PATH: /nginx/Dockerfile
+  PROXY_DOCKERFILE_PATH: nginx/Dockerfile
   PROXY_LATEST_IMAGE: ${{ secrets.DOCKER_PROXY_REGISTRY }}:latest
   PROXY_COMMIT_IMAGE: ${{ secrets.DOCKER_PROXY_REGISTRY }}:${{ github.sha }}
 
@@ -22,6 +22,7 @@ jobs:
     - name: Build image (PROXY)
       working-directory: .
       run: |
+        ls -l
         docker build -f ${{ env.PROXY_DOCKERFILE_PATH}} -t proxy --cache-from ${{ env.PROXY_LATEST_IMAGE }} -t ${{ env.PROXY_COMMIT_IMAGE }} .
     - name: Tag latest image (PROXY)
       run: |
