@@ -96,7 +96,12 @@ backup/
 postgres-data/
 qa.txt
 
-project/static/admin/
-project/static/drf-yasg/
-project/static/rest-framework/
-project/static/rest_framework_swagger/
+.mypy_cache/
+
+drf-yasg/
+
+rest_framework/
+
+debug_toolbar/
+
+rest_framework_swagger/
