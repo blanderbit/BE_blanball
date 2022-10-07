@@ -26,7 +26,7 @@ jobs:
         docker build -f ${{ env.PROXY_DOCKERFILE_PATH}} -t proxy --cache-from ${{ env.PROXY_LATEST_IMAGE }} -t ${{ env.PROXY_COMMIT_IMAGE }} .
     - name: Tag latest image (PROXY)
       run: |
-        docker tag ${{ env.PROXY_LATEST_IMAGE }} ${{ env.PROXY_COMMIT_IMAGE }} 
+        docker tag ${{ env.PROXY_COMMIT_IMAGE }} ${{ env.PROXY_LATEST_IMAGE }}
     - name: Push images (PROXY)
       run: |
         docker push ${{ env.PROXY_COMMIT_IMAGE }}
