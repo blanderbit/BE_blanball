@@ -76,7 +76,7 @@ jobs:
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
 
-    - name: Pull latest image
+    - name: Pull latest image (API)
       run: |
         docker pull ${LATEST_IMAGE} --ignore-pull-failures || true
     - name: Build image (API)

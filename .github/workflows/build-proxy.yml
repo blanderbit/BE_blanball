@@ -1,6 +1,7 @@
 on: [push,workflow_dispatch]
 
 env:
+  PROXY_DOCKERFILE_PATH: nginx/Dockerfile
   PROXY_REGISTRY: ${{ secrets.DOCKER_PROXY_REGISTRY }}
   PROXY_LATEST_IMAGE: ${{ secrets.DOCKER_PROXY_REGISTRY }}:latest
   PROXY_COMMIT_IMAGE: ${{ secrets.DOCKER_PROXY_REGISTRY }}:${{ github.sha }}
@@ -13,7 +14,7 @@ jobs:
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v2
       with:
-        registry: ${{ env.REGISTRY }}
+        registry: ${{ env.PROXY_REGISTRY }}
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
 
@@ -23,14 +24,14 @@ jobs:
     - name: Build image (PROXY)
       working-directory: .
       run: |
-        docker build -f ${{ env.API_DOCKERFILE_PATH }} -t api --cache-from ${{ env.PROXY_LATEST_IMAGE }} -t ${{ env.PROXY_COMMIT_IMAGE }} .
+        docker build -f ${{ env.PROXY_DOCKERFILE_PATH}} -t api --cache-from ${{ env.PROXY_LATEST_IMAGE }} -t ${{ env.PROXY_COMMIT_IMAGE }} .
     - name: Tag latest image (PROXY)
       run: |
-        docker tag ${{ env.COMMIT_IMAGE }} ${{ env.LATEST_IMAGE }} 
+        docker tag ${{ env.PROXY_LATEST_IMAGE }} ${{ env.PROXY_LATEST_IMAGE }} 
     - name: Push images (PROXY)
       run: |
-        docker push ${{ env.COMMIT_IMAGE }}
-        docker push ${{ env.LATEST_IMAGE }}        
+        docker push ${{ env.PROXY_LATEST_IMAGE }}
+        docker push ${{ env.PROXY_LATEST_IMAGE }}        
     - name: Trigger deploy in portainer
       run: |
         curl -X POST ${{ env.WEBHOOK }}
