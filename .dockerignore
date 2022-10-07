@@ -4,4 +4,6 @@ __pycache__/
 venv/
 .mypy_cache/
 app.sock
+daphne.sock
+daphne.sock.lock
 celerybeat-schedule

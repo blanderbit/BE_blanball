@@ -23,7 +23,7 @@ jobs:
     - name: Build image (PROXY)
       working-directory: .
       run: |
-        docker build -f ${{ env.PROXY_DOCKERFILE_PATH}} -t api --cache-from ${{ env.PROXY_LATEST_IMAGE }} -t ${{ env.PROXY_COMMIT_IMAGE }} .
+        docker build -f ${{ env.PROXY_DOCKERFILE_PATH}} -t proxy --cache-from ${{ env.PROXY_LATEST_IMAGE }} -t ${{ env.PROXY_COMMIT_IMAGE }} .
     - name: Tag latest image (PROXY)
       run: |
         docker tag ${{ env.PROXY_LATEST_IMAGE }} ${{ env.PROXY_LATEST_IMAGE }} 
