@@ -1,9 +1,5 @@
 on: [push,workflow_dispatch]
 
-env:
-  PROXY_LATEST_IMAGE: ${{ secrets.DOCKER_PROXY_REGISTRY }}:latest
-  PROXY_COMMIT_IMAGE: ${{ secrets.DOCKER_PROXY_REGISTRY }}:${{ github.sha }}
-
 jobs:
   run_tests:
     runs-on: ubuntu-latest
@@ -58,7 +54,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Set env vars (TEST)
-      # if: github.event_name == 'push' && github.ref == 'refs/heads/develop' || github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+      if: github.event_name == 'push' && github.ref == 'refs/heads/develop' || github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
       run: |
         echo "WEBHOOK=${{ secrets.PORTAINER_WEBHOOK_URL_TEST }}" >> $GITHUB_ENV
         echo "REGISTRY=${{ secrets.DOCKER_REGISTRY_TEST }}" >> $GITHUB_ENV
