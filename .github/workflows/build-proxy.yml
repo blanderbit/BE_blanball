@@ -2,7 +2,6 @@ on: [push,workflow_dispatch]
 
 env:
   PROXY_DOCKERFILE_PATH: nginx/Dockerfile
-  PROXY_REGISTRY: ${{ secrets.DOCKER_PROXY_REGISTRY }}
   PROXY_LATEST_IMAGE: ${{ secrets.DOCKER_PROXY_REGISTRY }}:latest
   PROXY_COMMIT_IMAGE: ${{ secrets.DOCKER_PROXY_REGISTRY }}:${{ github.sha }}
 
@@ -14,7 +13,7 @@ jobs:
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v2
       with:
-        registry: ${{ env.PROXY_REGISTRY }}
+        registry: ${{ secrets.DOCKER_PROXY_REGISTRY }}
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
 
