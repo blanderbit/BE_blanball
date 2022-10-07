@@ -1,9 +1,5 @@
 on: [push,workflow_dispatch]
 
-env:
-  PROXY_LATEST_IMAGE: ${{ secrets.DOCKER_PROXY_REGISTRY }}:latest
-  PROXY_COMMIT_IMAGE: ${{ secrets.DOCKER_PROXY_REGISTRY }}:${{ github.sha }}
-
 jobs:
   run_tests:
     runs-on: ubuntu-latest
