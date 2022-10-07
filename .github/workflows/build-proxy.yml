@@ -31,6 +31,3 @@ jobs:
       run: |
         docker push ${{ env.PROXY_COMMIT_IMAGE }}
         docker push ${{ env.PROXY_LATEST_IMAGE }}        
-    - name: Trigger deploy in portainer
-      run: |
-        curl -X POST ${{ env.WEBHOOK }}
