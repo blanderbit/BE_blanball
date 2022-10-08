@@ -22,6 +22,7 @@ USE_TZ: bool = config('USE_TZ',cast = bool, default = True)
 DEFAULT_AUTO_FIELDL: str = 'django.db.models.BigAutoField'
 
 # Static files
+STATIC_URL: str = '/api/static/'
 STATIC_ROOT: str = os.path.join(BASE_DIR, 'static/')
 
 CUSTOM_PAGINATION_PAGE_SIZE = 10
