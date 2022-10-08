@@ -131,7 +131,7 @@ services:
     networks:
       - app-network
     ports:
-      - 49280:80
+      - 49280:49299
 
   db_backup:
     container_name: db_backup
