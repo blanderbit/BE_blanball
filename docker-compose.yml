@@ -21,10 +21,19 @@ services:
     container_name: api
     env_file: 
       - ./compose/.env
+<<<<<<< HEAD
     entrypoint: compose/entrypoint.sh
     command: api
     build: .
     volumes:
+=======
+    # entrypoint: compose/entrypoint.sh
+    command: python project/manage.py runserver
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    volumes: 
+>>>>>>> d9183e24ae870136a69f66db8c0328170946d8a8
       - .:/usr/src/blanball
     networks:
       - app-network
@@ -58,7 +67,13 @@ services:
       - ./compose/.env
     entrypoint: compose/entrypoint.sh
     command: celery-worker
+<<<<<<< HEAD
     build: .
+=======
+    build: 
+      context: .
+      dockerfile: Dockerfile
+>>>>>>> d9183e24ae870136a69f66db8c0328170946d8a8
     volumes: 
       - .:/usr/src/blanball
     networks:
@@ -75,7 +90,13 @@ services:
       - ./compose/.env 
     entrypoint: compose/entrypoint.sh
     command: celery-beat
+<<<<<<< HEAD
     build: .
+=======
+    build: 
+      context: .
+      dockerfile: Dockerfile
+>>>>>>> d9183e24ae870136a69f66db8c0328170946d8a8
     volumes: 
       - .:/usr/src/blanball
     networks:

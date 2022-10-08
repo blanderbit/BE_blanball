@@ -3,6 +3,8 @@
 __pycache__/
 venv/
 app.sock
+daphne.sock
+daphne.sock.lock
 celerybeat-schedule
 
 drf-yasg/
