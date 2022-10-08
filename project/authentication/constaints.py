@@ -50,9 +50,9 @@ REGISTER_SUCCESS_BODY_TITLE = 'Registration was successful'
 REGISTER_SUCCESS_TITLE = 'Thank you for registering with BlanBall'
 REGISTER_SUCCESS_TEXT = 'You received this message because this email is registered in the BlanBall app.'
 
-TEMPLATE_SUCCESS_BODY_TITLE  = 'Change {body} passed successfully'
-TEMPLATE_SUCCESS_TITLE = 'Your {body} changed!'
-TEMPLATE_SUCCESS_TEXT = 'You received this message {body} in the BlanBall application.'
+TEMPLATE_SUCCESS_BODY_TITLE  = 'Change {key} passed successfully'
+TEMPLATE_SUCCESS_TITLE = 'Your {key} changed!'
+TEMPLATE_SUCCESS_TEXT = 'You received this message because your {key} has been changed in the BlanBall application.'
 
 EMAIL_VERIFY_SUCCESS_BODY_TITLE = 'Verification was successful!'
 EMAIL_VERIFY_SUCCESS_TITLE = 'Your account has been activated!'

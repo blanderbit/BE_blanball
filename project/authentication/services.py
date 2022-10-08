@@ -54,7 +54,7 @@ def code_create(email: str, type: str, dop_info: str) -> None:
     user: User = User.objects.get(email = email)
     context: dict = ({'title':check_code_type(code),'code': list(code.verify_code),
         'name': user.profile.name,'surname': user.profile.last_name})
-    template: str = render_to_string("email_code.html",context)
+    template: str = render_to_string('email_code.html', context)
     print(verify_code)
     data: dict = {'email_body': template ,'to_email': email}
     Util.send_email.delay(data)
@@ -75,6 +75,6 @@ def reset_password(serializer: Serializer) -> None:
     user.set_password(serializer.validated_data['new_password'])
     user.save()
     code.delete()
-    send_email_template(user = user, body_title = TEMPLATE_SUCCESS_BODY_TITLE.format(body = 'password'),
-        title = TEMPLATE_SUCCESS_TITLE.format(body = 'password'),
-        text = TEMPLATE_SUCCESS_TEXT.format(body = 'because your password has been changed'))
+    send_email_template(user = user, body_title = TEMPLATE_SUCCESS_BODY_TITLE.format(key = 'password'),
+        title = TEMPLATE_SUCCESS_TITLE.format(key = 'password'),
+        text = TEMPLATE_SUCCESS_TEXT.format(key = 'password'))

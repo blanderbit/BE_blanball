@@ -180,7 +180,7 @@ class TestAuthenticationViews(SetUpAauthenticationViews):
         self.assertEqual(User.objects.first().is_verified, False)
         response = self.client.get(reverse('request-email-verify'))
         verify = self.client.post(reverse('check-code'), {'verify_code': Code.objects.first().verify_code})
-        print(User.objects.first().is_verified)
+        self.assertEqual(User.objects.first().is_verified, True)
         self.assertEqual(verify.status_code, HTTP_200_OK)
         self.assertEqual(response.status_code, HTTP_200_OK)
 

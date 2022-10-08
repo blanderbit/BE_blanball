@@ -38,14 +38,14 @@ services:
     links:
      - redis
 
-  nginx:
-    container_name: nginx
+  proxy:
+    container_name: proxy
     env_file: 
       - stack.env
     image: registry.it-flumx.com/blanball-proxy:latest
     restart: always
     ports:
-      - 49299:81
+      - 49299:80
     networks:
       - app-network
     depends_on:
@@ -167,5 +167,4 @@ volumes:
   pgadmin-data:
   db-backup-data:
   ftp-server-data:
-
 
