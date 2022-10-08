@@ -35,19 +35,7 @@ services:
     networks:
       - app-network    
     links:
-     - redis
-
-  static:
-    container_name: static
-    env_file: 
-      - stack.env
-    image: registry.it-flumx.com/flumx_te_blanball_be_test_static:latest
-    restart: always
-    networks:
-      - app-network
-    depends_on:
-      api:
-        condition: service_started
+      - redis
 
   daphne:
     container_name: daphne
@@ -68,7 +56,7 @@ services:
     networks:
       - app-network    
     links:
-     - redis
+      - redis
 
   db:
     container_name: db
@@ -115,6 +103,63 @@ services:
       redis:
         condition: service_healthy
 
+  celery-beat:
+    container_name: celery-beat
+    env_file: 
+      - stack.env
+    image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
+    user: deploy
+    restart: always 
+    entrypoint: compose/entrypoint.sh
+    command: celery-beat
+    networks:
+      - app-network
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  pgadmin:
+    container_name: pgadmin
+    env_file: 
+      - stack.env
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      - PGADMIN_LISTEN_PORT=49299
+    volumes:
+      - pgadmin-data:/usr/src/blanball/storage/pgadmin/data
+    networks:
+      - app-network
+    ports:
+      - 49280:80
+
+  db_backup:
+    container_name: db_backup
+    env_file: 
+      - stack.env
+    image: prodrigestivill/postgres-backup-local
+    restart: always
+    volumes:
+      - db-backup-data:/usr/src/blanball/storage/db-backup/data
+    networks:
+      - app-network
+    depends_on:
+      db:
+        condition: service_started
+
+  ftp-server:
+    env_file:
+      - stack.env
+    container_name: ftp-server
+    image: garethflowers/ftp-server
+    restart: always
+    ports:
+      - '49221:21/tcp'
+    volumes:
+      - ftp-server-data:/home/user
+    networks:
+      - app-network
+    
 networks:
   app-network:
     driver: bridge    
