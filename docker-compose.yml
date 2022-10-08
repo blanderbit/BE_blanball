@@ -21,8 +21,8 @@ services:
     container_name: api
     env_file: 
       - ./compose/.env
-    # entrypoint: compose/entrypoint.sh
-    command: python project/manage.py runserver
+    entrypoint: compose/entrypoint.sh
+    command: api
     build: 
       context: .
       dockerfile: Dockerfile
