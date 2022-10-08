@@ -29,7 +29,7 @@ from events.filters import EventDateTimeRangeFilter
 
 from project.pagination import CustomPagination
 from notifications.tasks import *
-from authentication.fuzzy_filter import RankedFuzzySearchFilter
+from authentication.filters import RankedFuzzySearchFilter
 
 from django.db.models import Count
 from django.db.models.query import QuerySet

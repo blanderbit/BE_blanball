@@ -1,11 +1,13 @@
 version: "3.8"
 
 services: 
+
   db:
     container_name: db
     env_file: 
       - stack.env
     image: postgres:latest
+    restart: always
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
     networks:
@@ -20,9 +22,10 @@ services:
     env_file: 
       - stack.env
     image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
-    command: bash compose/local/django-start.sh
-    volumes:
-      - .:/usr/src/blanball
+    user: deploy
+    entrypoint: compose/entrypoint.sh
+    restart: always
+    command: api-deploy
     ports:
       - 49200:8000
     depends_on:
@@ -34,11 +37,13 @@ services:
       - app-network    
     links:
      - redis
+
   nginx:
     container_name: nginx
     env_file: 
       - stack.env
     image: registry.it-flumx.com/blanball-proxy:latest
+    restart: always
     ports:
       - 49299:81
     networks:
@@ -46,11 +51,34 @@ services:
     depends_on:
       api:
         condition: service_started
+
+  daphne:
+    container_name: daphne
+    env_file: 
+      - stack.env
+    image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
+    user: deploy
+    restart: always
+    entrypoint: compose/entrypoint.sh
+    command: daphne
+    ports:
+      - 49290:9000
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - app-network    
+    links:
+     - redis
+
   redis:
     container_name: redis
     env_file: 
       - stack.env
     image: redis:latest
+    restart: always
     volumes:
       - redis-data:/usr/src/blanball/storage/redis/data
     networks:
@@ -65,8 +93,10 @@ services:
       - stack.env
     container_name: celery-worker
     image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
+    user: deploy
     restart: always
-    command: bash compose/local/celery-worker-start.sh
+    entrypoint: compose/entrypoint.sh
+    command: celery-worker
     networks:
       - app-network  
     depends_on:
@@ -78,8 +108,10 @@ services:
     env_file: 
       - stack.env
     image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
+    user: deploy
     restart: always 
-    command: bash compose/local/celery-beat-start.sh
+    entrypoint: compose/entrypoint.sh
+    command: celery-beat
     networks:
       - app-network
     depends_on:
@@ -91,6 +123,7 @@ services:
     env_file: 
       - stack.env
     image: dpage/pgadmin4
+    restart: always
     volumes:
       - pgadmin-data:/usr/src/blanball/storage/pgadmin/data
     networks:
@@ -111,11 +144,13 @@ services:
     depends_on:
       db:
         condition: service_started
+
   ftp-server:
     env_file: 
       - stack.env
     container_name: ftp-server
     image: garethflowers/ftp-server
+    restart: always
     ports:
       - '49221:21/tcp'
     volumes:
@@ -125,10 +160,12 @@ services:
     
 networks:
   app-network:
-     driver: bridge    
+    driver: bridge    
      
 volumes:
   redis-data:
   pgadmin-data:
   db-backup-data:
   ftp-server-data:
+
+
