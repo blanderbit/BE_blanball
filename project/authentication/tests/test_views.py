@@ -23,7 +23,7 @@ class TestAuthenticationViews(SetUpAauthenticationViews):
         response = self.client.post(reverse('register'), self.user_register_data)
         self.assertEqual(User.objects.count(), 1)
         self.assertTrue(User.objects.get(email = self.user_register_data['email']).profile.age == 22)
-        self.assertEqual('User',User.objects.get(email =self.user_register_data['email']).role)
+        self.assertEqual('User', User.objects.get(email =self.user_register_data['email']).role)
         self.assertEqual(response.status_code, HTTP_201_CREATED)
     
     def test_register_with_authorized(self) -> None:
@@ -74,9 +74,9 @@ class TestAuthenticationViews(SetUpAauthenticationViews):
         self.client.post(reverse('request-change-email'), self.request_change_email_data)
         response = self.client.post(reverse('check-code'), {'verify_code': Code.objects.first().verify_code})
         self.client.force_authenticate(None)
-        login_user_with_old_email = self.client.post(reverse('login'),{'email': self.user_register_data['email'],'password':
+        login_user_with_old_email = self.client.post(reverse('login'),{'email': self.user_register_data['email'], 'password':
         self.user_register_data['password']})
-        login_user_with_new_email = self.client.post(reverse('login'), {'email':'change_email@example.com','password':
+        login_user_with_new_email = self.client.post(reverse('login'), {'email':self.request_change_email_data['email'], 'password':
         self.user_register_data['password']})
         self.assertEqual(login_user_with_new_email.status_code, HTTP_200_OK)
         self.assertEqual(login_user_with_old_email.status_code, HTTP_400_BAD_REQUEST)
@@ -175,6 +175,23 @@ class TestAuthenticationViews(SetUpAauthenticationViews):
         self.assertEqual(request_delete.status_code, HTTP_200_OK)
         self.assertEqual(response.status_code, HTTP_200_OK)
 
+    def test_verify_account(self) -> None:
+        self.auth()
+        self.assertEqual(User.objects.first().is_verified, False)
+        response = self.client.get(reverse('request-email-verify'))
+        verify = self.client.post(reverse('check-code'), {'verify_code': Code.objects.first().verify_code})
+        print(User.objects.first().is_verified)
+        self.assertEqual(verify.status_code, HTTP_200_OK)
+        self.assertEqual(response.status_code, HTTP_200_OK)
+
+    def test_code_delete_after_success_uses(self) -> None:
+        self.auth()
+        response = self.client.get(reverse('request-email-verify'))
+        self.assertEqual(Code.objects.count(), 1)
+        verify = self.client.post(reverse('check-code'), {'verify_code': Code.objects.first().verify_code})
+        self.assertEqual(Code.objects.count(), 0)
+        self.assertEqual(verify.status_code, HTTP_200_OK)
+        self.assertEqual(response.status_code, HTTP_200_OK)
 
     def auth(self) -> NoneType:
         self.client.post(reverse('register'), self.user_register_data)
