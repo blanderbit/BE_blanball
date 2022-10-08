@@ -96,10 +96,26 @@ backup/
 postgres-data/
 qa.txt
 
+<<<<<<< HEAD
+.mypy_cache/
+
+drf-yasg/
+
+rest_framework/
+
+debug_toolbar/
+
+rest_framework_swagger/
+=======
 project/static/admin/
 project/static/drf-yasg/
 project/static/rest-framework/
 project/static/rest_framework_swagger/
 
 daphne.sock
+<<<<<<< HEAD
 daphne.sock.lock
+>>>>>>> b2516adc780e9ff911191dbe66ae108c6db2d06d
+=======
+daphne.sock.lock
+>>>>>>> d9183e24ae870136a69f66db8c0328170946d8a8

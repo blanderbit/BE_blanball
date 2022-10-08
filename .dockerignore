@@ -2,8 +2,15 @@
 .vscode/
 __pycache__/
 venv/
-.mypy_cache/
 app.sock
 daphne.sock
 daphne.sock.lock
 celerybeat-schedule
+
+drf-yasg/
+
+rest_framework/
+
+debug_toolbar/
+
+rest_framework_swagger/
