@@ -2,6 +2,8 @@ from project.yasg import urlpatterns as doc_urls
 from django.conf.urls.static import serve
 
 from django.urls import path,include
+from django.conf.urls.static import static
+from django.
 from django.conf import settings
 
 urlpatterns = [
@@ -13,9 +15,7 @@ urlpatterns = [
         name='notifications'),
     path('api/v1/reviews/', include('reviews.urls'), 
         name='reviews'),
-    path(settings.STATIC_URL[1:], serve, {'document_root': settings.STATIC_ROOT })
 ]
-print(settings.STATIC_URL[1:])
-print(settings.STATIC_ROOT)
 
+urlpatterns += static(settings.STATIC_URL, document_root = settings.STATIC_ROOT)
 urlpatterns += doc_urls
