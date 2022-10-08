@@ -22,7 +22,6 @@ USE_TZ: bool = config('USE_TZ',cast = bool, default = True)
 DEFAULT_AUTO_FIELDL: str = 'django.db.models.BigAutoField'
 
 # Static files
-STATIC_URL: str = '/static/'
 STATIC_ROOT: str = os.path.join(BASE_DIR, 'static/')
 
 CUSTOM_PAGINATION_PAGE_SIZE = 10
@@ -123,7 +122,7 @@ else:
 
 
 SWAGGER_SETTINGS: dict[str, Any] = {
-    'SHOW_REQUEST_HEADERS': config('SHOW_REQUEST_HEADERS',cast = bool),
+    'SHOW_REQUEST_HEADERS': config('SHOW_REQUEST_HEADERS', cast = bool),
     'SECURITY_DEFINITIONS': {
         'Bearer': {
             'type': 'apiKey',
@@ -131,8 +130,8 @@ SWAGGER_SETTINGS: dict[str, Any] = {
             'in': 'Header'
         }
     },
-    'USE_SESSION_AUTH': config('USE_SESSION_AUTH',cast = bool),
-    'JSON_EDITOR': config('JSON_EDITOR',cast = bool),
+    'USE_SESSION_AUTH': config('USE_SESSION_AUTH', cast = bool),
+    'JSON_EDITOR': config('JSON_EDITOR', cast = bool),
     'SUPPORTED_SUBMIT_METHODS': (
         'get',
         'post',

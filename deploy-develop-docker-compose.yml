@@ -24,7 +24,6 @@ services:
     image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
     user: deploy
     entrypoint: compose/entrypoint.sh
-    restart: always
     command: api-deploy
     ports:
       - 49200:8000
@@ -58,7 +57,6 @@ services:
       - stack.env
     image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
     user: deploy
-    restart: always
     entrypoint: compose/entrypoint.sh
     command: daphne
     ports:
@@ -78,7 +76,6 @@ services:
     env_file: 
       - stack.env
     image: redis:latest
-    restart: always
     volumes:
       - redis-data:/usr/src/blanball/storage/redis/data
     networks:
@@ -94,7 +91,6 @@ services:
     container_name: celery-worker
     image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
     user: deploy
-    restart: always
     entrypoint: compose/entrypoint.sh
     command: celery-worker
     networks:
