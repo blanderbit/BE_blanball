@@ -32,12 +32,12 @@ class RankedFuzzySearchFilter(MySearchFilter):
         full_text_expr: Concat = Concat(*full_text_vector, output_field=TextField())
 
         similarity: TrigramSimilarity = TrigramSimilarity(full_text_expr, search_terms)
-        queryset: QuerySet = queryset.annotate(rank=similarity)
+        queryset: QuerySet = queryset.annotate(rank = similarity)
 
         if min_rank is None:
-            queryset = queryset.filter(rank__gt=0.0)
+            queryset = queryset.filter(rank__gt = 0.0)
         elif min_rank > 0.0:
-            queryset = queryset.filter(rank__gte=min_rank)
+            queryset = queryset.filter(rank__gte = min_rank)
 
         return queryset[:5]
 
@@ -50,7 +50,7 @@ class RankedFuzzySearchFilter(MySearchFilter):
 
             queryset: QuerySet = self.search_queryset(queryset, search_fields, search_terms, min_rank)
         else:
-            queryset: QuerySet = queryset.annotate(rank=Value(1.0, output_field=FloatField()))
+            queryset: QuerySet = queryset.annotate(rank=Value(1.0, output_field=  FloatField()))
 
         return queryset[:5]
 

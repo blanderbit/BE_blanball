@@ -4,7 +4,7 @@ services:
   db:
     container_name: db
     env_file: 
-      - ./compose/.env
+      - .env
     image: postgres:latest
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
@@ -20,8 +20,8 @@ services:
   api:
     container_name: api
     env_file: 
-      - ./compose/.env
-    entrypoint: compose/entrypoint.sh
+      - .env
+    entrypoint: scripts/entrypoint.sh
     command: api
     build: 
       context: .
@@ -42,8 +42,8 @@ services:
 
   redis:
     container_name: redis
-    env_file:
-      - ./compose/.env
+    env_file: 
+      - .env
     image: redis:7.0.4-alpine
     volumes: 
       - redis-data:/usr/src/blanball/storage/redis/data
@@ -57,8 +57,8 @@ services:
   celery-worker: 
     container_name: celery-worker
     env_file: 
-      - ./compose/.env
-    entrypoint: compose/entrypoint.sh
+      - .env
+    entrypoint: scripts/entrypoint.sh
     command: celery-worker
     build: 
       context: .
@@ -76,8 +76,8 @@ services:
   celery-beat:
     container_name: celery-beat
     env_file: 
-      - ./compose/.env 
-    entrypoint: compose/entrypoint.sh
+      - .env
+    entrypoint: scripts/entrypoint.sh
     command: celery-beat
     build: 
       context: .
@@ -95,7 +95,7 @@ services:
   ftp-server:
     container_name: ftp-server
     env_file: 
-      - ./compose/.env
+      - .env
     image: garethflowers/ftp-server
     ports:
       - 21:21/tcp

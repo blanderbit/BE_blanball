@@ -61,7 +61,7 @@ from events.constaints import (
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, EVENT_NOT_FOUND_ERROR, EVENT_DELETED_SUCCESS, EVENT_UPDATE_MESSAGE_TYPE,
     EVENT_UPDATE_SUCCESS, JOIN_TO_EVENT_SUCCESS, NEW_REQUEST_TO_PARTICIPATION_MESSAGE_TYPE, NEW_REQUEST_TO_PARTICIPATION, 
     APPLICATION_FOR_PARTICIPATION_SUCCESS, NO_IN_EVENT_FANS_LIST_ERROR, DISCONNECT_FROM_EVENT_SUCCESS, 
-    LEAVE_USER_FROM_THE_EVENT_NOTIFICATION, NO_IN_EVENT_MEMBERS_LIST_ERROR
+    LEAVE_USER_FROM_THE_EVENT_NOTIFICATION, NO_IN_EVENT_MEMBERS_LIST_ERROR, EVENT_UPDATE_TEXT
 
 )
 from authentication.constaints import (
@@ -110,7 +110,7 @@ class InviteUserToEvent(GenericAPIView):
             event: Event = Event.objects.get(id = serializer.validated_data['event_id'])
             if not invite_user.current_rooms.filter(id = event.id).exists():
                 send_to_user(user = invite_user,notification_text=
-                INVITE_USER_NOTIFICATION.format(user_name = request.user.profile.name,event_name = event.name),
+                INVITE_USER_NOTIFICATION.format(user_name = request.user.profile.name, event_name = event.name),
                 message_type = INVITE_USER_TO_EVENT_MESSAGE_TYPE)
                 return Response(SENT_INVATION_SUCCESS, status = HTTP_200_OK)
             return Response(ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, status = HTTP_400_BAD_REQUEST)
@@ -123,11 +123,10 @@ class GetDeleteEvent(RetrieveAPIView):
     '''a class that allows you to get, update, delete an event'''
     serializer_class =  EventSerializer
     queryset = Event.objects.all()
-    permission_classes = [IsNotAuthenticated]
     
     def delete(self, request: Request, pk: int) -> Response:
         try:
-            event: Event = self.queryset.filter(id = pk)
+            event: Event = self.queryset.get(id = pk)
             if event.author.id == request.user.id:
                 event.delete()
                 return Response(EVENT_DELETED_SUCCESS, status = HTTP_200_OK)
@@ -140,18 +139,18 @@ class UpdateEvent(GenericAPIView):
     serializer_class = UpdateEventSerializer
     queryset = Event.objects.all()
 
-    def put(self, request: Request,pk: int) -> Response:
+    def put(self, request: Request, pk: int) -> Response:
         serializer = self.serializer_class(data = request.data)
-        serializer.is_valid(raise_exception= True)
+        serializer.is_valid(raise_exception = True)
+        event: Event = self.queryset.filter(id = pk).select_related('author').prefetch_related('current_users', 'fans')
         try:
-            event: Event = self.queryset.filter(id = pk).select_related('author').prefetch_related('current_users','fans')
             if event[0].author.id == request.user.id:
                 send_notification_to_subscribe_event_user(event = event[0],
-                notification_text = 'event_updated', message_type = EVENT_UPDATE_MESSAGE_TYPE)
+                notification_text = EVENT_UPDATE_TEXT.format(event_id = event[0].id), message_type = EVENT_UPDATE_MESSAGE_TYPE)
                 event.update(**serializer.validated_data)
                 return Response(EVENT_UPDATE_SUCCESS, status = HTTP_200_OK)
             return Response(NO_PERMISSIONS_ERROR, status = HTTP_403_FORBIDDEN)
-        except Event.DoesNotExist:
+        except IndexError:
             return Response(EVENT_NOT_FOUND_ERROR, status = HTTP_404_NOT_FOUND)
   
 

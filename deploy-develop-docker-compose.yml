@@ -7,7 +7,6 @@ services:
     env_file: 
       - stack.env
     image: registry.it-flumx.com/blanball-proxy:latest
-    restart: always
     ports:
       - 49299:80
     networks:
@@ -22,8 +21,7 @@ services:
       - stack.env
     image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
     user: deploy
-    entrypoint: compose/entrypoint.sh
-    restart: always
+    entrypoint: scripts/entrypoint.sh
     command: api-deploy
     ports:
       - 49200:8000
@@ -43,8 +41,7 @@ services:
       - stack.env
     image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
     user: deploy
-    restart: always
-    entrypoint: compose/entrypoint.sh
+    entrypoint: scripts/entrypoint.sh
     command: daphne
     ports:
       - 49290:9000
@@ -94,8 +91,7 @@ services:
     container_name: celery-worker
     image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
     user: deploy
-    restart: always
-    entrypoint: compose/entrypoint.sh
+    entrypoint: scripts/entrypoint.sh
     command: celery-worker
     networks:
       - app-network  
@@ -109,8 +105,7 @@ services:
       - stack.env
     image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
     user: deploy
-    restart: always 
-    entrypoint: compose/entrypoint.sh
+    entrypoint: scripts/entrypoint.sh
     command: celery-beat
     networks:
       - app-network
@@ -124,14 +119,12 @@ services:
       - stack.env
     image: dpage/pgadmin4
     restart: always
-    environment:
-      - PGADMIN_LISTEN_PORT=49299
     volumes:
       - pgadmin-data:/usr/src/blanball/storage/pgadmin/data
     networks:
       - app-network
     ports:
-      - 49280:49299
+      - 49280:${PGADMIN_LISTEN_PORT}
 
   db_backup:
     container_name: db_backup

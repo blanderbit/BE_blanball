@@ -1,17 +1,24 @@
 from datetime import date
 from typing import Any
 from django.utils import timezone
-from .models import *
+from authentication.models import (
+    User,
+    Profile,
+    Code,
+)
 from django.template.loader import render_to_string
 from .tasks import Util
+
 import random
 import string
+
+from django.conf import settings
 
 from rest_framework.serializers import Serializer
 
 from authentication.constaints import (
     PHONE_CHANGE_CODE_TYPE, EMAIL_MESSAGE_TEMPLATE_TITLE, EMAIL_CHANGE_CODE_TYPE, ACCOUNT_DELETE_CODE_TYPE, 
-    PASSWORD_CHANGE_CODE_TYPE, EMAIL_VERIFY_CODE_TYPE, PASSWORD_RESET_CODE_TYPE, CODE_EXPIRE_MINUTES_TIME,
+    PASSWORD_CHANGE_CODE_TYPE, EMAIL_VERIFY_CODE_TYPE, PASSWORD_RESET_CODE_TYPE,
     TEMPLATE_SUCCESS_BODY_TITLE, TEMPLATE_SUCCESS_TITLE, TEMPLATE_SUCCESS_TEXT,
 )
     
@@ -50,13 +57,13 @@ def code_create(email: str, type: str, dop_info: str) -> None:
     '''create email verification code'''
     verify_code: str = ''.join(random.choices(string.ascii_uppercase, k = Code._meta.get_field('verify_code').max_length))
     code: Code = Code.objects.create(dop_info = dop_info, verify_code = verify_code, user_email = email, type = type,
-        life_time = timezone.now() + timezone.timedelta(minutes = CODE_EXPIRE_MINUTES_TIME))
+        life_time = timezone.now() + timezone.timedelta(minutes = settings.CODE_EXPIRE_MINUTES_TIME))
     user: User = User.objects.get(email = email)
     context: dict = ({'title':check_code_type(code),'code': list(code.verify_code),
         'name': user.profile.name,'surname': user.profile.last_name})
     template: str = render_to_string('email_code.html', context)
     print(verify_code)
-    data: dict = {'email_body': template ,'to_email': email}
+    data: dict = {'email_body': template, 'to_email': email}
     Util.send_email.delay(data)
 
 

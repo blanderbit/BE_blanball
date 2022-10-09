@@ -7,7 +7,6 @@ from notifications.serializers import (
     ChangeMaintenanceSerializer,
 )
 from notifications.models import Notification
-from project.constaints import *
 from project.pagination import CustomPagination
 
 from django.db.models.query import QuerySet
@@ -32,6 +31,7 @@ from notifications.services import (
     bulk_read_notifications,
 )
 
+from notifications.constaints import (MAINTENANCE_UPDATED_SUCCESS, MAINTENANCE_CAN_NOT_UPDATE_ERROR, CONFIG_FILE_ERROR)
 
 class NotificationsList(ListAPIView):
     serializer_class = NotificationSerializer
@@ -40,7 +40,8 @@ class NotificationsList(ListAPIView):
     ordering_fields = ('id', )
     queryset = Notification.objects.all().select_related('user').order_by('-id')
 
-class UserNotificationsList(NotificationsList):     
+class UserNotificationsList(NotificationsList):
+       
     def get_queryset(self) -> QuerySet:
         return self.queryset.filter(user_id = self.request.user.id)
 

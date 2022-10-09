@@ -1,9 +1,8 @@
 from authentication.models import Code
-from project.constaints import *
 from collections import OrderedDict
 from django.utils import timezone
 
-from  rest_framework.status import  HTTP_400_BAD_REQUEST
+from rest_framework.status import  HTTP_400_BAD_REQUEST
 from rest_framework.serializers import ValidationError
 
 from authentication.constaints import (

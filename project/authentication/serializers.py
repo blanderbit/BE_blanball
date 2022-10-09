@@ -102,9 +102,9 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
 class RegisterSerializer(serializers.ModelSerializer):
     '''a class that serializes user registration'''
     password: str = serializers.CharField(
-        max_length=68, min_length=8, write_only=True)
+        max_length = 68, min_length = 8, write_only = True)
     re_password: str = serializers.CharField(
-        max_length=68, min_length=8, write_only=True)
+        max_length = 68, min_length = 8, write_only = True)
     profile: Profile = CreateUpdateProfileSerializer()
 
     class Meta:
@@ -134,9 +134,9 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class LoginSerializer(serializers.ModelSerializer):
     '''class that serializes user login'''
-    email: str = serializers.EmailField(min_length=3, max_length=255)
-    password: str = serializers.CharField(min_length=8,
-        max_length=68, write_only=True)
+    email: str = serializers.EmailField(min_length = 3, max_length = 255)
+    password: str = serializers.CharField(min_length = 8,
+        max_length = 68, write_only = True)
 
     tokens = serializers.SerializerMethodField()
 

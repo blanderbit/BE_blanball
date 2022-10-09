@@ -22,9 +22,11 @@ from notifications.tasks import send_to_user
 
 def send_notification_to_subscribe_event_user(event: Event, notification_text: str, message_type: str) -> None:
     for user in event.current_users.all():
-        send_to_user(user = user, notification_text = notification_text, message_type = message_type)
+        send_to_user(user = user, notification_text = f'{user.profile.name},{notification_text}', 
+            message_type = message_type)
     for fan in event.fans.all():
-        send_to_user(user = fan, notification_text = notification_text, message_type = message_type)
+        send_to_user(user = fan, notification_text = f'{user.profile.name},{notification_text}', 
+            message_type = message_type)
 
 def validate_user_before_join_to_event(user: User, event: Event) -> None:
     if user.current_rooms.filter(id = event.id).exists():
@@ -33,14 +35,14 @@ def validate_user_before_join_to_event(user: User, event: Event) -> None:
         raise ValidationError(ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR, HTTP_400_BAD_REQUEST)
     if event.author.id == user.id:
         raise ValidationError(EVENT_AUTHOR_CAN_NOT_JOIN_ERROR, HTTP_400_BAD_REQUEST)
-    if RequestToParticipation.objects.filter(user = user,event = event.id,event_author = event.author):
+    if RequestToParticipation.objects.filter(user = user,event = event.id, event_author = event.author):
         raise ValidationError(ALREADY_SENT_REQUEST_TO_PARTICIPATE, HTTP_400_BAD_REQUEST)
 
 def send_notification_to_event_author(event: Event) -> None:
     if event.amount_members > event.count_current_users:
-        user_type: str = 'новий'
+        user_type: str = 'new'
     elif event.amount_members == event.count_current_users:
-        user_type: str = 'останній'
+        user_type: str = 'last'
     send_to_user(user = User.objects.get(id = event.author.id), notification_text=
         NEW_USER_ON_THE_EVENT_NOTIFICATION.format(author_name = event.author.profile.name, 
         user_type = user_type,event_id = event.id),
@@ -75,7 +77,7 @@ def bulk_delete_events(serializer: Serializer, queryset: QuerySet, user: User) -
                 not_deleted.append(event_id)
         else:
             not_deleted.append(event_id)
-    return {"delete success": deleted, "delete error":  not_deleted}
+    return {'delete success': deleted, 'delete error':  not_deleted}
 
 def bulk_accpet_or_decline(serializer: Serializer,queryset: QuerySet,user: User) -> dict[str,list[int]]:
     success: list[int] = []

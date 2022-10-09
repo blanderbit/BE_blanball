@@ -98,10 +98,3 @@ qa.txt
 .mypy_cache/
 
 drf-yasg/
-
-rest_framework/
-
-debug_toolbar/
-
-daphne.sock
-daphne.sock.lock

@@ -1,4 +1,21 @@
-from .views import *
+from authentication.views import (
+    RegisterUser,
+    LoginUser,
+    UserList,
+    UsersRelevantList,
+    AdminUsersList,
+    UserOwnerProfile,
+    UserProfile,
+    RequestPasswordReset,
+    ResetPassword,
+    RequestChangePassword,
+    CheckCode,
+    UpdateProfile,
+    RequetChangeEmail,
+    RequestChangePhone,
+    CheckUserActive,
+    RequestEmailVerify,
+)
 
 from django.urls import path
 

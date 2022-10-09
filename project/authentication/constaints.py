@@ -40,7 +40,6 @@ PASSWORD_CHANGE_CODE_TYPE = 'password_change'
 EMAIL_CHANGE_CODE_TYPE = 'email_change'
 PHONE_CHANGE_CODE_TYPE = 'phone_change'
 ACCOUNT_DELETE_CODE_TYPE = 'accoount_delete'
-CODE_EXPIRE_MINUTES_TIME = 5
 SENT_CODE_TO_EMAIL_SUCCESS = {'success': 'We have sent you a code to email'}
 
 EMAIL_MESSAGE_TEMPLATE_TITLE = '{type} {key} in the Blanball app'

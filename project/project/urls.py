@@ -1,8 +1,8 @@
 from project.yasg import urlpatterns as doc_urls
-from django.conf.urls.static import serve
-
-from django.urls import path,include
-from django.conf.urls.static import static
+from django.urls import (
+    path,
+    include,
+)
 from django.conf.urls.static import static
 from django.conf import settings
 

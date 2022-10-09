@@ -1,28 +1,30 @@
 version: "3.8"
 
 services: 
-  db:
-    container_name: db
-    image: "postgres:latest"
-    env_file:
+
+  proxy:
+    container_name: proxy
+    env_file: 
       - stack.env
-    volumes:
-      - ./postgres-data:/var/lib/postgresql/data
-    healthcheck:
-      test: pg_isready -U postgres -d postgres
-      timeout: 40s
-      retries: 20
+    image: registry.it-flumx.com/blanball-proxy:latest
+    ports:
+      - 49399:80
     networks:
       - app-network
+    depends_on:
+      api:
+        condition: service_started
       
   api:
     container_name: api
-    env_file:
+    env_file: 
       - stack.env
-    image: registry.it-flumx.com/flumx_test_blanball_be:latest
-    command: bash compose/local/django-start.sh
+    image: registry.it-flumx.com/flumx_pr_blanball_be_prod:latest
+    user: deploy
+    entrypoint: scripts/entrypoint.sh
+    command: api-deploy
     ports:
-      - "49205:8000"
+      - 49228:8000
     depends_on:
       db:
         condition: service_healthy
@@ -31,13 +33,49 @@ services:
     networks:
       - app-network    
     links:
-     - redis
-     
+      - redis
+
+  daphne:
+    container_name: daphne
+    env_file: 
+      - stack.env
+    image: registry.it-flumx.com/flumx_pr_blanball_be_prod:latest
+    user: deploy
+    entrypoint: scripts/entrypoint.sh
+    command: daphne
+    ports:
+      - 49291:9000
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - app-network    
+    links:
+      - redis
+
+  db:
+    container_name: db
+    env_file: 
+      - stack.env
+    image: postgres:latest
+    restart: always
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: pg_isready -U postgres -d postgres
+      timeout: 5s
+      retries: 20
+
   redis:
     container_name: redis
-    env_file:
+    env_file: 
       - stack.env
     image: redis:latest
+    restart: always
     volumes:
       - redis-data:/usr/src/blanball/storage/redis/data
     networks:
@@ -48,12 +86,13 @@ services:
       retries: 5
 
   celery-worker:
-    env_file:
+    env_file: 
       - stack.env
     container_name: celery-worker
-    image: registry.it-flumx.com/blanball_be:latest
-    restart: always
-    command: bash compose/local/celery-worker-start.sh
+    image: registry.it-flumx.com/flumx_pr_blanball_be_prod:latest
+    user: deploy
+    entrypoint: scripts/entrypoint.sh
+    command: celery-worker
     networks:
       - app-network  
     depends_on:
@@ -61,33 +100,35 @@ services:
         condition: service_healthy
 
   celery-beat:
-    env_file:
-      - stack.env
     container_name: celery-beat
-    image: registry.it-flumx.com/flumx_test_blanball_be:latest
-    restart: always 
-    command: bash compose/local/celery-beat-start.sh
+    env_file: 
+      - stack.env
+    image: registry.it-flumx.com/flumx_pr_blanball_be_prod:latest
+    user: deploy
+    entrypoint: scripts/entrypoint.sh
+    command: celery-beat
     networks:
       - app-network
     depends_on:
       redis:
         condition: service_healthy
 
-  # pgadmin:
-  #   container_name: pgadmin
-  #   env_file:
-  #     - stack.env
-  #   image: dpage/pgadmin4
-  #   volumes:
-  #     - pgadmin-data:/usr/src/blanball/storage/pgadmin/data
-  #   ports:
-  #     - "49201:80"
-  #   networks:
-  #     - app-network
+  pgadmin:
+    container_name: pgadmin
+    env_file: 
+      - stack.env
+    image: dpage/pgadmin4
+    restart: always
+    volumes:
+      - pgadmin-data:/usr/src/blanball/storage/pgadmin/data
+    networks:
+      - app-network
+    ports:
+      - 49280:${PGADMIN_LISTEN_PORT}
 
   db_backup:
     container_name: db_backup
-    env_file:
+    env_file: 
       - stack.env
     image: prodrigestivill/postgres-backup-local
     restart: always
@@ -98,12 +139,26 @@ services:
     depends_on:
       db:
         condition: service_started
+
+  ftp-server:
+    env_file:
+      - stack.env
+    container_name: ftp-server
+    image: garethflowers/ftp-server
+    restart: always
+    ports:
+      - '49222:21/tcp'
+    volumes:
+      - ftp-server-data:/home/user
+    networks:
+      - app-network
     
 networks:
   app-network:
-     driver: bridge    
+    driver: bridge    
      
 volumes:
   redis-data:
-  # pgadmin-data:
+  pgadmin-data:
   db-backup-data:
+  ftp-server-data:
