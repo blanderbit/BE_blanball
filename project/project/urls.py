@@ -1,16 +1,21 @@
 from project.yasg import urlpatterns as doc_urls
-
-from django.urls import path,include
+from django.urls import (
+    path,
+    include,
+)
+from django.conf.urls.static import static
 from django.conf import settings
 
 urlpatterns = [
-    path('events/api/v1/', include('events.urls'), 
+    path('api/v1/events/', include('events.urls'), 
         name='events'),
-    path('authentication/api/v1/', include('authentication.urls'), 
+    path('api/v1/authentication/', include('authentication.urls'), 
         name='authentication'),
-    path('notifications/api/v1/', include('notifications.urls'), 
+    path('api/v1/notifications/', include('notifications.urls'), 
         name='notifications'),
-    path('reviews/api/v1/', include('reviews.urls'), 
+    path('api/v1/reviews/', include('reviews.urls'), 
         name='reviews'),
 ]
+
+urlpatterns += static(settings.STATIC_URL, document_root = settings.STATIC_ROOT)
 urlpatterns += doc_urls

@@ -2,6 +2,59 @@ version: "3.8"
 
 services: 
 
+  proxy:
+    container_name: proxy
+    env_file: 
+      - stack.env
+    image: registry.it-flumx.com/blanball-proxy:latest
+    ports:
+      - 49299:80
+    networks:
+      - app-network
+    depends_on:
+      api:
+        condition: service_started
+      
+  api:
+    container_name: api
+    env_file: 
+      - stack.env
+    image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
+    user: deploy
+    entrypoint: scripts/entrypoint.sh
+    command: api-deploy
+    ports:
+      - 49200:8000
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - app-network    
+    links:
+      - redis
+
+  daphne:
+    container_name: daphne
+    env_file: 
+      - stack.env
+    image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
+    user: deploy
+    entrypoint: scripts/entrypoint.sh
+    command: daphne
+    ports:
+      - 49290:9000
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - app-network    
+    links:
+      - redis
+
   db:
     container_name: db
     env_file: 
@@ -16,62 +69,6 @@ services:
       test: pg_isready -U postgres -d postgres
       timeout: 5s
       retries: 20
-      
-  api:
-    container_name: api
-    env_file: 
-      - stack.env
-    image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
-    user: deploy
-    entrypoint: compose/entrypoint.sh
-    restart: always
-    command: api-deploy
-    ports:
-      - 49200:8000
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - app-network    
-    links:
-     - redis
-
-  nginx:
-    container_name: nginx
-    env_file: 
-      - stack.env
-    image: registry.it-flumx.com/blanball-proxy:latest
-    restart: always
-    ports:
-      - 49299:81
-    networks:
-      - app-network
-    depends_on:
-      api:
-        condition: service_started
-
-  daphne:
-    container_name: daphne
-    env_file: 
-      - stack.env
-    image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
-    user: deploy
-    restart: always
-    entrypoint: compose/entrypoint.sh
-    command: daphne
-    ports:
-      - 49290:9000
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - app-network    
-    links:
-     - redis
 
   redis:
     container_name: redis
@@ -94,8 +91,7 @@ services:
     container_name: celery-worker
     image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
     user: deploy
-    restart: always
-    entrypoint: compose/entrypoint.sh
+    entrypoint: scripts/entrypoint.sh
     command: celery-worker
     networks:
       - app-network  
@@ -108,9 +104,7 @@ services:
     env_file: 
       - stack.env
     image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
-    user: deploy
-    restart: always 
-    entrypoint: compose/entrypoint.sh
+    entrypoint: scripts/entrypoint.sh
     command: celery-beat
     networks:
       - app-network
@@ -129,7 +123,7 @@ services:
     networks:
       - app-network
     ports:
-      - 49280:80
+      - 49280:${PGADMIN_LISTEN_PORT}
 
   db_backup:
     container_name: db_backup
@@ -146,7 +140,7 @@ services:
         condition: service_started
 
   ftp-server:
-    env_file: 
+    env_file:
       - stack.env
     container_name: ftp-server
     image: garethflowers/ftp-server
@@ -167,5 +161,3 @@ volumes:
   pgadmin-data:
   db-backup-data:
   ftp-server-data:
-
-

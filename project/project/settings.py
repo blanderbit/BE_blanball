@@ -13,32 +13,33 @@ django.utils.encoding.smart_text = smart_str
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Internationalization
-LANGUAGE_CODE: str = config('LANGUAGE_CODE')
+LANGUAGE_CODE: str = config('LANGUAGE_CODE', cast = str)
 
-TIME_ZONE: str = config('TIME_ZONE')
-USE_I18N: bool = config('USE_I18N',cast = bool, default = True)
-USE_TZ: bool = config('USE_TZ',cast = bool, default = True)
+TIME_ZONE: str = config('TIME_ZONE', cast = str)
+USE_I18N: bool = config('USE_I18N', cast = bool)
+USE_TZ: bool = config('USE_TZ', cast = bool)
 
 DEFAULT_AUTO_FIELDL: str = 'django.db.models.BigAutoField'
 
+CODE_EXPIRE_MINUTES_TIME: int = config('CODE_EXPIRE_MINUTES_TIME', cast = int)
 # Static files
-STATIC_URL: str = '/static/'
+STATIC_URL: str = '/api/static/'
 STATIC_ROOT: str = os.path.join(BASE_DIR, 'static/')
 
-CUSTOM_PAGINATION_PAGE_SIZE = 10
+PAGINATION_PAGE_SIZE = config('PAGINATION_PAGE_SIZE', cast = int)
 
-SECRET_KEY: str = config('SECRET_KEY')
+SECRET_KEY: str = config('SECRET_KEY', cast = str)
 
 WSGI_APPLICATION: str = 'project.wsgi.application'
 ASGI_APPLICATION: str = 'project.asgi.application'
 
 ROOT_URLCONF: str = 'project.urls'
 
-DEBUG: bool = config('DEBUG',cast = bool,default = True)
+DEBUG: bool = config('DEBUG', cast = bool)
 
-AUTH_USER_MODEL: str = config('AUTH_USER_MODEL')
+AUTH_USER_MODEL: str = config('AUTH_USER_MODEL', cast = str)
 
-ALLOWED_HOSTS: list[str] = config('ALLOWED_HOSTS', cast=Csv())
+ALLOWED_HOSTS: list[str] = config('ALLOWED_HOSTS', cast = Csv())
 
 # Application definition:
 INSTALLED_APPS: tuple[str] = [
@@ -82,40 +83,40 @@ if os.environ.get('GITHUB_WORKFLOW'):
     CELERY_RESULT_BACKEND: str = 'redis://127.0.0.1:6379'
     DATABASES: dict[str, Any]= {
         'default': {
-           'ENGINE': 'django.db.backends.postgresql',
-           'NAME': 'postgres_test',
-           'USER': 'postgres_test',
-           'PASSWORD': 'postgres_test',
+           'ENGINE': config('DB_ENGINE', cast = str),
+           'NAME': config('POSTGRES_DB_TEST', cast = str),
+           'USER': config('POSTGRES_USER_TEST', cast = str),
+           'PASSWORD': config('POSTGRES_PASSWORD_TEST', cast = str),
            'HOST': '127.0.0.1',
-           'PORT': '5432',
+           'PORT': config('POSTGRES_PORT', cast = int),
         }
     }
     CHANNEL_LAYERS: dict[str, Any] = {
-        "default": {
-            "BACKEND": "channels_redis.core.RedisChannelLayer",
-            "CONFIG": {
-                "hosts": [('127.0.0.1', 6379)],
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                'hosts': [('127.0.0.1', config('REDIS_PORT', cast = int))],
             },
         },
     }
 else:
-    CELERY_BROKER_URL: str = config('CELERY_BROKER_URL')
-    CELERY_RESULT_BACKEND: str = config('CELERY_RESULT_BACKEND')
+    CELERY_BROKER_URL: str = config('CELERY_BROKER_URL', cast = str)
+    CELERY_RESULT_BACKEND: str = config('CELERY_RESULT_BACKEND', cast = str)
     DATABASES: dict[str,Any] = {
         'default': {
-            'ENGINE': config('DB_ENGINE'),
-            'NAME':  config('POSTGRES_DB'),
-            'USER': config('POSTGRES_USER'),
-            'PASSWORD': config('POSTGRES_PASSWORD'),
-            'HOST': config('POSTGRES_HOST'),
-            'PORT': config('POSTGRES_PORT'),
+            'ENGINE':config('DB_ENGINE', cast = str),
+            'NAME': config('POSTGRES_DB', cast = str),
+            'USER': config('POSTGRES_USER', cast = str),
+            'PASSWORD': config('POSTGRES_PASSWORD', cast = str),
+            'HOST': config('POSTGRES_HOST', cast = str),
+            'PORT': config('POSTGRES_PORT', cast = int),
         }
     }
     CHANNEL_LAYERS: dict[str, Any] = {
-        "default": {
-            "BACKEND": "channels_redis.core.RedisChannelLayer",
-            "CONFIG": {
-                "hosts": [("redis", config('REDIS_PORT'))],
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                'hosts': [('redis', config('REDIS_PORT', cast = int))],
             },
         },
     }
@@ -123,7 +124,7 @@ else:
 
 
 SWAGGER_SETTINGS: dict[str, Any] = {
-    'SHOW_REQUEST_HEADERS': config('SHOW_REQUEST_HEADERS',cast = bool),
+    'SHOW_REQUEST_HEADERS': config('SHOW_REQUEST_HEADERS', cast = bool),
     'SECURITY_DEFINITIONS': {
         'Bearer': {
             'type': 'apiKey',
@@ -131,8 +132,8 @@ SWAGGER_SETTINGS: dict[str, Any] = {
             'in': 'Header'
         }
     },
-    'USE_SESSION_AUTH': config('USE_SESSION_AUTH',cast = bool),
-    'JSON_EDITOR': config('JSON_EDITOR',cast = bool),
+    'USE_SESSION_AUTH': config('USE_SESSION_AUTH', cast = bool),
+    'JSON_EDITOR': config('JSON_EDITOR', cast = bool),
     'SUPPORTED_SUBMIT_METHODS': (
         'get',
         'post',
@@ -189,19 +190,19 @@ REST_FRAMEWORK: dict[str, Any]  = {
 }
 
 SIMPLE_JWT: dict[str, Any] = {
-    'AUTH_HEADER_TYPES': (config('AUTH_HEADER_TYPES')),
+    'AUTH_HEADER_TYPES': (config('AUTH_HEADER_TYPES', cast = str)),
     'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days = config('ACCESS_TOKEN_LIFETIME', cast = int)),
-    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=config('REFRESH_TOKEN_LIFETIME', cast = int)),
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days = config('REFRESH_TOKEN_LIFETIME', cast = int)),
 }
 
 
 #conected smpt gmail settings
-EMAIL_BACKEND: str = config('EMAIL_BACKEND')
-EMAIL_HOST: str = config('EMAIL_HOST')
+EMAIL_BACKEND: str = config('EMAIL_BACKEND', cast = str)
+EMAIL_HOST: str = config('EMAIL_HOST', cast = str)
 EMAIL_PORT: int = config('EMAIL_PORT', cast = int)
 EMAIL_USE_TLS: bool = config('EMAIL_USE_TLS', cast = bool)
-EMAIL_HOST_USER: str = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD: str = config('EMAIL_HOST_PASSWORD')
+EMAIL_HOST_USER: str = config('EMAIL_HOST_USER', cast = str)
+EMAIL_HOST_PASSWORD: str = config('EMAIL_HOST_PASSWORD', cast = str)
 
 #celery framework settings
 CELERY_TASK_SERIALIZER: str = 'json'
@@ -209,13 +210,13 @@ CELERY_RESULT_SERIALIZER: str = 'json'
 CELERY_ACKS_LATE: bool = True
 CELERY_PREFETCH_MULTIPLIER: int = 1
 
-INTERNAL_IPS: list[str] = config('ALLOWED_HOSTS', cast=Csv())
+INTERNAL_IPS: list[str] = config('ALLOWED_HOSTS', cast = Csv())
 
 
-DEFAULT_FILE_STORAGE: str = config('FILE_STORAGE')
-FTP_USER: str = config('FTP_USER')
-FTP_PASS: str = config('FTP_PASS')
-FTP_PORT: str = config('FTP_PORT')
-FTP_STORAGE_LOCATION = 'ftp://'+FTP_USER+':'+FTP_PASS+'@ftp-server:'+FTP_PORT
+DEFAULT_FILE_STORAGE: str = config('FILE_STORAGE', cast = str)
+FTP_USER: str = config('FTP_USER', cast = str)
+FTP_PASS: str = config('FTP_PASS', cast = str)
+FTP_PORT: str = config('FTP_PORT', cast = str)
+FTP_STORAGE_LOCATION = 'ftp://' + FTP_USER + ':' + FTP_PASS + '@ftp-server:' + FTP_PORT
 
-ALGORITHM = 'HS256'
+ALGORITHM: str = config('ALGORITHM', cast = str)

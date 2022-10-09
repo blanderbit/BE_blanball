@@ -7,6 +7,7 @@ ARG DEPLOY \
   GID=1000
 
 ENV DEPLOY=${DEPLOY} \
+  # project workind directory
   APP_PATH='/usr/src/blanball' \
   # python:
   PYTHONFAULTHANDLER=1 \
@@ -25,8 +26,10 @@ ENV DEPLOY=${DEPLOY} \
   POETRY_CACHE_DIR='/var/cache/pypoetry' \
   POETRY_HOME='/usr/local'
 
+# set project workind directory
 WORKDIR $APP_PATH
 
+# Copy only requirements, to cache them in docker layer
 COPY ./poetry.lock ./pyproject.toml $APP_PATH/
 
 
@@ -36,6 +39,8 @@ RUN apt-get update && apt-get upgrade -y \
   && useradd -d $APP_PATH -g deploy -l -r -u "${UID}" deploy \
   && chown deploy:deploy -R $APP_PATH
 
+# Installing `poetry` package manager:
+# https://github.com/python-poetry/poetry
 RUN pip install --upgrade pip\
   &&pip install poetry=="$POETRY_VERSION" 
 
@@ -52,4 +57,5 @@ RUN target="$POETRY_CACHE_DIR" \
       $(if [ "$DEPLOY" = 'true' ]; then echo '--no-root --only main'; fi) \
       --no-interaction --no-ansi
 
+# copy ource code to project workind directory
 COPY . $APP_PATH

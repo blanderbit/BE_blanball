@@ -1,5 +1,4 @@
-from .consumers import *
-from .views import *
+from notifications.consumers import UserConsumer
 
 from django.urls import path
 

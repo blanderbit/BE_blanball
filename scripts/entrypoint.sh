@@ -17,9 +17,7 @@ Backend()
 
 Daphne()
 {
-    rm -f /usr/src/blanball/daphne.sock
-    rm -f /usr/src/blanball/daphne.sock.lock
-    daphne -u /usr/src/blanball/daphne.sock --proxy-headers project.asgi:application
+    daphne project.asgi:application --port 9000 --bind 0.0.0.0 -v2
 }
 
 CeleryWorker()

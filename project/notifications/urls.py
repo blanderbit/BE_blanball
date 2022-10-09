@@ -1,7 +1,14 @@
-from .views import *
+from notifications.views import (
+    NotificationsList,
+    UserNotificationsList,
+    ReadNotifications,
+    DeleteNotifcations,
+    ChangeMaintenance,
+    GetMaintenance,
+    GetCurrentVersion,
+)   
 
 from django.urls import path
-
 
 urlpatterns = [
     # endpoint where user can get list of notifications

@@ -5,7 +5,7 @@ from events.models import (
 from project.celery import app
 from events.services import send_notification_to_subscribe_event_user
 from events.constaints import (
-    EVENT_TIME_NOTIFICATION_MESSAGE_TYPE,EVENT_TIME_NOTIFICATION_TEXT)
+    EVENT_TIME_NOTIFICATION_MESSAGE_TYPE, EVENT_TIME_NOTIFICATION_TEXT)
 
 from django.utils import timezone
 
@@ -35,7 +35,7 @@ def check_event_start_time() -> None:
             event.save()
 
 @app.task
-def delete_uproved_requests_to_participation() -> None:
+def delete_requests_to_participation() -> None:
     for request in RequestToParticipation.objects.all():
         if request.event.status == 'Finished':
             request.delete()

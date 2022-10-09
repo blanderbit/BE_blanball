@@ -3,8 +3,9 @@ from authentication.models import User
 from typing import Any
 from django.db.models.query import QuerySet
 from notifications.tasks import send_to_user
-from project.constaints import (
-    CHANGE_MAINTENANCE_MESSAGE_TYPE,MAINTENANCE_FALSE_NOTIFICATION_TEXT,MAINTENANCE_TRUE_NOTIFICATION_TEXT)
+
+from notifications.constaints import (CHANGE_MAINTENANCE_MESSAGE_TYPE, MAINTENANCE_FALSE_NOTIFICATION_TEXT, 
+MAINTENANCE_TRUE_NOTIFICATION_TEXT)
 
 def update_maintenance(data: dict[str, str]) -> None:
     with open('./project/config.json', 'w') as f:

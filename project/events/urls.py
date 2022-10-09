@@ -1,4 +1,22 @@
-from .views import *
+from events.views import (
+    CreateEvent,
+    GetDeleteEvent,
+    UpdateEvent,
+    EventList,
+    DeleteEvents,
+    JoinToEvent,
+    LeaveFromEvent,
+    FanJoinToEvent,
+    FanLeaveFromEvent,
+    UserEvents,
+    EventsRelevantList,
+    UserEventsRelevantList,
+    UserPlannedEvents,
+    PopularIvents,
+    InviteUserToEvent,
+    RequestToParticipationsList,
+    BulkAcceptOrDeclineRequestToParticipation,
+)
 
 from django.urls import path
 
@@ -13,7 +31,7 @@ urlpatterns = [
     path('client/event/update/<int:pk>', UpdateEvent.as_view(),
         name='update-event'),
     #endpoint where user can get list of events
-    path('client/events/list' ,EventList.as_view(), 
+    path('client/events/list', EventList.as_view(), 
         name='events-list'),
     # endpoint where user can bulk delete events
     path('admin/events/delete', DeleteEvents.as_view(),

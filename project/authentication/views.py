@@ -134,7 +134,7 @@ class UserProfile(GenericAPIView):
                     serializer = self.serializer_class(user, fields = (fields))
                 elif item[1] == False:
                     fields.append(item[0])
-                    serializer = self.serializer_class(user, fields=(fields))
+                    serializer = self.serializer_class(user, fields = (fields))
             return Response(serializer.data, status = HTTP_200_OK)
         except User.DoesNotExist:
             return Response(NO_SUCH_USER_ERROR, status = HTTP_404_NOT_FOUND)
@@ -250,49 +250,47 @@ class CheckCode(GenericAPIView):
     '''password reset on a previously sent request'''
     serializer_class = CheckCodeSerializer
 
+    def success(self, key: str) -> None:
+        self.user.save()
+        self.code.delete()
+        send_email_template(user = self.user, body_title = TEMPLATE_SUCCESS_BODY_TITLE.format(key = key),
+        title = TEMPLATE_SUCCESS_TITLE.format(key = key),
+        text = TEMPLATE_SUCCESS_TEXT.format(key = key))
+
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
-        verify_code:str = serializer.validated_data["verify_code"]
-        self.code:Code = Code.objects.get(verify_code = verify_code)
-        self.user:User = User.objects.get(id = request.user.id)
+        verify_code: str = serializer.validated_data["verify_code"]
+        self.code: Code = Code.objects.get(verify_code = verify_code)
+        self.user: User = User.objects.get(id = request.user.id)
         if self.code.user_email != self.user.email:
             raise ValidationError(NO_PERMISSIONS_ERROR, HTTP_400_BAD_REQUEST)
 
         if self.code.type == PASSWORD_CHANGE_CODE_TYPE:
             self.user.set_password(self.code.dop_info)
-            send_email_template(user=self.user,body_title = TEMPLATE_SUCCESS_BODY_TITLE.format(body = 'password'),
-            title = TEMPLATE_SUCCESS_TITLE.format(body = 'password'),
-            text = TEMPLATE_SUCCESS_TEXT.format(body = 'because your password has been changed'))
-            self.user.save()
+            self.success(key = 'password')
             return Response(CHANGE_PASSWORD_SUCCESS, status = HTTP_200_OK) 
  
         elif self.code.type == PHONE_CHANGE_CODE_TYPE:
             self.user.phone = self.code.dop_info
-            send_email_template(user=self.user,body_title = TEMPLATE_SUCCESS_BODY_TITLE.format(body = 'phone number'),
-            title = TEMPLATE_SUCCESS_TITLE.format(body = 'phone number'),
-            text = TEMPLATE_SUCCESS_TEXT.format(body = 'because your phone number has been changed'))
-            self.user.save()
+            self.success(key = 'phone number')
             return Response(CHANGE_PHONE_SUCCESS, status = HTTP_200_OK)
-
-        elif self.code.type == EMAIL_VERIFY_CODE_TYPE:
-            self.user.is_verified = True
-            send_email_template(user=self.user,body_title = EMAIL_VERIFY_SUCCESS_BODY_TITLE, title = EMAIL_VERIFY_SUCCESS_TITLE,
-            text = TEMPLATE_SUCCESS_TEXT.format(body = 'because your email has been activated'))
-            self.user.save()
-            return Response(ACTIVATION_SUCCESS, status = HTTP_200_OK)
             
         elif self.code.type == EMAIL_CHANGE_CODE_TYPE:
             self.user.email = self.code.dop_info
-            send_email_template(user=self.user,body_title = TEMPLATE_SUCCESS_BODY_TITLE.format(body = 'password'),
-            title = TEMPLATE_SUCCESS_TITLE.format(body = 'password'),
-            text = TEMPLATE_SUCCESS_TEXT.format(body = 'because your password has been changed'))
-            self.user.save()
-            return Response(CHANGE_EMAIL_SUCCESS, status=HTTP_200_OK) 
+            self.success(key = 'email')
+            return Response(CHANGE_EMAIL_SUCCESS, status = HTTP_200_OK) 
 
         elif self.code.type == ACCOUNT_DELETE_CODE_TYPE:
             # send_email_template(user=self.user,body_title=PASS_UPDATE_SUCCESS_BODY_TITLE,title=PASS_UPDATE_SUCCESS_TITLE,
             # text=TEMPLATE_SUCCESS_TEXT.format(body='оскільки ваш акаунт було видалено'))
             User.objects.filter(id = self.user.id).delete()
-            return Response(ACCOUNT_DELETED_SUCCESS, status=HTTP_200_OK)
+            return Response(ACCOUNT_DELETED_SUCCESS, status = HTTP_200_OK)
 
+        elif self.code.type == EMAIL_VERIFY_CODE_TYPE:
+            self.user.is_verified = True
+            self.user.save()
+            self.code.delete()
+            # send_email_template(user = self.user, body_title = EMAIL_VERIFY_SUCCESS_BODY_TITLE, title = EMAIL_VERIFY_SUCCESS_TITLE,
+            # text = TEMPLATE_SUCCESS_TEXT.format(body = 'because your email has been activated'))
+            return Response(ACTIVATION_SUCCESS, status = HTTP_200_OK)
