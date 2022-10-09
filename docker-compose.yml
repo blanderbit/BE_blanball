@@ -56,6 +56,7 @@ services:
 
   celery-worker: 
     container_name: celery-worker
+    user: deploy
     env_file: 
       - .env
     entrypoint: scripts/entrypoint.sh

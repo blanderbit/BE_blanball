@@ -104,7 +104,6 @@ services:
     env_file: 
       - stack.env
     image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
-    user: deploy
     entrypoint: scripts/entrypoint.sh
     command: celery-beat
     networks:

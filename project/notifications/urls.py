@@ -7,12 +7,8 @@ from notifications.views import (
     GetMaintenance,
     GetCurrentVersion,
 )   
-from notifications.consumers import UserConsumer
 
 from django.urls import path
-
-
-
 
 urlpatterns = [
     # endpoint where user can get list of notifications
@@ -36,9 +32,4 @@ urlpatterns = [
     # endpoint where admin can get maintenance
     path('admin/get/current/version', GetCurrentVersion.as_view(), 
         name='get-current-version'),
-]
-
-ws_urlpatterns = [
-    path('my/notifications/',UserConsumer.as_asgi(), 
-        name = 'user_notifications')
 ]
