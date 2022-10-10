@@ -1,4 +1,5 @@
 import json
+from tkinter.messagebox import NO
 from authentication.models import User
 from typing import Any
 from django.db.models.query import QuerySet
@@ -6,6 +7,8 @@ from notifications.tasks import send_to_user
 
 from notifications.constaints import (CHANGE_MAINTENANCE_MESSAGE_TYPE, MAINTENANCE_FALSE_NOTIFICATION_TEXT, 
 MAINTENANCE_TRUE_NOTIFICATION_TEXT)
+
+from notifications.models import Notification
 
 def update_maintenance(data: dict[str, str]) -> None:
     with open('./project/config.json', 'w') as f:
@@ -22,33 +25,25 @@ def update_maintenance(data: dict[str, str]) -> None:
 
 def bulk_delete_notifications(data: dict[str, Any], queryset: QuerySet, user: User) -> dict[str, int]:
     deleted: list[int] = [] 
-    not_deleted: list[int] = []
     for notification in data:
-        notify = queryset.filter(id = notification)
-        if notify:
+        try:
             notify = queryset.get(id = notification)
             if notify.user == user:
                 notify.delete()
                 deleted.append(notification)
-            else:
-                not_deleted.append(notification)
-        else:
-            not_deleted.append(notification)
-    return {"delete success": deleted, "delete error":  not_deleted}
+        except Notification.DoesNotExist:
+            pass
+    return {'delete success': deleted}
 
 def bulk_read_notifications(data: dict[str, Any], queryset: QuerySet) -> dict[str, int]:
-    read: list[int] = [] 
-    not_read: list[int] = []
+    success: list[int] = [] 
     for notification in data:
-        notify = queryset.filter(id = notification)
-        if notify:
+        try: 
             notify = queryset.get(id = notification)
             if notify.type != 'Read':
                 notify.type = 'Read'
                 notify.save()
-                read.append(notification)
-            else:
-                not_read.append(notification) 
-        else:
-            not_read.append(notification)
-    return {"read success": read, "read error": not_read}
+                success.append(notification)
+        except Notification.DoesNotExist:
+            pass
+    return {'read success': success}

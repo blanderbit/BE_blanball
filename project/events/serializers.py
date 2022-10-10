@@ -16,8 +16,14 @@ from rest_framework.status import (
 from events.validators import EventDateTimeValidator
 
 from events.constaints import (
-    EVENT_TIME_EXPIRED_ERROR, NO_EVENT_PLACE_ERROR, EVENT_NOT_FOUND_ERROR
+    EVENT_TIME_EXPIRED_ERROR, NO_EVENT_PLACE_ERROR, EVENT_NOT_FOUND_ERROR, AUTHOR_CAN_NOT_INVITE_ERROR,
+    ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, ALREADY_IN_EVENT_FANS_LIST_ERROR, 
 )
+from authentication.constaints import (
+    NO_SUCH_USER_ERROR,
+)
+
+from authentication.models import User
 
 class CreateEventSerializer(serializers.ModelSerializer):
     class Meta:
@@ -114,6 +120,24 @@ class InviteUserToEventSerializer(serializers.Serializer):
             'event_id',
             'user_id',
         )
+
+    def validate(self, attrs) -> OrderedDict:
+        try:
+            invite_user = User.objects.get(id = attrs.get('user_id'))
+            event = Event.objects.get(id = attrs.get('event_id'))
+            if event.status == 'Finished':
+                raise serializers.ValidationError(EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST)
+            if invite_user.id == Event.objects.get(id = event.id).author.id:
+                raise serializers.ValidationError(AUTHOR_CAN_NOT_INVITE_ERROR , HTTP_400_BAD_REQUEST)
+            if invite_user.current_rooms.filter(id = event.id).exists():
+                raise serializers.ValidationError(ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, status = HTTP_400_BAD_REQUEST)
+            if invite_user.current_views_rooms.filter(id = event.id).exists():
+                raise serializers.ValidationError(ALREADY_IN_EVENT_FANS_LIST_ERROR, status = HTTP_400_BAD_REQUEST)
+            return super().validate(attrs)
+        except User.DoesNotExist:
+            raise serializers.ValidationError(NO_SUCH_USER_ERROR, HTTP_404_NOT_FOUND)
+        except Event.DoesNotExist:
+            raise serializers.ValidationError(EVENT_NOT_FOUND_ERROR, status = HTTP_404_NOT_FOUND)
 
 
 class RequestToParticipationSerializer(serializers.ModelSerializer):

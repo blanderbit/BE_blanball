@@ -1,4 +1,5 @@
 import re
+from this import d
 
 from django.utils import timezone
 from django.db.models.query import QuerySet
@@ -65,44 +66,33 @@ def filter_event_by_user_planned_events_time(pk: int, queryset: QuerySet) -> Que
 
 def bulk_delete_events(serializer: Serializer, queryset: QuerySet, user: User) -> dict[str, list[int]]:
     deleted: list[int] = [] 
-    not_deleted: list[int] = []
     for event_id in serializer.validated_data['events']:
-        event: Event = queryset.filter(id = event_id)
-        if event:
-            event = queryset.get(id = event_id)
+        try:
+            event: Event = queryset.get(id = event_id)
             if event.author == user:
                 event.delete()
                 deleted.append(event_id)
-            else:
-                not_deleted.append(event_id)
-        else:
-            not_deleted.append(event_id)
-    return {'delete success': deleted, 'delete error':  not_deleted}
+        except Event.DoesNotExist:
+            pass
+    return {'delete success': deleted}
 
-def bulk_accpet_or_decline(serializer: Serializer,queryset: QuerySet,user: User) -> dict[str,list[int]]:
+def bulk_accpet_or_decline(serializer: Serializer, user: User) -> dict[str,list[int]]:
     success: list[int] = []
-    not_success: list[int] = []
     for request_id in serializer.validated_data['requests']:
-        request_to_p = queryset.filter(id = request_id)
-        if request_to_p:
-            request_to_p = queryset.get(id = request_id)
+        try:
+            request_to_p = RequestToParticipation.objects.get(id = request_id)
             if request_to_p.event_author.id == user.id:
                 if serializer.validated_data['type'] == True:
-                    send_to_user(user = request_to_p.user, notification_text = RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION.format(
-                        user_name = request_to_p.user.profile.name, event_id = request_to_p.event.id, response_type = 'accepted'),
-                        message_type = RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_MESSAGE_TYPE)
-                    success.append(request_id)
+                    response_type: str = 'accepted'
                     request_to_p.user.current_rooms.add(request_to_p.event)
-                    request_to_p.delete()
                 else:
-                    send_to_user(user = request_to_p.user, notification_text = RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION.format(
-                        user_name = request_to_p.user.profile.name,event_id = request_to_p.event.id,response_type = 'rejected'),
-                        message_type = RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_MESSAGE_TYPE)
-                    success.append(request_id)
-                    request_to_p.delete()
-            else:
-                not_success.append(request_id)
-        else:
-            not_success.append(request_id)
-    return {"success": success, "error":  not_success}
+                    response_type: str = 'rejected'
+                success.append(request_id)
+                send_to_user(user = request_to_p.user, notification_text = RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION.format(
+                user_name = request_to_p.user.profile.name, event_id = request_to_p.event.id, response_type = response_type),
+                message_type = RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_MESSAGE_TYPE)
+                request_to_p.delete()
 
+        except RequestToParticipation.DoesNotExist:
+            pass
+    return {'success': success}

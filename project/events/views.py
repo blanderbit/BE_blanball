@@ -61,7 +61,7 @@ from events.constaints import (
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, EVENT_NOT_FOUND_ERROR, EVENT_DELETED_SUCCESS, EVENT_UPDATE_MESSAGE_TYPE,
     EVENT_UPDATE_SUCCESS, JOIN_TO_EVENT_SUCCESS, NEW_REQUEST_TO_PARTICIPATION_MESSAGE_TYPE, NEW_REQUEST_TO_PARTICIPATION, 
     APPLICATION_FOR_PARTICIPATION_SUCCESS, NO_IN_EVENT_FANS_LIST_ERROR, DISCONNECT_FROM_EVENT_SUCCESS, 
-    LEAVE_USER_FROM_THE_EVENT_NOTIFICATION, NO_IN_EVENT_MEMBERS_LIST_ERROR, EVENT_UPDATE_TEXT
+    LEAVE_USER_FROM_THE_EVENT_NOTIFICATION, NO_IN_EVENT_MEMBERS_LIST_ERROR, EVENT_UPDATE_TEXT, AUTHOR_CAN_NOT_INVITE_ERROR, 
 
 )
 from authentication.constaints import (
@@ -103,21 +103,14 @@ class InviteUserToEvent(GenericAPIView):
     def post(self,request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
-        try:
-            invite_user: User = User.objects.get(id = serializer.validated_data['user_id'])
-            if invite_user.id == request.user.id:
-                return Response(SENT_INVATION_ERROR, status = HTTP_400_BAD_REQUEST)
-            event: Event = Event.objects.get(id = serializer.validated_data['event_id'])
-            if not invite_user.current_rooms.filter(id = event.id).exists():
-                send_to_user(user = invite_user,notification_text=
-                INVITE_USER_NOTIFICATION.format(user_name = request.user.profile.name, event_name = event.name),
-                message_type = INVITE_USER_TO_EVENT_MESSAGE_TYPE)
-                return Response(SENT_INVATION_SUCCESS, status = HTTP_200_OK)
-            return Response(ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, status = HTTP_400_BAD_REQUEST)
-        except User.DoesNotExist:
-            return Response(NO_SUCH_USER_ERROR, status = HTTP_404_NOT_FOUND)
-        except Event.DoesNotExist:
-            return Response(EVENT_NOT_FOUND_ERROR, status = HTTP_404_NOT_FOUND)
+        invite_user: User = User.objects.get(id = serializer.validated_data['user_id'])
+        event: Event = Event.objects.get(id = serializer.validated_data['event_id'])
+        if invite_user.id == request.user.id:
+            return Response(SENT_INVATION_ERROR, status = HTTP_400_BAD_REQUEST)
+        send_to_user(user = invite_user,notification_text=
+        INVITE_USER_NOTIFICATION.format(user_name = request.user.profile.name, event_name = event.name),
+        message_type = INVITE_USER_TO_EVENT_MESSAGE_TYPE)
+        return Response(SENT_INVATION_SUCCESS, status = HTTP_200_OK)
 
 class GetDeleteEvent(RetrieveAPIView):
     '''a class that allows you to get, update, delete an event'''
@@ -175,7 +168,7 @@ class DeleteEvents(GenericAPIView):
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
         return Response(bulk_delete_events(
-            serializer = serializer, queryset = self.queryset,user = request.user), status = HTTP_200_OK)
+            serializer = serializer, queryset = self.queryset, user = request.user), status = HTTP_200_OK)
 
 
 class JoinToEvent(GenericAPIView):
@@ -249,7 +242,8 @@ class EventsRelevantList(ListAPIView):
     search_fields = ('name', )
 
 class UserEventsRelevantList(EventsRelevantList):
-    def get_queryset(self) -> QuerySet:
+
+    def get_queryset(self) -> QuerySet[Event]:
         return self.queryset.filter(author_id = self.request.user.id)
 
 class UserEvents(ListAPIView):
@@ -260,14 +254,14 @@ class UserEvents(ListAPIView):
     filterset_fields = ('type', )
     queryset = Event.objects.all()
 
-    def get_queryset(self) -> QuerySet:
+    def get_queryset(self) -> QuerySet[Event]:
         return self.queryset.filter(author_id = self.request.user.id) 
 
 class PopularIvents(UserEvents):
     serializer_class = PopularIventsListSerializer
     queryset = Event.objects.filter(status = 'Planned')
 
-    def get_queryset(self) -> QuerySet:
+    def get_queryset(self) -> QuerySet[Event]:
         return self.queryset.annotate(count = Count('current_users')).order_by('-count')[:10]
 
 class UserPlannedEvents(UserEvents):
@@ -305,4 +299,4 @@ class BulkAcceptOrDeclineRequestToParticipation(GenericAPIView):
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
         return Response(bulk_accpet_or_decline(
-            serializer = serializer, queryset = self.queryset, user = request.user), status = HTTP_200_OK)
+            serializer = serializer, user = request.user), status = HTTP_200_OK)
