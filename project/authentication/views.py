@@ -197,7 +197,7 @@ class RequestChangePassword(GenericAPIView):
         serializer.is_valid(raise_exception = True)
         if not request.user.check_password(serializer.data.get('old_password')):
             return Response(WRONG_PASSWORD_ERROR, status = HTTP_400_BAD_REQUEST)
-        code_create(email=request.user.email,type=PASSWORD_CHANGE_CODE_TYPE,
+        code_create(email=request.user.email,type = PASSWORD_CHANGE_CODE_TYPE,
         dop_info = serializer.validated_data['new_password'])
         return Response(SENT_CODE_TO_EMAIL_SUCCESS, status = HTTP_200_OK)
 
