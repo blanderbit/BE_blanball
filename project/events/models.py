@@ -93,7 +93,7 @@ class RequestToParticipation(models.Model):
     user: User = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'user')
     time_created: date =  models.DateTimeField(auto_now_add = True)
     event: Event = models.ForeignKey(Event, on_delete = models.CASCADE)
-    event_author: User = models.ForeignKey(User, on_delete = models.CASCADE, related_name='author')
+    event_author: User = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'author')
 
     def __str__(self) -> str:
         return self.user.email
