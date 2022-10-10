@@ -130,9 +130,9 @@ class InviteUserToEventSerializer(serializers.Serializer):
             if invite_user.id == Event.objects.get(id = event.id).author.id:
                 raise serializers.ValidationError(AUTHOR_CAN_NOT_INVITE_ERROR , HTTP_400_BAD_REQUEST)
             if invite_user.current_rooms.filter(id = event.id).exists():
-                raise serializers.ValidationError(ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, status = HTTP_400_BAD_REQUEST)
+                raise serializers.ValidationError(ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, HTTP_400_BAD_REQUEST)
             if invite_user.current_views_rooms.filter(id = event.id).exists():
-                raise serializers.ValidationError(ALREADY_IN_EVENT_FANS_LIST_ERROR, status = HTTP_400_BAD_REQUEST)
+                raise serializers.ValidationError(ALREADY_IN_EVENT_FANS_LIST_ERROR, HTTP_400_BAD_REQUEST)
             return super().validate(attrs)
         except User.DoesNotExist:
             raise serializers.ValidationError(NO_SUCH_USER_ERROR, HTTP_404_NOT_FOUND)

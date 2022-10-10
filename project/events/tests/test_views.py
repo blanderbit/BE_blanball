@@ -148,7 +148,6 @@ class TestEventsViews(SetUpEventsViews):
         response = self.client.post(reverse('bulk-delete-events'), {'events': [Event.objects.first().id,
         Event.objects.last().id]})
         self.assertEqual(Event.objects.count(), 8)
-        self.assertEqual(len(response.data['delete error']), 0)
         self.assertEqual(len(response.data['delete success']), 2)
         self.assertEqual(response.status_code, HTTP_200_OK)
     
@@ -158,7 +157,6 @@ class TestEventsViews(SetUpEventsViews):
         self.register_second_user()
         response = self.client.post(reverse('bulk-delete-events'), {'events': [Event.objects.first().id,
         Event.objects.last().id]})
-        self.assertEqual(len(response.data['delete error']), 2)
         self.assertEqual(len(response.data['delete success']), 0)
         self.assertEqual(Event.objects.count(), 10)
         self.assertEqual(response.status_code, HTTP_200_OK)
@@ -280,7 +278,6 @@ class TestEventsViews(SetUpEventsViews):
             "type": True
         })
         self.assertEqual(len(accept_request_to_participation.data['success']), 1)
-        self.assertEqual(len(accept_request_to_participation.data['error']), 0)
         self.assertEqual(Event.objects.first().count_current_users, 1)
         self.assertEqual(event_join.status_code, HTTP_200_OK)
 
