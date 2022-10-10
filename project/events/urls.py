@@ -34,7 +34,7 @@ urlpatterns = [
     path('client/events/list', EventList.as_view(), 
         name='events-list'),
     # endpoint where user can bulk delete events
-    path('admin/events/delete', DeleteEvents.as_view(),
+    path('client/events/delete', DeleteEvents.as_view(),
         name='bulk-delete-events'),
     # endpoint where user can join to event 
     path('client/event/join', JoinToEvent.as_view(),
@@ -56,13 +56,13 @@ urlpatterns = [
         name='relevant-event-list'),
     # endpoint where user can get relevant list of events
     path('client/my/relevant/events/list', UserEventsRelevantList.as_view(), 
-        name='relevant-event-list'),
+        name='relevant-user-events-list'),
     # endpoint where a user can get list of other user scheduled events
-    path('client/user/planned/events/list<int:pk>', UserPlannedEvents.as_view(), 
-        name='user-planned-events'),
+    path('client/user/planned/events/list/<int:pk>', UserPlannedEvents.as_view(), 
+        name='user-planned-events-list'),
     # endpoint where a user can get list of the most popular events
     path('client/popular/events/list', PopularIvents.as_view(), 
-        name='popular-events'),
+        name='popular-events-list'),
     #endpoint where a user can invite other user to ivent
     path('client/invite/user/to/event', InviteUserToEvent.as_view(), 
         name='invite-to-event'),

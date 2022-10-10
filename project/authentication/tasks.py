@@ -24,7 +24,7 @@ class EmailThread(threading.Thread):
 class Util: 
     @staticmethod
     @app.task
-    def send_email(data: dict[str,Any]) -> None:
+    def send_email(data: dict[str, Any]) -> None:
         send: EmailMessage = EmailMessage(
         subject = BLANBALL,body = data['email_body'], to = [data['to_email']])
         send.content_subtype = 'html'

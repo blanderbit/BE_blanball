@@ -122,7 +122,7 @@ class UpdateProfile(GenericAPIView):
 class UserProfile(GenericAPIView):
     '''get public user profile'''
     serializer_class = UserSerializer
-    queryset = User.objects.all()
+    queryset: QuerySet[User] = User.objects.all()
 
     def get(self, request: Request, pk: int) -> Response:
         '''getting a public user profile'''
@@ -159,7 +159,7 @@ class UsersRelevantList(ListAPIView):
 
 class AdminUsersList(UserList):
     '''displaying the full list of admin users'''
-    def get_queryset(self) -> QuerySet:
+    def get_queryset(self) -> QuerySet[User]:
         return self.queryset.filter(role = 'Admin')
 
 class RequestPasswordReset(GenericAPIView):
@@ -260,7 +260,7 @@ class CheckCode(GenericAPIView):
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
-        verify_code: str = serializer.validated_data["verify_code"]
+        verify_code: str = serializer.validated_data['verify_code']
         self.code: Code = Code.objects.get(verify_code = verify_code)
         self.user: User = User.objects.get(id = request.user.id)
         if self.code.user_email != self.user.email:

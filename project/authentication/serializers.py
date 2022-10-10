@@ -254,7 +254,7 @@ class ResetPasswordSerializer(serializers.Serializer):
 
 
 class CheckCodeSerializer(serializers.Serializer):
-    verify_code:str = serializers.CharField(
+    verify_code: str = serializers.CharField(
         min_length = 5,max_length = 5, write_only = True)
 
     class Meta:
