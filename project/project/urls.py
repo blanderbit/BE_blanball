@@ -8,13 +8,13 @@ from django.conf import settings
 
 urlpatterns = [
     path('api/v1/events/', include('events.urls'), 
-        name='events'),
+        name = 'events'),
     path('api/v1/authentication/', include('authentication.urls'), 
-        name='authentication'),
+        name = 'authentication'),
     path('api/v1/notifications/', include('notifications.urls'), 
-        name='notifications'),
+        name = 'notifications'),
     path('api/v1/reviews/', include('reviews.urls'), 
-        name='reviews'),
+        name = 'reviews'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root = settings.STATIC_ROOT)

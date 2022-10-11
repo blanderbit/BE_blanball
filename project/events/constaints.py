@@ -3,7 +3,7 @@ APPLICATION_FOR_PARTICIPATION_SUCCESS = {'success': 'Your application for partic
 
 ALREADY_SENT_REQUEST_TO_PARTICIPATE = {'error': 'You have already sent a request to participate'}
 
-INVITE_USER_NOTIFICATION = '@{user_name},invited you to the event {event_name}'
+INVITE_USER_NOTIFICATION = '@{user_name},invited you to the event №{event_name}'
 SENT_INVATION_ERROR = {'error': 'You cannot invite yourself to the event'} 
 NEW_USER_ON_THE_EVENT_NOTIFICATION = '{author_name},for your event under the number {event_id} joined {user_type} player'
 NEW_REQUEST_TO_PARTICIPATION = '{author_name},you have received a new request to participate in the event under the number №{event_id}'

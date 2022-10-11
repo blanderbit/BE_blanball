@@ -2,6 +2,7 @@ from typing import Any
 from project.pagination import CustomPagination
 
 from django.db.models.query import QuerySet
+from django.conf import settings
 
 from rest_framework.filters import (
     SearchFilter,
@@ -10,6 +11,9 @@ from rest_framework.filters import (
 from rest_framework.generics import (
     GenericAPIView,
     ListAPIView,
+)
+from rest_framework.views import (
+    APIView
 )
 from rest_framework.status import (
     HTTP_201_CREATED,
@@ -54,6 +58,10 @@ from authentication.filters import (
     RankedFuzzySearchFilter,
     UserAgeRangeFilter,
 )
+import urllib.request
+from urllib.error import URLError
+
+import base64
 
 from authentication.constaints import (
     REGISTER_SUCCESS_BODY_TITLE, REGISTER_SUCCESS_TITLE, REGISTER_SUCCESS_TEXT, SENT_CODE_TO_EMAIL_SUCCESS, ACCOUNT_DELETE_CODE_TYPE,
@@ -62,7 +70,7 @@ from authentication.constaints import (
     TEMPLATE_SUCCESS_BODY_TITLE, TEMPLATE_SUCCESS_BODY_TITLE, NO_PERMISSIONS_ERROR, TEMPLATE_SUCCESS_TITLE, TEMPLATE_SUCCESS_TEXT,
     ACTIVATION_SUCCESS, CHANGE_PHONE_SUCCESS, CHANGE_PASSWORD_SUCCESS,EMAIL_VERIFY_SUCCESS_BODY_TITLE, EMAIL_VERIFY_SUCCESS_TITLE,
     CHANGE_EMAIL_SUCCESS, ACCOUNT_DELETED_SUCCESS, EMAIL_VERIFY_SUCCESS_TEXT, ACCOUNT_DELETE_SUCCESS_TEXT, 
-    ACCOUNT_DELETE_SUCCESS_BODY_TITLE, ACCOUNT_DELETE_SUCCESS_TITLE,
+    ACCOUNT_DELETE_SUCCESS_BODY_TITLE, ACCOUNT_DELETE_SUCCESS_TITLE, NO_SUCH_IMAGE_ERROR
 )
 
 
@@ -246,6 +254,17 @@ class RequestChangePhone(GenericAPIView):
         code_create(email = request.user.email,type = PHONE_CHANGE_CODE_TYPE,
         dop_info = serializer.validated_data['phone'])
         return Response(SENT_CODE_TO_EMAIL_SUCCESS, status = HTTP_200_OK)
+
+
+class GetImage(APIView):
+
+    def get(self, request: Request, image_path: str) -> Response:
+        try:
+            with urllib.request.urlopen(f'{settings.FTP_STORAGE_LOCATION}/users/{image_path}') as image:
+                img_bytes = base64.b64encode(image.read())
+                return Response(img_bytes, status = HTTP_200_OK)
+        except URLError:
+            return Response(NO_SUCH_IMAGE_ERROR, status = HTTP_404_NOT_FOUND)
 
 class CheckCode(GenericAPIView):
     '''password reset on a previously sent request'''
