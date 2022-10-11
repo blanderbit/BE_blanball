@@ -49,11 +49,17 @@ REGISTER_SUCCESS_BODY_TITLE = 'Registration was successful'
 REGISTER_SUCCESS_TITLE = 'Thank you for registering with BlanBall'
 REGISTER_SUCCESS_TEXT = 'You received this message because this email is registered in the BlanBall app.'
 
+
+ACCOUNT_DELETE_SUCCESS_BODY_TITLE = 'Account successfully deleted'
+ACCOUNT_DELETE_SUCCESS_TITLE = 'Thank you for using our app'
+ACCOUNT_DELETE_SUCCESS_TEXT = 'You received this message because your account has been deleted in the BlanBall app.'
+
 TEMPLATE_SUCCESS_BODY_TITLE  = 'Change {key} passed successfully'
 TEMPLATE_SUCCESS_TITLE = 'Your {key} changed!'
 TEMPLATE_SUCCESS_TEXT = 'You received this message because your {key} has been changed in the BlanBall application.'
 
 EMAIL_VERIFY_SUCCESS_BODY_TITLE = 'Verification was successful!'
-EMAIL_VERIFY_SUCCESS_TITLE = 'Your account has been activated!'
+EMAIL_VERIFY_SUCCESS_TEXT = 'You received this message because your account has been verified in the BlanBall application.'
+EMAIL_VERIFY_SUCCESS_TITLE = 'Your account has been verified!'
 GET_PLANNED_IVENTS_ERROR = {'error': 'Get planned ivents can only contain: day(d), month(m) and year(y)'}
 BLANBALL = 'BlanBall'

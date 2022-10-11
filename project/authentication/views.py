@@ -61,7 +61,8 @@ from authentication.constaints import (
     EMAIL_VERIFY_CODE_TYPE, ALREADY_VERIFIED_ERROR, PHONE_CHANGE_CODE_TYPE, EMAIL_CHANGE_CODE_TYPE, THIS_EMAIL_ALREADY_IN_USE_ERROR,
     TEMPLATE_SUCCESS_BODY_TITLE, TEMPLATE_SUCCESS_BODY_TITLE, NO_PERMISSIONS_ERROR, TEMPLATE_SUCCESS_TITLE, TEMPLATE_SUCCESS_TEXT,
     ACTIVATION_SUCCESS, CHANGE_PHONE_SUCCESS, CHANGE_PASSWORD_SUCCESS,EMAIL_VERIFY_SUCCESS_BODY_TITLE, EMAIL_VERIFY_SUCCESS_TITLE,
-    CHANGE_EMAIL_SUCCESS, ACCOUNT_DELETED_SUCCESS
+    CHANGE_EMAIL_SUCCESS, ACCOUNT_DELETED_SUCCESS, EMAIL_VERIFY_SUCCESS_TEXT, ACCOUNT_DELETE_SUCCESS_TEXT, 
+    ACCOUNT_DELETE_SUCCESS_BODY_TITLE, ACCOUNT_DELETE_SUCCESS_TITLE,
 )
 
 
@@ -282,15 +283,16 @@ class CheckCode(GenericAPIView):
             return Response(CHANGE_EMAIL_SUCCESS, status = HTTP_200_OK) 
 
         elif self.code.type == ACCOUNT_DELETE_CODE_TYPE:
-            # send_email_template(user=self.user,body_title=PASS_UPDATE_SUCCESS_BODY_TITLE,title=PASS_UPDATE_SUCCESS_TITLE,
-            # text=TEMPLATE_SUCCESS_TEXT.format(body='оскільки ваш акаунт було видалено'))
+            send_email_template(user = self.user, body_title = ACCOUNT_DELETE_SUCCESS_BODY_TITLE, title = ACCOUNT_DELETE_SUCCESS_TITLE,
+            text = ACCOUNT_DELETE_SUCCESS_TEXT)
             User.objects.filter(id = self.user.id).delete()
+            self.code.delete()
             return Response(ACCOUNT_DELETED_SUCCESS, status = HTTP_200_OK)
 
         elif self.code.type == EMAIL_VERIFY_CODE_TYPE:
             self.user.is_verified = True
             self.user.save()
             self.code.delete()
-            # send_email_template(user = self.user, body_title = EMAIL_VERIFY_SUCCESS_BODY_TITLE, title = EMAIL_VERIFY_SUCCESS_TITLE,
-            # text = TEMPLATE_SUCCESS_TEXT.format(body = 'because your email has been activated'))
+            send_email_template(user = self.user, body_title = EMAIL_VERIFY_SUCCESS_BODY_TITLE, title = EMAIL_VERIFY_SUCCESS_TITLE,
+            text = EMAIL_VERIFY_SUCCESS_TEXT)
             return Response(ACTIVATION_SUCCESS, status = HTTP_200_OK)
