@@ -84,7 +84,7 @@ class GetMaintenance(APIView):
         try:
             with open('./project/config.json', 'r') as f:
                 data = f.read()
-            return Response({self.key:json.loads(data)[self.key]}, status = HTTP_200_OK)
+            return Response({self.key: json.loads(data)[self.key]}, status = HTTP_200_OK)
         except:
             return Response(CONFIG_FILE_ERROR, status = HTTP_400_BAD_REQUEST)
 
