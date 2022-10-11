@@ -108,7 +108,7 @@ class InviteUserToEvent(GenericAPIView):
         if invite_user.id == request.user.id:
             return Response(SENT_INVATION_ERROR, status = HTTP_400_BAD_REQUEST)
         send_to_user(user = invite_user,notification_text=
-        INVITE_USER_NOTIFICATION.format(user_name = request.user.profile.name, event_name = event.name),
+        INVITE_USER_NOTIFICATION.format(user_name = request.user.profile.name, event_name = event.id),
         message_type = INVITE_USER_TO_EVENT_MESSAGE_TYPE)
         return Response(SENT_INVATION_SUCCESS, status = HTTP_200_OK)
 

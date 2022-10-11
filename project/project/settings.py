@@ -217,6 +217,6 @@ DEFAULT_FILE_STORAGE: str = config('FILE_STORAGE', cast = str)
 FTP_USER: str = config('FTP_USER', cast = str)
 FTP_PASS: str = config('FTP_PASS', cast = str)
 FTP_PORT: str = config('FTP_PORT', cast = str)
-FTP_STORAGE_LOCATION = 'ftp://' + FTP_USER + ':' + FTP_PASS + '@ftp-server:' + FTP_PORT
+FTP_STORAGE_LOCATION: str = 'ftp://' + FTP_USER + ':' + FTP_PASS + '@ftp-server:' + FTP_PORT
 
 ALGORITHM: str = config('ALGORITHM', cast = str)

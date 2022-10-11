@@ -63,3 +63,5 @@ EMAIL_VERIFY_SUCCESS_TEXT = 'You received this message because your account has 
 EMAIL_VERIFY_SUCCESS_TITLE = 'Your account has been verified!'
 GET_PLANNED_IVENTS_ERROR = {'error': 'Get planned ivents can only contain: day(d), month(m) and year(y)'}
 BLANBALL = 'BlanBall'
+
+NO_SUCH_IMAGE_ERROR = {'error': 'Image not found'}
