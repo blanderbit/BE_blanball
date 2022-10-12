@@ -77,8 +77,8 @@ def validate_birthday(value: date) -> ValidationError:
     if timezone.now().date() - value < timezone.timedelta(days = 2191):
         raise ValidationError(MIN_AGE_VALUE_ERROR, HTTP_400_BAD_REQUEST) 
 
-def configuration_dict() -> dict:
-    return {'email': True, 'phone': True, 'send_email': True}
+def configuration_dict() -> dict[str, bool]:
+    return {'email': True, 'phone': True, 'send_email': True, 'show_my_planned_events': True}
 
 
 def image_file_name(instance, filename: str) -> str:
