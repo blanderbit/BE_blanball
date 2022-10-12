@@ -1,6 +1,7 @@
 from datetime import (date, 
     datetime,
 )
+from email.policy import default
 from authentication.models import (
     User,
     Gender,
@@ -74,6 +75,7 @@ class Event(models.Model):
     status: str =  models.CharField(choices = Status.choices, max_length = 10,default = 'Planned')
     current_users: User = models.ManyToManyField(User, related_name = 'current_rooms', blank = True)
     fans: User = models.ManyToManyField(User, related_name = 'current_views_rooms', blank = True)
+    template: bool = models.BooleanField(default = False)
 
     @property
     def count_current_users(self) -> int:
@@ -85,6 +87,9 @@ class Event(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+    def get_event_list(template: bool):
+        return Event.objects.all().select_related('author').prefetch_related('current_users', 'fans').order_by('-id').filter(template = template)
     
     class Meta:
         db_table = 'event'
