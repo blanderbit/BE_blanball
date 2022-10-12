@@ -1,5 +1,5 @@
 import re
-from this import d
+import pandas
 
 from django.utils import timezone
 from django.db.models.query import QuerySet
@@ -18,9 +18,27 @@ from events.constaints import (
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR, EVENT_AUTHOR_CAN_NOT_JOIN_ERROR, 
     ALREADY_SENT_REQUEST_TO_PARTICIPATE, NEW_USER_ON_THE_EVENT_NOTIFICATION, NEW_USER_ON_THE_EVENT_MESSAGE_TYPE,
     RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION, RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_MESSAGE_TYPE,
-    GET_PLANNED_EVENTS_ERROR
+    INVITE_USER_TO_EVENT_MESSAGE_TYPE, INVITE_USER_NOTIFICATION, SENT_INVATION_ERROR,
+    GET_PLANNED_EVENTS_ERROR,
 )
 from notifications.tasks import send_to_user
+
+def event_create(serializer, request_user: User) -> None:
+    for user in serializer.validated_data['current_users']:
+        if user.email == request_user.email:
+            raise ValidationError(SENT_INVATION_ERROR, HTTP_400_BAD_REQUEST)
+        send_to_user(user = user, notification_text = INVITE_USER_NOTIFICATION.format(
+        user_name = request_user.profile.name, event_name = serializer.validated_data['name']),
+        message_type = INVITE_USER_TO_EVENT_MESSAGE_TYPE)
+    serializer.validated_data.pop('current_users')
+    try:
+        contact_number: str = serializer.validated_data['contact_number']
+    except:
+        contact_number: str = User.objects.get(id = request_user.id).phone
+    serializer.save(author = request_user, date_and_time = 
+    pandas.to_datetime(serializer.validated_data['date_and_time'].isoformat()).round('1min').to_pydatetime(),
+    contact_number = contact_number)        
+
 
 def send_notification_to_subscribe_event_user(event: Event, notification_text: str, message_type: str) -> None:
     for user in event.current_users.all():

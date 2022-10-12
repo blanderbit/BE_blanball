@@ -1,6 +1,4 @@
 from typing import Any
-import pandas
-from requests import request
 
 from events.models import (
     Event,
@@ -26,6 +24,7 @@ from events.services import (
     send_notification_to_event_author,
     send_notification_to_subscribe_event_user,
     validate_get_user_planned_events,
+    event_create,
 )
 from events.filters import EventDateTimeRangeFilter
 
@@ -78,26 +77,9 @@ class CreateEvent(GenericAPIView):
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
-        for user in serializer.validated_data['current_users']:
-            if user.email == request.user.email:
-                return Response(SENT_INVATION_ERROR, status = HTTP_400_BAD_REQUEST)
-            send_to_user(user = user, notification_text = INVITE_USER_NOTIFICATION.format(
-            user_name = request.user.profile.name, event_name = serializer.validated_data['name']),
-            message_type = INVITE_USER_TO_EVENT_MESSAGE_TYPE)
-        self.perform_create(serializer = serializer)
+        event_create(serializer = serializer, request_user = request.user)
         return Response(serializer.data, status = HTTP_201_CREATED)
         
-
-    def perform_create(self, serializer: CreateEventSerializer) -> None:
-        serializer.validated_data.pop('current_users')
-        try:
-            contact_number: str = serializer.validated_data['contact_number']
-        except:
-            contact_number: str = User.objects.get(id = self.request.user.id).phone
-        serializer.save(author = self.request.user, date_and_time = 
-        pandas.to_datetime(serializer.validated_data['date_and_time'].isoformat()).round('1min').to_pydatetime(),
-        contact_number = contact_number)        
-
 class InviteUserToEvent(GenericAPIView):
     serializer_class = InviteUserToEventSerializer
     

@@ -225,7 +225,25 @@ FTP_STORAGE_LOCATION: str = 'ftp://' + FTP_USER + ':' + FTP_PASS + '@ftp-server:
 
 ALGORITHM: str = config('ALGORITHM', cast = str)
 
-CORS_ALLOWED_ORIGINS: tuple[str] = config('CORS_ALLOWED_ORIGINS', cast = Csv())
-CORS_ALLOW_METHODS: tuple[str] = config('CORS_ALLOW_METHODS', cast = Csv())
-CORS_ALLOW_HEADERS: tuple[str] = config('CORS_ALLOW_HEADERS', cast = Csv())
-
+CORS_ALLOWED_ORIGINS: tuple[str] = (
+    'http://localhost:5173', 
+    'http://178.151.201.167:49201',
+)
+CORS_ALLOW_METHODS: tuple[str] = (
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'POST',
+    'PUT',
+)
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
