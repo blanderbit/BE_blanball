@@ -31,6 +31,7 @@ django-storages = "^1.13.1"
 paramiko = "^2.11.0"
 freezegun = "^1.2.2"
 uWSGI = "^2.0.20"
+django-cors-headers = "^3.13.0"
 
 [tool.poetry.dev-dependencies]
 

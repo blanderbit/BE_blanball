@@ -1,4 +1,9 @@
+from ctypes import Union
+import os
+import uuid
+
 from datetime import date, datetime
+
 from typing import Any
 
 from PIL import Image
@@ -24,6 +29,8 @@ from rest_framework.status import HTTP_400_BAD_REQUEST
 from authentication.constaints import (
     MIN_AGE_VALUE_ERROR,MAX_AGE_VALUE_ERROR
 )
+from django.db import connection
+
 
 class UserManager(BaseUserManager):
     '''user manager'''
@@ -73,12 +80,18 @@ def validate_birthday(value: date) -> ValidationError:
 def configuration_dict() -> dict:
     return {'email': True, 'phone': True, 'send_email': True}
 
+
+def image_file_name(instance, filename: str) -> str:
+    filename: uuid.UUID = (uuid.uuid4())
+
+    return os.path.join('users', str(filename))
+
 class Profile(models.Model):
-    name: str = models.CharField(max_length=255)
-    last_name: str = models.CharField(max_length=255)
-    gender: str = models.CharField(choices = Gender.choices, max_length=10)
+    name: str = models.CharField(max_length = 255)
+    last_name: str = models.CharField(max_length = 255)
+    gender: str = models.CharField(choices = Gender.choices, max_length = 10)
     birthday: date = models.DateField(blank = True, null = True, validators = [validate_birthday])
-    avatar: Image = models.ImageField(null = True, blank=True, upload_to='srv/sftp/')
+    avatar: Image = models.ImageField(null = True, blank=True, upload_to = image_file_name)
     age: int = models.PositiveSmallIntegerField(null = True, blank = True)
     height: int = models.PositiveSmallIntegerField(null = True, blank = True, validators=[
             MinValueValidator(30),
@@ -91,10 +104,10 @@ class Profile(models.Model):
     position: str = models.CharField(choices = Position.choices, max_length = 255, null = True, blank = True)
     created_at: datetime = models.DateTimeField(auto_now_add = True)
     about_me: str =  models.TextField(blank = True, null = True)
-    
+
     def __str__(self) -> str:
         return self.name
-    
+
     class Meta:
         db_table = 'user_profile'
 

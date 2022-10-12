@@ -42,7 +42,7 @@ AUTH_USER_MODEL: str = config('AUTH_USER_MODEL', cast = str)
 ALLOWED_HOSTS: list[str] = config('ALLOWED_HOSTS', cast = Csv())
 
 # Application definition:
-INSTALLED_APPS: tuple[str] = [
+INSTALLED_APPS: tuple[str] = (
     # Default django apps:
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -51,6 +51,7 @@ INSTALLED_APPS: tuple[str] = [
     'django.contrib.staticfiles',
 
     # Other libs apps:
+    'corsheaders',
     'rest_framework_swagger',
     'rest_framework',
     'django_inlinecss',
@@ -64,10 +65,11 @@ INSTALLED_APPS: tuple[str] = [
     'authentication.apps.AuthenticationConfig',
     'notifications.apps.NotificationsConfig',
     'reviews.apps.ReviewsConfig',
-]
+)
 
 
-MIDDLEWARE: tuple[str] = [
+MIDDLEWARE: tuple[str] = (
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -75,7 +77,8 @@ MIDDLEWARE: tuple[str] = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
+)
+
 
 #conected datdabse settings
 if os.environ.get('GITHUB_WORKFLOW'):
@@ -217,6 +220,11 @@ DEFAULT_FILE_STORAGE: str = config('FILE_STORAGE', cast = str)
 FTP_USER: str = config('FTP_USER', cast = str)
 FTP_PASS: str = config('FTP_PASS', cast = str)
 FTP_PORT: str = config('FTP_PORT', cast = str)
-FTP_STORAGE_LOCATION = 'ftp://' + FTP_USER + ':' + FTP_PASS + '@ftp-server:' + FTP_PORT
+FTP_STORAGE_LOCATION: str = 'ftp://' + FTP_USER + ':' + FTP_PASS + '@ftp-server:' + FTP_PORT
 
 ALGORITHM: str = config('ALGORITHM', cast = str)
+
+CORS_ALLOWED_ORIGINS: tuple[str] = config('CORS_ALLOWED_ORIGINS', cast = Csv())
+CORS_ALLOW_METHODS: tuple[str] = config('CORS_ALLOW_METHODS', cast = Csv())
+CORS_ALLOW_HEADERS: tuple[str] = config('CORS_ALLOW_HEADERS', cast = Csv())
+

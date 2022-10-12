@@ -2,6 +2,7 @@ from typing import Any
 from project.pagination import CustomPagination
 
 from django.db.models.query import QuerySet
+from django.conf import settings
 
 from rest_framework.filters import (
     SearchFilter,
@@ -10,6 +11,9 @@ from rest_framework.filters import (
 from rest_framework.generics import (
     GenericAPIView,
     ListAPIView,
+)
+from rest_framework.views import (
+    APIView
 )
 from rest_framework.status import (
     HTTP_201_CREATED,
@@ -54,6 +58,10 @@ from authentication.filters import (
     RankedFuzzySearchFilter,
     UserAgeRangeFilter,
 )
+import urllib.request
+from urllib.error import URLError
+
+import base64
 
 from authentication.constaints import (
     REGISTER_SUCCESS_BODY_TITLE, REGISTER_SUCCESS_TITLE, REGISTER_SUCCESS_TEXT, SENT_CODE_TO_EMAIL_SUCCESS, ACCOUNT_DELETE_CODE_TYPE,
@@ -61,7 +69,8 @@ from authentication.constaints import (
     EMAIL_VERIFY_CODE_TYPE, ALREADY_VERIFIED_ERROR, PHONE_CHANGE_CODE_TYPE, EMAIL_CHANGE_CODE_TYPE, THIS_EMAIL_ALREADY_IN_USE_ERROR,
     TEMPLATE_SUCCESS_BODY_TITLE, TEMPLATE_SUCCESS_BODY_TITLE, NO_PERMISSIONS_ERROR, TEMPLATE_SUCCESS_TITLE, TEMPLATE_SUCCESS_TEXT,
     ACTIVATION_SUCCESS, CHANGE_PHONE_SUCCESS, CHANGE_PASSWORD_SUCCESS,EMAIL_VERIFY_SUCCESS_BODY_TITLE, EMAIL_VERIFY_SUCCESS_TITLE,
-    CHANGE_EMAIL_SUCCESS, ACCOUNT_DELETED_SUCCESS
+    CHANGE_EMAIL_SUCCESS, ACCOUNT_DELETED_SUCCESS, EMAIL_VERIFY_SUCCESS_TEXT, ACCOUNT_DELETE_SUCCESS_TEXT, 
+    ACCOUNT_DELETE_SUCCESS_BODY_TITLE, ACCOUNT_DELETE_SUCCESS_TITLE, NO_SUCH_IMAGE_ERROR
 )
 
 
@@ -246,6 +255,17 @@ class RequestChangePhone(GenericAPIView):
         dop_info = serializer.validated_data['phone'])
         return Response(SENT_CODE_TO_EMAIL_SUCCESS, status = HTTP_200_OK)
 
+
+class GetImage(APIView):
+
+    def get(self, request: Request, image_path: str) -> Response:
+        try:
+            with urllib.request.urlopen(f'{settings.FTP_STORAGE_LOCATION}/users/{image_path}') as image:
+                img_bytes = base64.b64encode(image.read())
+                return Response(img_bytes, status = HTTP_200_OK)
+        except URLError:
+            return Response(NO_SUCH_IMAGE_ERROR, status = HTTP_404_NOT_FOUND)
+
 class CheckCode(GenericAPIView):
     '''password reset on a previously sent request'''
     serializer_class = CheckCodeSerializer
@@ -282,15 +302,16 @@ class CheckCode(GenericAPIView):
             return Response(CHANGE_EMAIL_SUCCESS, status = HTTP_200_OK) 
 
         elif self.code.type == ACCOUNT_DELETE_CODE_TYPE:
-            # send_email_template(user=self.user,body_title=PASS_UPDATE_SUCCESS_BODY_TITLE,title=PASS_UPDATE_SUCCESS_TITLE,
-            # text=TEMPLATE_SUCCESS_TEXT.format(body='оскільки ваш акаунт було видалено'))
+            send_email_template(user = self.user, body_title = ACCOUNT_DELETE_SUCCESS_BODY_TITLE, title = ACCOUNT_DELETE_SUCCESS_TITLE,
+            text = ACCOUNT_DELETE_SUCCESS_TEXT)
             User.objects.filter(id = self.user.id).delete()
+            self.code.delete()
             return Response(ACCOUNT_DELETED_SUCCESS, status = HTTP_200_OK)
 
         elif self.code.type == EMAIL_VERIFY_CODE_TYPE:
             self.user.is_verified = True
             self.user.save()
             self.code.delete()
-            # send_email_template(user = self.user, body_title = EMAIL_VERIFY_SUCCESS_BODY_TITLE, title = EMAIL_VERIFY_SUCCESS_TITLE,
-            # text = TEMPLATE_SUCCESS_TEXT.format(body = 'because your email has been activated'))
+            send_email_template(user = self.user, body_title = EMAIL_VERIFY_SUCCESS_BODY_TITLE, title = EMAIL_VERIFY_SUCCESS_TITLE,
+            text = EMAIL_VERIFY_SUCCESS_TEXT)
             return Response(ACTIVATION_SUCCESS, status = HTTP_200_OK)

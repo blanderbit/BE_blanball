@@ -11,16 +11,22 @@ MAINTENANCE_TRUE_NOTIFICATION_TEXT)
 from notifications.models import Notification
 
 def update_maintenance(data: dict[str, str]) -> None:
+
+    with open('./project/config.json', 'r') as f:
+        json_data = json.load(f)
+        json_data['isMaintenance'] = data['isMaintenance']
+
     with open('./project/config.json', 'w') as f:
-        json.dump(data,f)
+        f.write(json.dumps(json_data))
+
         for user in User.objects.all():
-            if data["isMaintenance"] == True:
+            if json_data['isMaintenance'] == True:
                 notification_text = MAINTENANCE_TRUE_NOTIFICATION_TEXT.format(
-                username = user.profile.name, last_name = user.profile.last_name)
+                username = user.profile.name)
             else:
                 notification_text = MAINTENANCE_FALSE_NOTIFICATION_TEXT.format(
-                username = user.profile.name, last_name = user.profile.last_name)
-            send_to_user(user = user,notification_text = notification_text, 
+                username = user.profile.name)
+            send_to_user(user = user, notification_text = notification_text, 
                 message_type = CHANGE_MAINTENANCE_MESSAGE_TYPE)
 
 def bulk_delete_notifications(data: dict[str, Any], queryset: QuerySet, user: User) -> dict[str, int]:

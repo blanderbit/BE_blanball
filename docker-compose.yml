@@ -99,7 +99,8 @@ services:
       - .env
     image: garethflowers/ftp-server
     ports:
-      - 21:21/tcp
+      - '20-21:20-21/tcp'
+      - '40000-40009:40000-40009/tcp'
     volumes:
       - ftp-server-data:/home/user
     networks:
