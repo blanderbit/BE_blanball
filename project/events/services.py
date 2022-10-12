@@ -17,7 +17,8 @@ from events.models import (
 from events.constaints import (
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR, EVENT_AUTHOR_CAN_NOT_JOIN_ERROR, 
     ALREADY_SENT_REQUEST_TO_PARTICIPATE, NEW_USER_ON_THE_EVENT_NOTIFICATION, NEW_USER_ON_THE_EVENT_MESSAGE_TYPE,
-    RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION, RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_MESSAGE_TYPE
+    RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION, RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_MESSAGE_TYPE,
+    GET_PLANNED_EVENTS_ERROR
 )
 from notifications.tasks import send_to_user
 
@@ -48,6 +49,12 @@ def send_notification_to_event_author(event: Event) -> None:
         NEW_USER_ON_THE_EVENT_NOTIFICATION.format(author_name = event.author.profile.name, 
         user_type = user_type,event_id = event.id),
         message_type = NEW_USER_ON_THE_EVENT_MESSAGE_TYPE)
+
+
+def validate_get_user_planned_events(pk: int, request_user: User ) -> None:
+    user = User.objects.get(id = pk)
+    if user.configuration['show_my_planned_events'] == False and request_user.id != user.id:
+        raise ValidationError(GET_PLANNED_EVENTS_ERROR, HTTP_400_BAD_REQUEST)  
 
 
 def filter_event_by_user_planned_events_time(pk: int, queryset: QuerySet) -> QuerySet:

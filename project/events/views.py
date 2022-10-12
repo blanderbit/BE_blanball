@@ -1,5 +1,6 @@
 from typing import Any
 import pandas
+from requests import request
 
 from events.models import (
     Event,
@@ -24,6 +25,7 @@ from events.services import (
     bulk_delete_events,
     send_notification_to_event_author,
     send_notification_to_subscribe_event_user,
+    validate_get_user_planned_events,
 )
 from events.filters import EventDateTimeRangeFilter
 
@@ -67,7 +69,6 @@ from events.constaints import (
 from authentication.constaints import (
     NO_SUCH_USER_ERROR, NO_PERMISSIONS_ERROR
 )
-
 
 class CreateEvent(GenericAPIView):
     '''class that allows you to create a new event'''
@@ -270,12 +271,13 @@ class UserPlannedEvents(UserEvents):
 
     def list(self, request: Request, pk: int) -> Response:
         try:
+            validate_get_user_planned_events(pk = pk, request_user = request.user)
             serializer = self.serializer_class(
                 filter_event_by_user_planned_events_time(pk = pk, queryset = self.queryset.all()), many = True)
-            serializer = self.serializer_class(serializer.data, many=True)
             return Response(serializer.data, status = HTTP_200_OK)
         except User.DoesNotExist:
             return Response(NO_SUCH_USER_ERROR, status = HTTP_400_BAD_REQUEST)
+
 
 class RequestToParticipationsList(ListAPIView):
     serializer_class = RequestToParticipationSerializer

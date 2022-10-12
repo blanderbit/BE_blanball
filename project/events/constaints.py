@@ -40,3 +40,5 @@ EVENT_UPDATE_MESSAGE_TYPE = 'event_updated'
 EVENT_UPDATE_TEXT = 'the event №{event_id}, to which you subscribed as a participant, has been updated'
 EVENT_DELETE_TEXT = 'the event №{event_id}, to which you subscribed as a participant, has been deleted'
 AUTHOR_CAN_NOT_INVITE_ERROR = {'error': 'The author cannot be invited to his event'}
+
+GET_PLANNED_EVENTS_ERROR = {'error': 'The user has hidden the list of his scheduled events'}
