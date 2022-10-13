@@ -18,6 +18,9 @@ class Review(models.Model):
         ])
     user: User =  models.ForeignKey(User, on_delete = models.PROTECT, related_name = 'reviews')
 
+    def __repr__ (self) -> str:
+        return '<Review %s>' % self.id
+
     def __str__(self) -> str:
         return self.email
         

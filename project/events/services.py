@@ -44,9 +44,9 @@ def event_create(data: Union[dict[str, Any], OrderedDict[str, Any]], request_use
     try:
         contact_number: str = data['contact_number']
     except:
-        contact_number: str = User.objects.get(id = request_user.id).phone 
+        contact_number: str = str(User.objects.get(id = request_user.id).phone)
     data['contact_number'] = contact_number
-    data['date_and_time'] = pandas.to_datetime(data['date_and_time'].isoformat()).round('1min').to_pydatetime()
+    data['date_and_time'] = str(pandas.to_datetime(data['date_and_time'].isoformat()).round('1min').to_pydatetime())
     Event.objects.create(**data, author = request_user)
     return data
 

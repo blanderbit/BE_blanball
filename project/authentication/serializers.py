@@ -20,15 +20,9 @@ from authentication.constaints import (PASSWORD_CHANGE_CODE_TYPE, EMAIL_CHANGE_C
 )
 
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
-    """
-    A ModelSerializer that takes an additional `fields` argument that
-    controls which fields should be displayed.
-    """
-
     def __init__(self, *args, **kwargs) -> None:
         fields: tuple[str] = kwargs.pop('fields', None)
 
-        # Instantiate the superclass normally
         super().__init__(*args, **kwargs)
 
         if fields is not None:

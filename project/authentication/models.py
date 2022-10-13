@@ -80,7 +80,6 @@ def validate_birthday(value: date) -> ValidationError:
 def configuration_dict() -> dict[str, bool]:
     return {'email': True, 'phone': True, 'send_email': True, 'show_my_planned_events': True}
 
-
 def image_file_name(instance, filename: str) -> str:
     filename: uuid.UUID = (uuid.uuid4())
 
@@ -105,8 +104,12 @@ class Profile(models.Model):
     created_at: datetime = models.DateTimeField(auto_now_add = True)
     about_me: str =  models.TextField(blank = True, null = True)
 
+    def __repr__ (self) -> str:
+        return '<Profile %s>' % self.id
+
     def __str__(self) -> str:
         return self.name
+
 
     class Meta:
         db_table = 'user_profile'
@@ -127,6 +130,9 @@ class User(AbstractBaseUser):
     USERNAME_FIELD = 'email'
 
     objects = UserManager()
+
+    def __repr__ (self) -> str:
+        return '<User %s>' % self.id
 
     def __str__(self) -> str:
         return self.email
@@ -153,6 +159,9 @@ class Code(models.Model):
     user_email: str = models.CharField(max_length = 255)
     dop_info: str = models.CharField(max_length = 255, null = True, blank = True)
 
+    def __repr__ (self) -> str:
+        return '<Code %s>' % self.id
+
     def __str__(self) -> str:  
         return self.verify_code
     
@@ -161,7 +170,10 @@ class Code(models.Model):
 
 
 class ActiveUser(models.Model):
-    user: User = models.ForeignKey(User, on_delete=models.CASCADE)
+    user: User = models.ForeignKey(User, on_delete = models.CASCADE)
+
+    def __repr__ (self) -> str:
+        return '<ActiveUser %s>' % self.id
 
     def __str__(self) -> str:
         return self.user.email

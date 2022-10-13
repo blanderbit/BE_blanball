@@ -1,7 +1,6 @@
 from datetime import (date, 
     datetime,
 )
-from email.policy import default
 from typing import Any
 from authentication.models import (
     User,
@@ -86,6 +85,9 @@ class Event(models.Model):
     def count_current_fans(self) -> int:
         return self.current_fans.count()
 
+    def __repr__ (self) -> str:
+        return '<Event %s>' % self.id
+
     def __str__(self) -> str:
         return self.name
 
@@ -101,6 +103,9 @@ class RequestToParticipation(models.Model):
     event: Event = models.ForeignKey(Event, on_delete = models.CASCADE)
     event_author: User = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'author')
 
+    def __repr__ (self) -> str:
+        return '<RequestToParticipation %s>' % self.id
+
     def __str__(self) -> str:
         return self.user.email
     
@@ -113,6 +118,9 @@ class EventTemplate(models.Model):
     name: str = models.CharField(max_length = 255)
     time_created: datetime = models.DateTimeField(auto_now_add = True)
     event_data: dict[str, Any] = models.JSONField()
+
+    def __repr__ (self) -> str:
+        return '<EventTemplate %s>' % self.id
 
     def __str__(self) -> str:
         return self.name

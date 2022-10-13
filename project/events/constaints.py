@@ -4,7 +4,7 @@ APPLICATION_FOR_PARTICIPATION_SUCCESS: dict[str, str] = {'success': 'Your applic
 ALREADY_SENT_REQUEST_TO_PARTICIPATE: dict[str, str] = {'error': 'You have already sent a request to participate'}
 
 INVITE_USER_NOTIFICATION: str = '@{user_name},invited you to the event №{event_name}'
-SENT_INVATION_ERROR = {'error': 'You cannot invite yourself to the event'} 
+SENT_INVATION_ERROR: dict[str, str] = {'error': 'You cannot invite yourself to the event'} 
 NEW_USER_ON_THE_EVENT_NOTIFICATION: str = '{author_name},for your event under the number {event_id} joined {user_type} player'
 NEW_REQUEST_TO_PARTICIPATION: str = '{author_name},you have received a new request to participate in the event under the number №{event_id}'
 NEW_REQUEST_TO_PARTICIPATION_MESSAGE_TYPE: str = 'new_request_to_participation'
