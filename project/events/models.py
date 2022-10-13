@@ -1,6 +1,7 @@
 from datetime import (date, 
     datetime,
 )
+from email.policy import default
 from authentication.models import (
     User,
     Gender,
@@ -10,6 +11,7 @@ from django.core.validators import (
     MaxValueValidator, 
     MinValueValidator,
 )
+from django.db.models.query import QuerySet
 
 from phonenumber_field.modelfields import PhoneNumberField
 
@@ -62,7 +64,7 @@ class Event(models.Model):
     amount_members: int = models.PositiveSmallIntegerField(validators = [
             MinValueValidator(6),
             MaxValueValidator(50)],
-            default=6)
+            default = 6)
     type: str = models.CharField(choices = Type.choices, max_length = 15)
     price: int = models.PositiveSmallIntegerField(null = True,blank= True, validators = [
         MinValueValidator(1)])
@@ -85,6 +87,9 @@ class Event(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+    def get_event_list() -> QuerySet:
+        return Event.objects.all().select_related('author').prefetch_related('current_users', 'fans').order_by('-id')
     
     class Meta:
         db_table = 'event'
