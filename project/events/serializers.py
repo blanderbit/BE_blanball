@@ -1,5 +1,6 @@
 from events.models import (
     Event,
+    EventTemplate,
     RequestToParticipation,
 )
 from authentication.serializers import EventUsersSerializer
@@ -34,6 +35,16 @@ class CreateEventSerializer(serializers.ModelSerializer):
             'status',
             'current_fans',
         )
+
+class EventTemplateSerializer(serializers.ModelSerializer):
+    event_data = CreateEventSerializer()
+
+    class Meta:
+        model = EventTemplate
+        exclude = (
+            'author',
+        )
+
 
 class UpdateEventSerializer(serializers.ModelSerializer):
     class Meta:

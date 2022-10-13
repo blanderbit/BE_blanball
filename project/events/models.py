@@ -2,6 +2,7 @@ from datetime import (date,
     datetime,
 )
 from email.policy import default
+from typing import Any
 from authentication.models import (
     User,
     Gender,
@@ -105,3 +106,16 @@ class RequestToParticipation(models.Model):
     
     class Meta:
         db_table = 'request_to_participation'
+    
+
+class EventTemplate(models.Model):
+    author: User = models.ForeignKey(User, on_delete = models.CASCADE)
+    name: str = models.CharField(max_length = 255)
+    time_created: datetime = models.DateTimeField(auto_now_add = True)
+    event_data: dict[str, Any] = models.JSONField()
+
+    def __str__(self) -> str:
+        return self.name
+
+    class Meta:
+        db_table = 'event_template'

@@ -3,6 +3,7 @@ from typing import Any
 from events.models import (
     Event,
     RequestToParticipation,
+    EventTemplate,
 )
 from events.serializers import (
     BulkAcceptOrDeclineRequestToParticipationSerializer,
@@ -15,6 +16,7 @@ from events.serializers import (
     EventSerializer,
     InviteUserToEventSerializer,
     CreateEventSerializer,
+    EventTemplateSerializer,
 )
 from events.services import (
     validate_user_before_join_to_event,
@@ -25,8 +27,11 @@ from events.services import (
     send_notification_to_subscribe_event_user,
     validate_get_user_planned_events,
     event_create,
+    validate_event_template,
 )
-from events.filters import EventDateTimeRangeFilter
+from events.filters import (
+    EventDateTimeRangeFilter, 
+)
 
 from project.pagination import CustomPagination
 from notifications.tasks import *
@@ -77,9 +82,26 @@ class CreateEvent(GenericAPIView):
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
-        event_create(serializer = serializer, request_user = request.user)
-        return Response(serializer.data, status = HTTP_201_CREATED)
-        
+        data: dict[str, Any] = event_create(data = serializer.validated_data, request_user = request.user)
+        return Response(data, status = HTTP_201_CREATED)
+
+class CreateEventTemplate(GenericAPIView):
+    queryset = EventTemplate.objects.all()
+    serializer_class = EventTemplateSerializer
+
+    def post(self, request: Request) -> Response:
+        # serializer.save(author = request_user
+        validate_event_template(data = request.data, request_user = request.user)
+        EventTemplate.objects.create(author = request.user, **request.data)
+        return Response(request.data)
+
+class EventsTemplateList(ListAPIView):
+    serializer_class = EventTemplateSerializer
+    queryset = EventTemplate.objects.all()
+
+    def get_queryset(self) -> QuerySet[EventTemplate]:
+        return self.queryset.filter(author_id = self.request.user.id) 
+
 class InviteUserToEvent(GenericAPIView):
     serializer_class = InviteUserToEventSerializer
     
@@ -149,8 +171,9 @@ class DeleteEvents(GenericAPIView):
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
-        return Response(bulk_delete_events(
-            serializer = serializer, queryset = self.queryset, user = request.user), status = HTTP_200_OK)
+        data: dict[str, list[int]] = bulk_delete_events(
+            serializer = serializer.validated_data['events'], queryset = self.queryset, user = request.user)
+        return Response(data, status = HTTP_200_OK)
 
 class JoinToEvent(GenericAPIView):
     serializer_class = JoinOrRemoveRoomSerializer
@@ -228,7 +251,7 @@ class UserEventsRelevantList(EventsRelevantList):
         return self.queryset.filter(author_id = self.request.user.id)
 
 class UserEvents(ListAPIView):
-    serializer_class =  EventListSerializer
+    serializer_class = EventListSerializer
     filter_backends = (SearchFilter, DjangoFilterBackend)
     pagination_class = CustomPagination
     search_fields = ['id', 'name', 'small_disc', 'price', 'place', 'date_and_time', 'amount_members']
@@ -285,5 +308,6 @@ class BulkAcceptOrDeclineRequestToParticipation(GenericAPIView):
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
-        return Response(bulk_accpet_or_decline(
-            serializer = serializer, user = request.user), status = HTTP_200_OK)
+        data: dict[str, list[int]] = bulk_accpet_or_decline(
+            serializer = serializer.validated_data, user = request.user)
+        return Response(data, status = HTTP_200_OK)
