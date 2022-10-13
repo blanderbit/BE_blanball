@@ -89,7 +89,7 @@ class TestEventsViews(SetUpEventsViews):
         event_join = self.client.post(reverse('join-to-event'), {'event_id': Event.objects.first().id})
         self.assertEqual(fan_join_to_event.status_code, HTTP_200_OK)
         self.assertEqual(event_join.status_code, HTTP_400_BAD_REQUEST)
-        self.assertEqual(Event.objects.first().count_fans, 1)
+        self.assertEqual(Event.objects.first().count_current_fans, 1)
         self.assertEqual(Event.objects.first().count_current_users, 0)
 
     @freeze_time('2022-9-29')

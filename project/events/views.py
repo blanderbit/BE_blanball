@@ -118,7 +118,7 @@ class UpdateEvent(GenericAPIView):
     def put(self, request: Request, pk: int) -> Response:
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
-        event: Event = self.queryset.filter(id = pk).select_related('author').prefetch_related('current_users', 'fans')
+        event: Event = self.queryset.filter(id = pk).select_related('author').prefetch_related('current_users', 'current_fans')
         try:
             if event[0].author.id == request.user.id:
                 send_notification_to_subscribe_event_user(event = event[0],
@@ -140,7 +140,6 @@ class EventList(ListAPIView):
     ordering_fields = ('id', )
     filterset_fields = ('type', 'need_ball', 'gender', 'status', 'duration')
     queryset = Event.get_event_list()
-
 
 class DeleteEvents(GenericAPIView):
     '''class that allows you to delete multiple events at once'''
@@ -184,8 +183,8 @@ class FanJoinToEvent(GenericAPIView):
         event: Event = Event.objects.get(id = serializer.data['event_id'])
         if not user.current_views_rooms.filter(id = serializer.data['event_id']).exists():
             user.current_views_rooms.add(event)
-            return Response(JOIN_TO_EVENT_SUCCESS, status=HTTP_200_OK)
-        return Response(ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, status=HTTP_400_BAD_REQUEST)
+            return Response(JOIN_TO_EVENT_SUCCESS, status = HTTP_200_OK)
+        return Response(ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, status = HTTP_400_BAD_REQUEST)
 
 class FanLeaveFromEvent(GenericAPIView):
     serializer_class = JoinOrRemoveRoomSerializer
@@ -239,7 +238,12 @@ class UserEvents(ListAPIView):
     def get_queryset(self) -> QuerySet[Event]:
         return self.queryset.filter(author_id = self.request.user.id) 
 
-class PopularIvents(UserEvents):
+class UserParticipantEvents(UserEvents):
+
+     def get_queryset(self) -> QuerySet[Event]:
+        return self.queryset.filter(current_users__in = [self.request.user.id])
+
+class PopularEvents(UserEvents):
     serializer_class = PopularIventsListSerializer
     queryset = Event.get_event_list().filter(status = 'Planned')
 

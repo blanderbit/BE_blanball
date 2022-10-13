@@ -32,7 +32,7 @@ class CreateEventSerializer(serializers.ModelSerializer):
         exclude = (
             'author',
             'status',
-            'fans',
+            'current_fans',
         )
 
 class UpdateEventSerializer(serializers.ModelSerializer):
@@ -42,7 +42,7 @@ class UpdateEventSerializer(serializers.ModelSerializer):
         exclude = (
             'author',
             'status',
-            'fans',
+            'current_fans',
             'current_users',
         )
 
@@ -84,9 +84,10 @@ class EventListSerializer(serializers.ModelSerializer):
             'type',
             'need_ball',
             'need_form',
+            'privacy',
             'date_and_time',
             'count_current_users',
-            'count_fans',
+            'count_current_fans',
         ) 
 
 class DeleteIventsSerializer(serializers.Serializer):
