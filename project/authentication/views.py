@@ -148,7 +148,6 @@ class UserProfile(GenericAPIView):
         except User.DoesNotExist:
             return Response(NO_SUCH_USER_ERROR, status = HTTP_404_NOT_FOUND)
 
-
 class UserList(ListAPIView):
     '''get all users list'''
     serializer_class = UsersListSerializer

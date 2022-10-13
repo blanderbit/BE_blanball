@@ -139,7 +139,7 @@ class EventList(ListAPIView):
     search_fields = ('id', 'name', 'small_disc', 'price', 'place', 'date_and_time', 'amount_members')
     ordering_fields = ('id', )
     filterset_fields = ('type', 'need_ball', 'gender', 'status', 'duration')
-    queryset = Event.get_event_list(template = False)
+    queryset = Event.get_event_list()
 
 
 class DeleteEvents(GenericAPIView):
@@ -152,7 +152,6 @@ class DeleteEvents(GenericAPIView):
         serializer.is_valid(raise_exception = True)
         return Response(bulk_delete_events(
             serializer = serializer, queryset = self.queryset, user = request.user), status = HTTP_200_OK)
-
 
 class JoinToEvent(GenericAPIView):
     serializer_class = JoinOrRemoveRoomSerializer
@@ -221,13 +220,13 @@ class LeaveFromEvent(GenericAPIView):
 class EventsRelevantList(ListAPIView):
     filter_backends = (RankedFuzzySearchFilter, )
     serializer_class = EventListSerializer
-    queryset = Event.get_event_list(template = False)
+    queryset = Event.get_event_list()
     search_fields = ('name', )
 
 class UserEventsRelevantList(EventsRelevantList):
 
     def get_queryset(self) -> QuerySet[Event]:
-        return self.queryset.filter(author_id = self.request.user.id, template = False)
+        return self.queryset.filter(author_id = self.request.user.id)
 
 class UserEvents(ListAPIView):
     serializer_class =  EventListSerializer
@@ -235,21 +234,21 @@ class UserEvents(ListAPIView):
     pagination_class = CustomPagination
     search_fields = ['id', 'name', 'small_disc', 'price', 'place', 'date_and_time', 'amount_members']
     filterset_fields = ('type', )
-    queryset = Event.get_event_list(template = False)
+    queryset = Event.get_event_list()
 
     def get_queryset(self) -> QuerySet[Event]:
-        return self.queryset.filter(author_id = self.request.user.id, template = False) 
+        return self.queryset.filter(author_id = self.request.user.id) 
 
 class PopularIvents(UserEvents):
     serializer_class = PopularIventsListSerializer
-    queryset = Event.get_event_list(template = False).filter(status = 'Planned')
+    queryset = Event.get_event_list().filter(status = 'Planned')
 
     def get_queryset(self) -> QuerySet[Event]:
         return self.queryset.annotate(count = Count('current_users')).order_by('-count')[:10]
 
 class UserPlannedEvents(UserEvents):
     serializer_class = PopularIventsListSerializer
-    queryset = Event.get_event_list(template = False).filter(status = 'Planned')
+    queryset = Event.get_event_list().filter(status = 'Planned')
 
     def list(self, request: Request, pk: int) -> Response:
         try:

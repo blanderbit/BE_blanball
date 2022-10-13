@@ -11,6 +11,7 @@ from django.core.validators import (
     MaxValueValidator, 
     MinValueValidator,
 )
+from django.db.models.query import QuerySet
 
 from phonenumber_field.modelfields import PhoneNumberField
 
@@ -63,7 +64,7 @@ class Event(models.Model):
     amount_members: int = models.PositiveSmallIntegerField(validators = [
             MinValueValidator(6),
             MaxValueValidator(50)],
-            default=6)
+            default = 6)
     type: str = models.CharField(choices = Type.choices, max_length = 15)
     price: int = models.PositiveSmallIntegerField(null = True,blank= True, validators = [
         MinValueValidator(1)])
@@ -75,7 +76,6 @@ class Event(models.Model):
     status: str =  models.CharField(choices = Status.choices, max_length = 10,default = 'Planned')
     current_users: User = models.ManyToManyField(User, related_name = 'current_rooms', blank = True)
     fans: User = models.ManyToManyField(User, related_name = 'current_views_rooms', blank = True)
-    template: bool = models.BooleanField(default = False)
 
     @property
     def count_current_users(self) -> int:
@@ -88,8 +88,8 @@ class Event(models.Model):
     def __str__(self) -> str:
         return self.name
 
-    def get_event_list(template: bool):
-        return Event.objects.all().select_related('author').prefetch_related('current_users', 'fans').order_by('-id').filter(template = template)
+    def get_event_list() -> QuerySet:
+        return Event.objects.all().select_related('author').prefetch_related('current_users', 'fans').order_by('-id')
     
     class Meta:
         db_table = 'event'
