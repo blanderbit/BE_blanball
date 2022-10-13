@@ -73,23 +73,23 @@ class Event(models.Model):
     privacy: bool = models.BooleanField()
     duration: int = models.PositiveSmallIntegerField(choices = Duration.choices)
     forms: list = models.CharField(choices = CloseType.choices, max_length = 15)
-    status: str =  models.CharField(choices = Status.choices, max_length = 10,default = 'Planned')
+    status: str =  models.CharField(choices = Status.choices, max_length = 10, default = 'Planned')
     current_users: User = models.ManyToManyField(User, related_name = 'current_rooms', blank = True)
-    fans: User = models.ManyToManyField(User, related_name = 'current_views_rooms', blank = True)
+    current_fans: User = models.ManyToManyField(User, related_name = 'current_views_rooms', blank = True)
 
     @property
     def count_current_users(self) -> int:
         return self.current_users.count()
 
     @property
-    def count_fans(self) -> int:
-        return self.fans.count()
+    def count_current_fans(self) -> int:
+        return self.current_fans.count()
 
     def __str__(self) -> str:
         return self.name
 
     def get_event_list() -> QuerySet:
-        return Event.objects.all().select_related('author').prefetch_related('current_users', 'fans').order_by('-id')
+        return Event.objects.all().select_related('author').prefetch_related('current_users', 'current_fans').order_by('-id')
     
     class Meta:
         db_table = 'event'

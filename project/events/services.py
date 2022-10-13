@@ -44,7 +44,7 @@ def send_notification_to_subscribe_event_user(event: Event, notification_text: s
     for user in event.current_users.all():
         send_to_user(user = user, notification_text = f'{user.profile.name},{notification_text}', 
             message_type = message_type)
-    for fan in event.fans.all():
+    for fan in event.current_fans.all():
         send_to_user(user = fan, notification_text = f'{user.profile.name},{notification_text}', 
             message_type = message_type)
 

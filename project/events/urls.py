@@ -12,10 +12,11 @@ from events.views import (
     EventsRelevantList,
     UserEventsRelevantList,
     UserPlannedEvents,
-    PopularIvents,
+    PopularEvents,
     InviteUserToEvent,
     RequestToParticipationsList,
     BulkAcceptOrDeclineRequestToParticipation,
+    UserParticipantEvents,
 )
 
 from django.urls import path
@@ -51,6 +52,9 @@ urlpatterns = [
     # endpoint where user can get list of your events
     path('client/my/events/list', UserEvents.as_view(), 
         name = 'user-events-list'),
+    # endpoint where user can get list of your events
+    path('client/my/participant/events/list', UserParticipantEvents.as_view(), 
+        name = 'user-participant-events-list'),
     # endpoint where user can get relevant list of events
     path('client/relevant/events/list', EventsRelevantList.as_view(), 
         name = 'relevant-event-list'),
@@ -61,7 +65,7 @@ urlpatterns = [
     path('client/user/planned/events/list/<int:pk>', UserPlannedEvents.as_view(), 
         name = 'user-planned-events-list'),
     # endpoint where a user can get list of the most popular events
-    path('client/popular/events/list', PopularIvents.as_view(), 
+    path('client/popular/events/list', PopularEvents.as_view(), 
         name = 'popular-events-list'),
     #endpoint where a user can invite other user to ivent
     path('client/invite/user/to/event', InviteUserToEvent.as_view(), 
