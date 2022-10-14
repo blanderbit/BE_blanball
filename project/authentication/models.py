@@ -35,7 +35,7 @@ from django.db import connection
 class UserManager(BaseUserManager):
     '''user manager'''
     def create_user(self, email: str, phone: str, password: None = None, *agrs: Any, **kwargs: Any):
-        user = self.model(phone=phone,email=self.normalize_email(email), *agrs, **kwargs)
+        user = self.model(phone = phone, email = self.normalize_email(email), *agrs, **kwargs)
         user.set_password(password)
         user.role = 'User'
         user.save()
@@ -80,7 +80,6 @@ def validate_birthday(value: date) -> ValidationError:
 def configuration_dict() -> dict[str, bool]:
     return {'email': True, 'phone': True, 'send_email': True, 'show_my_planned_events': True}
 
-
 def image_file_name(instance, filename: str) -> str:
     filename: uuid.UUID = (uuid.uuid4())
 
@@ -105,8 +104,12 @@ class Profile(models.Model):
     created_at: datetime = models.DateTimeField(auto_now_add = True)
     about_me: str =  models.TextField(blank = True, null = True)
 
+    def __repr__ (self) -> str:
+        return '<Profile %s>' % self.id
+
     def __str__(self) -> str:
         return self.name
+
 
     class Meta:
         db_table = 'user_profile'
@@ -121,17 +124,20 @@ class User(AbstractBaseUser):
     role: str = models.CharField(choices = Role.choices, max_length = 10, blank = True, null = True)
     updated_at: str = models.DateTimeField(auto_now = True)
     raiting: float = models.FloatField(null = True, blank= True)
-    profile: Profile = models.ForeignKey(Profile, on_delete = models.CASCADE, blank = True, null = True, related_name='user')
+    profile: Profile = models.ForeignKey(Profile, on_delete = models.CASCADE, blank = True, null = True, related_name = 'user')
     configuration: dict = models.JSONField(default = configuration_dict)
 
     USERNAME_FIELD = 'email'
 
     objects = UserManager()
 
+    def __repr__ (self) -> str:
+        return '<User %s>' % self.id
+
     def __str__(self) -> str:
         return self.email
 
-    def tokens(self) -> dict:
+    def tokens(self) -> dict[str, str]:
         refresh: RefreshToken = RefreshToken.for_user(self)
         access: AccessToken = AccessToken.for_user(self)
         return {
@@ -140,7 +146,7 @@ class User(AbstractBaseUser):
         }
     @property
     def group_name(self) -> str:
-        return "user_%s" % self.id
+        return 'user_%s' % self.id
 
     class Meta:
         db_table = 'user'
@@ -153,6 +159,9 @@ class Code(models.Model):
     user_email: str = models.CharField(max_length = 255)
     dop_info: str = models.CharField(max_length = 255, null = True, blank = True)
 
+    def __repr__ (self) -> str:
+        return '<Code %s>' % self.id
+
     def __str__(self) -> str:  
         return self.verify_code
     
@@ -161,7 +170,10 @@ class Code(models.Model):
 
 
 class ActiveUser(models.Model):
-    user: User = models.ForeignKey(User, on_delete=models.CASCADE)
+    user: User = models.ForeignKey(User, on_delete = models.CASCADE)
+
+    def __repr__ (self) -> str:
+        return '<ActiveUser %s>' % self.id
 
     def __str__(self) -> str:
         return self.user.email

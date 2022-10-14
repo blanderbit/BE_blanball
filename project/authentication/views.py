@@ -205,7 +205,7 @@ class RequestChangePassword(GenericAPIView):
         serializer.is_valid(raise_exception = True)
         if not request.user.check_password(serializer.data.get('old_password')):
             return Response(WRONG_PASSWORD_ERROR, status = HTTP_400_BAD_REQUEST)
-        code_create(email=request.user.email,type = PASSWORD_CHANGE_CODE_TYPE,
+        code_create(email = request.user.email, type = PASSWORD_CHANGE_CODE_TYPE,
         dop_info = serializer.validated_data['new_password'])
         return Response(SENT_CODE_TO_EMAIL_SUCCESS, status = HTTP_200_OK)
 
@@ -260,7 +260,7 @@ class GetImage(APIView):
     def get(self, request: Request, image_path: str) -> Response:
         try:
             with urllib.request.urlopen(f'{settings.FTP_STORAGE_LOCATION}/users/{image_path}') as image:
-                img_bytes = base64.b64encode(image.read())
+                img_bytes: bytes = base64.b64encode(image.read())
                 return Response(img_bytes, status = HTTP_200_OK)
         except URLError:
             return Response(NO_SUCH_IMAGE_ERROR, status = HTTP_404_NOT_FOUND)

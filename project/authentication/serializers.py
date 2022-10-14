@@ -20,15 +20,9 @@ from authentication.constaints import (PASSWORD_CHANGE_CODE_TYPE, EMAIL_CHANGE_C
 )
 
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
-    """
-    A ModelSerializer that takes an additional `fields` argument that
-    controls which fields should be displayed.
-    """
-
     def __init__(self, *args, **kwargs) -> None:
         fields: tuple[str] = kwargs.pop('fields', None)
 
-        # Instantiate the superclass normally
         super().__init__(*args, **kwargs)
 
         if fields is not None:
@@ -142,7 +136,7 @@ class LoginSerializer(serializers.ModelSerializer):
 
     def get_tokens(self, obj) -> dict:
         '''function that issues jwt tokens for an authorized user'''
-        user = User.objects.get(email=obj['email'])
+        user: User = User.objects.get(email=obj['email'])
         return {
             'refresh': user.tokens()['refresh'],
             'access': user.tokens()['access']
