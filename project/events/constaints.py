@@ -5,7 +5,7 @@ ALREADY_SENT_REQUEST_TO_PARTICIPATE: dict[str, str] = {'error': 'You have alread
 
 INVITE_USER_NOTIFICATION: str = '@{user_name},invited you to the event №{event_name}'
 SENT_INVATION_ERROR: dict[str, str] = {'error': 'You cannot invite yourself to the event'} 
-NEW_USER_ON_THE_EVENT_NOTIFICATION: str = '{author_name},for your event under the number {event_id} joined {user_type} player'
+NEW_USER_ON_THE_EVENT_NOTIFICATION: str = '{author_name},for your event under the №{event_id} joined {user_type} player'
 NEW_REQUEST_TO_PARTICIPATION: str = '{author_name},you have received a new request to participate in the event under the number №{event_id}'
 NEW_REQUEST_TO_PARTICIPATION_MESSAGE_TYPE: str = 'new_request_to_participation'
 NEW_USER_ON_THE_EVENT_MESSAGE_TYPE: str = 'new_user_on_the_event'
@@ -19,7 +19,7 @@ JOIN_TO_EVENT_SUCCESS: dict[str, str] = {'success': 'Join to event'}
 DISCONNECT_FROM_EVENT_SUCCESS: dict[str, str] = {'success': 'Dicsonnect from event'}
 SENT_INVATION_SUCCESS: dict[str, str] = {'success': 'Invation was sent'}
 EVENT_NOT_FOUND_ERROR: dict[str, str] = {'error': 'Event not found'}
-EVENT_AUTHOR_CAN_NOT_JOIN_ERROR: dict[str, str] = {'error': 'Author can`t join to your event'}
+EVENT_AUTHOR_CAN_NOT_JOIN_ERROR: dict[str, str] = {'error': 'Author can`t join to his event'}
 EVENT_TIME_EXPIRED_ERROR: dict[str, str] = {'error': 'Event time expired'}
 BAD_EVENT_TIME_CREATE_ERROR: dict[str, str] = {'error': 'The time of the event must differ from the minimum by an hour'}
 ALREADY_IN_EVENT_MEMBERS_LIST_ERROR: dict[str, str] = {'error': 'Already in the event members list'}
@@ -43,3 +43,10 @@ EVENT_DELETE_TEXT: str = 'the event №{event_id}, to which you subscribed as a 
 AUTHOR_CAN_NOT_INVITE_ERROR: dict[str, str] = {'error': 'The author cannot be invited to his event'}
 
 GET_PLANNED_EVENTS_ERROR: dict[str, str] = {'error': 'The user has hidden the list of his scheduled events'}
+
+
+EVENT_TEMPLATE_UPDATE_SUCCESS: dict[str, str] = {'success': 'Event template updated'}
+EVENT_TEMPLATE_NOT_FOUND_ERROR: dict[str, str] = {'error': 'Event template not found'}
+
+
+INVALID_EVENT_TEMPLATE_CHOICE: str = 'Invalid choice {choice_value}'

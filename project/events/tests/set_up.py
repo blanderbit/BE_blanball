@@ -7,8 +7,7 @@ class SetUpEventsViews(APITestCase):
     def setUp(self) -> OrderedDict:
         self.event_create_data = {
             'name': 'string',
-            'small_disc': 'string',
-            'full_disc': 'string',
+            'description': 'string',
             'place': 'string',
             'gender': 'Man',
             'date_and_time': '2022-9-30T10:44:32.275Z',
@@ -27,8 +26,7 @@ class SetUpEventsViews(APITestCase):
 
         self.event_create_withount_phone_data = {
             'name': 'string',
-            'small_disc': 'string',
-            'full_disc': 'string',
+            'description': 'string',
             'place': 'string',
             'gender': 'Man',
             'date_and_time': '2022-9-30T10:44:32.275Z',
@@ -46,8 +44,7 @@ class SetUpEventsViews(APITestCase):
 
         self.event_update_data = {
             'name': 'updated',
-            'small_disc': 'string',
-            'full_disc': 'string',
+            'description': 'string',
             'place': 'string',
             'gender': 'Man',
             'date_and_time': '2022-9-30T10:44:32.275Z',

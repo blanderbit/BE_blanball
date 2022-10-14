@@ -136,7 +136,7 @@ class LoginSerializer(serializers.ModelSerializer):
 
     def get_tokens(self, obj) -> dict:
         '''function that issues jwt tokens for an authorized user'''
-        user = User.objects.get(email=obj['email'])
+        user: User = User.objects.get(email=obj['email'])
         return {
             'refresh': user.tokens()['refresh'],
             'access': user.tokens()['access']

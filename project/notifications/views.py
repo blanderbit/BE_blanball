@@ -52,7 +52,7 @@ class ReadNotifications(GenericAPIView):
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)        
-        return Response(bulk_read_notifications(data = serializer.validated_data['notifications'],
+        return Response(bulk_read_notifications(data = serializer.validated_data['ids'],
             queryset = self.queryset), status = HTTP_200_OK)
 
 class DeleteNotifcations(GenericAPIView):
@@ -62,7 +62,7 @@ class DeleteNotifcations(GenericAPIView):
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
-        return Response(bulk_delete_notifications(data = serializer.validated_data['notifications'],
+        return Response(bulk_delete_notifications(data = serializer.validated_data['ids'],
             queryset = self.queryset, user = request.user), status = HTTP_200_OK)
 
 class ChangeMaintenance(GenericAPIView):

@@ -16,7 +16,9 @@ from events.serializers import (
     EventSerializer,
     InviteUserToEventSerializer,
     CreateEventSerializer,
-    EventTemplateSerializer,
+    TemplateCreateSerializer,
+    TemplateListSerializer,
+    TemplateGetSerializer,
 )
 from events.services import (
     validate_user_before_join_to_event,
@@ -27,7 +29,6 @@ from events.services import (
     send_notification_to_subscribe_event_user,
     validate_get_user_planned_events,
     event_create,
-    validate_event_template,
 )
 from events.filters import (
     EventDateTimeRangeFilter, 
@@ -56,18 +57,18 @@ from rest_framework.filters import (
     SearchFilter,
     OrderingFilter,
 )
+from rest_framework.serializers import ValidationError
 from rest_framework.response import Response
 from rest_framework.request import Request
 from django_filters.rest_framework import DjangoFilterBackend
-
-from authentication.permisions import *
 
 from events.constaints import (
     SENT_INVATION_ERROR, INVITE_USER_TO_EVENT_MESSAGE_TYPE, INVITE_USER_NOTIFICATION, SENT_INVATION_SUCCESS,
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, EVENT_NOT_FOUND_ERROR, EVENT_DELETED_SUCCESS, EVENT_UPDATE_MESSAGE_TYPE,
     EVENT_UPDATE_SUCCESS, JOIN_TO_EVENT_SUCCESS, NEW_REQUEST_TO_PARTICIPATION_MESSAGE_TYPE, NEW_REQUEST_TO_PARTICIPATION, 
     APPLICATION_FOR_PARTICIPATION_SUCCESS, NO_IN_EVENT_FANS_LIST_ERROR, DISCONNECT_FROM_EVENT_SUCCESS, 
-    LEAVE_USER_FROM_THE_EVENT_NOTIFICATION, NO_IN_EVENT_MEMBERS_LIST_ERROR, EVENT_UPDATE_TEXT, AUTHOR_CAN_NOT_INVITE_ERROR, 
+    EVENT_TEMPLATE_UPDATE_SUCCESS, EVENT_TEMPLATE_NOT_FOUND_ERROR, LEAVE_USER_FROM_THE_EVENT_NOTIFICATION, 
+    NO_IN_EVENT_MEMBERS_LIST_ERROR, EVENT_UPDATE_TEXT, AUTHOR_CAN_NOT_INVITE_ERROR, EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,
 
 )
 from authentication.constaints import (
@@ -86,21 +87,55 @@ class CreateEvent(GenericAPIView):
         return Response(data, status = HTTP_201_CREATED)
 
 class CreateEventTemplate(GenericAPIView):
+    serializer_class = TemplateCreateSerializer
     queryset = EventTemplate.objects.all()
-    serializer_class = EventTemplateSerializer
 
     def post(self, request: Request) -> Response:
-        # serializer.save(author = request_user
-        validate_event_template(data = request.data, request_user = request.user)
+        serializer = self.serializer_class(data = request.data)
+        serializer.is_valid(raise_exception = True)
         EventTemplate.objects.create(author = request.user, **request.data)
-        return Response(request.data)
+        return Response(serializer.data)
 
 class EventsTemplateList(ListAPIView):
-    serializer_class = EventTemplateSerializer
+    serializer_class = TemplateListSerializer
+    filter_backends = (DjangoFilterBackend, OrderingFilter, SearchFilter, )
+    pagination_class = CustomPagination
+    search_fields = ('name', 'time_created')
+    ordering_fields = ('id', )
     queryset = EventTemplate.objects.all()
 
     def get_queryset(self) -> QuerySet[EventTemplate]:
         return self.queryset.filter(author_id = self.request.user.id) 
+
+class UpdateEventTemplate(GenericAPIView):
+    serializer_class = TemplateCreateSerializer
+    queryset = EventTemplate.objects.all()
+
+    def put(self, request: Request, pk: int) -> Response:
+        serializer = self.serializer_class(data = request.data)
+        serializer.is_valid(raise_exception = True)
+        event_template: EventTemplate = EventTemplate.objects.filter(id = pk)
+        try:
+            if event_template[0].author.id == request.user.id:
+                event_template.update(**request.data)
+                return Response(EVENT_TEMPLATE_UPDATE_SUCCESS, status = HTTP_200_OK)
+            return Response(NO_PERMISSIONS_ERROR, status = HTTP_403_FORBIDDEN)
+        except IndexError:
+            return Response(EVENT_TEMPLATE_NOT_FOUND_ERROR, status = HTTP_404_NOT_FOUND)
+
+class GetEventTemplate(GenericAPIView):
+    serializer_class = TemplateGetSerializer
+    queryset = EventTemplate.objects.all()
+
+    def get(self, request: Request, pk: int) -> Response:
+        try:
+            event_template: EventTemplate = EventTemplate.objects.get(id = pk)
+            if event_template.author.id == request.user.id:
+                serializer = self.serializer_class(event_template)
+                return Response(serializer.data, status = HTTP_200_OK)
+            return Response(NO_PERMISSIONS_ERROR, status = HTTP_403_FORBIDDEN)
+        except EventTemplate.DoesNotExist:
+            return Response(EVENT_TEMPLATE_NOT_FOUND_ERROR, status = HTTP_404_NOT_FOUND)
 
 class InviteUserToEvent(GenericAPIView):
     serializer_class = InviteUserToEventSerializer
@@ -117,21 +152,10 @@ class InviteUserToEvent(GenericAPIView):
         message_type = INVITE_USER_TO_EVENT_MESSAGE_TYPE)
         return Response(SENT_INVATION_SUCCESS, status = HTTP_200_OK)
 
-class GetDeleteEvent(RetrieveAPIView):
-    '''a class that allows you to get, update, delete an event'''
+class GetEvent(RetrieveAPIView):
+    '''a class that allows you to get an event'''
     serializer_class =  EventSerializer
     queryset = Event.objects.all()
-    
-    def delete(self, request: Request, pk: int) -> Response:
-        try:
-            event: Event = self.queryset.get(id = pk)
-            if event.author.id == request.user.id:
-                event.delete()
-                return Response(EVENT_DELETED_SUCCESS, status = HTTP_200_OK)
-            return Response(NO_PERMISSIONS_ERROR, status = HTTP_403_FORBIDDEN)
-        except Event.DoesNotExist:
-            return Response(EVENT_NOT_FOUND_ERROR, status = HTTP_404_NOT_FOUND)
-
 
 class UpdateEvent(GenericAPIView):
     serializer_class = UpdateEventSerializer
@@ -158,7 +182,7 @@ class EventList(ListAPIView):
     filter_backends = (DjangoFilterBackend, OrderingFilter, SearchFilter, )
     filterset_class = EventDateTimeRangeFilter
     pagination_class = CustomPagination
-    search_fields = ('id', 'name', 'small_disc', 'price', 'place', 'date_and_time', 'amount_members')
+    search_fields = ('id', 'name', 'price', 'place', 'date_and_time', 'amount_members')
     ordering_fields = ('id', )
     filterset_fields = ('type', 'need_ball', 'gender', 'status', 'duration')
     queryset = Event.get_event_list()
@@ -172,8 +196,11 @@ class DeleteEvents(GenericAPIView):
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
         data: dict[str, list[int]] = bulk_delete_events(
-            serializer = serializer.validated_data['events'], queryset = self.queryset, user = request.user)
+            data = serializer.validated_data['ids'], queryset = self.queryset, user = request.user)
         return Response(data, status = HTTP_200_OK)
+
+class DeleteEventTemplates(DeleteEvents):
+    queryset = EventTemplate.objects.all()
 
 class JoinToEvent(GenericAPIView):
     serializer_class = JoinOrRemoveRoomSerializer
@@ -204,6 +231,8 @@ class FanJoinToEvent(GenericAPIView):
         serializer.is_valid(raise_exception = True)
         user: User = request.user
         event: Event = Event.objects.get(id = serializer.data['event_id'])
+        if event.author.id == request.user.id:
+            raise ValidationError(EVENT_AUTHOR_CAN_NOT_JOIN_ERROR, HTTP_400_BAD_REQUEST)
         if not user.current_views_rooms.filter(id = serializer.data['event_id']).exists():
             user.current_views_rooms.add(event)
             return Response(JOIN_TO_EVENT_SUCCESS, status = HTTP_200_OK)
@@ -254,7 +283,7 @@ class UserEvents(ListAPIView):
     serializer_class = EventListSerializer
     filter_backends = (SearchFilter, DjangoFilterBackend)
     pagination_class = CustomPagination
-    search_fields = ['id', 'name', 'small_disc', 'price', 'place', 'date_and_time', 'amount_members']
+    search_fields = ('id', 'name', 'price', 'place', 'date_and_time', 'amount_members')
     filterset_fields = ('type', )
     queryset = Event.get_event_list()
 
@@ -309,5 +338,5 @@ class BulkAcceptOrDeclineRequestToParticipation(GenericAPIView):
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
         data: dict[str, list[int]] = bulk_accpet_or_decline(
-            serializer = serializer.validated_data, user = request.user)
+            data = serializer.validated_data, user = request.user)
         return Response(data, status = HTTP_200_OK)

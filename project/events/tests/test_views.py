@@ -125,27 +125,11 @@ class TestEventsViews(SetUpEventsViews):
         self.assertEqual(get_user_events_list.status_code, HTTP_200_OK)
         self.assertEqual(get_user_events_list_2.data['total_count'], 0)
         self.assertEqual(get_user_events_list_2.status_code, HTTP_200_OK)
-    
-    @freeze_time('2022-9-29')
-    def test_delete_event(self) -> None:
-        self.create_events(1)
-        event_id = Event.objects.first().id
-        response = self.client.delete(reverse('get-delete-event', kwargs = {'pk': event_id}))
-        self.assertEqual(Event.objects.count(), 0)
-        self.assertEqual(response.status_code, HTTP_200_OK)
-    
-    @freeze_time('2022-9-29')
-    def test_no_author_delete_event(self) -> None:
-        self.create_events(1)
-        self.register_second_user()
-        response = self.client.delete(reverse('get-delete-event', kwargs = {'pk': Event.objects.first().id}))
-        self.assertEqual(Event.objects.count(), 1)
-        self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)
 
     @freeze_time('2022-9-29')
     def test_bulk_delete_events(self) -> None:
         self.create_events(10)
-        response = self.client.post(reverse('bulk-delete-events'), {'events': [Event.objects.first().id,
+        response = self.client.post(reverse('bulk-delete-events'), {'ids': [Event.objects.first().id,
         Event.objects.last().id]})
         self.assertEqual(Event.objects.count(), 8)
         self.assertEqual(len(response.data['delete success']), 2)
@@ -155,7 +139,7 @@ class TestEventsViews(SetUpEventsViews):
     def test_no_author_bulk_delete_events(self) -> None:
         self.create_events(10)
         self.register_second_user()
-        response = self.client.post(reverse('bulk-delete-events'), {'events': [Event.objects.first().id,
+        response = self.client.post(reverse('bulk-delete-events'), {'ids': [Event.objects.first().id,
         Event.objects.last().id]})
         self.assertEqual(len(response.data['delete success']), 0)
         self.assertEqual(Event.objects.count(), 10)
@@ -164,9 +148,9 @@ class TestEventsViews(SetUpEventsViews):
     @freeze_time('2022-9-29')
     def test_update_event(self) -> None:
         self.create_events(1)
-        get_event = self.client.get(reverse('get-delete-event', kwargs = {'pk': Event.objects.first().id}))
+        get_event = self.client.get(reverse('get-event', kwargs = {'pk': Event.objects.first().id}))
         response = self.client.put(reverse('update-event', kwargs = {'pk': Event.objects.first().id}), self.event_update_data)
-        get_event_after_update = self.client.get(reverse('get-delete-event', kwargs = {'pk': Event.objects.first().id}))
+        get_event_after_update = self.client.get(reverse('get-event', kwargs = {'pk': Event.objects.first().id}))
         self.assertEqual(get_event.data['name'], self.event_create_data['name'])
         self.assertTrue(get_event_after_update.data['name'] != self.event_create_data['name'])
         self.assertEqual(response.status_code, HTTP_200_OK)
@@ -176,7 +160,7 @@ class TestEventsViews(SetUpEventsViews):
         self.create_events(1)
         self.register_second_user()
         response = self.client.put(reverse('update-event', kwargs = {'pk': Event.objects.first().id}), self.event_update_data)
-        get_event = self.client.get(reverse('get-delete-event', kwargs = {'pk': Event.objects.first().id}))
+        get_event = self.client.get(reverse('get-event', kwargs = {'pk': Event.objects.first().id}))
         self.assertTrue(get_event.data['name'] != self.event_update_data['name'])
         self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)
 

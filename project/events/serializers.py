@@ -1,3 +1,4 @@
+from keyword import kwlist
 from events.models import (
     Event,
     EventTemplate,
@@ -36,13 +37,45 @@ class CreateEventSerializer(serializers.ModelSerializer):
             'current_fans',
         )
 
-class EventTemplateSerializer(serializers.ModelSerializer):
+
+class TemplateCreateSerializer(serializers.ModelSerializer):
     event_data = CreateEventSerializer()
 
     class Meta:
         model = EventTemplate
         exclude = (
             'author',
+        )
+
+class TemplateGetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EventTemplate
+        exclude = (
+            'author',
+        )
+
+class EventTemplateListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        validators = [EventDateTimeValidator()]
+        exclude = (
+            'author',
+            'status',
+            'current_fans',
+            'current_users',
+            'description',
+        )
+
+class TemplateListSerializer(serializers.ModelSerializer):
+    event_data = EventTemplateListSerializer()
+    class Meta:
+        model = EventTemplate
+        fields = (
+            'id',
+            'name', 
+            'time_created', 
+            'count_current_users', 
+            'event_data',
         )
 
 
@@ -94,6 +127,7 @@ class EventListSerializer(serializers.ModelSerializer):
             'price',
             'type',
             'need_ball',
+            'duration',
             'need_form',
             'privacy',
             'date_and_time',
@@ -102,7 +136,10 @@ class EventListSerializer(serializers.ModelSerializer):
         ) 
 
 class DeleteIventsSerializer(serializers.Serializer):
-    events: list[int] = serializers.ListField(child = serializers.IntegerField(min_value = 0))
+    ids: list[int] = serializers.ListField(child = serializers.IntegerField(min_value = 0))
+
+    class Meta:
+        fieds = ('ids', )
 
 
 class JoinOrRemoveRoomSerializer(serializers.Serializer):

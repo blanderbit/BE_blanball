@@ -54,8 +54,7 @@ class Event(models.Model):
 
     author: User = models.ForeignKey(User, on_delete = models.CASCADE)
     name: str = models.CharField(max_length = 255)
-    small_disc: str = models.CharField(max_length = 255)
-    full_disc: str = models.TextField()
+    description: str = models.TextField()
     place: str = models.CharField(max_length = 255)
     gender: str = models.CharField(choices = Gender.choices, max_length = 10)
     date_and_time: datetime = models.DateTimeField()
@@ -66,7 +65,7 @@ class Event(models.Model):
             MaxValueValidator(50)],
             default = 6)
     type: str = models.CharField(choices = Type.choices, max_length = 15)
-    price: int = models.PositiveSmallIntegerField(null = True,blank= True, validators = [
+    price: int = models.PositiveSmallIntegerField(null = True, blank= True, validators = [
         MinValueValidator(1)])
     price_description: str = models.CharField(max_length = 500, null = True, blank= True)
     need_form: bool = models.BooleanField()
@@ -74,8 +73,8 @@ class Event(models.Model):
     duration: int = models.PositiveSmallIntegerField(choices = Duration.choices)
     forms: list = models.CharField(choices = CloseType.choices, max_length = 15)
     status: str =  models.CharField(choices = Status.choices, max_length = 10, default = 'Planned')
-    current_users: User = models.ManyToManyField(User, related_name = 'current_rooms', blank = True)
-    current_fans: User = models.ManyToManyField(User, related_name = 'current_views_rooms', blank = True)
+    current_users: list[User] = models.ManyToManyField(User, related_name = 'current_rooms', blank = True)
+    current_fans: list[User] = models.ManyToManyField(User, related_name = 'current_views_rooms', blank = True)
 
     @property
     def count_current_users(self) -> int:
@@ -86,7 +85,7 @@ class Event(models.Model):
         return self.current_fans.count()
 
     def __repr__ (self) -> str:
-        return '<Event %s>' % self.id
+        return  '<Event %s>' % self.id
 
     def __str__(self) -> str:
         return self.name
@@ -99,7 +98,7 @@ class Event(models.Model):
 
 class RequestToParticipation(models.Model):
     user: User = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'user')
-    time_created: date =  models.DateTimeField(auto_now_add = True)
+    time_created: date = models.DateTimeField(auto_now_add = True)
     event: Event = models.ForeignKey(Event, on_delete = models.CASCADE)
     event_author: User = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'author')
 
@@ -118,6 +117,10 @@ class EventTemplate(models.Model):
     name: str = models.CharField(max_length = 255)
     time_created: datetime = models.DateTimeField(auto_now_add = True)
     event_data: dict[str, Any] = models.JSONField()
+
+    @property
+    def count_current_users(self) -> int:
+        return len(self.event_data['current_users'])
 
     def __repr__ (self) -> str:
         return '<EventTemplate %s>' % self.id

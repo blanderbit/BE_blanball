@@ -1,3 +1,4 @@
+from datetime import datetime
 import re
 from secrets import choice
 from selectors import EVENT_READ
@@ -17,6 +18,7 @@ from rest_framework.status import (
 from authentication.models import User
 from events.models import (
     Event,
+    EventTemplate,
     RequestToParticipation,
 )
 from events.constaints import (
@@ -28,12 +30,9 @@ from events.constaints import (
 )
 from notifications.tasks import send_to_user
 
-from authentication.constaints import (
-    NO_SUCH_USER_ERROR,
-)
 
 def event_create(data: Union[dict[str, Any], OrderedDict[str, Any]], request_user: User) -> dict[str, Any]:
-    data: dict[str, Any] = dict(data)
+    data = dict(data)
     for user in data['current_users']:
         if user.email == request_user.email:
             raise ValidationError(SENT_INVATION_ERROR, HTTP_400_BAD_REQUEST)
@@ -43,33 +42,19 @@ def event_create(data: Union[dict[str, Any], OrderedDict[str, Any]], request_use
     data.pop('current_users')
     try:
         contact_number: str = data['contact_number']
-    except:
+    except KeyError:
         contact_number: str = str(User.objects.get(id = request_user.id).phone)
     data['contact_number'] = contact_number
-    data['date_and_time'] = str(pandas.to_datetime(data['date_and_time'].isoformat()).round('1min').to_pydatetime())
+    data['date_and_time'] = pandas.to_datetime(data['date_and_time'].isoformat()).round('1min').to_pydatetime()
     Event.objects.create(**data, author = request_user)
     return data
-
-def validate_event_template(data: dict[str, Any], request_user: User) -> None:
-    if data['event_data']['duration'] not in [i[0] for i in Event.Duration.choices]:
-        raise ValidationError()
-    if data['event_data']['forms'] not in [i[0] for i in Event.CloseType.choices]:
-        raise ValidationError()
-
-    for user in data['event_data']['current_users']:
-        try:
-            user: User = User.objects.get(id = user)
-            if request_user.id == user.id:
-                raise ValidationError(AUTHOR_CAN_NOT_INVITE_ERROR, HTTP_400_BAD_REQUEST)
-        except User.DoesNotExist:
-            raise ValidationError(NO_SUCH_USER_ERROR, HTTP_404_NOT_FOUND)
 
 def send_notification_to_subscribe_event_user(event: Event, notification_text: str, message_type: str) -> None:
     for user in event.current_users.all():
         send_to_user(user = user, notification_text = f'{user.profile.name},{notification_text}', 
             message_type = message_type)
     for fan in event.current_fans.all():
-        send_to_user(user = fan, notification_text = f'{user.profile.name},{notification_text}', 
+        send_to_user(user = fan, notification_text = f'{fan.profile.name},{notification_text}', 
             message_type = message_type)
 
 def validate_user_before_join_to_event(user: User, event: Event) -> None:
@@ -115,13 +100,13 @@ def filter_event_by_user_planned_events_time(pk: int, queryset: QuerySet) -> Que
 
 def bulk_delete_events(data: dict[str, Any], queryset: QuerySet, user: User) -> dict[str, list[int]]:
     deleted: list[int] = [] 
-    for event_id in data['events']:
+    for event_id in data:
         try:
-            event: Event = queryset.get(id = event_id)
+            event: Union[Event, EventTemplate] = queryset.get(id = event_id)
             if event.author == user:
                 event.delete()
                 deleted.append(event_id)
-        except Event.DoesNotExist:
+        except(Event.DoesNotExist, EventTemplate.DoesNotExist):
             pass
     return {'delete success': deleted}
 
