@@ -26,7 +26,7 @@ from events.views import (
 
 from django.urls import path
 
-urlpatterns = [
+urlpatterns: list = [
     # endpoint where user can create new event 
     path('client/event/create', CreateEvent.as_view(), 
         name = 'event-create'),

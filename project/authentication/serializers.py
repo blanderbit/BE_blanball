@@ -21,7 +21,7 @@ from authentication.constaints import (PASSWORD_CHANGE_CODE_TYPE, EMAIL_CHANGE_C
 
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs) -> None:
-        fields: tuple[str] = kwargs.pop('fields', None)
+        fields: list[str] = kwargs.pop('fields', None)
 
         super().__init__(*args, **kwargs)
 
@@ -35,50 +35,52 @@ class EventUsersProfileSerializer(DynamicFieldsModelSerializer):
 
     class Meta:
         model: Profile = Profile
-        fields: tuple[str] = (
+        fields: Union[str, list[str]] = [
             'name',
             'last_name',
             'avatar',
             'position',
-        )
+        ]
 
 class EventUsersSerializer(serializers.ModelSerializer):
     profile = EventUsersProfileSerializer()
 
     class Meta:
         model: User = User
-        fields: tuple[str] = ('profile', )
+        fields: Union[str, list[str]] = [
+            'profile', 
+        ]
 
 
 class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model: Profile = Profile
-        fields: tuple[str] = '__all__'
+        fields: Union[str, list[str]] = '__all__'
 
 class CreateUpdateProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model: Profile =  Profile
-        exclude: tuple[str] = (
+        exclude: Union[str, list[str]] = [
             'created_at',
             'age',
-        )
+        ]
 
 class UpdateProfileSerializer(serializers.ModelSerializer):
     profile = CreateUpdateProfileSerializer()
 
     class Meta:
         model: User = User
-        fields: tuple[str] = (
+        fields: Union[str, list[str]] = [
             'configuration',
             'profile',
             'get_planned_events',
-        )
+        ]
 
     def validate(self, attrs: OrderedDict) -> Union[serializers.ValidationError, OrderedDict]:
         conf: str =  attrs.get('configuration')
-        keys: tuple[str] = ('email', 'phone', 'send_email', 'show_my_planned_events')
+        keys: list[str] = ['email', 'phone', 'send_email', 'show_my_planned_events']
         planned_events =  attrs.get('get_planned_events')
         string: str = re.findall(r'\D', planned_events)[0]
         if string not in ['d','m','y']:
@@ -103,13 +105,13 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model: User = User
-        fields: tuple[str] = (
+        fields: Union[str, list[str]] = [
             'email',
             'phone',
             'password',
             're_password',
             'profile',
-        )
+        ]
 
     def validate(self, attrs: OrderedDict) -> Union[serializers.ValidationError, OrderedDict]:
         '''data validation function'''
@@ -144,11 +146,11 @@ class LoginSerializer(serializers.ModelSerializer):
 
     class Meta:
         model: User = User
-        fields: tuple[str] = (
+        fields: Union[str, list[str]] = [
             'email', 
             'password', 
             'tokens',
-        )
+        ]
 
     def validate(self, attrs: OrderedDict) -> Union[serializers.ValidationError, dict[str, str], OrderedDict]:
         '''data validation function for user authorization'''
@@ -171,7 +173,7 @@ class UserSerializer(DynamicFieldsModelSerializer):
 
     class Meta:
         model: User = User
-        fields: tuple[str] = (
+        fields: Union[str, list[str]] = [
             'email',
             'role',
             'phone',
@@ -179,13 +181,13 @@ class UserSerializer(DynamicFieldsModelSerializer):
             'raiting',
             'profile',
             'configuration'
-        )
+        ]
 
 class ProfileListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model: Profile = Profile
-        fields: tuple[str] = (
+        fields: Union[str, list[str]] = [
             'id',
             'name',
             'last_name',
@@ -193,32 +195,36 @@ class ProfileListSerializer(serializers.ModelSerializer):
             'position',
             'gender',
             'age',
-        )
+        ]
 
 class UsersListSerializer(serializers.ModelSerializer):
     profile = ProfileListSerializer()
 
     class Meta:
         model: User = User
-        fields: tuple[str] = (
+        fields: Union[str, list[str]] = [
             'id',
             'profile',
             'raiting',
             'role',
-        )
+        ]
 
 
 class EmailSerializer(serializers.Serializer):
     email: str = serializers.EmailField(min_length = 3, max_length = 255)
 
     class Meta:
-        fields: tuple[str] = ('email', )
+        fields: Union[str, list[str]] = [
+            'email', 
+        ]
 
         
 class RequestChangePhoneSerializer(serializers.ModelSerializer):
     class Meta:
         model: User =  User
-        fields: tuple[str] = ('phone', )
+        fields: Union[str, list[str]] = [
+            'phone', 
+        ]
 
 class RequestChangePasswordSerializer(serializers.Serializer):
     new_password: str = serializers.CharField(
@@ -227,10 +233,10 @@ class RequestChangePasswordSerializer(serializers.Serializer):
         min_length = 8, max_length = 68)
 
     class Meta:
-        fields: tuple[str] = (
+        fields: Union[str, list[str]] = [
             'new_password',
             'old_password',
-        )
+        ]
 
 
 class ResetPasswordSerializer(serializers.Serializer):
@@ -241,10 +247,10 @@ class ResetPasswordSerializer(serializers.Serializer):
 
     class Meta:
         validators = [CodeValidator(token_type = PASSWORD_RESET_CODE_TYPE)]
-        fields: tuple[str] = (
+        fields: Union[str, list[str]] = [
             'verify_code',
             'new_password',
-        )
+        ]
 
 
 class CheckCodeSerializer(serializers.Serializer):
@@ -254,14 +260,18 @@ class CheckCodeSerializer(serializers.Serializer):
     class Meta:
         validators = [CodeValidator(token_type = [PASSWORD_CHANGE_CODE_TYPE, EMAIL_CHANGE_CODE_TYPE,
             EMAIL_VERIFY_CODE_TYPE, PHONE_CHANGE_CODE_TYPE, ACCOUNT_DELETE_CODE_TYPE])]
-        fields: tuple[str] = ('verify_code', )
+        fields: Union[str, list[str]] = [
+            'verify_code', 
+        ]
 
 
 class CheckUserActiveSerializer(serializers.Serializer):
     user_id: int = serializers.IntegerField(min_value = 0)
 
     class Meta:
-        fields: tuple[str] = ('user_id', )
+        fields: Union[str, list[str]] = [
+            'user_id', 
+        ]
 
     def validate(self, attrs: OrderedDict) -> Union[OrderedDict, serializers.ValidationError]:
         user_id: int = attrs.get('user_id')

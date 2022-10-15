@@ -61,8 +61,6 @@ from authentication.filters import (
 import urllib.request
 from urllib.error import URLError
 
-import base64
-
 from authentication.constaints import (
     REGISTER_SUCCESS_BODY_TITLE, REGISTER_SUCCESS_TITLE, REGISTER_SUCCESS_TEXT, SENT_CODE_TO_EMAIL_SUCCESS, ACCOUNT_DELETE_CODE_TYPE,
     PASSWORD_RESET_CODE_TYPE, NO_SUCH_USER_ERROR, PASSWORD_CHANGE_CODE_TYPE, WRONG_PASSWORD_ERROR, PASSWORD_RESET_SUCCESS,
@@ -77,7 +75,7 @@ from authentication.constaints import (
 class RegisterUser(GenericAPIView):
     '''register user'''
     serializer_class = RegisterSerializer
-    permission_classes = (IsNotAuthenticated, )
+    permission_classes = [IsNotAuthenticated, ]
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
@@ -93,7 +91,7 @@ class RegisterUser(GenericAPIView):
 class LoginUser(GenericAPIView):
     '''user login'''
     serializer_class = LoginSerializer
-    permission_classes = (IsNotAuthenticated, )
+    permission_classes = [IsNotAuthenticated, ]
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
@@ -151,18 +149,18 @@ class UserList(ListAPIView):
     '''get all users list'''
     serializer_class = UsersListSerializer
     pagination_class = CustomPagination
-    filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter, )
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter, ]
     filterset_class = UserAgeRangeFilter
-    search_fields: tuple[str] = ('profile__name', 'profile__gender', 'profile__last_name')
-    ordering_fields: tuple[str] = ('id', 'profile__age', 'raiting')
+    search_fields: list[str] = ['profile__name', 'profile__gender', 'profile__last_name']
+    ordering_fields: list[str] = ['id', 'profile__age', 'raiting']
     queryset: QuerySet[User] = User.objects.filter(role = 'User').select_related('profile').order_by('-id')
 
 class UsersRelevantList(ListAPIView):
     '''getting the 5 most relevant users for your query'''
-    filter_backends = (RankedFuzzySearchFilter, )
+    filter_backends = [RankedFuzzySearchFilter, ]
     serializer_class = UsersListSerializer
     queryset: QuerySet[User] = User.objects.filter(role = 'User').select_related('profile')
-    search_fields: tuple[str] = ('profile__name', 'profile__last_name')
+    search_fields: list[str] = ['profile__name', 'profile__last_name']
 
 class AdminUsersList(UserList):
     '''displaying the full list of admin users'''
@@ -171,7 +169,7 @@ class AdminUsersList(UserList):
 
 class RequestPasswordReset(GenericAPIView):
     serializer_class = EmailSerializer
-    permission_classes = (IsNotAuthenticated, )
+    permission_classes = [IsNotAuthenticated, ]
 
     def post(self, request: Request) -> Response:
         '''send request to reset user password by email'''
@@ -185,7 +183,7 @@ class RequestPasswordReset(GenericAPIView):
 class ResetPassword(GenericAPIView):
     '''password reset on a previously sent request'''
     serializer_class = ResetPasswordSerializer
-    permission_classes = (IsNotAuthenticated, )
+    permission_classes = [IsNotAuthenticated, ]
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)

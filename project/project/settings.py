@@ -44,7 +44,7 @@ AUTH_USER_MODEL: str = config('AUTH_USER_MODEL', cast = str)
 ALLOWED_HOSTS: list[str] = config('ALLOWED_HOSTS', cast = Csv())
 
 # Application definition:
-INSTALLED_APPS: tuple[str] = (
+INSTALLED_APPS: list[str] = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -66,10 +66,10 @@ INSTALLED_APPS: tuple[str] = (
     'authentication.apps.AuthenticationConfig',
     'notifications.apps.NotificationsConfig',
     'reviews.apps.ReviewsConfig',
-)
+]
 
 
-MIDDLEWARE: tuple[str] = (
+MIDDLEWARE: list[str] = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -79,7 +79,7 @@ MIDDLEWARE: tuple[str] = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-)
+]
 
 
 #conected datdabse settings
@@ -149,7 +149,7 @@ SWAGGER_SETTINGS: dict[str, Any] = {
 
 
 
-TEMPLATES: list[dict[str,Any]] = [
+TEMPLATES: list[dict[str, Any]] = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(BASE_DIR, 'templates')],
@@ -166,7 +166,7 @@ TEMPLATES: list[dict[str,Any]] = [
 ]
 
 
-AUTH_PASSWORD_VALIDATORS: tuple[dict[str, str]] = (
+AUTH_PASSWORD_VALIDATORS: list[dict[str, str]] = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
@@ -179,7 +179,7 @@ AUTH_PASSWORD_VALIDATORS: tuple[dict[str, str]] = (
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
-)
+]
 
 REST_FRAMEWORK: dict[str, Any]  = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -226,18 +226,18 @@ FTP_STORAGE_LOCATION: str = 'ftp://' + FTP_USER + ':' + FTP_PASS + '@ftp-server:
 
 ALGORITHM: str = config('ALGORITHM', cast = str)
 
-CORS_ALLOWED_ORIGINS: tuple[str] = (
+CORS_ALLOWED_ORIGINS: list[str] = [
     'http://localhost:5173', 
     'http://178.151.201.167:49201',
-)
-CORS_ALLOW_METHODS: tuple[str] = (
+]
+CORS_ALLOW_METHODS: list[str] = [
     'DELETE',
     'GET',
     'OPTIONS',
     'POST',
     'PUT',
-)
-CORS_ALLOW_HEADERS = [
+]
+CORS_ALLOW_HEADERS: list[str] = [
     'accept',
     'accept-encoding',
     'authorization',

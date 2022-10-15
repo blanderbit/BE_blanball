@@ -78,7 +78,7 @@ from authentication.constaints import (
 class CreateEvent(GenericAPIView):
     '''class that allows you to create a new event'''
     serializer_class = CreateEventSerializer
-    queryset = Event.objects.all()
+    queryset: QuerySet[Event] = Event.objects.all()
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
@@ -88,7 +88,7 @@ class CreateEvent(GenericAPIView):
 
 class CreateEventTemplate(GenericAPIView):
     serializer_class = TemplateCreateSerializer
-    queryset = EventTemplate.objects.all()
+    queryset: QuerySet[EventTemplate] = EventTemplate.objects.all()
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
@@ -98,10 +98,10 @@ class CreateEventTemplate(GenericAPIView):
 
 class EventsTemplateList(ListAPIView):
     serializer_class = TemplateListSerializer
-    filter_backends = (DjangoFilterBackend, OrderingFilter, SearchFilter, )
+    filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter, ]
     pagination_class = CustomPagination
-    search_fields: tuple[str] = ('name', 'time_created')
-    ordering_fields: tuple[str] = ('id', )
+    search_fields: list[str] = ['name', 'time_created']
+    ordering_fields: list[str] = ['id', ]
     queryset: QuerySet[EventTemplate] = EventTemplate.objects.all()
 
     def get_queryset(self) -> QuerySet[EventTemplate]:
@@ -179,12 +179,12 @@ class UpdateEvent(GenericAPIView):
 class EventList(ListAPIView):
     '''class that allows you to get a complete list of events'''
     serializer_class = EventListSerializer
-    filter_backends = (DjangoFilterBackend, OrderingFilter, SearchFilter, )
+    filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter, ]
     filterset_class = EventDateTimeRangeFilter
     pagination_class = CustomPagination
-    search_fields: tuple[str] = ('id', 'name', 'price', 'place', 'date_and_time', 'amount_members')
-    ordering_fields: tuple[str] = ('id', )
-    filterset_fields: tuple[str] = ('type', 'need_ball', 'gender', 'status', 'duration')
+    search_fields: list[str] = ['id', 'name', 'price', 'place', 'date_and_time', 'amount_members']
+    ordering_fields: list[str] = ['id', ]
+    filterset_fields: list[str] = ['type', 'need_ball', 'gender', 'status', 'duration']
     queryset: QuerySet[Event] = Event.get_event_list()
 
 class DeleteEvents(GenericAPIView):
@@ -269,10 +269,10 @@ class LeaveFromEvent(GenericAPIView):
         return Response(NO_IN_EVENT_MEMBERS_LIST_ERROR, status = HTTP_400_BAD_REQUEST)
 
 class EventsRelevantList(ListAPIView):
-    filter_backends = (RankedFuzzySearchFilter, )
+    filter_backends = [RankedFuzzySearchFilter]
     serializer_class = EventListSerializer
     queryset: QuerySet[Event] = Event.get_event_list()
-    search_fields: tuple[str] = ('name', )
+    search_fields: list[str]= ['name']
 
 class UserEventsRelevantList(EventsRelevantList):
 
@@ -281,10 +281,10 @@ class UserEventsRelevantList(EventsRelevantList):
 
 class UserEvents(ListAPIView):
     serializer_class = EventListSerializer
-    filter_backends = (SearchFilter, DjangoFilterBackend)
+    filter_backends = [SearchFilter, DjangoFilterBackend]
     pagination_class = CustomPagination
-    search_fields: tuple[str] = ('id', 'name', 'price', 'place', 'date_and_time', 'amount_members')
-    filterset_fields: tuple[str] = ('type', )
+    search_fields: list[str] = ['id', 'name', 'price', 'place', 'date_and_time', 'amount_members']
+    filterset_fields: list[str] = ['type']
     queryset: QuerySet[Event] = Event.get_event_list()
 
     def get_queryset(self) -> QuerySet[Event]:

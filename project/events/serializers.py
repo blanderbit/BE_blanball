@@ -1,3 +1,4 @@
+from ctypes import Union
 from events.models import (
     Event,
     EventTemplate,
@@ -30,11 +31,11 @@ class CreateEventSerializer(serializers.ModelSerializer):
     class Meta:
         model: Event = Event
         validators = [EventDateTimeValidator()]
-        exclude: tuple[str] = (
+        exclude: Union[str, list[str]] = [
             'author',
             'status',
             'current_fans',
-        )
+        ]
 
 
 class TemplateCreateSerializer(serializers.ModelSerializer):
@@ -42,52 +43,52 @@ class TemplateCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model: EventTemplate = EventTemplate
-        exclude: tuple[str] = (
+        exclude: Union[str, list[str]] = [
             'author',
-        )
+        ]
 
 class TemplateGetSerializer(serializers.ModelSerializer):
     class Meta:
         model: EventTemplate = EventTemplate
-        exclude = (
+        exclude: Union[str, list[str]] = [
             'author',
-        )
+        ]
 
 class EventTemplateListSerializer(serializers.ModelSerializer):
     class Meta:
         model: Event = Event
         validators = [EventDateTimeValidator()]
-        exclude: tuple[str] = (
+        exclude: Union[str, list[str]] = [
             'author',
             'status',
             'current_fans',
             'current_users',
             'description',
-        )
+        ]
 
 class TemplateListSerializer(serializers.ModelSerializer):
     event_data = EventTemplateListSerializer()
     class Meta:
         model: EventTemplate = EventTemplate
-        fields: tuple[str] = (
+        fields: Union[str, list[str]] = [
             'id',
             'name', 
             'time_created', 
             'count_current_users', 
             'event_data',
-        )
+        ]
 
 
 class UpdateEventSerializer(serializers.ModelSerializer):
     class Meta:
         model: EventTemplate = Event
         validators = [EventDateTimeValidator()]
-        exclude: tuple[str] = (
+        exclude: Union[str, list[str]] = [
             'author',
             'status',
             'current_fans',
             'current_users',
-        )
+        ]
 
     def update(self, instance, validated_data: dict) -> OrderedDict:
         return super().update(instance, validated_data)
@@ -97,12 +98,12 @@ class EventSerializer(serializers.ModelSerializer):
     current_users = EventUsersSerializer(many=True)
     class Meta:
         model: Event = Event
-        fields: tuple[str] = '__all__'
+        fields: Union[str, list[str]]= '__all__'
 
 class PopularIventsListSerializer(serializers.ModelSerializer):
     class Meta:
         model: Event = Event
-        fields: tuple[str] = (
+        fields: Union[str, list[str]] = (
             'author',
             'id',
             'name',
@@ -115,7 +116,7 @@ class PopularIventsListSerializer(serializers.ModelSerializer):
 class EventListSerializer(serializers.ModelSerializer):
     class Meta:
         model: Event = Event
-        fields: tuple[str] = (
+        fields: Union[str, list[str]] = (
             'author',
             'id',
             'name',
@@ -138,14 +139,18 @@ class DeleteIventsSerializer(serializers.Serializer):
     ids: list[int] = serializers.ListField(child = serializers.IntegerField(min_value = 0))
 
     class Meta:
-        fieds: tuple[str] = ('ids', )
+        fieds: Union[str, list[str]] = [
+            'ids', 
+        ]
 
 
 class JoinOrRemoveRoomSerializer(serializers.Serializer):
     event_id: int = serializers.IntegerField(min_value = 0)
 
     class Meta:
-        fields: tuple[str] = ('event_id', )
+        fields: Union[str, list[str]] = [
+            'event_id', 
+        ]
 
     def validate(self, attrs: OrderedDict) -> OrderedDict:
         event_id: int = attrs.get('event_id')
@@ -164,10 +169,10 @@ class InviteUserToEventSerializer(serializers.Serializer):
     event_id: int = serializers.IntegerField(min_value = 0)
 
     class Meta:
-        fields: tuple[str] = (
+        fields: Union[str, list[str]] = [
             'event_id',
             'user_id',
-        )
+        ]
 
     def validate(self, attrs) -> OrderedDict:
         try:
@@ -192,19 +197,19 @@ class RequestToParticipationSerializer(serializers.ModelSerializer):
     user = EventUsersSerializer()
     class Meta:
         model: RequestToParticipation = RequestToParticipation
-        fields: tuple[str] = (
+        fields: Union[str, list[str]] = [
             'id',
             'user',
             'time_created',
-        )
+        ]
 
 class BulkAcceptOrDeclineRequestToParticipationSerializer(serializers.Serializer):
     requests: list[int] = serializers.ListField(child = serializers.IntegerField(min_value = 0))
     type: bool = serializers.BooleanField()
 
     class Meta:
-        fields: tuple[str] = (
+        fields: Union[str, list[str]] = [
             'requests',
             'type',
-        )
+        ]
 

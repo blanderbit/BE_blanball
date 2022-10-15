@@ -20,7 +20,7 @@ from authentication.views import (
 
 from django.urls import path
 
-urlpatterns = [
+urlpatterns: list = [
     # endpoint where user can register
     path('client/register', RegisterUser.as_view(), 
         name = 'register'),
