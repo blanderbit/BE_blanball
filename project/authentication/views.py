@@ -80,16 +80,15 @@ class RegisterUser(GenericAPIView):
     permission_classes = (IsNotAuthenticated, )
 
     def post(self, request: Request) -> Response:
-        user: dict[str, Any] = request.data
-        serializer = self.serializer_class(data = user)
+        serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
         profile: Profile = Profile.objects.create(**serializer.validated_data['profile'])
         count_age(profile = profile, data = serializer.validated_data['profile'].items())
         serializer.save(profile = profile)
-        send_email_template(user = User.objects.get(profile = profile.id), 
-        body_title = REGISTER_SUCCESS_BODY_TITLE, title = REGISTER_SUCCESS_TITLE,
-        text = REGISTER_SUCCESS_TEXT)
-        return Response(serializer.data, status = HTTP_201_CREATED)
+        user: User = User.objects.get(profile = profile.id)
+        send_email_template(user = user, body_title = REGISTER_SUCCESS_BODY_TITLE, 
+        title = REGISTER_SUCCESS_TITLE, text = REGISTER_SUCCESS_TEXT)
+        return Response(user.tokens(), status = HTTP_201_CREATED)
 
 class LoginUser(GenericAPIView):
     '''user login'''
@@ -118,7 +117,7 @@ class UserOwnerProfile(GenericAPIView):
 
 class UpdateProfile(GenericAPIView):
     serializer_class = UpdateProfileSerializer
-    queryset = User.objects.all()
+    queryset: QuerySet[User] = User.objects.all()
 
     def put(self, request: Request) -> Response: 
         '''changing profile information'''
@@ -154,16 +153,16 @@ class UserList(ListAPIView):
     pagination_class = CustomPagination
     filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter, )
     filterset_class = UserAgeRangeFilter
-    search_fields = ('profile__name', 'profile__gender', 'profile__last_name')
-    ordering_fields = ('id', 'profile__age', 'raiting')
-    queryset = User.objects.filter(role = 'User').select_related('profile').order_by('-id')
+    search_fields: tuple[str] = ('profile__name', 'profile__gender', 'profile__last_name')
+    ordering_fields: tuple[str] = ('id', 'profile__age', 'raiting')
+    queryset: QuerySet[User] = User.objects.filter(role = 'User').select_related('profile').order_by('-id')
 
 class UsersRelevantList(ListAPIView):
     '''getting the 5 most relevant users for your query'''
     filter_backends = (RankedFuzzySearchFilter, )
     serializer_class = UsersListSerializer
-    queryset = User.objects.filter(role = 'User').select_related('profile')
-    search_fields = ('profile__name', 'profile__last_name')
+    queryset: QuerySet[User] = User.objects.filter(role = 'User').select_related('profile')
+    search_fields: tuple[str] = ('profile__name', 'profile__last_name')
 
 class AdminUsersList(UserList):
     '''displaying the full list of admin users'''
@@ -192,7 +191,7 @@ class ResetPassword(GenericAPIView):
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
         try:
-            reset_password(serializer = serializer)
+            reset_password(data = serializer.validated_data)
             return Response(PASSWORD_RESET_SUCCESS, status = HTTP_200_OK)
         except User.DoesNotExist:
             return Response(NO_SUCH_USER_ERROR, status = HTTP_404_NOT_FOUND) 
@@ -260,7 +259,7 @@ class GetImage(APIView):
     def get(self, request: Request, image_path: str) -> Response:
         try:
             with urllib.request.urlopen(f'{settings.FTP_STORAGE_LOCATION}/users/{image_path}') as image:
-                img_bytes: bytes = base64.b64encode(image.read())
+                img_bytes: bytes = image.read()
                 return Response(img_bytes, status = HTTP_200_OK)
         except URLError:
             return Response(NO_SUCH_IMAGE_ERROR, status = HTTP_404_NOT_FOUND)

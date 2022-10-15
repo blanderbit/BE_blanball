@@ -34,8 +34,8 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
 class EventUsersProfileSerializer(DynamicFieldsModelSerializer):
 
     class Meta:
-        model = Profile
-        fields = (
+        model: Profile = Profile
+        fields: tuple[str] = (
             'name',
             'last_name',
             'avatar',
@@ -46,21 +46,21 @@ class EventUsersSerializer(serializers.ModelSerializer):
     profile = EventUsersProfileSerializer()
 
     class Meta:
-        model = User
-        fields = ('profile', )
+        model: User = User
+        fields: tuple[str] = ('profile', )
 
 
 class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Profile
-        fields = '__all__'
+        model: Profile = Profile
+        fields: tuple[str] = '__all__'
 
 class CreateUpdateProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model =  Profile
-        exclude = (
+        model: Profile =  Profile
+        exclude: tuple[str] = (
             'created_at',
             'age',
         )
@@ -69,8 +69,8 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
     profile = CreateUpdateProfileSerializer()
 
     class Meta:
-        model = User
-        fields = (
+        model: User = User
+        fields: tuple[str] = (
             'configuration',
             'profile',
             'get_planned_events',
@@ -102,8 +102,8 @@ class RegisterSerializer(serializers.ModelSerializer):
     profile: Profile = CreateUpdateProfileSerializer()
 
     class Meta:
-        model = User
-        fields = (
+        model: User = User
+        fields: tuple[str] = (
             'email',
             'phone',
             'password',
@@ -134,17 +134,17 @@ class LoginSerializer(serializers.ModelSerializer):
 
     tokens = serializers.SerializerMethodField()
 
-    def get_tokens(self, obj) -> dict:
+    def get_tokens(self, obj) -> dict[str, str]:
         '''function that issues jwt tokens for an authorized user'''
-        user: User = User.objects.get(email=obj['email'])
+        user: User = User.objects.get(email = obj['email'])
         return {
             'refresh': user.tokens()['refresh'],
             'access': user.tokens()['access']
         }
 
     class Meta:
-        model = User
-        fields = (
+        model: User = User
+        fields: tuple[str] = (
             'email', 
             'password', 
             'tokens',
@@ -170,8 +170,8 @@ class UserSerializer(DynamicFieldsModelSerializer):
     profile: Profile = ProfileSerializer()
 
     class Meta:
-        model = User
-        fields = (
+        model: User = User
+        fields: tuple[str] = (
             'email',
             'role',
             'phone',
@@ -184,8 +184,8 @@ class UserSerializer(DynamicFieldsModelSerializer):
 class ProfileListSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Profile
-        fields = (
+        model: Profile = Profile
+        fields: tuple[str] = (
             'id',
             'name',
             'last_name',
@@ -199,8 +199,8 @@ class UsersListSerializer(serializers.ModelSerializer):
     profile = ProfileListSerializer()
 
     class Meta:
-        model = User
-        fields= (
+        model: User = User
+        fields: tuple[str] = (
             'id',
             'profile',
             'raiting',
@@ -212,13 +212,13 @@ class EmailSerializer(serializers.Serializer):
     email: str = serializers.EmailField(min_length = 3, max_length = 255)
 
     class Meta:
-        fields = ('email', )
+        fields: tuple[str] = ('email', )
 
         
 class RequestChangePhoneSerializer(serializers.ModelSerializer):
     class Meta:
-        model =  User
-        fields = ('phone', )
+        model: User =  User
+        fields: tuple[str] = ('phone', )
 
 class RequestChangePasswordSerializer(serializers.Serializer):
     new_password: str = serializers.CharField(
@@ -227,7 +227,7 @@ class RequestChangePasswordSerializer(serializers.Serializer):
         min_length = 8, max_length = 68)
 
     class Meta:
-        fields = (
+        fields: tuple[str] = (
             'new_password',
             'old_password',
         )
@@ -241,7 +241,7 @@ class ResetPasswordSerializer(serializers.Serializer):
 
     class Meta:
         validators = [CodeValidator(token_type = PASSWORD_RESET_CODE_TYPE)]
-        fields = (
+        fields: tuple[str] = (
             'verify_code',
             'new_password',
         )
@@ -253,15 +253,15 @@ class CheckCodeSerializer(serializers.Serializer):
 
     class Meta:
         validators = [CodeValidator(token_type = [PASSWORD_CHANGE_CODE_TYPE, EMAIL_CHANGE_CODE_TYPE,
-        EMAIL_VERIFY_CODE_TYPE, PHONE_CHANGE_CODE_TYPE, ACCOUNT_DELETE_CODE_TYPE])]
-        fields = ('verify_code', )
+            EMAIL_VERIFY_CODE_TYPE, PHONE_CHANGE_CODE_TYPE, ACCOUNT_DELETE_CODE_TYPE])]
+        fields: tuple[str] = ('verify_code', )
 
 
 class CheckUserActiveSerializer(serializers.Serializer):
     user_id: int = serializers.IntegerField(min_value = 0)
 
     class Meta:
-        fields = ('user_id', )
+        fields: tuple[str] = ('user_id', )
 
     def validate(self, attrs: OrderedDict) -> Union[OrderedDict, serializers.ValidationError]:
         user_id: int = attrs.get('user_id')

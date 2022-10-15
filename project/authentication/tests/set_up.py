@@ -27,7 +27,7 @@ class SetUpAuthenticationModels(APITestCase):
             'password': 'string11',
         }
         self.profile: Profile = Profile.objects.create(**self.profile_data)
-        self.user: User = User.objects.create(**self.user_data,profile = self.profile)
+        self.user: User = User.objects.create(**self.user_data, profile = self.profile)
         return super().setUp()
 
 

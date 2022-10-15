@@ -31,7 +31,7 @@ from events.constaints import (
 from notifications.tasks import send_to_user
 
 
-def event_create(data: Union[dict[str, Any], OrderedDict[str, Any]], request_user: User) -> dict[str, Any]:
+def event_create(*, data: Union[dict[str, Any], OrderedDict[str, Any]], request_user: User) -> dict[str, Any]:
     data = dict(data)
     for user in data['current_users']:
         if user.email == request_user.email:
@@ -49,7 +49,7 @@ def event_create(data: Union[dict[str, Any], OrderedDict[str, Any]], request_use
     Event.objects.create(**data, author = request_user)
     return data
 
-def send_notification_to_subscribe_event_user(event: Event, notification_text: str, message_type: str) -> None:
+def send_notification_to_subscribe_event_user(*, event: Event, notification_text: str, message_type: str) -> None:
     for user in event.current_users.all():
         send_to_user(user = user, notification_text = f'{user.profile.name},{notification_text}', 
             message_type = message_type)
@@ -57,7 +57,7 @@ def send_notification_to_subscribe_event_user(event: Event, notification_text: s
         send_to_user(user = fan, notification_text = f'{fan.profile.name},{notification_text}', 
             message_type = message_type)
 
-def validate_user_before_join_to_event(user: User, event: Event) -> None:
+def validate_user_before_join_to_event(*, user: User, event: Event) -> None:
     if user.current_rooms.filter(id = event.id).exists():
         raise ValidationError(ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, HTTP_400_BAD_REQUEST)
     if user.current_views_rooms.filter(id = event.id).exists():
@@ -78,27 +78,27 @@ def send_notification_to_event_author(event: Event) -> None:
         message_type = NEW_USER_ON_THE_EVENT_MESSAGE_TYPE)
 
 
-def validate_get_user_planned_events(pk: int, request_user: User ) -> None:
-    user = User.objects.get(id = pk)
+def validate_get_user_planned_events(*, pk: int, request_user: User ) -> None:
+    user: User = User.objects.get(id = pk)
     if user.configuration['show_my_planned_events'] == False and request_user.id != user.id:
         raise ValidationError(GET_PLANNED_EVENTS_ERROR, HTTP_400_BAD_REQUEST)  
 
 
-def filter_event_by_user_planned_events_time(pk: int, queryset: QuerySet) -> QuerySet:
+def filter_event_by_user_planned_events_time(*, pk: int, queryset: QuerySet) -> QuerySet:
     user: User =  User.objects.get(id = pk)
     num: str = re.findall(r'\d{1,10}', user.get_planned_events)[0]
-    string = re.findall(r'\D', user.get_planned_events)[0]
+    string: str = re.findall(r'\D', user.get_planned_events)[0]
     if string == 'd':
-        num = int(num[0])
+        num: int = int(num[0])
     elif string == 'm':  
-        num = int(num[0]) * 30 + int(num[0]) // 2
+        num: int = int(num[0]) * 30 + int(num[0]) // 2
     elif string == 'y':
-        num = int(num[0]) * 365
-    finish_date = timezone.now() + timezone.timedelta(days = int(num))
+        num: int = int(num[0]) * 365
+    finish_date: datetime = timezone.now() + timezone.timedelta(days = int(num))
     return queryset.filter(author_id = user.id, date_and_time__range = [timezone.now(), finish_date])
 
 
-def bulk_delete_events(data: dict[str, Any], queryset: QuerySet, user: User) -> dict[str, list[int]]:
+def bulk_delete_events(*, data: dict[str, Any], queryset: QuerySet, user: User) -> dict[str, list[int]]:
     deleted: list[int] = [] 
     for event_id in data:
         try:
@@ -110,7 +110,7 @@ def bulk_delete_events(data: dict[str, Any], queryset: QuerySet, user: User) -> 
             pass
     return {'delete success': deleted}
 
-def bulk_accpet_or_decline(data, user: User) -> dict[str, list[int]]:
+def bulk_accpet_or_decline(*, data, user: User) -> dict[str, list[int]]:
     success: list[int] = []
     for request_id in data['requests']:
         try:

@@ -71,7 +71,7 @@ class Role(models.TextChoices):
     user: str = 'User'
     admin: str = 'Admin'
 
-def validate_birthday(value: date) -> ValidationError:
+def validate_birthday(value: date) -> None:
     if timezone.now().date() - value > timezone.timedelta(days = 29200):
         raise ValidationError(MAX_AGE_VALUE_ERROR, HTTP_400_BAD_REQUEST) 
     if timezone.now().date() - value < timezone.timedelta(days = 2191):
@@ -112,7 +112,7 @@ class Profile(models.Model):
 
 
     class Meta:
-        db_table = 'user_profile'
+        db_table: str = 'user_profile'
 
 
 class User(AbstractBaseUser):
@@ -127,7 +127,7 @@ class User(AbstractBaseUser):
     profile: Profile = models.ForeignKey(Profile, on_delete = models.CASCADE, blank = True, null = True, related_name = 'user')
     configuration: dict = models.JSONField(default = configuration_dict)
 
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD: str = 'email'
 
     objects = UserManager()
 
@@ -149,7 +149,7 @@ class User(AbstractBaseUser):
         return 'user_%s' % self.id
 
     class Meta:
-        db_table = 'user'
+        db_table: str = 'user'
 
 
 class Code(models.Model):
@@ -166,7 +166,7 @@ class Code(models.Model):
         return self.verify_code
     
     class Meta:
-        db_table = 'code'
+        db_table: str = 'code'
 
 
 class ActiveUser(models.Model):
@@ -179,5 +179,5 @@ class ActiveUser(models.Model):
         return self.user.email
     
     class Meta:
-        db_table = 'active_user'
+        db_table: str = 'active_user'
 

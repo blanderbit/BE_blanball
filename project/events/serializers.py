@@ -1,4 +1,3 @@
-from keyword import kwlist
 from events.models import (
     Event,
     EventTemplate,
@@ -29,9 +28,9 @@ from authentication.models import User
 
 class CreateEventSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Event
+        model: Event = Event
         validators = [EventDateTimeValidator()]
-        exclude = (
+        exclude: tuple[str] = (
             'author',
             'status',
             'current_fans',
@@ -42,23 +41,23 @@ class TemplateCreateSerializer(serializers.ModelSerializer):
     event_data = CreateEventSerializer()
 
     class Meta:
-        model = EventTemplate
-        exclude = (
+        model: EventTemplate = EventTemplate
+        exclude: tuple[str] = (
             'author',
         )
 
 class TemplateGetSerializer(serializers.ModelSerializer):
     class Meta:
-        model = EventTemplate
+        model: EventTemplate = EventTemplate
         exclude = (
             'author',
         )
 
 class EventTemplateListSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Event
+        model: Event = Event
         validators = [EventDateTimeValidator()]
-        exclude = (
+        exclude: tuple[str] = (
             'author',
             'status',
             'current_fans',
@@ -69,8 +68,8 @@ class EventTemplateListSerializer(serializers.ModelSerializer):
 class TemplateListSerializer(serializers.ModelSerializer):
     event_data = EventTemplateListSerializer()
     class Meta:
-        model = EventTemplate
-        fields = (
+        model: EventTemplate = EventTemplate
+        fields: tuple[str] = (
             'id',
             'name', 
             'time_created', 
@@ -81,9 +80,9 @@ class TemplateListSerializer(serializers.ModelSerializer):
 
 class UpdateEventSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Event
+        model: EventTemplate = Event
         validators = [EventDateTimeValidator()]
-        exclude = (
+        exclude: tuple[str] = (
             'author',
             'status',
             'current_fans',
@@ -94,16 +93,16 @@ class UpdateEventSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 class EventSerializer(serializers.ModelSerializer):
-    author =  EventUsersSerializer()
+    author = EventUsersSerializer()
     current_users = EventUsersSerializer(many=True)
     class Meta:
-        model = Event
-        fields = '__all__'
+        model: Event = Event
+        fields: tuple[str] = '__all__'
 
 class PopularIventsListSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Event
-        fields = (
+        model: Event = Event
+        fields: tuple[str] = (
             'author',
             'id',
             'name',
@@ -115,8 +114,8 @@ class PopularIventsListSerializer(serializers.ModelSerializer):
 
 class EventListSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Event
-        fields = (
+        model: Event = Event
+        fields: tuple[str] = (
             'author',
             'id',
             'name',
@@ -139,14 +138,14 @@ class DeleteIventsSerializer(serializers.Serializer):
     ids: list[int] = serializers.ListField(child = serializers.IntegerField(min_value = 0))
 
     class Meta:
-        fieds = ('ids', )
+        fieds: tuple[str] = ('ids', )
 
 
 class JoinOrRemoveRoomSerializer(serializers.Serializer):
     event_id: int = serializers.IntegerField(min_value = 0)
 
     class Meta:
-        fields = ('event_id', )
+        fields: tuple[str] = ('event_id', )
 
     def validate(self, attrs: OrderedDict) -> OrderedDict:
         event_id: int = attrs.get('event_id')
@@ -165,15 +164,15 @@ class InviteUserToEventSerializer(serializers.Serializer):
     event_id: int = serializers.IntegerField(min_value = 0)
 
     class Meta:
-        fields = (
+        fields: tuple[str] = (
             'event_id',
             'user_id',
         )
 
     def validate(self, attrs) -> OrderedDict:
         try:
-            invite_user = User.objects.get(id = attrs.get('user_id'))
-            event = Event.objects.get(id = attrs.get('event_id'))
+            invite_user: User = User.objects.get(id = attrs.get('user_id'))
+            event: Event = Event.objects.get(id = attrs.get('event_id'))
             if event.status == 'Finished':
                 raise serializers.ValidationError(EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST)
             if invite_user.id == Event.objects.get(id = event.id).author.id:
@@ -192,19 +191,19 @@ class InviteUserToEventSerializer(serializers.Serializer):
 class RequestToParticipationSerializer(serializers.ModelSerializer):
     user = EventUsersSerializer()
     class Meta:
-        model = RequestToParticipation
-        fields = (
+        model: RequestToParticipation = RequestToParticipation
+        fields: tuple[str] = (
             'id',
             'user',
             'time_created',
         )
 
 class BulkAcceptOrDeclineRequestToParticipationSerializer(serializers.Serializer):
-    requests: list[int] = serializers.ListField(child=serializers.IntegerField(min_value = 0))
+    requests: list[int] = serializers.ListField(child = serializers.IntegerField(min_value = 0))
     type: bool = serializers.BooleanField()
 
     class Meta:
-        fields = (
+        fields: tuple[str] = (
             'requests',
             'type',
         )

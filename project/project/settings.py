@@ -8,6 +8,8 @@ from typing import Union,Any
 from pathlib import Path
 from decouple import config, Csv
 
+from array import array
+
 django.utils.encoding.smart_text = smart_str
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -43,7 +45,6 @@ ALLOWED_HOSTS: list[str] = config('ALLOWED_HOSTS', cast = Csv())
 
 # Application definition:
 INSTALLED_APPS: tuple[str] = (
-    # Default django apps:
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
