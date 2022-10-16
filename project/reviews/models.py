@@ -29,4 +29,6 @@ class Review(models.Model):
         return self.email
         
     class Meta:
-        db_table = 'review'
+        db_table: str = 'review'
+        verbose_name: str = 'review'
+        verbose_name_plural: str = 'reviews'

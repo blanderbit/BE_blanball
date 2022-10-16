@@ -1,4 +1,5 @@
 import os
+from tabnanny import verbose
 import uuid
 
 from datetime import date, datetime
@@ -28,7 +29,6 @@ from rest_framework.status import HTTP_400_BAD_REQUEST
 from authentication.constaints import (
     MIN_AGE_VALUE_ERROR,MAX_AGE_VALUE_ERROR
 )
-from django.db import connection
 
 
 class UserManager(BaseUserManager):
@@ -115,7 +115,9 @@ class Profile(models.Model):
 
 
     class Meta:
-        db_table: str = 'user_profile'
+        db_table: str = 'profile'
+        verbose_name: str = 'profile'
+        verbose_name_plural: str = 'profiles'
 
 
 class User(AbstractBaseUser):
@@ -157,6 +159,8 @@ class User(AbstractBaseUser):
 
     class Meta:
         db_table: str = 'user'
+        verbose_name: str = 'user'
+        verbose_name_plural: str = 'users'
 
 
 class Code(models.Model):
@@ -176,19 +180,6 @@ class Code(models.Model):
     
     class Meta:
         db_table: str = 'code'
-
-
-class ActiveUser(models.Model):
-    user: User = models.ForeignKey(User, on_delete = models.CASCADE)
-
-    @final
-    def __repr__ (self) -> str:
-        return '<ActiveUser %s>' % self.id
-
-    @final
-    def __str__(self) -> str:
-        return self.user.email
-    
-    class Meta:
-        db_table: str = 'active_user'
+        verbose_name: str = 'code'
+        verbose_name_plural: str = 'codes'
 

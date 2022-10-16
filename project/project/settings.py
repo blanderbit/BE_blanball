@@ -8,7 +8,6 @@ from typing import Union,Any
 from pathlib import Path
 from decouple import config, Csv
 
-from array import array
 
 django.utils.encoding.smart_text = smart_str
 

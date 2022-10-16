@@ -98,7 +98,7 @@ def validate_user_before_join_to_event(*, user: User, event: Event) -> None:
     if RequestToParticipation.objects.filter(user = user,event = event.id, event_author = event.author):
         raise ValidationError(ALREADY_SENT_REQUEST_TO_PARTICIPATE, HTTP_400_BAD_REQUEST)
 
-def send_notification_to_event_author(event: Event) -> None:
+def send_notification_to_event_author(*, event: Event) -> None:
     if event.amount_members > event.count_current_users:
         user_type: str = 'new'
     elif event.amount_members == event.count_current_users:

@@ -32,7 +32,6 @@ from authentication.models import (
     User,
     Profile,
     Code,
-    ActiveUser,
 )
 from authentication.serializers import (
     RegisterSerializer,
@@ -216,18 +215,6 @@ class RequestEmailVerify(GenericAPIView):
         code_create(email = user.email, type = EMAIL_VERIFY_CODE_TYPE,
         dop_info = user.email)
         return Response(SENT_CODE_TO_EMAIL_SUCCESS, status = HTTP_200_OK)
-
-class CheckUserActive(GenericAPIView):
-    serializer_class: Type[Serializer] = CheckUserActiveSerializer
-
-    def post(self, request: Request) -> Response:
-        serializer = self.serializer_class(data = request.data)
-        serializer.is_valid(raise_exception = True)
-        try:
-            ActiveUser.objects.get(user_id = serializer.validated_data['user_id'])
-            return Response({True: 'User active'})
-        except ActiveUser.DoesNotExist:
-            return Response({False: 'User not active'})
 
 class RequetChangeEmail(GenericAPIView):
     serializer_class: Type[Serializer] = EmailSerializer

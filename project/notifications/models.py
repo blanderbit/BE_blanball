@@ -27,4 +27,6 @@ class Notification(models.Model):
         return self.notification_text
 
     class Meta:
-        db_table = 'notification'
+        db_table: str = 'notification'
+        verbose_name: str = 'notification'
+        verbose_name_plural: str = 'notifications'
