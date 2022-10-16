@@ -1,7 +1,8 @@
 import json
-from tkinter.messagebox import NO
+
+from typing import Any, Optional, TypeVar, Generator
+
 from authentication.models import User
-from typing import Any
 from django.db.models.query import QuerySet
 from notifications.tasks import send_to_user
 
@@ -9,6 +10,8 @@ from notifications.constaints import (CHANGE_MAINTENANCE_MESSAGE_TYPE, MAINTENAN
 MAINTENANCE_TRUE_NOTIFICATION_TEXT)
 
 from notifications.models import Notification
+
+bulk = TypeVar(Optional[Generator[list[dict[str, int]], None, None]])
 
 def update_maintenance(data: dict[str, str]) -> None:
 
@@ -29,27 +32,23 @@ def update_maintenance(data: dict[str, str]) -> None:
             send_to_user(user = user, notification_text = notification_text, 
                 message_type = CHANGE_MAINTENANCE_MESSAGE_TYPE)
 
-def bulk_delete_notifications(data: dict[str, Any], queryset: QuerySet, user: User) -> dict[str, int]:
-    deleted: list[int] = [] 
+def bulk_delete_notifications(data: dict[str, Any], queryset: QuerySet[Notification], user: User) -> bulk:
     for notification in data:
         try:
             notify = queryset.get(id = notification)
             if notify.user == user:
                 notify.delete()
-                deleted.append(notification)
+                yield {'success': notification}
         except Notification.DoesNotExist:
             pass
-    return {'delete success': deleted}
 
-def bulk_read_notifications(data: dict[str, Any], queryset: QuerySet) -> dict[str, int]:
-    success: list[int] = [] 
+def bulk_read_notifications(data: dict[str, Any], queryset: QuerySet[Notification]) -> bulk:
     for notification in data:
         try: 
             notify = queryset.get(id = notification)
             if notify.type != 'Read':
                 notify.type = 'Read'
                 notify.save()
-                success.append(notification)
+                yield {'success': notification}
         except Notification.DoesNotExist:
             pass
-    return {'read success': success}

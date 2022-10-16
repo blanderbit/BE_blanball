@@ -1,5 +1,4 @@
-from typing import Any
-from project.pagination import CustomPagination
+from typing import Any, Type
 
 from django.db.models.query import QuerySet
 from django.conf import settings
@@ -21,11 +20,13 @@ from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_404_NOT_FOUND
 )
+from rest_framework.serializers import (
+    Serializer,
+    ValidationError,
+)
 from rest_framework.response import Response
 from rest_framework.request import Request
 from django_filters.rest_framework import DjangoFilterBackend
-
-from rest_framework.serializers import ValidationError
 
 from authentication.models import (
     User,
@@ -74,7 +75,7 @@ from authentication.constaints import (
 
 class RegisterUser(GenericAPIView):
     '''register user'''
-    serializer_class = RegisterSerializer
+    serializer_class: Type[Serializer] = RegisterSerializer
     permission_classes = [IsNotAuthenticated, ]
 
     def post(self, request: Request) -> Response:
@@ -90,7 +91,7 @@ class RegisterUser(GenericAPIView):
 
 class LoginUser(GenericAPIView):
     '''user login'''
-    serializer_class = LoginSerializer
+    serializer_class: Type[Serializer] = LoginSerializer
     permission_classes = [IsNotAuthenticated, ]
 
     def post(self, request: Request) -> Response:
@@ -114,7 +115,7 @@ class UserOwnerProfile(GenericAPIView):
         return Response(SENT_CODE_TO_EMAIL_SUCCESS, status=HTTP_200_OK)
 
 class UpdateProfile(GenericAPIView):
-    serializer_class = UpdateProfileSerializer
+    serializer_class: Type[Serializer] = UpdateProfileSerializer
     queryset: QuerySet[User] = User.objects.all()
 
     def put(self, request: Request) -> Response: 
@@ -127,7 +128,7 @@ class UpdateProfile(GenericAPIView):
 
 class UserProfile(GenericAPIView):
     '''get public user profile'''
-    serializer_class = UserSerializer
+    serializer_class: Type[Serializer] = UserSerializer
     queryset: QuerySet[User] = User.objects.all()
 
     def get(self, request: Request, pk: int) -> Response:
@@ -147,8 +148,7 @@ class UserProfile(GenericAPIView):
 
 class UserList(ListAPIView):
     '''get all users list'''
-    serializer_class = UsersListSerializer
-    pagination_class = CustomPagination
+    serializer_class: Type[Serializer] = UsersListSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter, ]
     filterset_class = UserAgeRangeFilter
     search_fields: list[str] = ['profile__name', 'profile__gender', 'profile__last_name']
@@ -158,7 +158,7 @@ class UserList(ListAPIView):
 class UsersRelevantList(ListAPIView):
     '''getting the 5 most relevant users for your query'''
     filter_backends = [RankedFuzzySearchFilter, ]
-    serializer_class = UsersListSerializer
+    serializer_class: Type[Serializer] = UsersListSerializer
     queryset: QuerySet[User] = User.objects.filter(role = 'User').select_related('profile')
     search_fields: list[str] = ['profile__name', 'profile__last_name']
 
@@ -168,7 +168,7 @@ class AdminUsersList(UserList):
         return self.queryset.filter(role = 'Admin')
 
 class RequestPasswordReset(GenericAPIView):
-    serializer_class = EmailSerializer
+    serializer_class: Type[Serializer] = EmailSerializer
     permission_classes = [IsNotAuthenticated, ]
 
     def post(self, request: Request) -> Response:
@@ -182,7 +182,7 @@ class RequestPasswordReset(GenericAPIView):
 
 class ResetPassword(GenericAPIView):
     '''password reset on a previously sent request'''
-    serializer_class = ResetPasswordSerializer
+    serializer_class: Type[Serializer] = ResetPasswordSerializer
     permission_classes = [IsNotAuthenticated, ]
 
     def post(self, request: Request) -> Response:
@@ -195,7 +195,7 @@ class ResetPassword(GenericAPIView):
             return Response(NO_SUCH_USER_ERROR, status = HTTP_404_NOT_FOUND) 
 
 class RequestChangePassword(GenericAPIView):
-    serializer_class = RequestChangePasswordSerializer
+    serializer_class: Type[Serializer] = RequestChangePasswordSerializer
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
@@ -207,7 +207,7 @@ class RequestChangePassword(GenericAPIView):
         return Response(SENT_CODE_TO_EMAIL_SUCCESS, status = HTTP_200_OK)
 
 class RequestEmailVerify(GenericAPIView):
-    serializer_class = EmailSerializer
+    serializer_class: Type[Serializer] = EmailSerializer
 
     def get(self, request: Request) -> Response:
         user: User = request.user
@@ -218,7 +218,7 @@ class RequestEmailVerify(GenericAPIView):
         return Response(SENT_CODE_TO_EMAIL_SUCCESS, status = HTTP_200_OK)
 
 class CheckUserActive(GenericAPIView):
-    serializer_class = CheckUserActiveSerializer
+    serializer_class: Type[Serializer] = CheckUserActiveSerializer
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
@@ -230,7 +230,7 @@ class CheckUserActive(GenericAPIView):
             return Response({False: 'User not active'})
 
 class RequetChangeEmail(GenericAPIView):
-    serializer_class = EmailSerializer
+    serializer_class: Type[Serializer] = EmailSerializer
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
@@ -242,7 +242,7 @@ class RequetChangeEmail(GenericAPIView):
         return Response(THIS_EMAIL_ALREADY_IN_USE_ERROR, status = HTTP_400_BAD_REQUEST)
 
 class RequestChangePhone(GenericAPIView):
-    serializer_class = RequestChangePhoneSerializer
+    serializer_class: Type[Serializer] = RequestChangePhoneSerializer
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
@@ -264,7 +264,7 @@ class GetImage(APIView):
 
 class CheckCode(GenericAPIView):
     '''password reset on a previously sent request'''
-    serializer_class = CheckCodeSerializer
+    serializer_class: Type[Serializer] = CheckCodeSerializer
 
     def success(self, key: str) -> None:
         self.user.save()

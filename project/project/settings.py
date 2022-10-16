@@ -28,7 +28,7 @@ CODE_EXPIRE_MINUTES_TIME: int = config('CODE_EXPIRE_MINUTES_TIME', cast = int)
 STATIC_URL: str = '/api/static/'
 STATIC_ROOT: str = os.path.join(BASE_DIR, 'static/')
 
-PAGINATION_PAGE_SIZE = config('PAGINATION_PAGE_SIZE', cast = int)
+PAGINATION_PAGE_SIZE: int = config('PAGINATION_PAGE_SIZE', cast = int)
 
 SECRET_KEY: str = config('SECRET_KEY', cast = str)
 
@@ -192,6 +192,7 @@ REST_FRAMEWORK: dict[str, Any]  = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
+    'DEFAULT_PAGINATION_CLASS': 'project.pagination.CustomPagination',
 }
 
 SIMPLE_JWT: dict[str, Any] = {

@@ -1,5 +1,6 @@
 import json
-from typing import Any
+from types import NoneType
+from typing import Any, Optional, Literal
 
 from authentication.models import (
     User,
@@ -27,13 +28,13 @@ class UserConsumer(AsyncWebsocketConsumer):
                 await self.add_user_to_active()
 
     @database_sync_to_async
-    def check_user(self) -> bool:
-        user:User = User.objects.filter(email = self.scope['user'])
+    def check_user(self) -> Optional[Literal[True]]:
+        user: User = User.objects.filter(email = self.scope['user'])
         if user:
             return True
 
     @database_sync_to_async
-    def check_user_group_name(self) -> bool:
+    def check_user_group_name(self) -> Optional[Literal[True]]:
         user: User = User.objects.filter(email = self.scope['user'])
         if user[0].group_name ==  self.room_group_name:
             return True
@@ -45,12 +46,22 @@ class UserConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def add_user_to_active(self) -> None:
         self.disconnect(400)
-        ActiveUser.objects.filter(user = User.objects.get(email = self.scope['user']).id).delete()
-        ActiveUser.objects.create(user = User.objects.get(email = self.scope['user']))
+        user: User = User.objects.get(email = self.scope['user'])
+        print(user.is_active)
+        ActiveUser.objects.filter(user = user.id).delete()
+        ActiveUser.objects.create(user = user)
+        user.is_active = True
+        user.save()
 
     @database_sync_to_async
     def delete_user_from_active(self) -> None:
-        return ActiveUser.objects.filter(user = User.objects.get(email = self.scope['user']).id).delete()
+        user: User = User.objects.get(email = self.scope['user'])
+        print(user.is_active)
+        ActiveUser.objects.filter(user = user.id).delete()
+        user.is_active = False
+        print(user.is_active)
+        user.save()
+        print(user)
 
     async def disconnect(self, close_code: int) -> None:
         # Leave room group
@@ -59,7 +70,7 @@ class UserConsumer(AsyncWebsocketConsumer):
                 self.room_group_name,
                 self.channel_name
             )
-            return await self.delete_user_from_active()
+            await self.delete_user_from_active()
 
     async def kafka_message(self, event: dict[str, Any]) -> None:
         # Send message to WebSocket
@@ -67,6 +78,6 @@ class UserConsumer(AsyncWebsocketConsumer):
             'message': event['message'],
             'date_time': str(timezone.now()),
             'message_type': event['message_type'],
-        },ensure_ascii=False).encode('utf-8')
+        }, ensure_ascii = False).encode('utf-8')
 
         await self.send(text_data.decode())

@@ -1,7 +1,7 @@
 import re
 
 from collections import OrderedDict
-from typing import Any, Union
+from typing import Any, Union, List
 
 from django.contrib import auth
 
@@ -178,9 +178,10 @@ class UserSerializer(DynamicFieldsModelSerializer):
             'role',
             'phone',
             'is_verified',
+            'is_active',
             'raiting',
             'profile',
-            'configuration'
+            'configuration',
         ]
 
 class ProfileListSerializer(serializers.ModelSerializer):

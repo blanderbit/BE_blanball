@@ -120,6 +120,7 @@ class User(AbstractBaseUser):
     email: str = models.EmailField(max_length = 255, unique = True, db_index = True)
     phone: str = PhoneNumberField(unique = True)
     is_verified: bool = models.BooleanField(default = False)
+    # is_active: bool = models.BooleanField(default = False)
     get_planned_events: str = models.CharField(max_length = 10, default = '1m') 
     role: str = models.CharField(choices = Role.choices, max_length = 10, blank = True, null = True)
     updated_at: str = models.DateTimeField(auto_now = True)

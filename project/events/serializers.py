@@ -1,12 +1,12 @@
-from ctypes import Union
+from collections import OrderedDict
+from typing import Union
+
 from events.models import (
     Event,
     EventTemplate,
     RequestToParticipation,
 )
 from authentication.serializers import EventUsersSerializer
-
-from collections import OrderedDict
 
 from rest_framework import serializers
 
@@ -95,15 +95,15 @@ class UpdateEventSerializer(serializers.ModelSerializer):
 
 class EventSerializer(serializers.ModelSerializer):
     author = EventUsersSerializer()
-    current_users = EventUsersSerializer(many=True)
+    current_users = EventUsersSerializer(many = True)
     class Meta:
         model: Event = Event
-        fields: Union[str, list[str]]= '__all__'
+        fields: Union[str, list[str]] = '__all__'
 
 class PopularIventsListSerializer(serializers.ModelSerializer):
     class Meta:
         model: Event = Event
-        fields: Union[str, list[str]] = (
+        fields: Union[str, list[str]] = [
             'author',
             'id',
             'name',
@@ -111,12 +111,12 @@ class PopularIventsListSerializer(serializers.ModelSerializer):
             'gender',
             'date_and_time',
             'type',
-        )    
+        ]    
 
 class EventListSerializer(serializers.ModelSerializer):
     class Meta:
         model: Event = Event
-        fields: Union[str, list[str]] = (
+        fields: Union[str, list[str]] = [
             'author',
             'id',
             'name',
@@ -133,7 +133,7 @@ class EventListSerializer(serializers.ModelSerializer):
             'date_and_time',
             'count_current_users',
             'count_current_fans',
-        ) 
+        ] 
 
 class DeleteIventsSerializer(serializers.Serializer):
     ids: list[int] = serializers.ListField(child = serializers.IntegerField(min_value = 0))

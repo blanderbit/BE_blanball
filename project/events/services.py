@@ -1,8 +1,6 @@
 from datetime import datetime
 import re
-from secrets import choice
-from selectors import EVENT_READ
-from typing import Any, Union
+from typing import Any, Optional, Union, Generator, TypeVar
 from collections import OrderedDict
 import pandas
 
@@ -29,6 +27,39 @@ from events.constaints import (
     GET_PLANNED_EVENTS_ERROR, AUTHOR_CAN_NOT_INVITE_ERROR, 
 )
 from notifications.tasks import send_to_user
+
+bulk = TypeVar(Optional[Generator[list[dict[str, int]], None, None]])
+
+
+def bulk_delete_events(*, data: dict[str, Any], queryset: QuerySet[Event], user: User) -> bulk:
+    for event_id in data:
+        try:
+            event: Union[Event, EventTemplate] = queryset.get(id = event_id)
+            if event.author == user:
+                event.delete()
+                yield {'success': event_id}
+        except(Event.DoesNotExist, EventTemplate.DoesNotExist):
+            pass
+
+
+def bulk_accpet_or_decline(*, data, user: User) -> bulk: 
+    for request_id in data['requests']:
+        try:
+            request_to_p = RequestToParticipation.objects.get(id = request_id)
+            if request_to_p.event_author.id == user.id:
+                if data['type'] == True:
+                    response_type: str = 'accepted'
+                    request_to_p.user.current_rooms.add(request_to_p.event)
+                else:
+                    response_type: str = 'rejected'
+                yield {'success': request_id}
+                send_to_user(user = request_to_p.user, notification_text = RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION.format(
+                user_name = request_to_p.user.profile.name, event_id = request_to_p.event.id, response_type = response_type),
+                message_type = RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_MESSAGE_TYPE)
+                request_to_p.delete()
+
+        except RequestToParticipation.DoesNotExist:
+            pass
 
 
 def event_create(*, data: Union[dict[str, Any], OrderedDict[str, Any]], request_user: User) -> dict[str, Any]:
@@ -84,7 +115,7 @@ def validate_get_user_planned_events(*, pk: int, request_user: User ) -> None:
         raise ValidationError(GET_PLANNED_EVENTS_ERROR, HTTP_400_BAD_REQUEST)  
 
 
-def filter_event_by_user_planned_events_time(*, pk: int, queryset: QuerySet) -> QuerySet:
+def filter_event_by_user_planned_events_time(*, pk: int, queryset: QuerySet[Event]) -> QuerySet[Event]:
     user: User =  User.objects.get(id = pk)
     num: str = re.findall(r'\d{1,10}', user.get_planned_events)[0]
     string: str = re.findall(r'\D', user.get_planned_events)[0]
@@ -97,36 +128,3 @@ def filter_event_by_user_planned_events_time(*, pk: int, queryset: QuerySet) -> 
     finish_date: datetime = timezone.now() + timezone.timedelta(days = int(num))
     return queryset.filter(author_id = user.id, date_and_time__range = [timezone.now(), finish_date])
 
-
-def bulk_delete_events(*, data: dict[str, Any], queryset: QuerySet, user: User) -> dict[str, list[int]]:
-    deleted: list[int] = [] 
-    for event_id in data:
-        try:
-            event: Union[Event, EventTemplate] = queryset.get(id = event_id)
-            if event.author == user:
-                event.delete()
-                deleted.append(event_id)
-        except(Event.DoesNotExist, EventTemplate.DoesNotExist):
-            pass
-    return {'delete success': deleted}
-
-def bulk_accpet_or_decline(*, data, user: User) -> dict[str, list[int]]:
-    success: list[int] = []
-    for request_id in data['requests']:
-        try:
-            request_to_p = RequestToParticipation.objects.get(id = request_id)
-            if request_to_p.event_author.id == user.id:
-                if data['type'] == True:
-                    response_type: str = 'accepted'
-                    request_to_p.user.current_rooms.add(request_to_p.event)
-                else:
-                    response_type: str = 'rejected'
-                success.append(request_id)
-                send_to_user(user = request_to_p.user, notification_text = RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION.format(
-                user_name = request_to_p.user.profile.name, event_id = request_to_p.event.id, response_type = response_type),
-                message_type = RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_MESSAGE_TYPE)
-                request_to_p.delete()
-
-        except RequestToParticipation.DoesNotExist:
-            pass
-    return {'success': success}

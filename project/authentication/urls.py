@@ -1,3 +1,5 @@
+from typing import Union
+
 from authentication.views import (
     RegisterUser,
     LoginUser,
@@ -19,8 +21,12 @@ from authentication.views import (
 )
 
 from django.urls import path
+from django.urls.resolvers import (
+   URLResolver, 
+   URLPattern,
+)
 
-urlpatterns: list = [
+urlpatterns: list[Union[URLResolver, URLPattern]] = [
     # endpoint where user can register
     path('client/register', RegisterUser.as_view(), 
         name = 'register'),

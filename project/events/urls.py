@@ -1,3 +1,5 @@
+from typing import Union
+
 from events.views import (
     CreateEvent,
     GetEvent,
@@ -25,8 +27,12 @@ from events.views import (
 )
 
 from django.urls import path
+from django.urls.resolvers import (
+   URLResolver, 
+   URLPattern,
+)
 
-urlpatterns: list = [
+urlpatterns: list[Union[URLResolver, URLPattern]] = [
     # endpoint where user can create new event 
     path('client/event/create', CreateEvent.as_view(), 
         name = 'event-create'),

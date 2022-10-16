@@ -1,11 +1,17 @@
+from typing import Union
+
 from reviews.views import (
     ReviewCreate,
     UserReviewsList,
 )
 
 from django.urls import path
+from django.urls.resolvers import (
+   URLResolver, 
+   URLPattern,
+)
 
-urlpatterns = [
+urlpatterns: list[Union[URLResolver, URLPattern]] = [
     # endpoint where user can create review
     path('client/review/create', ReviewCreate.as_view(), 
         name = 'create-review'),
