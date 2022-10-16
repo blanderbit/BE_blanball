@@ -1,3 +1,5 @@
+from typing import final
+
 from datetime import datetime
 from authentication.models import User
 
@@ -16,9 +18,11 @@ class Notification(models.Model):
     type: str = models.CharField(choices = Type.choices, max_length = 6,default = 'Unread')
     time_created: datetime = models.DateTimeField(auto_now_add=True)
 
+    @final
     def __repr__ (self) -> str:
         return '<Notification %s>' % self.id
 
+    @final
     def __str__(self) -> str:
         return self.notification_text
 

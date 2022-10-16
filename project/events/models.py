@@ -1,7 +1,8 @@
-from datetime import (date, 
+from datetime import (
+    date, 
     datetime,
 )
-from typing import Any
+from typing import Any, final
 from authentication.models import (
     User,
     Gender,
@@ -17,7 +18,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 class Event(models.Model):
     '''footbal ivent model'''
-        
+    
     class Type(models.TextChoices):
         '''ivent  type choices'''
         football: str = 'Football'
@@ -84,12 +85,15 @@ class Event(models.Model):
     def count_current_fans(self) -> int:
         return self.current_fans.count()
 
+    @final
     def __repr__ (self) -> str:
         return  '<Event %s>' % self.id
 
+    @final
     def __str__(self) -> str:
         return self.name
 
+    @final
     def get_event_list() -> QuerySet:
         return Event.objects.all().select_related('author').prefetch_related('current_users', 'current_fans').order_by('-id')
     

@@ -178,7 +178,7 @@ class UserSerializer(DynamicFieldsModelSerializer):
             'role',
             'phone',
             'is_verified',
-            'is_active',
+            'is_online',
             'raiting',
             'profile',
             'configuration',

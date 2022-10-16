@@ -1,10 +1,9 @@
-from ctypes import Union
 import os
 import uuid
 
 from datetime import date, datetime
 
-from typing import Any
+from typing import Any, final
 
 from PIL import Image
 
@@ -34,6 +33,7 @@ from django.db import connection
 
 class UserManager(BaseUserManager):
     '''user manager'''
+    @final
     def create_user(self, email: str, phone: str, password: None = None, *agrs: Any, **kwargs: Any):
         user = self.model(phone = phone, email = self.normalize_email(email), *agrs, **kwargs)
         user.set_password(password)
@@ -65,6 +65,7 @@ class Position(models.TextChoices):
     CF: str = 'CF'
     LF: str = 'LF' 
     ST: str = 'ST'
+
 
 class Role(models.TextChoices):
     '''role choices'''
@@ -104,9 +105,11 @@ class Profile(models.Model):
     created_at: datetime = models.DateTimeField(auto_now_add = True)
     about_me: str =  models.TextField(blank = True, null = True)
 
+    @final
     def __repr__ (self) -> str:
         return '<Profile %s>' % self.id
 
+    @final
     def __str__(self) -> str:
         return self.name
 
@@ -120,7 +123,7 @@ class User(AbstractBaseUser):
     email: str = models.EmailField(max_length = 255, unique = True, db_index = True)
     phone: str = PhoneNumberField(unique = True)
     is_verified: bool = models.BooleanField(default = False)
-    # is_active: bool = models.BooleanField(default = False)
+    is_online: bool = models.BooleanField(default = False)
     get_planned_events: str = models.CharField(max_length = 10, default = '1m') 
     role: str = models.CharField(choices = Role.choices, max_length = 10, blank = True, null = True)
     updated_at: str = models.DateTimeField(auto_now = True)
@@ -132,12 +135,15 @@ class User(AbstractBaseUser):
 
     objects = UserManager()
 
+    @final
     def __repr__ (self) -> str:
         return '<User %s>' % self.id
 
+    @final
     def __str__(self) -> str:
         return self.email
 
+    @final
     def tokens(self) -> dict[str, str]:
         refresh: RefreshToken = RefreshToken.for_user(self)
         access: AccessToken = AccessToken.for_user(self)
@@ -160,9 +166,11 @@ class Code(models.Model):
     user_email: str = models.CharField(max_length = 255)
     dop_info: str = models.CharField(max_length = 255, null = True, blank = True)
 
+    @final
     def __repr__ (self) -> str:
         return '<Code %s>' % self.id
 
+    @final
     def __str__(self) -> str:  
         return self.verify_code
     
@@ -173,9 +181,11 @@ class Code(models.Model):
 class ActiveUser(models.Model):
     user: User = models.ForeignKey(User, on_delete = models.CASCADE)
 
+    @final
     def __repr__ (self) -> str:
         return '<ActiveUser %s>' % self.id
 
+    @final
     def __str__(self) -> str:
         return self.user.email
     

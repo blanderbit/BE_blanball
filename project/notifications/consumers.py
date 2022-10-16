@@ -47,21 +47,17 @@ class UserConsumer(AsyncWebsocketConsumer):
     def add_user_to_active(self) -> None:
         self.disconnect(400)
         user: User = User.objects.get(email = self.scope['user'])
-        print(user.is_active)
         ActiveUser.objects.filter(user = user.id).delete()
         ActiveUser.objects.create(user = user)
-        user.is_active = True
+        user.is_online = True
         user.save()
 
     @database_sync_to_async
     def delete_user_from_active(self) -> None:
         user: User = User.objects.get(email = self.scope['user'])
-        print(user.is_active)
         ActiveUser.objects.filter(user = user.id).delete()
-        user.is_active = False
-        print(user.is_active)
+        user.is_online = False
         user.save()
-        print(user)
 
     async def disconnect(self, close_code: int) -> None:
         # Leave room group
