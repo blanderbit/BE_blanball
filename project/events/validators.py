@@ -6,7 +6,7 @@ from datetime import datetime
 from rest_framework.serializers import ValidationError
 from rest_framework.status import HTTP_400_BAD_REQUEST
 
-from events.constaints import (
+from events.constants import (
     BAD_EVENT_TIME_CREATE_ERROR, NO_PRICE_DESK_ERROR, )
 
 class EventDateTimeValidator:

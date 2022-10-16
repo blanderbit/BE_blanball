@@ -26,7 +26,7 @@ from rest_framework_simplejwt.tokens import (
 from rest_framework.serializers import ValidationError
 from rest_framework.status import HTTP_400_BAD_REQUEST
 
-from authentication.constaints import (
+from authentication.constants import (
     MIN_AGE_VALUE_ERROR,MAX_AGE_VALUE_ERROR
 )
 

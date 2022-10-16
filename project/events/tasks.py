@@ -4,7 +4,7 @@ from events.models import (
 )
 from project.celery import app
 from events.services import send_notification_to_subscribe_event_user
-from events.constaints import (
+from events.constants import (
     EVENT_TIME_NOTIFICATION_MESSAGE_TYPE, EVENT_TIME_NOTIFICATION_TEXT)
 
 from django.utils import timezone

@@ -17,11 +17,11 @@ from rest_framework.status import (
 
 from events.validators import EventDateTimeValidator
 
-from events.constaints import (
+from events.constants import (
     EVENT_TIME_EXPIRED_ERROR, NO_EVENT_PLACE_ERROR, EVENT_NOT_FOUND_ERROR, AUTHOR_CAN_NOT_INVITE_ERROR,
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, ALREADY_IN_EVENT_FANS_LIST_ERROR, 
 )
-from authentication.constaints import (
+from authentication.constants import (
     NO_SUCH_USER_ERROR,
 )
 

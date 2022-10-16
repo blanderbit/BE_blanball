@@ -1,4 +1,3 @@
-from tkinter import E
 from types import NoneType
 from .set_up import SetUpEventsViews
 from rest_framework.status import (

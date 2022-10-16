@@ -64,7 +64,7 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from django_filters.rest_framework import DjangoFilterBackend
 
-from events.constaints import (
+from events.constants import (
     SENT_INVATION_ERROR, INVITE_USER_TO_EVENT_MESSAGE_TYPE, INVITE_USER_NOTIFICATION, SENT_INVATION_SUCCESS,
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, EVENT_NOT_FOUND_ERROR, EVENT_DELETED_SUCCESS, EVENT_UPDATE_MESSAGE_TYPE,
     EVENT_UPDATE_SUCCESS, JOIN_TO_EVENT_SUCCESS, NEW_REQUEST_TO_PARTICIPATION_MESSAGE_TYPE, NEW_REQUEST_TO_PARTICIPATION, 
@@ -73,7 +73,7 @@ from events.constaints import (
     NO_IN_EVENT_MEMBERS_LIST_ERROR, EVENT_UPDATE_TEXT, AUTHOR_CAN_NOT_INVITE_ERROR, EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,
 
 )
-from authentication.constaints import (
+from authentication.constants import (
     NO_SUCH_USER_ERROR, NO_PERMISSIONS_ERROR
 )
 from rest_framework.exceptions import PermissionDenied

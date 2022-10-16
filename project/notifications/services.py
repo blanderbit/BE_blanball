@@ -6,8 +6,9 @@ from authentication.models import User
 from django.db.models.query import QuerySet
 from notifications.tasks import send_to_user
 
-from notifications.constaints import (CHANGE_MAINTENANCE_MESSAGE_TYPE, MAINTENANCE_FALSE_NOTIFICATION_TEXT, 
-MAINTENANCE_TRUE_NOTIFICATION_TEXT)
+from notifications.constants import (
+    CHANGE_MAINTENANCE_MESSAGE_TYPE, MAINTENANCE_FALSE_NOTIFICATION_TEXT, MAINTENANCE_TRUE_NOTIFICATION_TEXT,
+)
 
 from notifications.models import Notification
 
