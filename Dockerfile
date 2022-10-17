@@ -1,4 +1,4 @@
-FROM python:3.10
+FROM python:3.10.7
 
 # `DJANGO_ENV` arg is used to make prod / dev builds:
 ARG DEPLOY \
