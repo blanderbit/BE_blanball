@@ -1,16 +1,20 @@
 import itertools
 
+from typing import Any
+
 from django.db.models import (
     Value,
     TextField,
     FloatField,
 )
+
 from django.db.models.functions import Concat
 from django.contrib.postgres.search import TrigramSimilarity
-from django_filters import rest_framework as filters
-from rest_framework.filters import SearchFilter
 from django.db.models.query import QuerySet
 
+from django_filters import rest_framework as filters
+
+from rest_framework.filters import SearchFilter
 from rest_framework.request import Request
 
 from authentication.models import User
@@ -24,15 +28,16 @@ class MySearchFilter(SearchFilter):
 class RankedFuzzySearchFilter(MySearchFilter):
 
     @staticmethod
-    def search_queryset(queryset: QuerySet, search_fields: tuple[str], search_terms, min_rank) -> QuerySet:
+    def search_queryset(queryset: QuerySet[Any], 
+            search_fields: tuple[str], search_terms, min_rank) -> QuerySet[Any]:
         full_text_vector: tuple = sum(itertools.zip_longest(search_fields, (), fillvalue=Value(' ')), ())
         if len(search_fields) > 1:
             full_text_vector = full_text_vector[:-1]
 
-        full_text_expr: Concat = Concat(*full_text_vector, output_field=TextField())
+        full_text_expr: Concat = Concat(*full_text_vector, output_field = TextField())
 
         similarity: TrigramSimilarity = TrigramSimilarity(full_text_expr, search_terms)
-        queryset: QuerySet = queryset.annotate(rank = similarity)
+        queryset: QuerySet[Any] = queryset.annotate(rank = similarity)
 
         if min_rank is None:
             queryset = queryset.filter(rank__gt = 0.0)
@@ -41,16 +46,16 @@ class RankedFuzzySearchFilter(MySearchFilter):
 
         return queryset[:5]
 
-    def filter_queryset(self, request: Request, queryset: QuerySet, view) -> QuerySet:
+    def filter_queryset(self, request: Request, queryset: QuerySet[Any], view) -> QuerySet[Any]:
         search_fields: tuple[str] = getattr(view, 'search_fields', None)
         search_terms: str = ' '.join(self.get_search_terms(request))
 
         if search_fields and search_terms:
             min_rank = getattr(view, 'min_rank', None)
 
-            queryset: QuerySet = self.search_queryset(queryset, search_fields, search_terms, min_rank)
+            queryset: QuerySet[Any] = self.search_queryset(queryset, search_fields, search_terms, min_rank)
         else:
-            queryset: QuerySet = queryset.annotate(rank=Value(1.0, output_field=  FloatField()))
+            queryset: QuerySet[Any] = queryset.annotate(rank = Value(1.0, output_field = FloatField()))
 
         return queryset[:5]
 

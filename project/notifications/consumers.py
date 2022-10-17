@@ -44,7 +44,7 @@ class UserConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def add_user_to_active(self) -> None:
-        self.disconnect(400)
+        self.disconnect(200)
         user: User = User.objects.get(email = self.scope['user'])
         user.is_online = True
         user.save()
