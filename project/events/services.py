@@ -1,17 +1,21 @@
 from datetime import datetime
 import re
-from typing import Any, Optional, Union, Generator, TypeVar
+from typing import Any, Optional, Union, Generator, TypeVar, Callable
 from collections import OrderedDict
 import pandas
 
 from django.utils import timezone
 from django.db.models.query import QuerySet
 
-from rest_framework.serializers import ValidationError,Serializer
+from rest_framework.serializers import ValidationError
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_404_NOT_FOUND,
+    HTTP_403_FORBIDDEN,
 )
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.response import Response
+from rest_framework.request import Request
 
 from authentication.models import User
 from events.models import (
@@ -128,3 +132,16 @@ def filter_event_by_user_planned_events_time(*, pk: int, queryset: QuerySet[Even
     finish_date: datetime = timezone.now() + timezone.timedelta(days = int(num))
     return queryset.filter(author_id = user.id, date_and_time__range = [timezone.now(), finish_date])
 
+
+
+def only_author(Object):
+    def wrap(func: Callable[[Request, int, ...], Response]) -> Callable[[Request, int, ...], Response]:
+        def called(self, request: Request, pk: int, *args: Any, **kwargs: Any) -> Any:
+            try:
+                if self.request.user.id == Object.objects.get(id = pk).author.id:
+                    return func(self, request, pk, *args, **kwargs)
+                raise PermissionDenied(HTTP_403_FORBIDDEN)
+            except Object.DoesNotExist:
+                return Response(str(Object.__name__), status = HTTP_404_NOT_FOUND)
+        return called
+    return wrap

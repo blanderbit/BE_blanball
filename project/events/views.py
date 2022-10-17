@@ -1,4 +1,4 @@
-from typing import Any, Type, Callable
+from typing import Any, Type
 
 from events.models import (
     Event,
@@ -29,6 +29,7 @@ from events.services import (
     send_notification_to_subscribe_event_user,
     validate_get_user_planned_events,
     event_create,
+    only_author,
 )
 from events.filters import (
     EventDateTimeRangeFilter, 
@@ -76,20 +77,7 @@ from events.constants import (
 from authentication.constants import (
     NO_SUCH_USER_ERROR, NO_PERMISSIONS_ERROR
 )
-from rest_framework.exceptions import PermissionDenied
 
-
-def only_author(Object):
-    def wrap(func: Callable[[Request, int, ...], Response]) -> Callable[[Request, int, ...], Response]:
-        def called(self, request: Request, pk: int, *args: Any, **kwargs: Any) -> Any:
-            try:
-                if self.request.user.id == Object.objects.get(id = pk).author.id:
-                    return func(self, request, pk, *args, **kwargs)
-                raise PermissionDenied()
-            except Object.DoesNotExist:
-                return Response(str(Object.__name__), status = HTTP_404_NOT_FOUND)
-        return called
-    return wrap
 
 class CreateEvent(GenericAPIView):
     '''class that allows you to create a new event'''
