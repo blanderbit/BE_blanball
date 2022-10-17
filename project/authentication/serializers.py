@@ -182,9 +182,10 @@ class UserSerializer(DynamicFieldsModelSerializer):
             'role',
             'phone',
             'is_verified',
+            'is_online',
             'raiting',
             'profile',
-            'configuration'
+            'configuration',
         )
 
 class ProfileListSerializer(serializers.ModelSerializer):
@@ -211,6 +212,7 @@ class UsersListSerializer(serializers.ModelSerializer):
             'profile',
             'raiting',
             'role',
+            'is_online',
         )
 
 
