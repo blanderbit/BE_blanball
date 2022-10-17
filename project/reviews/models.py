@@ -1,3 +1,5 @@
+from typing import final
+
 from datetime import datetime
 
 from authentication.models import User
@@ -18,11 +20,15 @@ class Review(models.Model):
         ])
     user: User =  models.ForeignKey(User, on_delete = models.PROTECT, related_name = 'reviews')
 
+    @final
     def __repr__ (self) -> str:
         return '<Review %s>' % self.id
 
+    @final
     def __str__(self) -> str:
         return self.email
         
     class Meta:
-        db_table = 'review'
+        db_table: str = 'review'
+        verbose_name: str = 'review'
+        verbose_name_plural: str = 'reviews'

@@ -1,4 +1,4 @@
-from typing import Any, Type, Callable
+from typing import Any, Type
 
 from events.models import (
     Event,
@@ -29,6 +29,7 @@ from events.services import (
     send_notification_to_subscribe_event_user,
     validate_get_user_planned_events,
     event_create,
+    only_author,
 )
 from events.filters import (
     EventDateTimeRangeFilter, 
@@ -64,7 +65,7 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from django_filters.rest_framework import DjangoFilterBackend
 
-from events.constaints import (
+from events.constants import (
     SENT_INVATION_ERROR, INVITE_USER_TO_EVENT_MESSAGE_TYPE, INVITE_USER_NOTIFICATION, SENT_INVATION_SUCCESS,
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, EVENT_NOT_FOUND_ERROR, EVENT_DELETED_SUCCESS, EVENT_UPDATE_MESSAGE_TYPE,
     EVENT_UPDATE_SUCCESS, JOIN_TO_EVENT_SUCCESS, NEW_REQUEST_TO_PARTICIPATION_MESSAGE_TYPE, NEW_REQUEST_TO_PARTICIPATION, 
@@ -73,23 +74,10 @@ from events.constaints import (
     NO_IN_EVENT_MEMBERS_LIST_ERROR, EVENT_UPDATE_TEXT, AUTHOR_CAN_NOT_INVITE_ERROR, EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,
 
 )
-from authentication.constaints import (
+from authentication.constants import (
     NO_SUCH_USER_ERROR, NO_PERMISSIONS_ERROR
 )
-from rest_framework.exceptions import PermissionDenied
 
-
-def only_author(Object):
-    def wrap(func: Callable[[Request, int, ...], Response]) -> Callable[[Request, int, ...], Response]:
-        def called(self, request: Request, pk: int, *args: Any, **kwargs: Any) -> Any:
-            try:
-                if self.request.user.id == Object.objects.get(id = pk).author.id:
-                    return func(self, request, pk, *args, **kwargs)
-                raise PermissionDenied()
-            except Object.DoesNotExist:
-                return Response(str(Object.__str__), status = HTTP_404_NOT_FOUND)
-        return called
-    return wrap
 
 class CreateEvent(GenericAPIView):
     '''class that allows you to create a new event'''
@@ -216,7 +204,7 @@ class JoinToEvent(GenericAPIView):
         validate_user_before_join_to_event(user = user, event = event)
         if not event.privacy:
             user.current_rooms.add(event)
-            send_notification_to_event_author(event)
+            send_notification_to_event_author(event = event)
             return Response(JOIN_TO_EVENT_SUCCESS, status = HTTP_200_OK)
         else:
             send_to_user(user = event.author, notification_text=

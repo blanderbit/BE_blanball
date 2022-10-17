@@ -15,7 +15,6 @@ from authentication.views import (
     UpdateProfile,
     RequetChangeEmail,
     RequestChangePhone,
-    CheckUserActive,
     RequestEmailVerify,
     GetImage,
 )
@@ -70,10 +69,7 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     # endpoint where user can request change phone
     path('client/request-change/phone', RequestChangePhone.as_view(), 
         name = 'request-change-phone'),
-    # endpoint where user can check is another user active
-    path('client/search/user/active', CheckUserActive.as_view(),
-        name = 'check-user-active'),
-    # endpoint where user can check is another user active
+    # endpoint where user can request verify email
     path('client/request-verify/email', RequestEmailVerify.as_view(), 
         name = 'request-email-verify'),
     path('client/get/image/<str:image_path>', GetImage.as_view(), 

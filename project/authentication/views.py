@@ -32,7 +32,6 @@ from authentication.models import (
     User,
     Profile,
     Code,
-    ActiveUser,
 )
 from authentication.serializers import (
     RegisterSerializer,
@@ -45,7 +44,6 @@ from authentication.serializers import (
     RequestChangePasswordSerializer,
     RequestChangePhoneSerializer,
     CheckCodeSerializer,
-    CheckUserActiveSerializer,
 )
 from authentication.services import (
     count_age,
@@ -62,7 +60,7 @@ from authentication.filters import (
 import urllib.request
 from urllib.error import URLError
 
-from authentication.constaints import (
+from authentication.constants import (
     REGISTER_SUCCESS_BODY_TITLE, REGISTER_SUCCESS_TITLE, REGISTER_SUCCESS_TEXT, SENT_CODE_TO_EMAIL_SUCCESS, ACCOUNT_DELETE_CODE_TYPE,
     PASSWORD_RESET_CODE_TYPE, NO_SUCH_USER_ERROR, PASSWORD_CHANGE_CODE_TYPE, WRONG_PASSWORD_ERROR, PASSWORD_RESET_SUCCESS,
     EMAIL_VERIFY_CODE_TYPE, ALREADY_VERIFIED_ERROR, PHONE_CHANGE_CODE_TYPE, EMAIL_CHANGE_CODE_TYPE, THIS_EMAIL_ALREADY_IN_USE_ERROR,
@@ -216,18 +214,6 @@ class RequestEmailVerify(GenericAPIView):
         code_create(email = user.email, type = EMAIL_VERIFY_CODE_TYPE,
         dop_info = user.email)
         return Response(SENT_CODE_TO_EMAIL_SUCCESS, status = HTTP_200_OK)
-
-class CheckUserActive(GenericAPIView):
-    serializer_class: Type[Serializer] = CheckUserActiveSerializer
-
-    def post(self, request: Request) -> Response:
-        serializer = self.serializer_class(data = request.data)
-        serializer.is_valid(raise_exception = True)
-        try:
-            ActiveUser.objects.get(user_id = serializer.validated_data['user_id'])
-            return Response({True: 'User active'})
-        except ActiveUser.DoesNotExist:
-            return Response({False: 'User not active'})
 
 class RequetChangeEmail(GenericAPIView):
     serializer_class: Type[Serializer] = EmailSerializer

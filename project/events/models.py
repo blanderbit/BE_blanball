@@ -1,7 +1,8 @@
-from datetime import (date, 
+from datetime import (
+    date, 
     datetime,
 )
-from typing import Any
+from typing import Any, final
 from authentication.models import (
     User,
     Gender,
@@ -17,7 +18,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 class Event(models.Model):
     '''footbal ivent model'''
-        
+    
     class Type(models.TextChoices):
         '''ivent  type choices'''
         football: str = 'Football'
@@ -84,17 +85,23 @@ class Event(models.Model):
     def count_current_fans(self) -> int:
         return self.current_fans.count()
 
+    @final
     def __repr__ (self) -> str:
         return  '<Event %s>' % self.id
 
+    @final
     def __str__(self) -> str:
         return self.name
 
+    @final
     def get_event_list() -> QuerySet:
         return Event.objects.all().select_related('author').prefetch_related('current_users', 'current_fans').order_by('-id')
     
     class Meta:
         db_table = 'event'
+        verbose_name: str = 'event'
+        verbose_name_plural: str = 'events'
+        
 
 class RequestToParticipation(models.Model):
     user: User = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'user')
@@ -102,14 +109,18 @@ class RequestToParticipation(models.Model):
     event: Event = models.ForeignKey(Event, on_delete = models.CASCADE)
     event_author: User = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'author')
 
+    @final
     def __repr__ (self) -> str:
         return '<RequestToParticipation %s>' % self.id
 
+    @final
     def __str__(self) -> str:
         return self.user.email
     
     class Meta:
         db_table = 'request_to_participation'
+        verbose_name: str = 'request to participation'
+        verbose_name_plural: str = 'requests to participation'
     
 
 class EventTemplate(models.Model):
@@ -122,11 +133,15 @@ class EventTemplate(models.Model):
     def count_current_users(self) -> int:
         return len(self.event_data['current_users'])
 
+    @final
     def __repr__ (self) -> str:
         return '<EventTemplate %s>' % self.id
 
+    @final
     def __str__(self) -> str:
         return self.name
 
     class Meta:
-        db_table = 'event_template'
+        db_table: str = 'event_template'
+        verbose_name: str = 'event template'
+        verbose_name_plural: str = 'event template'

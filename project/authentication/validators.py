@@ -5,7 +5,7 @@ from django.utils import timezone
 from rest_framework.status import  HTTP_400_BAD_REQUEST
 from rest_framework.serializers import ValidationError
 
-from authentication.constaints import (
+from authentication.constants import (
     BAD_CODE_ERROR, CODE_EXPIRED_ERROR,
 )
 

@@ -1,11 +1,12 @@
 from collections import OrderedDict
+from typing import Any
 
 from rest_framework.test import APITestCase
 
 
 class SetUpEventsViews(APITestCase):
-    def setUp(self) -> OrderedDict:
-        self.event_create_data = {
+    def setUp(self) -> OrderedDict[str, Any]:
+        self.event_create_data: dict[str, Any] = {
             'name': 'string',
             'description': 'string',
             'place': 'string',
@@ -24,7 +25,7 @@ class SetUpEventsViews(APITestCase):
             'current_users': []
         }
 
-        self.event_create_withount_phone_data = {
+        self.event_create_withount_phone_data: dict[str, Any] = {
             'name': 'string',
             'description': 'string',
             'place': 'string',
@@ -42,7 +43,7 @@ class SetUpEventsViews(APITestCase):
             'current_users': []
         }
 
-        self.event_update_data = {
+        self.event_update_data: dict[str, Any] = {
             'name': 'updated',
             'description': 'string',
             'place': 'string',
@@ -60,11 +61,11 @@ class SetUpEventsViews(APITestCase):
             'forms': 'Shirt-Front',
         }
 
-        self.event_join_data = {
+        self.event_join_data: dict[str, int] = {
             'event_id': 1
         }
 
-        self.user_reg_data = {
+        self.user_reg_data: dict[str, Any] = {
             "email": "user@example.com",
             "phone": "+380683861969",
             "password": "string11",
@@ -81,7 +82,7 @@ class SetUpEventsViews(APITestCase):
             }
         }
 
-        self.user_reg_data_2 = {
+        self.user_reg_data_2: dict[str, Any] = {
             "email": "user@example.com2",
             "phone": "+380683861980",
             "password": "string11",
@@ -97,6 +98,6 @@ class SetUpEventsViews(APITestCase):
                 "about_me": "string"
             }
         }
-        self.fan_event_join_data = {
+        self.fan_event_join_data: dict[str, int] = {
             'event_id': 0
         }

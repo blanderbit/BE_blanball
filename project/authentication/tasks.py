@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, final
 from django.utils import timezone
 import threading
 
@@ -9,7 +9,7 @@ from project.celery import app
 
 from django.core.mail import EmailMessage
 
-from authentication.constaints import BLANBALL
+from authentication.constants import BLANBALL
 
 
 class EmailThread(threading.Thread):
@@ -20,7 +20,8 @@ class EmailThread(threading.Thread):
 
     def run(self) -> None:
         self.email.send()
-
+        
+@final
 class Util: 
     @staticmethod
     @app.task

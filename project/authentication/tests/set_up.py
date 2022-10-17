@@ -11,7 +11,8 @@ from rest_framework.test import APITestCase
 
 
 class SetUpAuthenticationModels(APITestCase):
-    def setUp(self) -> OrderedDict:
+
+    def setUp(self) -> OrderedDict[str, Any]:
         self.profile_data: dict[str, Any] = {
             'name': 'John',
             'last_name': 'Jesus',
@@ -21,7 +22,7 @@ class SetUpAuthenticationModels(APITestCase):
             'weight': 30,
             'position': 'ST'
         }
-        self.user_data = {
+        self.user_data: dict[str, str] = {
             'email': 'user@example.com',
             'phone': '+380683861969',
             'password': 'string11',
@@ -32,8 +33,9 @@ class SetUpAuthenticationModels(APITestCase):
 
 
 class SetUpAauthenticationViews(APITestCase):
-    def setUp(self) -> OrderedDict:
-        self.user_register_data = {
+
+    def setUp(self) -> OrderedDict[str, Any]:
+        self.user_register_data: dict[str, Any] = {
             'email': 'user@example.com',
             'phone': '+380683861969',
             'password': 'string11',
@@ -49,7 +51,7 @@ class SetUpAauthenticationViews(APITestCase):
                 'about_me': 'string'
             }
         } 
-        self.user_register_bad_data = {
+        self.user_register_bad_data: dict[str, Any] = {
             'email': 'user@example.com',
             'phone': 'gffgfgfg',
             'password': 'string12121',
@@ -65,7 +67,7 @@ class SetUpAauthenticationViews(APITestCase):
                 'about_me': 'string'
             }
         } 
-        self.user_register_bad_birthday_date = {
+        self.user_register_bad_birthday_date: dict[str, Any] = {
             'email': 'test_user_bad_data@example.com',
             'phone': '+380683881969',
             'password': 'string11',
@@ -81,40 +83,40 @@ class SetUpAauthenticationViews(APITestCase):
                 'about_me': 'string'
             }
         }
-        self.user_login_data = {
+        self.user_login_data: dict[str, str] = {
             'email': 'user@example.com',
             'password': 'string11'
         }
 
-        self.user_login_bad_data = {
+        self.user_login_bad_data: dict[str, str] = {
             'email': 'user@example.com1921',
             'password': 'string11'
         }
 
-        self.request_change_password_data = {
+        self.request_change_password_data: dict[str, str] = {
             'new_password': '19211921',
             'old_password': 'string11',
         }
 
-        self.request_change_password_bad_data = {
+        self.request_change_password_bad_data: dict[str, str] = {
             'new_password': '19211921',
             'old_password': 'string1',
         }
 
-        self.code_bad_data = {
+        self.code_bad_data: dict[str, str] = {
             'verify_code': '11111'
         }
-        self.request_change_phone_data = {
+        self.request_change_phone_data: dict[str, str] = {
             'phone': '+380683861970'
         }
-        self.request_change_email_data = {
+        self.request_change_email_data: dict[str, str] = {
             'email': 'change_email@example.com'
         }
-        self.request_change_password_data = {
+        self.request_change_password_data: dict[str, str] = {
             'old_password': self.user_register_data['password'],
             'new_password': '20202020',
         }
-        self.request_change_password_bad_data = {
+        self.request_change_password_bad_data: dict[str, str] = {
             'old_password': '20202020',
             'new_password': '20202020',
         }

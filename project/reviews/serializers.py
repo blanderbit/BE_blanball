@@ -4,9 +4,8 @@ from collections import OrderedDict
 from reviews.models import Review
 from authentication.models import User
 
-from reviews.constaints import (
-    REVIEW_CREATE_ERROR, 
-    REVIEW_CREATE_MESSAGE_TYPE,
+from reviews.constants import (
+    REVIEW_CREATE_ERROR, REVIEW_CREATE_MESSAGE_TYPE,
 )
 from notifications.tasks import send_to_user
 

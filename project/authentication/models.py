@@ -1,10 +1,10 @@
-from ctypes import Union
 import os
+from tabnanny import verbose
 import uuid
 
 from datetime import date, datetime
 
-from typing import Any
+from typing import Any, final
 
 from PIL import Image
 
@@ -26,14 +26,14 @@ from rest_framework_simplejwt.tokens import (
 from rest_framework.serializers import ValidationError
 from rest_framework.status import HTTP_400_BAD_REQUEST
 
-from authentication.constaints import (
+from authentication.constants import (
     MIN_AGE_VALUE_ERROR,MAX_AGE_VALUE_ERROR
 )
-from django.db import connection
 
 
 class UserManager(BaseUserManager):
     '''user manager'''
+    @final
     def create_user(self, email: str, phone: str, password: None = None, *agrs: Any, **kwargs: Any):
         user = self.model(phone = phone, email = self.normalize_email(email), *agrs, **kwargs)
         user.set_password(password)
@@ -66,6 +66,7 @@ class Position(models.TextChoices):
     LF: str = 'LF' 
     ST: str = 'ST'
 
+
 class Role(models.TextChoices):
     '''role choices'''
     user: str = 'User'
@@ -77,6 +78,7 @@ def validate_birthday(value: date) -> None:
     if timezone.now().date() - value < timezone.timedelta(days = 2191):
         raise ValidationError(MIN_AGE_VALUE_ERROR, HTTP_400_BAD_REQUEST) 
 
+@final
 def configuration_dict() -> dict[str, bool]:
     return {'email': True, 'phone': True, 'send_email': True, 'show_my_planned_events': True}
 
@@ -104,15 +106,19 @@ class Profile(models.Model):
     created_at: datetime = models.DateTimeField(auto_now_add = True)
     about_me: str =  models.TextField(blank = True, null = True)
 
+    @final
     def __repr__ (self) -> str:
         return '<Profile %s>' % self.id
 
+    @final
     def __str__(self) -> str:
         return self.name
 
 
     class Meta:
-        db_table: str = 'user_profile'
+        db_table: str = 'profile'
+        verbose_name: str = 'profile'
+        verbose_name_plural: str = 'profiles'
 
 
 class User(AbstractBaseUser):
@@ -120,7 +126,7 @@ class User(AbstractBaseUser):
     email: str = models.EmailField(max_length = 255, unique = True, db_index = True)
     phone: str = PhoneNumberField(unique = True)
     is_verified: bool = models.BooleanField(default = False)
-    # is_active: bool = models.BooleanField(default = False)
+    is_online: bool = models.BooleanField(default = False)
     get_planned_events: str = models.CharField(max_length = 10, default = '1m') 
     role: str = models.CharField(choices = Role.choices, max_length = 10, blank = True, null = True)
     updated_at: str = models.DateTimeField(auto_now = True)
@@ -132,12 +138,15 @@ class User(AbstractBaseUser):
 
     objects = UserManager()
 
+    @final
     def __repr__ (self) -> str:
         return '<User %s>' % self.id
 
+    @final
     def __str__(self) -> str:
         return self.email
 
+    @final
     def tokens(self) -> dict[str, str]:
         refresh: RefreshToken = RefreshToken.for_user(self)
         access: AccessToken = AccessToken.for_user(self)
@@ -151,6 +160,8 @@ class User(AbstractBaseUser):
 
     class Meta:
         db_table: str = 'user'
+        verbose_name: str = 'user'
+        verbose_name_plural: str = 'users'
 
 
 class Code(models.Model):
@@ -160,25 +171,16 @@ class Code(models.Model):
     user_email: str = models.CharField(max_length = 255)
     dop_info: str = models.CharField(max_length = 255, null = True, blank = True)
 
+    @final
     def __repr__ (self) -> str:
         return '<Code %s>' % self.id
 
+    @final
     def __str__(self) -> str:  
         return self.verify_code
     
     class Meta:
         db_table: str = 'code'
-
-
-class ActiveUser(models.Model):
-    user: User = models.ForeignKey(User, on_delete = models.CASCADE)
-
-    def __repr__ (self) -> str:
-        return '<ActiveUser %s>' % self.id
-
-    def __str__(self) -> str:
-        return self.user.email
-    
-    class Meta:
-        db_table: str = 'active_user'
+        verbose_name: str = 'code'
+        verbose_name_plural: str = 'codes'
 

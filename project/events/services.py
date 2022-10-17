@@ -1,17 +1,21 @@
 from datetime import datetime
 import re
-from typing import Any, Optional, Union, Generator, TypeVar
+from typing import Any, Optional, Union, Generator, TypeVar, Callable
 from collections import OrderedDict
 import pandas
 
 from django.utils import timezone
 from django.db.models.query import QuerySet
 
-from rest_framework.serializers import ValidationError,Serializer
+from rest_framework.serializers import ValidationError
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_404_NOT_FOUND,
+    HTTP_403_FORBIDDEN,
 )
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.response import Response
+from rest_framework.request import Request
 
 from authentication.models import User
 from events.models import (
@@ -19,7 +23,7 @@ from events.models import (
     EventTemplate,
     RequestToParticipation,
 )
-from events.constaints import (
+from events.constants import (
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR, EVENT_AUTHOR_CAN_NOT_JOIN_ERROR, 
     ALREADY_SENT_REQUEST_TO_PARTICIPATE, NEW_USER_ON_THE_EVENT_NOTIFICATION, NEW_USER_ON_THE_EVENT_MESSAGE_TYPE,
     RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION, RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_MESSAGE_TYPE,
@@ -98,7 +102,7 @@ def validate_user_before_join_to_event(*, user: User, event: Event) -> None:
     if RequestToParticipation.objects.filter(user = user,event = event.id, event_author = event.author):
         raise ValidationError(ALREADY_SENT_REQUEST_TO_PARTICIPATE, HTTP_400_BAD_REQUEST)
 
-def send_notification_to_event_author(event: Event) -> None:
+def send_notification_to_event_author(*, event: Event) -> None:
     if event.amount_members > event.count_current_users:
         user_type: str = 'new'
     elif event.amount_members == event.count_current_users:
@@ -128,3 +132,16 @@ def filter_event_by_user_planned_events_time(*, pk: int, queryset: QuerySet[Even
     finish_date: datetime = timezone.now() + timezone.timedelta(days = int(num))
     return queryset.filter(author_id = user.id, date_and_time__range = [timezone.now(), finish_date])
 
+
+
+def only_author(Object):
+    def wrap(func: Callable[[Request, int, ...], Response]) -> Callable[[Request, int, ...], Response]:
+        def called(self, request: Request, pk: int, *args: Any, **kwargs: Any) -> Any:
+            try:
+                if self.request.user.id == Object.objects.get(id = pk).author.id:
+                    return func(self, request, pk, *args, **kwargs)
+                raise PermissionDenied(HTTP_403_FORBIDDEN)
+            except Object.DoesNotExist:
+                return Response(str(Object.__name__), status = HTTP_404_NOT_FOUND)
+        return called
+    return wrap
