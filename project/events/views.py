@@ -167,17 +167,6 @@ class UpdateEvent(GenericAPIView):
         event.update(**serializer.validated_data)
         return Response(EVENT_UPDATE_SUCCESS, status = HTTP_200_OK)
   
-
-class EventList(ListAPIView):
-    '''class that allows you to get a complete list of events'''
-    serializer_class: Type[Serializer] = EventListSerializer
-    filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter, ]
-    filterset_class = EventDateTimeRangeFilter
-    search_fields: list[str] = ['id', 'name', 'price', 'place', 'date_and_time', 'amount_members']
-    ordering_fields: list[str] = ['id', ]
-    filterset_fields: list[str] = ['type', 'need_ball', 'gender', 'status', 'duration']
-    queryset: QuerySet[Event] = Event.get_event_list()
-
 class DeleteEvents(GenericAPIView):
     '''class that allows you to delete multiple events at once'''
     serializer_class: Type[Serializer] = DeleteIventsSerializer
@@ -259,6 +248,8 @@ class LeaveFromEvent(GenericAPIView):
             return Response(DISCONNECT_FROM_EVENT_SUCCESS, status = HTTP_200_OK)
         return Response(NO_IN_EVENT_MEMBERS_LIST_ERROR, status = HTTP_400_BAD_REQUEST)
 
+
+
 class EventsRelevantList(ListAPIView):
     filter_backends = [RankedFuzzySearchFilter]
     serializer_class: Type[Serializer] = EventListSerializer
@@ -270,12 +261,16 @@ class UserEventsRelevantList(EventsRelevantList):
     def get_queryset(self) -> QuerySet[Event]:
         return self.queryset.filter(author_id = self.request.user.id)
 
-class UserEvents(ListAPIView):
+class EventList(ListAPIView):
+    '''class that allows you to get a complete list of events'''
     serializer_class: Type[Serializer] = EventListSerializer
-    filter_backends = [SearchFilter, DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter, ]
     search_fields: list[str] = ['id', 'name', 'price', 'place', 'date_and_time', 'amount_members']
-    filterset_fields: list[str] = ['type']
+    ordering_fields: list[str] = ['id', ]
+    filterset_class = EventDateTimeRangeFilter
     queryset: QuerySet[Event] = Event.get_event_list()
+
+class UserEvents(EventList):
 
     def get_queryset(self) -> QuerySet[Event]:
         return self.queryset.filter(author_id = self.request.user.id) 

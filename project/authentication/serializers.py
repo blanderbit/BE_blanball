@@ -208,6 +208,7 @@ class UsersListSerializer(serializers.ModelSerializer):
             'profile',
             'raiting',
             'role',
+            'is_online',
         ]
 
 
@@ -256,7 +257,7 @@ class ResetPasswordSerializer(serializers.Serializer):
 
 class CheckCodeSerializer(serializers.Serializer):
     verify_code: str = serializers.CharField(
-        min_length = 5,max_length = 5, write_only = True)
+        min_length = 5, max_length = 5, write_only = True)
 
     class Meta:
         validators = [CodeValidator(token_type = [PASSWORD_CHANGE_CODE_TYPE, EMAIL_CHANGE_CODE_TYPE,

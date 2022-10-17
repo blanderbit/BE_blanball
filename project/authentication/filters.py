@@ -64,5 +64,5 @@ class UserAgeRangeFilter(filters.FilterSet):
     profile__age = filters.RangeFilter()
 
     class Meta:
-        model = User
-        fields = ('profile__age', )
+        model: User = User
+        fields = ['profile__age', 'profile__position', 'profile__gender']

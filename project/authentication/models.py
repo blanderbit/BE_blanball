@@ -34,7 +34,7 @@ from authentication.constants import (
 class UserManager(BaseUserManager):
     '''user manager'''
     @final
-    def create_user(self, email: str, phone: str, password: None = None, *agrs: Any, **kwargs: Any):
+    def create_user(self, email: str, phone: str, password: None = None, *agrs: Any, **kwargs: Any) -> 'User':
         user = self.model(phone = phone, email = self.normalize_email(email), *agrs, **kwargs)
         user.set_password(password)
         user.role = 'User'
