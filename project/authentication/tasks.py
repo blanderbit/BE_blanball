@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, final
 from django.utils import timezone
 import threading
 
@@ -20,7 +20,8 @@ class EmailThread(threading.Thread):
 
     def run(self) -> None:
         self.email.send()
-
+        
+@final
 class Util: 
     @staticmethod
     @app.task

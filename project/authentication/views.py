@@ -44,7 +44,6 @@ from authentication.serializers import (
     RequestChangePasswordSerializer,
     RequestChangePhoneSerializer,
     CheckCodeSerializer,
-    CheckUserActiveSerializer,
 )
 from authentication.services import (
     count_age,

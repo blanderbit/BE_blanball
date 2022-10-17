@@ -78,6 +78,7 @@ def validate_birthday(value: date) -> None:
     if timezone.now().date() - value < timezone.timedelta(days = 2191):
         raise ValidationError(MIN_AGE_VALUE_ERROR, HTTP_400_BAD_REQUEST) 
 
+@final
 def configuration_dict() -> dict[str, bool]:
     return {'email': True, 'phone': True, 'send_email': True, 'show_my_planned_events': True}
 
