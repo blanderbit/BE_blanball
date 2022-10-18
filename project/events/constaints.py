@@ -31,9 +31,10 @@ NO_EVENT_PLACE_ERROR = {'error': 'No place'}
 EVENT_TIME_NOTIFICATION_TEXT = 'Before the start of the event under the number {event_id} remained {time}. Dont forget to participate!'
 ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR = {'error': 'You cannot join the event as a player because you are already a member of the event as a spectator'}
 LEAVE_USER_FROM_THE_EVENT_NOTIFICATION = '{author_name},from your event under {event_id} player disconnected'
+LEAVE_USER_FROM_THE_EVENT_NOTIFICATION_MESSAGE_TYPE = 'leave_user_from_the_event'
 NO_PRICE_DESK_ERROR = {'error':'If the price is greater than 0 you must provide a description of what it is for'}
 
-EVENT_TIME_NOTIFICATION_MESSAGE_TYPE ='event_time_notification'
+EVENT_TIME_NOTIFICATION_MESSAGE_TYPE = 'event_time_notification'
 INVITE_USER_TO_EVENT_MESSAGE_TYPE = 'invite_user_to_event'
 EVENT_DELETE_MESSAGE_TYPE = 'event_deleted'
 EVENT_UPDATE_MESSAGE_TYPE = 'event_updated'
