@@ -5,5 +5,12 @@ class EventDateTimeRangeFilter(filters.FilterSet):
     date_and_time = filters.DateFromToRangeFilter()
 
     class Meta:
-        model = Event
-        fields = ('date_and_time', )
+        model: Event = Event
+        fields = [
+            'date_and_time',
+            'type', 
+            'need_ball', 
+            'gender', 
+            'status', 
+            'duration',
+        ]
