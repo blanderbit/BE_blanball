@@ -147,18 +147,6 @@ class UpdateEvent(GenericAPIView):
             return Response(EVENT_NOT_FOUND_ERROR, status = HTTP_404_NOT_FOUND)
   
 
-class EventList(ListAPIView):
-    '''class that allows you to get a complete list of events'''
-    serializer_class =  EventListSerializer
-    filter_backends = (DjangoFilterBackend, OrderingFilter, SearchFilter, )
-    filterset_class = EventDateTimeRangeFilter
-    pagination_class = CustomPagination
-    search_fields = ('id', 'name', 'small_disc', 'price', 'place', 'date_and_time', 'amount_members')
-    ordering_fields = ('id', )
-    filterset_fields = ('type', 'need_ball', 'gender', 'status', 'duration')
-    queryset = Event.objects.all().select_related('author').prefetch_related('current_users','fans').order_by('-id')
-
-
 class DeleteEvents(GenericAPIView):
     '''class that allows you to delete multiple events at once'''
     serializer_class = DeleteIventsSerializer
@@ -246,13 +234,18 @@ class UserEventsRelevantList(EventsRelevantList):
     def get_queryset(self) -> QuerySet[Event]:
         return self.queryset.filter(author_id = self.request.user.id)
 
-class UserEvents(ListAPIView):
+class EventList(ListAPIView):
+    '''class that allows you to get a complete list of events'''
     serializer_class =  EventListSerializer
-    filter_backends = (SearchFilter, DjangoFilterBackend)
+    filter_backends = (DjangoFilterBackend, OrderingFilter, SearchFilter, )
+    filterset_class = EventDateTimeRangeFilter
     pagination_class = CustomPagination
-    search_fields = ['id', 'name', 'small_disc', 'price', 'place', 'date_and_time', 'amount_members']
-    filterset_fields = ('type', )
-    queryset = Event.objects.all()
+    search_fields = ('id', 'name', 'small_disc', 'price', 'place', 'date_and_time', 'amount_members')
+    ordering_fields = ('id', )
+    filterset_fields = ('type', 'need_ball', 'gender', 'status', 'duration')
+    queryset = Event.objects.all().select_related('author').prefetch_related('current_users','fans').order_by('-id')
+
+class UserEvents(EventList):
 
     def get_queryset(self) -> QuerySet[Event]:
         return self.queryset.filter(author_id = self.request.user.id) 
