@@ -1,6 +1,7 @@
 from events.models import (
     Event,
     RequestToParticipation,
+    InviteToEvent,
 )
 from authentication.serializers import EventUsersSerializer
 
@@ -32,7 +33,7 @@ class CreateEventSerializer(serializers.ModelSerializer):
         exclude = (
             'author',
             'status',
-            'fans',
+            'current_fans',
         )
 
 class UpdateEventSerializer(serializers.ModelSerializer):
@@ -42,7 +43,7 @@ class UpdateEventSerializer(serializers.ModelSerializer):
         exclude = (
             'author',
             'status',
-            'fans',
+            'current_fans',
             'current_users',
         )
 
@@ -86,7 +87,7 @@ class EventListSerializer(serializers.ModelSerializer):
             'need_form',
             'date_and_time',
             'count_current_users',
-            'count_fans',
+            'count_current_fans',
         ) 
 
 class DeleteIventsSerializer(serializers.Serializer):
@@ -151,12 +152,34 @@ class RequestToParticipationSerializer(serializers.ModelSerializer):
         )
 
 class BulkAcceptOrDeclineRequestToParticipationSerializer(serializers.Serializer):
-    requests: list[int] = serializers.ListField(child=serializers.IntegerField(min_value = 0))
+    ids: list[int] = serializers.ListField(child=serializers.IntegerField(min_value = 0))
     type: bool = serializers.BooleanField()
 
     class Meta:
         fields = (
-            'requests',
+            'ids',
             'type',
         )
+
+class InInvitesEventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = [
+            'id',
+            'name',
+            'date_and_time',
+        ]
+
+class InvitesToEventListSerializer(serializers.ModelSerializer):
+    event = InInvitesEventSerializer()
+    sender = EventUsersSerializer()
+    class Meta:
+        model = InviteToEvent
+        fields = [
+            'id',
+            'time_created',
+            'event',
+            'sender'
+        ]
+
 
