@@ -4,6 +4,7 @@ import pandas
 from events.models import (
     Event,
     RequestToParticipation,
+    InviteToEvent,
 )
 from events.serializers import (
     BulkAcceptOrDeclineRequestToParticipationSerializer,
@@ -16,14 +17,18 @@ from events.serializers import (
     EventSerializer,
     InviteUserToEventSerializer,
     CreateEventSerializer,
+    InvitesToEventListSerializer,
 )
 from events.services import (
     validate_user_before_join_to_event,
+    validate_invited_users,
+    event_create,
     filter_event_by_user_planned_events_time,
-    bulk_accpet_or_decline,
     bulk_delete_events,
     send_notification_to_event_author,
     send_notification_to_subscribe_event_user,
+    bulk_accpet_or_decline_requests_to_participation,
+    bulk_accept_or_decline_invites_to_events,
 )
 from events.filters import EventDateTimeRangeFilter
 
@@ -73,19 +78,14 @@ from authentication.constaints import (
 class CreateEvent(GenericAPIView):
     '''class that allows you to create a new event'''
     serializer_class = CreateEventSerializer
-    queryset = Event.objects.all()
+    queryset: QuerySet[Event] = Event.objects.all()
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
-        for user in serializer.validated_data['current_users']:
-            if user.email == request.user.email:
-                return Response(SENT_INVATION_ERROR, status = HTTP_400_BAD_REQUEST)
-            send_to_user(user = user, notification_text = INVITE_USER_NOTIFICATION.format(
-            user_name = request.user.profile.name, event_name = serializer.validated_data['name']),
-            message_type = INVITE_USER_TO_EVENT_MESSAGE_TYPE)
-        self.perform_create(serializer = serializer)
-        return Response(serializer.data, status = HTTP_201_CREATED)
+        validate_invited_users(request_user = request.user, users = serializer.validated_data['current_users'])
+        data: dict[str, Any] = event_create(data = serializer.validated_data, request_user = request.user)
+        return Response(data, status = HTTP_201_CREATED)
         
 
     def perform_create(self, serializer: CreateEventSerializer) -> None:
@@ -108,10 +108,13 @@ class InviteUserToEvent(GenericAPIView):
         event: Event = Event.objects.get(id = serializer.validated_data['event_id'])
         if invite_user.id == request.user.id:
             return Response(SENT_INVATION_ERROR, status = HTTP_400_BAD_REQUEST)
-        send_to_user(user = invite_user,notification_text=
-        INVITE_USER_NOTIFICATION.format(user_name = request.user.profile.name, event_name = event.id),
-        message_type = INVITE_USER_TO_EVENT_MESSAGE_TYPE)
+        InviteToEvent.objects.send_invite(request_user = request.user, invite_user = invite_user, 
+            event = event)
         return Response(SENT_INVATION_SUCCESS, status = HTTP_200_OK)
+
+class InvitesToEventList(ListAPIView):
+    serializer_class = InvitesToEventListSerializer
+    queryset: QuerySet[Event] = InviteToEvent.get_invite_to_event_list()
 
 class GetDeleteEvent(RetrieveAPIView):
     '''a class that allows you to get, update, delete an event'''
@@ -136,7 +139,7 @@ class UpdateEvent(GenericAPIView):
     def put(self, request: Request, pk: int) -> Response:
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
-        event: Event = self.queryset.filter(id = pk).select_related('author').prefetch_related('current_users', 'fans')
+        event: Event = self.queryset.filter(id = pk).select_related('author').prefetch_related('current_users', 'current_fans')
         try:
             if event[0].author.id == request.user.id:
                 send_notification_to_subscribe_event_user(event = event[0],
@@ -157,7 +160,7 @@ class DeleteEvents(GenericAPIView):
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
         return Response(bulk_delete_events(
-            serializer = serializer, queryset = self.queryset, user = request.user), status = HTTP_200_OK)
+            data = serializer.validated_data['events'], queryset = self.queryset, user = request.user), status = HTTP_200_OK)
 
 
 class JoinToEvent(GenericAPIView):
@@ -244,7 +247,7 @@ class EventList(ListAPIView):
     search_fields = ('id', 'name', 'small_disc', 'price', 'place', 'date_and_time', 'amount_members')
     ordering_fields = ('id', )
     filterset_fields = ('type', 'need_ball', 'gender', 'status', 'duration')
-    queryset = Event.objects.all().select_related('author').prefetch_related('current_users','fans').order_by('-id')
+    queryset = Event.objects.all().select_related('author').prefetch_related('current_users','current_fans').order_by('-id')
 
 class UserEvents(EventList):
 
@@ -292,5 +295,5 @@ class BulkAcceptOrDeclineRequestToParticipation(GenericAPIView):
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
-        return Response(bulk_accpet_or_decline(
-            serializer = serializer, user = request.user), status = HTTP_200_OK)
+        return Response(bulk_accpet_or_decline_requests_to_participation(
+            data = serializer.validated_data, user = request.user), status = HTTP_200_OK)
