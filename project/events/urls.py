@@ -16,6 +16,8 @@ from events.views import (
     InviteUserToEvent,
     RequestToParticipationsList,
     BulkAcceptOrDeclineRequestToParticipation,
+    BulkAcceptOrDeclineInvitesToEvent,
+    InvitesToEventList,
 )
 
 from django.urls import path
@@ -27,6 +29,9 @@ urlpatterns = [
     # endpoint where user can get,delete event
     path('client/event/<int:pk>', GetDeleteEvent.as_view(),
         name = 'get-delete-event'),
+      #endpoint where user can get list of events
+    path('client/invites/to/events/list', InvitesToEventList.as_view(), 
+        name = 'invites-to-events-list'),
     # endpoint where user can update event
     path('client/event/update/<int:pk>', UpdateEvent.as_view(),
         name = 'update-event'),
@@ -72,4 +77,6 @@ urlpatterns = [
     #
     path('client/accept/or/decline/participations', BulkAcceptOrDeclineRequestToParticipation.as_view(), 
         name = 'accept-decline-participations'),
+    path('client/accept/or/decline/invites/to/events', BulkAcceptOrDeclineInvitesToEvent.as_view(), 
+        name = 'accept-decline-invites-to-event'),
 ]

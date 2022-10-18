@@ -297,3 +297,14 @@ class BulkAcceptOrDeclineRequestToParticipation(GenericAPIView):
         serializer.is_valid(raise_exception = True)
         return Response(bulk_accpet_or_decline_requests_to_participation(
             data = serializer.validated_data, user = request.user), status = HTTP_200_OK)
+
+class BulkAcceptOrDeclineInvitesToEvent(GenericAPIView):
+    serializer_class = BulkAcceptOrDeclineRequestToParticipationSerializer
+    queryset: QuerySet[Event] = InviteToEvent.get_invite_to_event_list()
+
+    def post(self, request: Request) -> Response:
+        serializer = self.serializer_class(data = request.data)
+        serializer.is_valid(raise_exception = True)
+        data: dict[str, int] = bulk_accept_or_decline_invites_to_events(
+            data = serializer.validated_data, request_user = request.user)
+        return Response(data, status = HTTP_200_OK)
