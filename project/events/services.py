@@ -13,6 +13,8 @@ from rest_framework.status import (
     HTTP_404_NOT_FOUND,
     HTTP_403_FORBIDDEN,
 )
+from django.db import transaction
+
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.request import Request
@@ -22,13 +24,15 @@ from events.models import (
     Event,
     EventTemplate,
     RequestToParticipation,
+    InviteToEvent,
 )
 from events.constants import (
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR, EVENT_AUTHOR_CAN_NOT_JOIN_ERROR, 
     ALREADY_SENT_REQUEST_TO_PARTICIPATE, NEW_USER_ON_THE_EVENT_NOTIFICATION, NEW_USER_ON_THE_EVENT_MESSAGE_TYPE,
     RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION, RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_MESSAGE_TYPE,
     INVITE_USER_TO_EVENT_MESSAGE_TYPE, INVITE_USER_NOTIFICATION, SENT_INVATION_ERROR,
-    GET_PLANNED_EVENTS_ERROR, AUTHOR_CAN_NOT_INVITE_ERROR, 
+    GET_PLANNED_EVENTS_ERROR, AUTHOR_CAN_NOT_INVITE_ERROR, RESPONSE_TO_THE_INVITE_TO_EVENT, 
+    RESPONSE_TO_THE_INVITE_TO_EVENT_MESSAGE_TYPE,
 )
 from notifications.tasks import send_to_user
 
@@ -45,17 +49,43 @@ def bulk_delete_events(*, data: dict[str, Any], queryset: QuerySet[Event], user:
         except(Event.DoesNotExist, EventTemplate.DoesNotExist):
             pass
 
+def bulk_accept_or_decline_invites_to_events(*, data: dict[str, Union[list[int], bool]], request_user: User) -> bulk: 
+    for invite_id in data['ids']:
+        try:
+            invite: InviteToEvent  = InviteToEvent.objects.get(id = invite_id)
+            if invite.recipient.id == request_user.id:
+                if invite.event.current_users.count() < invite.event.amount_members:
+                    if data['type'] == True:
+                        response_type: str = 'accepted'
+                        if invite.event.privacy == False:
+                            invite.recipient.current_rooms.add(invite.event)
+                        else:
+                            RequestToParticipation.objects.create(user = invite.recipient, 
+                                event_id = invite.event.id, event_author = invite.event.author)
+                    else:
+                        response_type: str = 'declined'
+                    yield {'success': invite_id}
+                    send_to_user(user = invite.sender, notification_text = RESPONSE_TO_THE_INVITE_TO_EVENT.format(
+                    user_name = invite.sender.profile.name, recipient_name = invite.recipient.profile.name, 
+                    recipient_last_name = invite.recipient.profile.last_name, 
+                    event_id = invite.event.id, response_type = response_type),
+                    message_type = RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_MESSAGE_TYPE)
+                    invite.delete()
 
-def bulk_accpet_or_decline(*, data, user: User) -> bulk: 
-    for request_id in data['requests']:
+        except InviteToEvent.DoesNotExist:
+            pass
+
+def bulk_accpet_or_decline_requests_to_participation(*, data: dict[str, Union[list[int], bool]], user: User) -> bulk: 
+    for request_id in data['ids']:
         try:
             request_to_p = RequestToParticipation.objects.get(id = request_id)
             if request_to_p.event_author.id == user.id:
                 if data['type'] == True:
                     response_type: str = 'accepted'
-                    request_to_p.user.current_rooms.add(request_to_p.event)
+                    if request_to_p.event.current_users.count() < request_to_p.event.amount_members:
+                        request_to_p.user.current_rooms.add(request_to_p.event)
                 else:
-                    response_type: str = 'rejected'
+                    response_type: str = 'declined'
                 yield {'success': request_id}
                 send_to_user(user = request_to_p.user, notification_text = RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION.format(
                 user_name = request_to_p.user.profile.name, event_id = request_to_p.event.id, response_type = response_type),
@@ -68,12 +98,7 @@ def bulk_accpet_or_decline(*, data, user: User) -> bulk:
 
 def event_create(*, data: Union[dict[str, Any], OrderedDict[str, Any]], request_user: User) -> dict[str, Any]:
     data = dict(data)
-    for user in data['current_users']:
-        if user.email == request_user.email:
-            raise ValidationError(SENT_INVATION_ERROR, HTTP_400_BAD_REQUEST)
-        send_to_user(user = user, notification_text = INVITE_USER_NOTIFICATION.format(
-        user_name = request_user.profile.name, event_name = data['name']),
-        message_type = INVITE_USER_TO_EVENT_MESSAGE_TYPE)
+    users: list[int] = data['current_users']
     data.pop('current_users')
     try:
         contact_number: str = data['contact_number']
@@ -81,8 +106,12 @@ def event_create(*, data: Union[dict[str, Any], OrderedDict[str, Any]], request_
         contact_number: str = str(User.objects.get(id = request_user.id).phone)
     data['contact_number'] = contact_number
     data['date_and_time'] = pandas.to_datetime(data['date_and_time'].isoformat()).round('1min').to_pydatetime()
-    Event.objects.create(**data, author = request_user)
-    return data
+    with transaction.atomic():
+        event: Event = Event.objects.create(**data, author = request_user)
+        for user in users:
+            InviteToEvent.objects.send_invite(request_user = request_user, invite_user = user, 
+                event = event)
+        return data
 
 def send_notification_to_subscribe_event_user(*, event: Event, notification_text: str, message_type: str) -> None:
     for user in event.current_users.all():
@@ -132,7 +161,10 @@ def filter_event_by_user_planned_events_time(*, pk: int, queryset: QuerySet[Even
     finish_date: datetime = timezone.now() + timezone.timedelta(days = int(num))
     return queryset.filter(author_id = user.id, date_and_time__range = [timezone.now(), finish_date])
 
-
+def validate_invited_users(*, request_user: User, users: list[User]) -> None:
+    for user in users:
+        if user.email == request_user.email:
+            raise ValidationError(SENT_INVATION_ERROR, HTTP_400_BAD_REQUEST)
 
 def only_author(Object):
     def wrap(func: Callable[[Request, int, ...], Response]) -> Callable[[Request, int, ...], Response]:

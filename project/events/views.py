@@ -1,9 +1,12 @@
 from typing import Any, Type
 
+from yaml import serialize
+
 from events.models import (
     Event,
     RequestToParticipation,
     EventTemplate,
+    InviteToEvent,
 )
 from events.serializers import (
     BulkAcceptOrDeclineRequestToParticipationSerializer,
@@ -19,17 +22,20 @@ from events.serializers import (
     TemplateCreateSerializer,
     TemplateListSerializer,
     TemplateGetSerializer,
+    InvitesToEventListSerializer,
 )
 from events.services import (
     validate_user_before_join_to_event,
     filter_event_by_user_planned_events_time,
-    bulk_accpet_or_decline,
+    bulk_accpet_or_decline_requests_to_participation,
     bulk_delete_events,
     send_notification_to_event_author,
     send_notification_to_subscribe_event_user,
     validate_get_user_planned_events,
     event_create,
     only_author,
+    validate_invited_users,
+    bulk_accept_or_decline_invites_to_events,
 )
 from events.filters import (
     EventDateTimeRangeFilter, 
@@ -83,17 +89,18 @@ from authentication.constants import (
 class CreateEvent(GenericAPIView):
     '''class that allows you to create a new event'''
     serializer_class: Type[Serializer] = CreateEventSerializer
-    queryset: QuerySet[Event] = Event.objects.all()
+    queryset: QuerySet[Event] = Event.get_event_list()
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
+        validate_invited_users(request_user = request.user, users = serializer.validated_data['current_users'])
         data: dict[str, Any] = event_create(data = serializer.validated_data, request_user = request.user)
         return Response(data, status = HTTP_201_CREATED)
 
 class CreateEventTemplate(GenericAPIView):
     serializer_class: Type[Serializer] = TemplateCreateSerializer
-    queryset: QuerySet[EventTemplate] = EventTemplate.objects.all()
+    queryset: QuerySet[EventTemplate] = EventTemplate.get_event_template_list()
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
@@ -106,7 +113,7 @@ class EventsTemplateList(ListAPIView):
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter, ]
     search_fields: list[str] = ['name', 'time_created']
     ordering_fields: list[str] = ['id', ]
-    queryset: QuerySet[EventTemplate] = EventTemplate.objects.all()
+    queryset: QuerySet[EventTemplate] = EventTemplate.get_event_template_list()
 
     def get_queryset(self) -> QuerySet[EventTemplate]:
         return self.queryset.filter(author_id = self.request.user.id) 
@@ -114,7 +121,7 @@ class EventsTemplateList(ListAPIView):
 
 class UpdateEventTemplate(GenericAPIView):
     serializer_class: Type[Serializer] = TemplateCreateSerializer
-    queryset: QuerySet[EventTemplate] = EventTemplate.objects.all()
+    queryset: QuerySet[EventTemplate] = EventTemplate.get_event_template_list()
 
     @only_author(EventTemplate)
     def put(self, request: Request, pk: int) -> Response:
@@ -126,7 +133,7 @@ class UpdateEventTemplate(GenericAPIView):
 
 class GetEventTemplate(GenericAPIView):
     serializer_class: Type[Serializer] = TemplateGetSerializer
-    queryset: QuerySet[EventTemplate] = EventTemplate.objects.all()
+    queryset: QuerySet[EventTemplate] = EventTemplate.get_event_template_list()
 
     @only_author(EventTemplate)
     def get(self, request: Request, pk: int) -> Response:
@@ -144,19 +151,18 @@ class InviteUserToEvent(GenericAPIView):
         event: Event = Event.objects.get(id = serializer.validated_data['event_id'])
         if invite_user.id == request.user.id:
             return Response(SENT_INVATION_ERROR, status = HTTP_400_BAD_REQUEST)
-        send_to_user(user = invite_user,notification_text=
-        INVITE_USER_NOTIFICATION.format(user_name = request.user.profile.name, event_name = event.id),
-        message_type = INVITE_USER_TO_EVENT_MESSAGE_TYPE)
+        InviteToEvent.objects.send_invite(request_user = request.user, invite_user = invite_user, 
+            event = event)
         return Response(SENT_INVATION_SUCCESS, status = HTTP_200_OK)
 
 class GetEvent(RetrieveAPIView):
     '''a class that allows you to get an event'''
     serializer_class: Type[Serializer] =  EventSerializer
-    queryset: QuerySet[Event] = Event.objects.all()
+    queryset: QuerySet[Event] = Event.get_event_list()
 
 class UpdateEvent(GenericAPIView):
     serializer_class: Type[Serializer] = UpdateEventSerializer
-    queryset: QuerySet[Event] = Event.objects.all()
+    queryset: QuerySet[Event] = Event.get_event_list()
 
     @only_author(Event)
     def put(self, request: Request, pk: int) -> Response:
@@ -171,7 +177,7 @@ class UpdateEvent(GenericAPIView):
 class DeleteEvents(GenericAPIView):
     '''class that allows you to delete multiple events at once'''
     serializer_class: Type[Serializer] = DeleteIventsSerializer
-    queryset: QuerySet[Event] = Event.objects.all()
+    queryset: QuerySet[Event] = Event.get_event_list()
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
@@ -181,7 +187,7 @@ class DeleteEvents(GenericAPIView):
         return Response(data, status = HTTP_200_OK)
 
 class DeleteEventTemplates(DeleteEvents):
-    queryset: QuerySet[Event] = EventTemplate.objects.all()
+    queryset: QuerySet[Event] = EventTemplate.get_event_template_list()
 
 class JoinToEvent(GenericAPIView):
     serializer_class: Type[Serializer] = JoinOrRemoveRoomSerializer
@@ -197,9 +203,6 @@ class JoinToEvent(GenericAPIView):
             send_notification_to_event_author(event = event)
             return Response(JOIN_TO_EVENT_SUCCESS, status = HTTP_200_OK)
         else:
-            send_to_user(user = event.author, notification_text=
-            NEW_REQUEST_TO_PARTICIPATION.format(author_name = event.author.profile.name, event_id = event.id),
-                message_type = NEW_REQUEST_TO_PARTICIPATION_MESSAGE_TYPE)
             RequestToParticipation.objects.create(user = user, event_id = event.id, event_author = event.author)
             return Response(APPLICATION_FOR_PARTICIPATION_SUCCESS, status = HTTP_200_OK)
 
@@ -281,6 +284,21 @@ class EventList(ListAPIView):
     filterset_class = EventDateTimeRangeFilter
     queryset: QuerySet[Event] = Event.get_event_list()
 
+class InvitesToEventList(ListAPIView):
+    serializer_class: Type[Serializer] = InvitesToEventListSerializer
+    queryset: QuerySet[Event] = InviteToEvent.get_invite_to_event_list()
+
+class BulkAcceptOrDeclineInvitesToEvent(GenericAPIView):
+    serializer_class: Type[Serializer] = BulkAcceptOrDeclineRequestToParticipationSerializer
+    queryset: QuerySet[Event] = InviteToEvent.get_invite_to_event_list()
+
+    def post(self, request: Request) -> Response:
+        serializer = self.serializer_class(data = request.data)
+        serializer.is_valid(raise_exception = True)
+        data: dict[str, int] = bulk_accept_or_decline_invites_to_events(
+            data = serializer.validated_data, request_user = request.user)
+        return Response(data, status = HTTP_200_OK)
+
 class UserEvents(EventList):
 
     def get_queryset(self) -> QuerySet[Event]:
@@ -314,7 +332,7 @@ class UserPlannedEvents(UserEvents):
 
 class RequestToParticipationsList(ListAPIView):
     serializer_class: Type[Serializer] = RequestToParticipationSerializer
-    queryset: QuerySet[RequestToParticipation] = RequestToParticipation.objects.all().order_by('-id')
+    queryset: QuerySet[RequestToParticipation] = RequestToParticipation.get_request_to_participation_list()
     
     def list(self, request: Request, pk: int) -> Response:
         try:
@@ -328,11 +346,11 @@ class RequestToParticipationsList(ListAPIView):
     
 class BulkAcceptOrDeclineRequestToParticipation(GenericAPIView):
     serializer_class: Type[Serializer] = BulkAcceptOrDeclineRequestToParticipationSerializer
-    queryset: QuerySet[RequestToParticipation] = RequestToParticipation.objects.all()
+    queryset: QuerySet[RequestToParticipation] = RequestToParticipation.get_request_to_participation_list()
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
-        data: dict[str, list[int]] = bulk_accpet_or_decline(
+        data: dict[str, list[int]] = bulk_accpet_or_decline_requests_to_participation(
             data = serializer.validated_data, user = request.user)
         return Response(data, status = HTTP_200_OK)

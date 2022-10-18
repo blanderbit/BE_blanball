@@ -16,6 +16,18 @@ from django.db.models.query import QuerySet
 
 from phonenumber_field.modelfields import PhoneNumberField
 
+from notifications.tasks import (
+    send_to_user,
+)
+from events.constants import (
+    INVITE_USER_NOTIFICATION, INVITE_USER_TO_EVENT_MESSAGE_TYPE,
+    SEND_INVATION_ERROR, 
+)
+from rest_framework.serializers import ValidationError
+from rest_framework.status import (
+    HTTP_403_FORBIDDEN,
+)
+
 class Event(models.Model):
     '''footbal ivent model'''
     
@@ -94,11 +106,11 @@ class Event(models.Model):
         return self.name
 
     @final
-    def get_event_list() -> QuerySet:
+    def get_event_list() -> QuerySet['Event']:
         return Event.objects.all().select_related('author').prefetch_related('current_users', 'current_fans').order_by('-id')
     
     class Meta:
-        db_table = 'event'
+        db_table: str = 'event'
         verbose_name: str = 'event'
         verbose_name_plural: str = 'events'
         
@@ -116,6 +128,10 @@ class RequestToParticipation(models.Model):
     @final
     def __str__(self) -> str:
         return self.user.email
+
+    @final
+    def get_request_to_participation_list() -> QuerySet['RequestToParticipation']:
+        return RequestToParticipation.objects.all().select_related('user', 'event_author', 'event').order_by('-id')
     
     class Meta:
         db_table = 'request_to_participation'
@@ -140,8 +156,53 @@ class EventTemplate(models.Model):
     @final
     def __str__(self) -> str:
         return self.name
+    
+    @final
+    def get_event_template_list() -> QuerySet['EventTemplate']:
+        return EventTemplate.objects.all().select_related('author').order_by('-id')
 
     class Meta:
         db_table: str = 'event_template'
         verbose_name: str = 'event template'
         verbose_name_plural: str = 'event template'
+
+class InviteToEventManager(models.Manager):
+
+    def send_invite(self, request_user, invite_user: User, event: Event) -> 'InviteToEvent':
+
+        if request_user.id == event.author.id or request_user.id not in event.current_users.all():
+            send_to_user(user = invite_user, notification_text=
+                INVITE_USER_NOTIFICATION.format(user_name = invite_user.profile.name,
+                inviter_name = request_user.profile.name, event_id = event.id),
+                message_type = INVITE_USER_TO_EVENT_MESSAGE_TYPE)
+        else:
+            raise ValidationError(SEND_INVATION_ERROR, HTTP_403_FORBIDDEN)
+
+        invite = self.model(recipient = invite_user, event = event, sender = request_user)
+        return invite.save()
+
+
+class InviteToEvent(models.Model):
+    recipient: User = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'recipient')
+    time_created: datetime = models.DateTimeField(auto_now_add = True)
+    event: Event = models.ForeignKey(Event, on_delete = models.CASCADE)
+    sender: User = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'sender')
+
+    objects = InviteToEventManager()
+
+    @final
+    def __repr__ (self) -> str:
+        return '<InviteToEvent %s>' % self.id
+
+    @final
+    def __str__(self) -> str:
+        return self.name
+
+    @final
+    def get_invite_to_event_list() -> QuerySet['InviteToEvent']:
+        return InviteToEvent.objects.all().select_related('recipient', 'event', 'sender').order_by('-id')
+
+    class Meta:
+        db_table: str = 'invite_to_event'
+        verbose_name: str = 'invite to event'
+        verbose_name_plural: str = 'invites to event'

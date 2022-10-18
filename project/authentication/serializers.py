@@ -48,6 +48,7 @@ class EventUsersSerializer(serializers.ModelSerializer):
     class Meta:
         model: User = User
         fields: Union[str, list[str]] = [
+            'id',
             'profile', 
         ]
 

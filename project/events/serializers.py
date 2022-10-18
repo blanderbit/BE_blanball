@@ -5,6 +5,7 @@ from events.models import (
     Event,
     EventTemplate,
     RequestToParticipation,
+    InviteToEvent,
 )
 from authentication.serializers import EventUsersSerializer
 
@@ -135,6 +136,29 @@ class EventListSerializer(serializers.ModelSerializer):
             'count_current_fans',
         ] 
 
+
+class InInvitesEventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model: Event = Event
+        fields: Union[str, list[str]] = [
+            'id',
+            'name',
+            'date_and_time',
+        ]
+
+class InvitesToEventListSerializer(serializers.ModelSerializer):
+    event = InInvitesEventSerializer()
+    sender = EventUsersSerializer()
+    class Meta:
+        model: InviteToEvent = InviteToEvent
+        fields: Union[str, list[str]] = [
+            'id',
+            'time_created',
+            'event',
+            'sender'
+        ]
+
+
 class DeleteIventsSerializer(serializers.Serializer):
     ids: list[int] = serializers.ListField(child = serializers.IntegerField(min_value = 0))
 
@@ -204,12 +228,12 @@ class RequestToParticipationSerializer(serializers.ModelSerializer):
         ]
 
 class BulkAcceptOrDeclineRequestToParticipationSerializer(serializers.Serializer):
-    requests: list[int] = serializers.ListField(child = serializers.IntegerField(min_value = 0))
+    ids: list[int] = serializers.ListField(child = serializers.IntegerField(min_value = 0))
     type: bool = serializers.BooleanField()
 
     class Meta:
         fields: Union[str, list[str]] = [
-            'requests',
+            'ids',
             'type',
         ]
 

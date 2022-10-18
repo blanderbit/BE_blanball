@@ -3,7 +3,7 @@ APPLICATION_FOR_PARTICIPATION_SUCCESS: dict[str, str] = {'success': 'Your applic
 
 ALREADY_SENT_REQUEST_TO_PARTICIPATE: dict[str, str] = {'error': 'You have already sent a request to participate'}
 
-INVITE_USER_NOTIFICATION: str = '@{user_name},invited you to the event №{event_name}'
+INVITE_USER_NOTIFICATION: str = '{user_name}, @{inviter_name},invited you to the event №{event_id}'
 SENT_INVATION_ERROR: dict[str, str] = {'error': 'You cannot invite yourself to the event'} 
 NEW_USER_ON_THE_EVENT_NOTIFICATION: str = '{author_name},for your event under the №{event_id} joined {user_type} player'
 NEW_REQUEST_TO_PARTICIPATION: str = '{author_name},you have received a new request to participate in the event under the number №{event_id}'
@@ -11,6 +11,9 @@ NEW_REQUEST_TO_PARTICIPATION_MESSAGE_TYPE: str = 'new_request_to_participation'
 NEW_USER_ON_THE_EVENT_MESSAGE_TYPE: str = 'new_user_on_the_event'
 RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION: str = '{user_name},your application for participation in event №{event_id} was {response_type}'
 RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_MESSAGE_TYPE: str = 'response_to_request_for_participation' 
+
+RESPONSE_TO_THE_INVITE_TO_EVENT: str = '{user_name},your user @{recipient_name} {recipient_last_name} invitation to the event №{event_id} was {response_type}'
+RESPONSE_TO_THE_INVITE_TO_EVENT_MESSAGE_TYPE: str = 'response_to_invite_user_to_event' 
 
 
 EVENT_DELETED_SUCCESS: dict[str, str] = {'success':  'Event deleted'}
@@ -48,5 +51,4 @@ GET_PLANNED_EVENTS_ERROR: dict[str, str] = {'error': 'The user has hidden the li
 EVENT_TEMPLATE_UPDATE_SUCCESS: dict[str, str] = {'success': 'Event template updated'}
 EVENT_TEMPLATE_NOT_FOUND_ERROR: dict[str, str] = {'error': 'Event template not found'}
 
-
-INVALID_EVENT_TEMPLATE_CHOICE: str = 'Invalid choice {choice_value}'
+SEND_INVATION_ERROR: dict[str, str] = {'error': 'You cannot invite users to this event'}
