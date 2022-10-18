@@ -24,6 +24,7 @@ from events.views import (
     UpdateEventTemplate,
     DeleteEventTemplates,
     GetEventTemplate,
+    UserEventsSceduler,
 )
 
 from django.urls import path
@@ -55,6 +56,9 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     #endpoint where user can get list of events
     path('client/events/list', EventList.as_view(), 
         name = 'events-list'),
+    #endpoint where user can get list of events
+    path('client/user/events/sceduler', UserEventsSceduler.as_view(), 
+        name = 'events-sceduler'),
     #endpoint where user can get list of events
     path('client/event/templates/list', EventsTemplateList.as_view(), 
         name = 'events-templates-list'),
@@ -103,4 +107,6 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     #
     path('client/accept/or/decline/participations', BulkAcceptOrDeclineRequestToParticipation.as_view(), 
         name = 'accept-decline-participations'),
+
+
 ]

@@ -1,5 +1,4 @@
 import os
-from tabnanny import verbose
 import uuid
 
 from datetime import date, datetime

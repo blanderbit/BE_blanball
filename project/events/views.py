@@ -40,6 +40,7 @@ from authentication.filters import RankedFuzzySearchFilter
 
 from django.db.models import Count
 from django.db.models.query import QuerySet
+from django.db.models import Q
 
 from rest_framework.generics import (
     GenericAPIView,
@@ -248,13 +249,23 @@ class LeaveFromEvent(GenericAPIView):
             return Response(DISCONNECT_FROM_EVENT_SUCCESS, status = HTTP_200_OK)
         return Response(NO_IN_EVENT_MEMBERS_LIST_ERROR, status = HTTP_400_BAD_REQUEST)
 
-
+from django.utils import timezone
 
 class EventsRelevantList(ListAPIView):
     filter_backends = [RankedFuzzySearchFilter]
     serializer_class: Type[Serializer] = EventListSerializer
     queryset: QuerySet[Event] = Event.get_event_list()
-    search_fields: list[str]= ['name']
+    search_fields: list[str] = ['name']
+
+class UserEventsSceduler(ListAPIView):
+    serializer_class: Type[Serializer] = EventListSerializer
+    queryset: QuerySet[Event] = Event.get_event_list()
+
+    def get_queryset(self) -> QuerySet[Event]:
+        # query = Q(current_users__in = [self.request.user.id])
+        # query.add(Q(current_users__in = [self.request.user.id]))
+        print(timezone.now().date().weekday())
+        return self.queryset.filter(Q(author_id = self.request.user.id) | Q(current_users__in = [self.request.user.id]))
 
 class UserEventsRelevantList(EventsRelevantList):
 
@@ -277,7 +288,7 @@ class UserEvents(EventList):
 
 class UserParticipantEvents(UserEvents):
 
-     def get_queryset(self) -> QuerySet[Event]:
+    def get_queryset(self) -> QuerySet[Event]:
         return self.queryset.filter(current_users__in = [self.request.user.id])
 
 class PopularEvents(UserEvents):
