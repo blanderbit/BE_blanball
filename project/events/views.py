@@ -244,7 +244,7 @@ class EventList(ListAPIView):
     filter_backends = (DjangoFilterBackend, OrderingFilter, SearchFilter, )
     filterset_class = EventDateTimeRangeFilter
     pagination_class = CustomPagination
-    search_fields = ('id', 'name', 'small_disc', 'price', 'place', 'date_and_time', 'amount_members')
+    search_fields = ('id', 'name', 'price', 'place', 'date_and_time', 'amount_members')
     ordering_fields = ('id', )
     filterset_fields = ('type', 'need_ball', 'gender', 'status', 'duration')
     queryset = Event.objects.all().select_related('author').prefetch_related('current_users','current_fans').order_by('-id')
