@@ -38,6 +38,7 @@ class Event(models.Model):
     class CloseType(models.TextChoices):
         shirt_front: str = 'Shirt-Front'
         t_shirt: str = 'T-Shirt'
+        any: str = 'Any'
 
     class Status(models.TextChoices):
         planned: str = 'Planned'
@@ -66,8 +67,7 @@ class Event(models.Model):
 
     author: User = models.ForeignKey(User, on_delete = models.CASCADE)
     name: str = models.CharField(max_length = 255)
-    small_disc: str = models.CharField(max_length = 255)
-    full_disc: str = models.TextField()
+    description: str = models.TextField()
     place: str = models.CharField(max_length = 255)
     gender: str = models.CharField(choices = Gender.choices, max_length = 10)
     date_and_time: datetime = models.DateTimeField()
@@ -85,7 +85,7 @@ class Event(models.Model):
     privacy: bool = models.BooleanField()
     duration: int = models.PositiveSmallIntegerField(choices = Duration.choices)
     forms: list = models.CharField(choices = CloseType.choices, max_length = 15)
-    status: str =  models.CharField(choices = Status.choices, max_length = 10,default = 'Planned')
+    status: str =  models.CharField(choices = Status.choices, max_length = 10, default = 'Planned')
     current_users: User = models.ManyToManyField(User, related_name = 'current_rooms', blank = True)
     current_fans: User = models.ManyToManyField(User, related_name = 'current_views_rooms', blank = True)
 
