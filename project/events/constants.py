@@ -51,4 +51,4 @@ GET_PLANNED_EVENTS_ERROR: dict[str, str] = {'error': 'The user has hidden the li
 EVENT_TEMPLATE_UPDATE_SUCCESS: dict[str, str] = {'success': 'Event template updated'}
 EVENT_TEMPLATE_NOT_FOUND_ERROR: dict[str, str] = {'error': 'Event template not found'}
 
-SEND_INVATION_ERROR: dict[str, str] = {'error': 'You cannot invite users to this event'}
+USER_CAN_NOT_INVITE_TO_THIS_EVENT_ERROR: dict[str, str] = {'error': 'You cannot invite users to this event'}

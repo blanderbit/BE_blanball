@@ -21,7 +21,7 @@ from notifications.tasks import (
 )
 from events.constants import (
     INVITE_USER_NOTIFICATION, INVITE_USER_TO_EVENT_MESSAGE_TYPE,
-    SEND_INVATION_ERROR, 
+    USER_CAN_NOT_INVITE_TO_THIS_EVENT_ERROR, 
 )
 from rest_framework.serializers import ValidationError
 from rest_framework.status import (
@@ -39,6 +39,7 @@ class Event(models.Model):
     class CloseType(models.TextChoices):
         shirt_front: str = 'Shirt-Front'
         t_shirt: str = 'T-Shirt'
+        any: str = 'Any'
 
     class Status(models.TextChoices):
         planned: str = 'Planned'
@@ -134,7 +135,7 @@ class RequestToParticipation(models.Model):
         return RequestToParticipation.objects.all().select_related('user', 'event_author', 'event').order_by('-id')
     
     class Meta:
-        db_table = 'request_to_participation'
+        db_table: str = 'request_to_participation'
         verbose_name: str = 'request to participation'
         verbose_name_plural: str = 'requests to participation'
     
@@ -164,11 +165,11 @@ class EventTemplate(models.Model):
     class Meta:
         db_table: str = 'event_template'
         verbose_name: str = 'event template'
-        verbose_name_plural: str = 'event template'
+        verbose_name_plural: str = 'events templates'
 
 class InviteToEventManager(models.Manager):
 
-    def send_invite(self, request_user, invite_user: User, event: Event) -> 'InviteToEvent':
+    def send_invite(self, request_user: User, invite_user: User, event: Event) -> 'InviteToEvent':
 
         if request_user.id == event.author.id or request_user.id not in event.current_users.all():
             send_to_user(user = invite_user, notification_text=
@@ -176,7 +177,7 @@ class InviteToEventManager(models.Manager):
                 inviter_name = request_user.profile.name, event_id = event.id),
                 message_type = INVITE_USER_TO_EVENT_MESSAGE_TYPE)
         else:
-            raise ValidationError(SEND_INVATION_ERROR, HTTP_403_FORBIDDEN)
+            raise ValidationError(USER_CAN_NOT_INVITE_TO_THIS_EVENT_ERROR, HTTP_403_FORBIDDEN)
 
         invite = self.model(recipient = invite_user, event = event, sender = request_user)
         return invite.save()
@@ -196,7 +197,7 @@ class InviteToEvent(models.Model):
 
     @final
     def __str__(self) -> str:
-        return self.name
+        return self.recipient.profile.name
 
     @final
     def get_invite_to_event_list() -> QuerySet['InviteToEvent']:
