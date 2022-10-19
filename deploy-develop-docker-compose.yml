@@ -140,18 +140,18 @@ services:
         condition: service_started
 
   ftp-server:
-    env_file:
-      - stack.env
     container_name: ftp-server
+    env_file: 
+      - stack.env
     image: garethflowers/ftp-server
-    restart: always
     ports:
-      - '49221:21/tcp'
+      - '20-21:20-21/tcp'
+      - '40000-40009:40000-40009/tcp'
     volumes:
       - ftp-server-data:/home/user
     networks:
       - app-network
-    
+
 networks:
   app-network:
     driver: bridge    
