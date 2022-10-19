@@ -275,6 +275,13 @@ class UserEventsRelevantList(EventsRelevantList):
     def get_queryset(self) -> QuerySet[Event]:
         return self.queryset.filter(author_id = self.request.user.id)
 
+class RemoveUserFromEvent(GenericAPIView):
+    serializer_class: Type[Serializer] = InviteUserToEventSerializer
+
+    def post(self, request: Request) -> Response:
+        serializer = self.serializer_class(data = request.data)
+        serializer.is_valid(raise_exception = True)
+
 class EventList(ListAPIView):
     '''class that allows you to get a complete list of events'''
     serializer_class: Type[Serializer] = EventListSerializer
