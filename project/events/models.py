@@ -18,7 +18,8 @@ from notifications.tasks import (
 from events.constaints import (
     INVITE_USER_NOTIFICATION, INVITE_USER_TO_EVENT_MESSAGE_TYPE,
     SEND_INVATION_ERROR, AUTHOR_CAN_NOT_INVITE_ERROR,
-    SENT_INVATION_ERROR, USER_CAN_NOT_INVITE_TO_THIS_EVENT_ERROR
+    SENT_INVATION_ERROR, USER_CAN_NOT_INVITE_TO_THIS_EVENT_ERROR,
+    USER_IN_BLACK_LIST_ERROR
 )
 
 from rest_framework.serializers import ValidationError
@@ -89,6 +90,7 @@ class Event(models.Model):
     status: str =  models.CharField(choices = Status.choices, max_length = 10, default = 'Planned')
     current_users: User = models.ManyToManyField(User, related_name = 'current_rooms', blank = True)
     current_fans: User = models.ManyToManyField(User, related_name = 'current_views_rooms', blank = True)
+    black_list: list[User] = models.ManyToManyField(User, related_name = 'black_list', blank = True)
 
     @property
     def count_current_users(self) -> int:
@@ -97,6 +99,10 @@ class Event(models.Model):
     @property
     def count_current_fans(self) -> int:
         return self.current_fans.count()
+
+    @staticmethod
+    def get_all() -> QuerySet['Event']:
+        return Event.objects.all().filter().select_related('author').prefetch_related('current_users', 'current_fans', 'black_list').order_by('-id')
 
     def __str__(self) -> str:
         return self.name
@@ -126,18 +132,21 @@ class InviteToEventManager(models.Manager):
             raise ValidationError(SENT_INVATION_ERROR, HTTP_403_FORBIDDEN)
         if invite_user.id == event.author.id:
             raise ValidationError(AUTHOR_CAN_NOT_INVITE_ERROR, HTTP_403_FORBIDDEN)
+        if invite_user in event.black_list.all():
+            raise ValidationError(USER_IN_BLACK_LIST_ERROR, HTTP_403_FORBIDDEN)
 
         if request_user.id == event.author.id or request_user.id in event.current_users.all():
+            invite = self.model(recipient = invite_user, event = event, sender = request_user)
+            invite.save()
             send_to_user(user = invite_user, notification_text =
                 INVITE_USER_NOTIFICATION.format(user_name = invite_user.profile.name,
                 inviter_name = request_user.profile.name, event_id = event.id),
                 message_type = INVITE_USER_TO_EVENT_MESSAGE_TYPE, data = {
-                    'event_id': event.id, 'sender_id': request_user.id})
+                    'invite_id': invite.id})
+            return invite
         else:
             raise ValidationError(USER_CAN_NOT_INVITE_TO_THIS_EVENT_ERROR, HTTP_403_FORBIDDEN)
 
-        invite = self.model(recipient = invite_user, event = event, sender = request_user)
-        return invite.save()
 
 
 

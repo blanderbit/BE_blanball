@@ -27,4 +27,4 @@ def delete_event(sender: Event, instance, **kwargs) -> None:
 def after_send_request_to_PARTICIPATION(sender: RequestToParticipation, instance, **kwargs) -> None:
     send_to_user(user = instance.event.author, notification_text =
     NEW_REQUEST_TO_PARTICIPATION.format(author_name = instance.event.author.profile.name, event_id = instance.event.id),
-    message_type = NEW_REQUEST_TO_PARTICIPATION_MESSAGE_TYPE, data = {'event_id': instance.event.id, 'user_id': current_request().user.id})
+    message_type = NEW_REQUEST_TO_PARTICIPATION_MESSAGE_TYPE, data = {'request_id': instance.id})

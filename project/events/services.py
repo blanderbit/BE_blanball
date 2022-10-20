@@ -32,7 +32,7 @@ from events.constaints import (
     RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION, RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_MESSAGE_TYPE,
     INVITE_USER_TO_EVENT_MESSAGE_TYPE, INVITE_USER_NOTIFICATION, SENT_INVATION_ERROR,
     GET_PLANNED_EVENTS_ERROR, AUTHOR_CAN_NOT_INVITE_ERROR, RESPONSE_TO_THE_INVITE_TO_EVENT, 
-    RESPONSE_TO_THE_INVITE_TO_EVENT_MESSAGE_TYPE,
+    RESPONSE_TO_THE_INVITE_TO_EVENT_MESSAGE_TYPE, USER_REMOVE_FROM_EVENT, USER_REMOVE_FROM_EVENT_MESSAGE_TYPE
 )
 from notifications.tasks import send_to_user
 
@@ -128,6 +128,8 @@ def validate_user_before_join_to_event(*, user: User, event: Event) -> None:
         raise ValidationError(ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR, HTTP_400_BAD_REQUEST)
     if event.author.id == user.id:
         raise ValidationError(EVENT_AUTHOR_CAN_NOT_JOIN_ERROR, HTTP_400_BAD_REQUEST)
+    if user in event.black_list.all():
+        raise PermissionDenied()
     if RequestToParticipation.objects.filter(user = user,event = event.id, event_author = event.author):
         raise ValidationError(ALREADY_SENT_REQUEST_TO_PARTICIPATE, HTTP_400_BAD_REQUEST)
 
@@ -172,3 +174,22 @@ def only_author(Object):
                 return Response({'error': f'{json.dumps(Object.__name__)} not found'}, status = HTTP_404_NOT_FOUND)
         return called
     return wrap
+
+
+def not_in_black_list(func: Callable[[Request, int, ...], Response]) -> Callable[[Request, int, ...], Response]:
+    def wrap(self, request: Request, pk: int, *args: Any, **kwargs: Any) -> Any:
+        try:
+            if request.user in Event.objects.get(id = pk).black_list.all():
+                raise PermissionDenied()
+            return func(self, request, pk, *args, **kwargs)
+        except Event.DoesNotExist:
+            return Response(EVENT_NOT_FOUND_ERROR, HTTP_404_NOT_FOUND)
+        
+    return wrap
+
+def remove_user_from_event(*, user: User, event: Event, reason: str) -> None:
+    user.current_rooms.remove(event)
+    event.black_list.add(user)
+    send_to_user(user = user, notification_text = USER_REMOVE_FROM_EVENT.format(
+        event_id = event.id, reason = reason), message_type = USER_REMOVE_FROM_EVENT_MESSAGE_TYPE, 
+        data = {'event_id': event.id})

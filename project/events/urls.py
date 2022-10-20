@@ -1,6 +1,6 @@
 from events.views import (
     CreateEvent,
-    GetDeleteEvent,
+    GetEvent,
     UpdateEvent,
     EventList,
     DeleteEvents,
@@ -12,12 +12,13 @@ from events.views import (
     EventsRelevantList,
     UserEventsRelevantList,
     UserPlannedEvents,
-    PopularIvents,
+    PopularEvents,
     InviteUserToEvent,
     RequestToParticipationsList,
     BulkAcceptOrDeclineRequestToParticipation,
     BulkAcceptOrDeclineInvitesToEvent,
     InvitesToEventList,
+    RemoveUserFromEvent,
 )
 
 from django.urls import path
@@ -27,8 +28,8 @@ urlpatterns = [
     path('client/event/create', CreateEvent.as_view(), 
         name = 'event-create'),
     # endpoint where user can get,delete event
-    path('client/event/<int:pk>', GetDeleteEvent.as_view(),
-        name = 'get-delete-event'),
+    path('client/event/<int:pk>', GetEvent.as_view(),
+        name = 'get-event'),
       #endpoint where user can get list of events
     path('client/invites/to/events/list', InvitesToEventList.as_view(), 
         name = 'invites-to-events-list'),
@@ -66,7 +67,7 @@ urlpatterns = [
     path('client/user/planned/events/list/<int:pk>', UserPlannedEvents.as_view(), 
         name = 'user-planned-events-list'),
     # endpoint where a user can get list of the most popular events
-    path('client/popular/events/list', PopularIvents.as_view(), 
+    path('client/popular/events/list', PopularEvents.as_view(), 
         name = 'popular-events-list'),
     #endpoint where a user can invite other user to ivent
     path('client/invite/user/to/event', InviteUserToEvent.as_view(), 
@@ -79,4 +80,8 @@ urlpatterns = [
         name = 'accept-decline-participations'),
     path('client/accept/or/decline/invites/to/events', BulkAcceptOrDeclineInvitesToEvent.as_view(), 
         name = 'accept-decline-invites-to-event'),
+
+    # endpoint where user can remove player from his event
+    path('client/remove/user/from/event', RemoveUserFromEvent.as_view(),
+        name = 'remove-user-from-event'),
 ]

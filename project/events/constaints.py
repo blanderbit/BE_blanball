@@ -55,3 +55,9 @@ EVENT_TEMPLATE_NOT_FOUND_ERROR: dict[str, str] = {'error': 'Event template not f
 
 SEND_INVATION_ERROR: dict[str, str] = {'error': 'You cannot invite users to this event'}
 
+USER_IN_BLACK_LIST_ERROR: dict[str, str] = {'error': 'This user cannot be invited to this event'}
+
+USER_REMOVE_FROM_EVENT_MESSAGE_TYPE: str = 'remove_from_event'
+USER_REMOVE_FROM_EVENT: str = 'You have been removed from the event №{event_id} for a reason - {reason}'
+
+USER_REMOVED_FROM_EVENT_SUCCESS: dict[str, str] = {'success': 'User removed from your event'}
