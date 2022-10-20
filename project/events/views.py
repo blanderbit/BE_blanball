@@ -86,6 +86,7 @@ from events.constants import (
     USER_REMOVED_FROM_EVENT_SUCCESS, LEAVE_USER_FROM_THE_EVENT_MESSAGE_TYPE
 
 )
+
 from authentication.constants import (
     NO_SUCH_USER_ERROR, NO_PERMISSIONS_ERROR
 )
