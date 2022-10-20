@@ -185,16 +185,17 @@ class InviteToEventManager(models.Manager):
             raise ValidationError(USER_IN_BLACK_LIST_ERROR, HTTP_403_FORBIDDEN)
 
         if request_user.id == event.author.id or request_user.id in event.current_users.all():
+            invite = self.model(recipient = invite_user, event = event, sender = request_user)
+            invite.save()
             send_to_user(user = invite_user, notification_text =
                 INVITE_USER_NOTIFICATION.format(user_name = invite_user.profile.name,
                 inviter_name = request_user.profile.name, event_id = event.id),
                 message_type = INVITE_USER_TO_EVENT_MESSAGE_TYPE, data = {
-                    'event_id': event.id, 'sender_id': request_user.id})
+                    'invite_id': invite.id})
+            return invite
         else:
             raise ValidationError(USER_CAN_NOT_INVITE_TO_THIS_EVENT_ERROR, HTTP_403_FORBIDDEN)
 
-        invite = self.model(recipient = invite_user, event = event, sender = request_user)
-        return invite.save()
 
 
 class InviteToEvent(models.Model):
