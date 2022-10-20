@@ -117,22 +117,22 @@ def event_create(*, data: Union[dict[str, Any], OrderedDict[str, Any]], request_
 def send_notification_to_subscribe_event_user(*, event: Event, notification_text: str, message_type: str) -> None:
     for user in event.current_users.all():
         send_to_user(user = user, notification_text = f'{user.profile.name},{notification_text}', 
-            message_type = message_type)
+            message_type = message_type, data = {'event_id': event.id})
     for fan in event.current_fans.all():
         send_to_user(user = fan, notification_text = f'{fan.profile.name},{notification_text}', 
-            message_type = message_type)
+            message_type = message_type, data = {'event_id': event.id})
 
 def validate_user_before_join_to_event(*, user: User, event: Event) -> None:
     if user.current_rooms.filter(id = event.id).exists():
         raise ValidationError(ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, HTTP_400_BAD_REQUEST)
     if user.current_views_rooms.filter(id = event.id).exists():
         raise ValidationError(ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR, HTTP_400_BAD_REQUEST)
-    if event.author.id == user.id:
-        raise ValidationError(EVENT_AUTHOR_CAN_NOT_JOIN_ERROR, HTTP_400_BAD_REQUEST)
+    # if event.author.id == user.id:
+    #     raise ValidationError(EVENT_AUTHOR_CAN_NOT_JOIN_ERROR, HTTP_400_BAD_REQUEST)
     if user in event.black_list.all():
         raise PermissionDenied()
-    if RequestToParticipation.objects.filter(user = user,event = event.id, event_author = event.author):
-        raise ValidationError(ALREADY_SENT_REQUEST_TO_PARTICIPATE, HTTP_400_BAD_REQUEST)
+    # if RequestToParticipation.objects.filter(user = user,event = event.id, event_author = event.author):
+    #     raise ValidationError(ALREADY_SENT_REQUEST_TO_PARTICIPATE, HTTP_400_BAD_REQUEST)
 
 def send_notification_to_event_author(*, event: Event) -> None:
     if event.amount_members > event.count_current_users:
@@ -141,8 +141,8 @@ def send_notification_to_event_author(*, event: Event) -> None:
         user_type: str = 'last'
     send_to_user(user = User.objects.get(id = event.author.id), notification_text=
         NEW_USER_ON_THE_EVENT_NOTIFICATION.format(author_name = event.author.profile.name, 
-        user_type = user_type,event_id = event.id),
-        message_type = NEW_USER_ON_THE_EVENT_MESSAGE_TYPE)
+        user_type = user_type, event_id = event.id),
+        message_type = NEW_USER_ON_THE_EVENT_MESSAGE_TYPE, data = {'event_id': event.id})
 
 
 def validate_get_user_planned_events(*, pk: int, request_user: User ) -> None:
@@ -191,4 +191,5 @@ def remove_user_from_event(*, user: User, event: Event, reason: str) -> None:
     user.current_rooms.remove(event)
     event.black_list.add(user)
     send_to_user(user = user, notification_text = USER_REMOVE_FROM_EVENT.format(
-        event_id = event.id, reason = reason), message_type = USER_REMOVE_FROM_EVENT_MESSAGE_TYPE)
+        event_id = event.id, reason = reason), message_type = USER_REMOVE_FROM_EVENT_MESSAGE_TYPE, 
+        data = {'event_id': event.id})

@@ -70,6 +70,7 @@ class UserConsumer(AsyncWebsocketConsumer):
             'message': event['message'],
             'date_time': str(timezone.now()),
             'message_type': event['message_type'],
+            'data': event['data']
         }, ensure_ascii = False).encode('utf-8')
 
         await self.send(text_data.decode())

@@ -83,7 +83,7 @@ from events.constants import (
     APPLICATION_FOR_PARTICIPATION_SUCCESS, NO_IN_EVENT_FANS_LIST_ERROR, DISCONNECT_FROM_EVENT_SUCCESS, 
     EVENT_TEMPLATE_UPDATE_SUCCESS, EVENT_TEMPLATE_NOT_FOUND_ERROR, LEAVE_USER_FROM_THE_EVENT_NOTIFICATION, 
     NO_IN_EVENT_MEMBERS_LIST_ERROR, EVENT_UPDATE_TEXT, AUTHOR_CAN_NOT_INVITE_ERROR, EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,
-    USER_REMOVED_FROM_EVENT_SUCCESS
+    USER_REMOVED_FROM_EVENT_SUCCESS, LEAVE_USER_FROM_THE_EVENT_MESSAGE_TYPE
 
 )
 from authentication.constants import (
@@ -254,9 +254,9 @@ class LeaveFromEvent(GenericAPIView):
         event: Event = Event.objects.get(id = serializer.data['event_id'])
         if user.current_rooms.filter(id = serializer.data['event_id']).exists():
             user.current_rooms.remove(event)
-            send_to_user(user = event.author, notification_text=
+            send_to_user(user = event.author, notification_text =
                 LEAVE_USER_FROM_THE_EVENT_NOTIFICATION.format(author_name = event.author.profile.name, event_id = event.id),
-                message_type = NEW_REQUEST_TO_PARTICIPATION_MESSAGE_TYPE)
+                message_type = LEAVE_USER_FROM_THE_EVENT_MESSAGE_TYPE)
             return Response(DISCONNECT_FROM_EVENT_SUCCESS, status = HTTP_200_OK)
         return Response(NO_IN_EVENT_MEMBERS_LIST_ERROR, status = HTTP_400_BAD_REQUEST)
 

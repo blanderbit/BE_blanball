@@ -35,6 +35,7 @@ EVENT_TIME_NOTIFICATION_TEXT: dict[str, str] = 'Before the start of the event un
 ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR: dict[str, str] = {'error': 
     'You cannot join the event as a player because you are already a member of the event as a spectator'}
 LEAVE_USER_FROM_THE_EVENT_NOTIFICATION: dict[str, str] = '{author_name},from your event under {event_id} player disconnected'
+LEAVE_USER_FROM_THE_EVENT_MESSAGE_TYPE: str = 'leave_from_the_event'
 NO_PRICE_DESK_ERROR: dict[str, str] = {'error': 'If the price is greater than 0 you must provide a description of what it is for'}
 
 USER_REMOVED_FROM_EVENT_SUCCESS: dict[str, str] = {'success': 'User removed from your event'}

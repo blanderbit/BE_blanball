@@ -188,7 +188,8 @@ class InviteToEventManager(models.Manager):
             send_to_user(user = invite_user, notification_text =
                 INVITE_USER_NOTIFICATION.format(user_name = invite_user.profile.name,
                 inviter_name = request_user.profile.name, event_id = event.id),
-                message_type = INVITE_USER_TO_EVENT_MESSAGE_TYPE)
+                message_type = INVITE_USER_TO_EVENT_MESSAGE_TYPE, data = {
+                    'event_id': event.id, 'sender_id': request_user.id})
         else:
             raise ValidationError(USER_CAN_NOT_INVITE_TO_THIS_EVENT_ERROR, HTTP_403_FORBIDDEN)
 

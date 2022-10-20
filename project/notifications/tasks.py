@@ -7,7 +7,8 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
 
-def send_to_user(user: User, notification_text: str, message_type: str) -> None:
+def send_to_user(user: User, notification_text: str, 
+        message_type: str, data: dict[str, int] = None) -> None:
     channel_layer = get_channel_layer()
     Notification.objects.create(user = user, notification_text = notification_text)
     async_to_sync(channel_layer.group_send)(
@@ -16,5 +17,6 @@ def send_to_user(user: User, notification_text: str, message_type: str) -> None:
             'type': 'kafka.message',
             'message': notification_text,
             'message_type': message_type, 
+            'data': data
         }
     )
