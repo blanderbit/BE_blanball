@@ -10,8 +10,10 @@ from events.constaints import (
     EVENT_DELETE_MESSAGE_TYPE, EVENT_DELETE_TEXT, NEW_REQUEST_TO_PARTICIPATION, NEW_REQUEST_TO_PARTICIPATION_MESSAGE_TYPE
 )
 
-from django.db.models.signals import pre_delete, post_save
+from django.db.models.signals import pre_delete, post_save, m2m_changed, pre_save
 from django.dispatch import receiver
+
+from events.middlewares import current_request
 
 
 @receiver(pre_delete, sender = Event)
@@ -23,6 +25,6 @@ def delete_event(sender: Event, instance, **kwargs) -> None:
 
 @receiver(post_save, sender = RequestToParticipation)
 def after_send_request_to_PARTICIPATION(sender: RequestToParticipation, instance, **kwargs) -> None:
-    send_to_user(user = instance.event.author, notification_text=
+    send_to_user(user = instance.event.author, notification_text =
     NEW_REQUEST_TO_PARTICIPATION.format(author_name = instance.event.author.profile.name, event_id = instance.event.id),
-    message_type = NEW_REQUEST_TO_PARTICIPATION_MESSAGE_TYPE)
+    message_type = NEW_REQUEST_TO_PARTICIPATION_MESSAGE_TYPE, data = {'event_id': instance.event.id, 'user_id': current_request().user.id})

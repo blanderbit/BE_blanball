@@ -21,7 +21,6 @@ from events.serializers import (
 )
 from events.services import (
     validate_user_before_join_to_event,
-    validate_invited_users,
     event_create,
     filter_event_by_user_planned_events_time,
     bulk_delete_events,
@@ -83,20 +82,8 @@ class CreateEvent(GenericAPIView):
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
-        validate_invited_users(request_user = request.user, users = serializer.validated_data['current_users'])
         data: dict[str, Any] = event_create(data = serializer.validated_data, request_user = request.user)
         return Response(data, status = HTTP_201_CREATED)
-        
-
-    def perform_create(self, serializer: CreateEventSerializer) -> None:
-        serializer.validated_data.pop('current_users')
-        try:
-            contact_number: str = serializer.validated_data['contact_number']
-        except:
-            contact_number: str = User.objects.get(id = self.request.user.id).phone
-        serializer.save(author = self.request.user, date_and_time = 
-        pandas.to_datetime(serializer.validated_data['date_and_time'].isoformat()).round('1min').to_pydatetime(),
-        contact_number = contact_number)        
 
 class InviteUserToEvent(GenericAPIView):
     serializer_class = InviteUserToEventSerializer
