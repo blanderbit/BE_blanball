@@ -15,6 +15,7 @@ RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_MESSAGE_TYPE: str = 'response_to_reque
 RESPONSE_TO_THE_INVITE_TO_EVENT: str = '{user_name},your user @{recipient_name} {recipient_last_name} invitation to the event №{event_id} was {response_type}'
 RESPONSE_TO_THE_INVITE_TO_EVENT_MESSAGE_TYPE: str = 'response_to_invite_user_to_event' 
 
+USER_CAN_NOT_INVITE_TO_THIS_EVENT_ERROR: dict[str, str] = {'error': 'You cannot invite users to this event'}
 
 EVENT_DELETED_SUCCESS: dict[str, str] = {'success':  'Event deleted'}
 EVENT_UPDATE_SUCCESS: dict[str, str] = {'success': 'Event updated'}

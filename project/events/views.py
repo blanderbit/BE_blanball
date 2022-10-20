@@ -161,7 +161,7 @@ class JoinToEvent(GenericAPIView):
         validate_user_before_join_to_event(user = user, event = event)
         if not event.privacy:
             user.current_rooms.add(event)
-            send_notification_to_event_author(event)
+            send_notification_to_event_author(event = event)
             return Response(JOIN_TO_EVENT_SUCCESS, status = HTTP_200_OK)
         else:
             send_to_user(user = event.author, notification_text=

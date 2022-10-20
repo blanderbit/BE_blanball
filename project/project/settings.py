@@ -8,6 +8,7 @@ from typing import Union,Any
 from pathlib import Path
 from decouple import config, Csv
 
+
 django.utils.encoding.smart_text = smart_str
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +27,7 @@ CODE_EXPIRE_MINUTES_TIME: int = config('CODE_EXPIRE_MINUTES_TIME', cast = int)
 STATIC_URL: str = '/api/static/'
 STATIC_ROOT: str = os.path.join(BASE_DIR, 'static/')
 
-PAGINATION_PAGE_SIZE = config('PAGINATION_PAGE_SIZE', cast = int)
+PAGINATION_PAGE_SIZE: int = config('PAGINATION_PAGE_SIZE', cast = int)
 
 SECRET_KEY: str = config('SECRET_KEY', cast = str)
 
@@ -42,8 +43,7 @@ AUTH_USER_MODEL: str = config('AUTH_USER_MODEL', cast = str)
 ALLOWED_HOSTS: list[str] = config('ALLOWED_HOSTS', cast = Csv())
 
 # Application definition:
-INSTALLED_APPS: tuple[str] = (
-    # Default django apps:
+INSTALLED_APPS: list[str] = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -65,10 +65,10 @@ INSTALLED_APPS: tuple[str] = (
     'authentication.apps.AuthenticationConfig',
     'notifications.apps.NotificationsConfig',
     'reviews.apps.ReviewsConfig',
-)
+]
 
 
-MIDDLEWARE: tuple[str] = (
+MIDDLEWARE: list[str] = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -78,7 +78,9 @@ MIDDLEWARE: tuple[str] = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-)
+
+    'events.middlewares.RequestMiddleware',
+]
 
 
 #conected datdabse settings
@@ -148,7 +150,7 @@ SWAGGER_SETTINGS: dict[str, Any] = {
 
 
 
-TEMPLATES: list[dict[str,Any]] = [
+TEMPLATES: list[dict[str, Any]] = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(BASE_DIR, 'templates')],
@@ -165,7 +167,7 @@ TEMPLATES: list[dict[str,Any]] = [
 ]
 
 
-AUTH_PASSWORD_VALIDATORS: tuple[dict[str, str]] = (
+AUTH_PASSWORD_VALIDATORS: list[dict[str, str]] = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
@@ -178,7 +180,7 @@ AUTH_PASSWORD_VALIDATORS: tuple[dict[str, str]] = (
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
-)
+]
 
 REST_FRAMEWORK: dict[str, Any]  = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -191,6 +193,7 @@ REST_FRAMEWORK: dict[str, Any]  = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
+    'DEFAULT_PAGINATION_CLASS': 'project.pagination.CustomPagination',
 }
 
 SIMPLE_JWT: dict[str, Any] = {
@@ -225,18 +228,18 @@ FTP_STORAGE_LOCATION: str = 'ftp://' + FTP_USER + ':' + FTP_PASS + '@ftp-server:
 
 ALGORITHM: str = config('ALGORITHM', cast = str)
 
-CORS_ALLOWED_ORIGINS: tuple[str] = (
+CORS_ALLOWED_ORIGINS: list[str] = [
     'http://localhost:5173', 
     'http://178.151.201.167:49201',
-)
-CORS_ALLOW_METHODS: tuple[str] = (
+]
+CORS_ALLOW_METHODS: list[str] = [
     'DELETE',
     'GET',
     'OPTIONS',
     'POST',
     'PUT',
-)
-CORS_ALLOW_HEADERS = [
+]
+CORS_ALLOW_HEADERS: list[str] = [
     'accept',
     'accept-encoding',
     'authorization',

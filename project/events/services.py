@@ -128,8 +128,6 @@ def validate_user_before_join_to_event(*, user: User, event: Event) -> None:
         raise ValidationError(ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR, HTTP_400_BAD_REQUEST)
     if event.author.id == user.id:
         raise ValidationError(EVENT_AUTHOR_CAN_NOT_JOIN_ERROR, HTTP_400_BAD_REQUEST)
-    if user in event.black_list.all():
-        raise PermissionDenied()
     if RequestToParticipation.objects.filter(user = user,event = event.id, event_author = event.author):
         raise ValidationError(ALREADY_SENT_REQUEST_TO_PARTICIPATE, HTTP_400_BAD_REQUEST)
 
