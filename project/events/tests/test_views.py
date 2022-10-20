@@ -255,8 +255,8 @@ class TestEventsViews(SetUpEventsViews):
         self.client.force_authenticate(None)
         self.auth()
         accept_request_to_participation = self.client.post(reverse('accept-decline-participations'), {
-            "requests": [RequestToParticipation.objects.first().id],
-            "type": True
+            'ids': [RequestToParticipation.objects.first().id],
+            'type': True
         })
         print(accept_request_to_participation.data)
         self.assertEqual(Event.objects.first().count_current_users, 1)
