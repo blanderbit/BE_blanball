@@ -65,4 +65,4 @@ class UserAgeRangeFilter(filters.FilterSet):
 
     class Meta:
         model: User = User
-        fields = ['profile__age', 'profile__position', 'profile__gender']
+        fields = ['profile__age', 'profile__position', 'profile__gender', 'is_online']

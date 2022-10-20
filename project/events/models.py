@@ -21,12 +21,14 @@ from notifications.tasks import (
 )
 from events.constants import (
     INVITE_USER_NOTIFICATION, INVITE_USER_TO_EVENT_MESSAGE_TYPE,
-    USER_CAN_NOT_INVITE_TO_THIS_EVENT_ERROR, 
+    USER_CAN_NOT_INVITE_TO_THIS_EVENT_ERROR, SENT_INVATION_ERROR,
+    AUTHOR_CAN_NOT_INVITE_ERROR, USER_IN_BLACK_LIST_ERROR
 )
 from rest_framework.serializers import ValidationError
 from rest_framework.status import (
     HTTP_403_FORBIDDEN,
 )
+
 
 class Event(models.Model):
     '''footbal ivent model'''
@@ -89,6 +91,7 @@ class Event(models.Model):
     status: str =  models.CharField(choices = Status.choices, max_length = 10, default = 'Planned')
     current_users: list[User] = models.ManyToManyField(User, related_name = 'current_rooms', blank = True)
     current_fans: list[User] = models.ManyToManyField(User, related_name = 'current_views_rooms', blank = True)
+    black_list: list[User] = models.ManyToManyField(User, related_name = 'black_list', blank = True)
 
     @property
     def count_current_users(self) -> int:
@@ -107,8 +110,9 @@ class Event(models.Model):
         return self.name
 
     @final
-    def get_event_list() -> QuerySet['Event']:
-        return Event.objects.all().select_related('author').prefetch_related('current_users', 'current_fans').order_by('-id')
+    @staticmethod
+    def get_all() -> QuerySet['Event']:
+        return Event.objects.all().filter().select_related('author').prefetch_related('current_users', 'current_fans').order_by('-id')
     
     class Meta:
         db_table: str = 'event'
@@ -131,7 +135,8 @@ class RequestToParticipation(models.Model):
         return self.user.email
 
     @final
-    def get_request_to_participation_list() -> QuerySet['RequestToParticipation']:
+    @staticmethod
+    def get_all() -> QuerySet['RequestToParticipation']:
         return RequestToParticipation.objects.all().select_related('user', 'event_author', 'event').order_by('-id')
     
     class Meta:
@@ -159,7 +164,8 @@ class EventTemplate(models.Model):
         return self.name
     
     @final
-    def get_event_template_list() -> QuerySet['EventTemplate']:
+    @staticmethod
+    def get_all() -> QuerySet['EventTemplate']:
         return EventTemplate.objects.all().select_related('author').order_by('-id')
 
     class Meta:
@@ -171,8 +177,15 @@ class InviteToEventManager(models.Manager):
 
     def send_invite(self, request_user: User, invite_user: User, event: Event) -> 'InviteToEvent':
 
-        if request_user.id == event.author.id or request_user.id not in event.current_users.all():
-            send_to_user(user = invite_user, notification_text=
+        if invite_user.id == request_user.id:
+            raise ValidationError(SENT_INVATION_ERROR, HTTP_403_FORBIDDEN)
+        if invite_user.id == event.author.id:
+            raise ValidationError(AUTHOR_CAN_NOT_INVITE_ERROR, HTTP_403_FORBIDDEN)
+        if invite_user in event.black_list.all():
+            raise ValidationError(USER_IN_BLACK_LIST_ERROR, HTTP_403_FORBIDDEN)
+
+        if request_user.id == event.author.id or request_user.id in event.current_users.all():
+            send_to_user(user = invite_user, notification_text =
                 INVITE_USER_NOTIFICATION.format(user_name = invite_user.profile.name,
                 inviter_name = request_user.profile.name, event_id = event.id),
                 message_type = INVITE_USER_TO_EVENT_MESSAGE_TYPE)
@@ -200,7 +213,8 @@ class InviteToEvent(models.Model):
         return self.recipient.profile.name
 
     @final
-    def get_invite_to_event_list() -> QuerySet['InviteToEvent']:
+    @staticmethod
+    def get_all() -> QuerySet['InviteToEvent']:
         return InviteToEvent.objects.all().select_related('recipient', 'event', 'sender').order_by('-id')
 
     class Meta:

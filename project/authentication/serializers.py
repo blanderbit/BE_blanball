@@ -36,6 +36,7 @@ class EventUsersProfileSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model: Profile = Profile
         fields: Union[str, list[str]] = [
+            'id',
             'name',
             'last_name',
             'avatar',

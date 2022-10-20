@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from typing import Union
+from typing import Any, Union
 
 from events.models import (
     Event,
@@ -14,13 +14,14 @@ from rest_framework import serializers
 from rest_framework.status import (
     HTTP_404_NOT_FOUND,
     HTTP_400_BAD_REQUEST,
+    HTTP_403_FORBIDDEN,
 )
 
 from events.validators import EventDateTimeValidator
 
 from events.constants import (
     EVENT_TIME_EXPIRED_ERROR, NO_EVENT_PLACE_ERROR, EVENT_NOT_FOUND_ERROR, AUTHOR_CAN_NOT_INVITE_ERROR,
-    ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, ALREADY_IN_EVENT_FANS_LIST_ERROR, 
+    ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, ALREADY_IN_EVENT_FANS_LIST_ERROR, NO_IN_EVENT_MEMBERS_LIST_ERROR,
 )
 from authentication.constants import (
     NO_SUCH_USER_ERROR,
@@ -36,6 +37,7 @@ class CreateEventSerializer(serializers.ModelSerializer):
             'author',
             'status',
             'current_fans',
+            'black_list',
         ]
 
 
@@ -89,6 +91,7 @@ class UpdateEventSerializer(serializers.ModelSerializer):
             'status',
             'current_fans',
             'current_users',
+            'black_list',
         ]
 
     def update(self, instance, validated_data: dict) -> OrderedDict:
@@ -198,14 +201,12 @@ class InviteUserToEventSerializer(serializers.Serializer):
             'user_id',
         ]
 
-    def validate(self, attrs) -> OrderedDict:
+    def validate(self, attrs) -> OrderedDict[str, Any]:
         try:
             invite_user: User = User.objects.get(id = attrs.get('user_id'))
             event: Event = Event.objects.get(id = attrs.get('event_id'))
             if event.status == 'Finished':
                 raise serializers.ValidationError(EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST)
-            if invite_user.id == Event.objects.get(id = event.id).author.id:
-                raise serializers.ValidationError(AUTHOR_CAN_NOT_INVITE_ERROR , HTTP_400_BAD_REQUEST)
             if invite_user.current_rooms.filter(id = event.id).exists():
                 raise serializers.ValidationError(ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, HTTP_400_BAD_REQUEST)
             if invite_user.current_views_rooms.filter(id = event.id).exists():
@@ -214,8 +215,34 @@ class InviteUserToEventSerializer(serializers.Serializer):
         except User.DoesNotExist:
             raise serializers.ValidationError(NO_SUCH_USER_ERROR, HTTP_404_NOT_FOUND)
         except Event.DoesNotExist:
-            raise serializers.ValidationError(EVENT_NOT_FOUND_ERROR, status = HTTP_404_NOT_FOUND)
+            raise serializers.ValidationError(EVENT_NOT_FOUND_ERROR, HTTP_404_NOT_FOUND)
 
+
+class RemoveUserFromEventSerializer(serializers.Serializer):
+    user_id: int = serializers.IntegerField(min_value = 0)
+    event_id: int = serializers.IntegerField(min_value = 0)
+    reason: str =  serializers.CharField(max_length = 255)
+
+    class Meta:
+        fields: Union[str, list[str]] = [
+            'event_id',
+            'user_id',
+            'reason',
+        ]
+
+    def validate(self, attrs) -> OrderedDict[str, Any]:
+        try:
+            removed_user: User = User.objects.get(id = attrs.get('user_id'))
+            event: Event = Event.objects.get(id = attrs.get('event_id'))
+            if event.status == 'Finished':
+                raise serializers.ValidationError(EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST)
+            if not removed_user.current_rooms.filter(id = event.id).exists():
+                raise serializers.ValidationError(NO_IN_EVENT_MEMBERS_LIST_ERROR, HTTP_400_BAD_REQUEST)
+            return super().validate(attrs)
+        except User.DoesNotExist:
+            raise serializers.ValidationError(NO_SUCH_USER_ERROR, HTTP_404_NOT_FOUND)
+        except Event.DoesNotExist:
+            raise serializers.ValidationError(EVENT_NOT_FOUND_ERROR, HTTP_404_NOT_FOUND)
 
 class RequestToParticipationSerializer(serializers.ModelSerializer):
     user = EventUsersSerializer()

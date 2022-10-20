@@ -27,6 +27,7 @@ from events.views import (
     UserEventsSceduler,
     InvitesToEventList,
     BulkAcceptOrDeclineInvitesToEvent,
+    RemoveUserFromEvent,
 )
 
 from django.urls import path
@@ -76,6 +77,9 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     # endpoint where user can join to event 
     path('client/event/join', JoinToEvent.as_view(),
         name = 'join-to-event'),
+    # endpoint where user can remove player from his event
+    path('client/remove/user/from/event', RemoveUserFromEvent.as_view(),
+        name = 'remove-user-from-event'),
     # endpoint where user can leave from event 
     path('client/event/leave', LeaveFromEvent.as_view(), 
         name = 'leave-from-event'),

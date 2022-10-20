@@ -27,8 +27,8 @@ EVENT_TIME_EXPIRED_ERROR: dict[str, str] = {'error': 'Event time expired'}
 BAD_EVENT_TIME_CREATE_ERROR: dict[str, str] = {'error': 'The time of the event must differ from the minimum by an hour'}
 ALREADY_IN_EVENT_MEMBERS_LIST_ERROR: dict[str, str] = {'error': 'Already in the event members list'}
 ALREADY_IN_EVENT_FANS_LIST_ERROR: dict[str, str] = {'error': 'Already in the event fans list'}
-NO_IN_EVENT_MEMBERS_LIST_ERROR: dict[str, str] = {'error': 'You are not in event members list'}
-NO_IN_EVENT_FANS_LIST_ERROR: dict[str, str] = {'error': 'You are not in event fans list'}
+NO_IN_EVENT_MEMBERS_LIST_ERROR: dict[str, str] = {'error': 'Not in event members list'}
+NO_IN_EVENT_FANS_LIST_ERROR: dict[str, str] = {'error': 'Not in event fans list'}
 PASSWORD_CHANGE_ERROR: dict[str, str] = {'error': 'Password not change'}
 NO_EVENT_PLACE_ERROR: dict[str, str] = {'error': 'No place'}
 EVENT_TIME_NOTIFICATION_TEXT: dict[str, str] = 'Before the start of the event under the number {event_id} remained {time}. Dont forget to participate!'
@@ -36,6 +36,8 @@ ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR: dict[str, str] = {'error':
     'You cannot join the event as a player because you are already a member of the event as a spectator'}
 LEAVE_USER_FROM_THE_EVENT_NOTIFICATION: dict[str, str] = '{author_name},from your event under {event_id} player disconnected'
 NO_PRICE_DESK_ERROR: dict[str, str] = {'error': 'If the price is greater than 0 you must provide a description of what it is for'}
+
+USER_REMOVED_FROM_EVENT_SUCCESS: dict[str, str] = {'success': 'User removed from your event'}
 
 EVENT_TIME_NOTIFICATION_MESSAGE_TYPE: str ='event_time_notification'
 INVITE_USER_TO_EVENT_MESSAGE_TYPE: str = 'invite_user_to_event'
@@ -52,3 +54,8 @@ EVENT_TEMPLATE_UPDATE_SUCCESS: dict[str, str] = {'success': 'Event template upda
 EVENT_TEMPLATE_NOT_FOUND_ERROR: dict[str, str] = {'error': 'Event template not found'}
 
 USER_CAN_NOT_INVITE_TO_THIS_EVENT_ERROR: dict[str, str] = {'error': 'You cannot invite users to this event'}
+
+USER_REMOVE_FROM_EVENT: str = 'You have been removed from the event №{event_id} for a reason - {reason}'
+USER_REMOVE_FROM_EVENT_MESSAGE_TYPE: str = 'remove_from_event'
+
+USER_IN_BLACK_LIST_ERROR: dict[str, str] = {'error': 'This user cannot be invited to this event'}
