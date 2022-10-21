@@ -1,7 +1,6 @@
 from notifications.models import Notification
 from authentication.models  import (
     User,
-    ActiveUser,
 )
 
 from asgiref.sync import async_to_sync

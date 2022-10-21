@@ -3,7 +3,6 @@ from typing import Any
 
 from authentication.models import (
     User,
-    ActiveUser,
 )
 
 from django.utils import timezone

@@ -76,7 +76,7 @@ from events.constaints import (
     LEAVE_USER_FROM_THE_EVENT_NOTIFICATION_MESSAGE_TYPE, USER_REMOVED_FROM_EVENT_SUCCESS
 
 )
-from authentication.constaints import (
+from authentication.constant.errors import (
     NO_SUCH_USER_ERROR, NO_PERMISSIONS_ERROR
 )
 
