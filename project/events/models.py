@@ -29,7 +29,6 @@ from rest_framework.status import (
     HTTP_403_FORBIDDEN,
 )
 
-
 class Event(models.Model):
     '''footbal ivent model'''
     
@@ -87,7 +86,7 @@ class Event(models.Model):
     need_form: bool = models.BooleanField()
     privacy: bool = models.BooleanField()
     duration: int = models.PositiveSmallIntegerField(choices = Duration.choices)
-    forms: list = models.CharField(choices = CloseType.choices, max_length = 15)
+    forms: str = models.CharField(choices = CloseType.choices, max_length = 15)
     status: str =  models.CharField(choices = Status.choices, max_length = 10, default = 'Planned')
     current_users: list[User] = models.ManyToManyField(User, related_name = 'current_rooms', blank = True)
     current_fans: list[User] = models.ManyToManyField(User, related_name = 'current_views_rooms', blank = True)

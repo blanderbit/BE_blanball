@@ -8,6 +8,8 @@ from typing import Any, final
 from PIL import Image
 
 from django.db import models
+from django.db.models.query import QuerySet
+
 from django.contrib.auth.models import AbstractBaseUser
 from django.utils import timezone
 from django.core.validators import (
@@ -146,6 +148,11 @@ class User(AbstractBaseUser):
         return self.email
 
     @final
+    @staticmethod
+    def get_all() -> QuerySet['User']:
+        return User.objects.all().select_related('profile').order_by('-id')
+
+    @final
     def tokens(self) -> dict[str, str]:
         refresh: RefreshToken = RefreshToken.for_user(self)
         access: AccessToken = AccessToken.for_user(self)
@@ -153,6 +160,7 @@ class User(AbstractBaseUser):
             'refresh': str(refresh),
             'access': str(access)
         }
+
     @property
     def group_name(self) -> str:
         return 'user_%s' % self.id

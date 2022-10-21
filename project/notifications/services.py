@@ -23,7 +23,7 @@ def update_maintenance(data: dict[str, str]) -> None:
     with open('./project/config.json', 'w') as f:
         f.write(json.dumps(json_data))
 
-        for user in User.objects.all():
+        for user in User.get_all():
             if json_data['isMaintenance'] == True:
                 notification_text = MAINTENANCE_TRUE_NOTIFICATION_TEXT.format(
                 username = user.profile.name)

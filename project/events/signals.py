@@ -14,8 +14,6 @@ from events.constants import (
 from django.db.models.signals import pre_delete, post_save, m2m_changed, pre_save
 from django.dispatch import receiver
 
-from events.middlewares import current_request
-
 
 @receiver(pre_delete, sender = Event)
 def delete_event(sender: Event, instance, **kwargs) -> None:

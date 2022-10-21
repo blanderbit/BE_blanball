@@ -114,7 +114,7 @@ class UserOwnerProfile(GenericAPIView):
 
 class UpdateProfile(GenericAPIView):
     serializer_class: Type[Serializer] = UpdateProfileSerializer
-    queryset: QuerySet[User] = User.objects.all()
+    queryset: QuerySet[User] = User.get_all()
 
     def put(self, request: Request) -> Response: 
         '''changing profile information'''
@@ -127,7 +127,7 @@ class UpdateProfile(GenericAPIView):
 class UserProfile(GenericAPIView):
     '''get public user profile'''
     serializer_class: Type[Serializer] = UserSerializer
-    queryset: QuerySet[User] = User.objects.all()
+    queryset: QuerySet[User] = User.get_all()
 
     def get(self, request: Request, pk: int) -> Response:
         '''getting a public user profile'''
@@ -151,13 +151,13 @@ class UserList(ListAPIView):
     filterset_class = UserAgeRangeFilter
     search_fields: list[str] = ['profile__name', 'profile__gender', 'profile__last_name']
     ordering_fields: list[str] = ['id', 'profile__age', 'raiting']
-    queryset: QuerySet[User] = User.objects.filter(role = 'User').select_related('profile').order_by('-id')
+    queryset: QuerySet[User] = User.get_all().filter(role = 'User')
 
 class UsersRelevantList(ListAPIView):
     '''getting the 5 most relevant users for your query'''
     filter_backends = [RankedFuzzySearchFilter, ]
     serializer_class: Type[Serializer] = UsersListSerializer
-    queryset: QuerySet[User] = User.objects.filter(role = 'User').select_related('profile')
+    queryset: QuerySet[User] = User.get_all().filter(role = 'User')
     search_fields: list[str] = ['profile__name', 'profile__last_name']
 
 class AdminUsersList(UserList):
