@@ -1,0 +1,1 @@
+REVIEW_CREATE_NOTIFICATION_TYPE: str = 'review_creaete'
