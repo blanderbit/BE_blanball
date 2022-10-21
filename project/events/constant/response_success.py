@@ -10,5 +10,3 @@ DISCONNECT_FROM_EVENT_SUCCESS: dict[str, str] = {'success': 'Dicsonnect from eve
 USER_REMOVED_FROM_EVENT_SUCCESS: dict[str, str] = {'success': 'User removed from your event'}
 
 SENT_INVATION_SUCCESS: dict[str, str] = {'success': 'Invation was sent'}
-
-EVENT_TEMPLATE_UPDATE_SUCCESS: dict[str, str] = {'success': 'Event template updated'}
