@@ -1,4 +1,3 @@
-from tkinter import E
 from types import NoneType
 from .set_up import SetUpEventsViews
 from rest_framework.status import (
@@ -125,12 +124,11 @@ class TestEventsViews(SetUpEventsViews):
         self.assertEqual(get_user_events_list.status_code, HTTP_200_OK)
         self.assertEqual(get_user_events_list_2.data['total_count'], 0)
         self.assertEqual(get_user_events_list_2.status_code, HTTP_200_OK)
-    
 
     @freeze_time('2022-9-29')
     def test_bulk_delete_events(self) -> None:
         self.create_events(10)
-        response = self.client.post(reverse('bulk-delete-events'), {'events': [Event.objects.first().id,
+        response = self.client.post(reverse('bulk-delete-events'), {'ids': [Event.objects.first().id,
         Event.objects.last().id]})
         self.assertEqual(Event.objects.count(), 8)
         self.assertEqual(response.status_code, HTTP_200_OK)
@@ -139,8 +137,8 @@ class TestEventsViews(SetUpEventsViews):
     def test_no_author_bulk_delete_events(self) -> None:
         self.create_events(10)
         self.register_second_user()
-        response = self.client.post(reverse('bulk-delete-events'), {'events': [Event.objects.first().id,
-        Event.objects.last().id]})
+        response = self.client.post(reverse('bulk-delete-events'), {'ids': [Event.objects.first().id,
+            Event.objects.last().id]})
         self.assertEqual(Event.objects.count(), 10)
         self.assertEqual(response.status_code, HTTP_200_OK)
     
@@ -223,7 +221,7 @@ class TestEventsViews(SetUpEventsViews):
         self.register_second_user()
         event_join = self.client.post(reverse('join-to-event'), {'event_id': Event.objects.first().id})
         self.assertEqual(Event.objects.first().count_current_users, 0)
-        self.assertEqual(Notification.objects.count(), 2)
+        self.assertEqual(Notification.objects.count(), 1)
         self.assertEqual(RequestToParticipation.objects.count(), 1)
         self.assertEqual(event_join.status_code, HTTP_200_OK)
 
@@ -257,10 +255,10 @@ class TestEventsViews(SetUpEventsViews):
         self.client.force_authenticate(None)
         self.auth()
         accept_request_to_participation = self.client.post(reverse('accept-decline-participations'), {
-            "requests": [RequestToParticipation.objects.first().id],
-            "type": True
+            'ids': [RequestToParticipation.objects.first().id],
+            'type': True
         })
-        # self.assertEqual(Event.objects.first().count_current_users, 1)
+        self.assertEqual(Event.objects.first().count_current_users, 1)
         self.assertEqual(event_join.status_code, HTTP_200_OK)
 
     

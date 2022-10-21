@@ -1,22 +1,31 @@
-from .serializers import *
-from .models import *
-from project.pagination import CustomPagination
+from typing import Type
+
+from reviews.serializers import (
+    CreateReviewSerializer,
+    ReviewListSerializer,
+)
+from reviews.models import (
+    Review,
+)
+
 from django.db.models.query import QuerySet
 
 from rest_framework.generics import (
     CreateAPIView,
     ListAPIView,
 )
+from rest_framework.serializers import (
+    Serializer,
+)
 
 
 class ReviewCreate(CreateAPIView):
-    serializer_class = CreateReviewSerializer
-    queryset = Review.objects.all().select_related('user')
+    serializer_class: Type[Serializer] = CreateReviewSerializer
+    queryset: QuerySet[Review] = Review.get_all()
 
 class UserReviewsList(ListAPIView):
-    serializer_class =  ReviewListSerializer
-    pagination_class = CustomPagination
-    queryset = Review.objects.all().select_related('user')
+    serializer_class: Type[Serializer] =  ReviewListSerializer
+    queryset: QuerySet[Review]  = Review.get_all()
 
-    def get_queryset(self) -> QuerySet:
-        return self.queryset.filter(user = self.request.user.id).order_by('-time_created')
+    def get_queryset(self) -> QuerySet[Review]:
+        return self.queryset.filter(user = self.request.user.id)
