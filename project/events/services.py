@@ -28,12 +28,17 @@ from events.models import (
     RequestToParticipation,
     InviteToEvent,
 )
-from events.constants import (
-    ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR, EVENT_AUTHOR_CAN_NOT_JOIN_ERROR, 
-    ALREADY_SENT_REQUEST_TO_PARTICIPATE, EVENT_NOT_FOUND_ERROR, NEW_USER_ON_THE_EVENT_MESSAGE_TYPE,
-    RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_MESSAGE_TYPE, RESPONSE_TO_THE_INVITE_TO_EVENT_MESSAGE_TYPE,
-    GET_PLANNED_EVENTS_ERROR, USER_REMOVE_FROM_EVENT_MESSAGE_TYPE,
+
+from events.constant.response_error import (
+    ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR, 
+    EVENT_AUTHOR_CAN_NOT_JOIN_ERROR, ALREADY_SENT_REQUEST_TO_PARTICIPATE_ERROR,
+    EVENT_NOT_FOUND_ERROR, GET_PLANNED_EVENTS_ERROR
 )
+from events.constant.notification_types import (
+    NEW_USER_ON_THE_EVENT_NOTIFICATION_TYPE, RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_NOTIFICATION_TYPE,
+    RESPONSE_TO_THE_INVITE_TO_EVENT_NOTIFICATION_TYPE, USER_REMOVE_FROM_EVENT_NOTIFICATION_TYPE 
+)
+
 from notifications.tasks import send_to_user
 
 bulk = TypeVar(Optional[Generator[list[dict[str, int]], None, None]])
@@ -66,7 +71,7 @@ def bulk_accept_or_decline_invites_to_events(*, data: dict[str, Union[list[int],
                         response_type: str = 'decline'
                     yield {'success': invite_id}
                     send_to_user(user = invite.sender,
-                    message_type = RESPONSE_TO_THE_INVITE_TO_EVENT_MESSAGE_TYPE,
+                    message_type = RESPONSE_TO_THE_INVITE_TO_EVENT_NOTIFICATION_TYPE,
                     data = {
                         'recipient': {
                             'id': invite.sender.id, 
@@ -104,7 +109,7 @@ def bulk_accpet_or_decline_requests_to_participation(*, data: dict[str, Union[li
                     response_type: str = 'declined'
                 yield {'success': request_id}
                 send_to_user(user = request_to_p.user,
-                    message_type = RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_MESSAGE_TYPE,
+                    message_type = RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_NOTIFICATION_TYPE,
                     data = {
                         'recipient': {
                             'id': request_to_p.user.id, 
@@ -187,11 +192,11 @@ def validate_user_before_join_to_event(*, user: User, event: Event) -> None:
     if user in event.black_list.all():
         raise PermissionDenied()
     if RequestToParticipation.objects.filter(user = user,event = event.id, event_author = event.author):
-        raise ValidationError(ALREADY_SENT_REQUEST_TO_PARTICIPATE, HTTP_400_BAD_REQUEST)
+        raise ValidationError(ALREADY_SENT_REQUEST_TO_PARTICIPATE_ERROR, HTTP_400_BAD_REQUEST)
 
 def send_notification_to_event_author(*, event: Event, request_user: User) -> None:
     send_to_user(user = User.objects.get(id = event.author.id), 
-        message_type = NEW_USER_ON_THE_EVENT_MESSAGE_TYPE, 
+        message_type = NEW_USER_ON_THE_EVENT_NOTIFICATION_TYPE, 
         data = {
             'recipient': {
                 'id': event.author.id, 
@@ -254,7 +259,7 @@ def not_in_black_list(func: Callable[[Request, int, ...], Response]) -> Callable
 def remove_user_from_event(*, user: User, event: Event, reason: str) -> None:
     user.current_rooms.remove(event)
     event.black_list.add(user)
-    send_to_user(user = user, message_type = USER_REMOVE_FROM_EVENT_MESSAGE_TYPE, 
+    send_to_user(user = user, message_type = USER_REMOVE_FROM_EVENT_NOTIFICATION_TYPE, 
         data = {
             'recipient': {
                 'id': user.id,

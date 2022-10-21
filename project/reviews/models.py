@@ -5,6 +5,8 @@ from datetime import datetime
 from authentication.models import User
 
 from django.db import models
+from django.db.models.query import QuerySet
+
 from django.core.validators import (
     MaxValueValidator,
     MinValueValidator,
@@ -23,6 +25,11 @@ class Review(models.Model):
     @final
     def __repr__ (self) -> str:
         return '<Review %s>' % self.id
+
+    @final
+    @staticmethod
+    def get_all() -> QuerySet['Review']:
+        return Review.objects.all().select_related('user').order_by('-id')
 
     @final
     def __str__(self) -> str:

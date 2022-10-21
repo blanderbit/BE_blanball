@@ -27,8 +27,8 @@ from rest_framework_simplejwt.tokens import (
 from rest_framework.serializers import ValidationError
 from rest_framework.status import HTTP_400_BAD_REQUEST
 
-from authentication.constants import (
-    MIN_AGE_VALUE_ERROR,MAX_AGE_VALUE_ERROR
+from authentication.constant.errors import (
+    MIN_AGE_VALUE_ERROR, MAX_AGE_VALUE_ERROR
 )
 
 
@@ -44,8 +44,8 @@ class UserManager(BaseUserManager):
 
 class Gender(models.TextChoices):
     '''gender choices'''
-    man: str = 'Man'
-    woomen: str = 'Woomen'
+    MAN: str = 'Man'
+    WOOMAN: str = 'Wooman'
 
 
 class Position(models.TextChoices):
@@ -70,8 +70,8 @@ class Position(models.TextChoices):
 
 class Role(models.TextChoices):
     '''role choices'''
-    user: str = 'User'
-    admin: str = 'Admin'
+    USER: str = 'User'
+    ADMIN: str = 'Admin'
 
 def validate_birthday(value: date) -> None:
     if timezone.now().date() - value > timezone.timedelta(days = 29200):

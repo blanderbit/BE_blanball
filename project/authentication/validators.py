@@ -5,9 +5,10 @@ from django.utils import timezone
 from rest_framework.status import  HTTP_400_BAD_REQUEST
 from rest_framework.serializers import ValidationError
 
-from authentication.constants import (
+from authentication.constant.errors import (
     BAD_CODE_ERROR, CODE_EXPIRED_ERROR,
 )
+
 
 class CodeValidator:
     def __init__(self, token_type: list[str]) -> None:

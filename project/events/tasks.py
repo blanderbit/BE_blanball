@@ -4,8 +4,8 @@ from events.models import (
 )
 from project.celery import app
 from events.services import send_notification_to_subscribe_event_user
-from events.constants import (
-    EVENT_TIME_NOTIFICATION_MESSAGE_TYPE,
+from events.constant.notification_types import (
+    EVENT_TIME_NOTIFICATION_TYPE,
 )
 
 from django.utils import timezone
@@ -15,17 +15,17 @@ def check_event_start_time() -> None:
     for event in Event.get_all():
         if event.date_and_time - timezone.now() == timezone.timedelta(minutes = 1440):
             send_notification_to_subscribe_event_user(event = event, 
-            message_type = EVENT_TIME_NOTIFICATION_MESSAGE_TYPE,
+            message_type = EVENT_TIME_NOTIFICATION_TYPE,
             start_time = event.date_and_time,
             time_to_start = 1440)
         elif event.date_and_time - timezone.now() == timezone.timedelta(minutes = 120):
             send_notification_to_subscribe_event_user(event = event, 
-            message_type = EVENT_TIME_NOTIFICATION_MESSAGE_TYPE,
+            message_type = EVENT_TIME_NOTIFICATION_TYPE,
             start_time = event.date_and_time,
             time_to_start = 120)
         elif event.date_and_time - timezone.now() == timezone.timedelta(minutes = 10):
             send_notification_to_subscribe_event_user(event = event, 
-            message_type = EVENT_TIME_NOTIFICATION_MESSAGE_TYPE,
+            message_type = EVENT_TIME_NOTIFICATION_TYPE,
             start_time = event.date_and_time,
             time_to_start = 10)
         elif event.date_and_time == timezone.now():
@@ -37,6 +37,6 @@ def check_event_start_time() -> None:
 
 @app.task
 def delete_requests_to_participation() -> None:
-    for request in RequestToParticipation.objects.all():
+    for request in RequestToParticipation.get_all():
         if request.event.status == 'Finished':
             request.delete()

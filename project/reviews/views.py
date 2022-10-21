@@ -22,11 +22,11 @@ from rest_framework.serializers import (
 
 class ReviewCreate(CreateAPIView):
     serializer_class: Type[Serializer] = CreateReviewSerializer
-    queryset: QuerySet[Review] = Review.objects.all().select_related('user')
+    queryset: QuerySet[Review] = Review.get_all()
 
 class UserReviewsList(ListAPIView):
     serializer_class: Type[Serializer] =  ReviewListSerializer
-    queryset: QuerySet[Review]  = Review.objects.all().select_related('user')
+    queryset: QuerySet[Review]  = Review.get_all()
 
     def get_queryset(self) -> QuerySet[Review]:
         return self.queryset.filter(user = self.request.user.id).order_by('-time_created')

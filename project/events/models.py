@@ -20,11 +20,14 @@ from phonenumber_field.modelfields import PhoneNumberField
 from notifications.tasks import (
     send_to_user,
 )
-from events.constants import (
-    INVITE_USER_TO_EVENT_MESSAGE_TYPE,
+from events.constant.response_error import (
     USER_CAN_NOT_INVITE_TO_THIS_EVENT_ERROR, SENT_INVATION_ERROR,
     AUTHOR_CAN_NOT_INVITE_ERROR, USER_IN_BLACK_LIST_ERROR
 )
+from events.constant.notification_types import (
+    INVITE_USER_TO_EVENT_NOTIFICATION_TYPEE
+)
+
 from rest_framework.serializers import ValidationError
 from rest_framework.status import (
     HTTP_403_FORBIDDEN,
@@ -187,7 +190,7 @@ class InviteToEventManager(models.Manager):
         if request_user.id == event.author.id or request_user.id in event.current_users.all():
             invite = self.model(recipient = invite_user, event = event, sender = request_user)
             invite.save()
-            send_to_user(user = invite_user, message_type = INVITE_USER_TO_EVENT_MESSAGE_TYPE, 
+            send_to_user(user = invite_user, message_type = INVITE_USER_TO_EVENT_NOTIFICATION_TYPEE, 
                 data = {
                     'recipient': {
                         'id': invite_user.id, 

@@ -34,15 +34,18 @@ from notifications.services import (
     bulk_read_notifications,
 )
 
-from notifications.constants import (
-    MAINTENANCE_UPDATED_SUCCESS, MAINTENANCE_CAN_NOT_UPDATE_ERROR, CONFIG_FILE_ERROR,
+from notifications.constant.errors import (
+    MAINTENANCE_CAN_NOT_UPDATE_ERROR, CONFIG_FILE_ERROR,
+)
+from notifications.constant.success import (
+    MAINTENANCE_UPDATED_SUCCESS,
 )
 
 class NotificationsList(ListAPIView):
     serializer_class: Type[Serializer] = NotificationSerializer
     filter_backends = [OrderingFilter, ]
     ordering_fields: list[str] = ['id', ]
-    queryset: QuerySet[Notification] = Notification.objects.all().select_related('user').order_by('-id')
+    queryset: QuerySet[Notification] = Notification.get_all()
 
 class UserNotificationsList(NotificationsList):
        
@@ -51,7 +54,7 @@ class UserNotificationsList(NotificationsList):
 
 class ReadNotifications(GenericAPIView):
     serializer_class: Type[Serializer] = ReadOrDeleteNotificationsSerializer
-    queryset: QuerySet[Notification] = Notification.objects.all()
+    queryset: QuerySet[Notification] = Notification.get_all()
     
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
@@ -61,7 +64,7 @@ class ReadNotifications(GenericAPIView):
 
 class DeleteNotifcations(GenericAPIView):
     serializer_class: Type[Serializer] = ReadOrDeleteNotificationsSerializer
-    queryset: QuerySet[Notification] = Notification.objects.all()
+    queryset: QuerySet[Notification] = Notification.get_all()
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)

@@ -6,8 +6,8 @@ from authentication.models import User
 from django.db.models.query import QuerySet
 from notifications.tasks import send_to_user
 
-from notifications.constants import (
-    CHANGE_MAINTENANCE_MESSAGE_TYPE,
+from notifications.constant.notification_types import (
+    CHANGE_MAINTENANCE_NOTIFICATION_TYPE,
 )
 
 from notifications.models import Notification
@@ -25,7 +25,7 @@ def update_maintenance(data: dict[str, str]) -> None:
 
         for user in User.get_all():
             send_to_user(user = user, 
-                message_type = CHANGE_MAINTENANCE_MESSAGE_TYPE,
+                message_type = CHANGE_MAINTENANCE_NOTIFICATION_TYPE,
                 data = {
                     'recipient':{
                         'id': user.id,

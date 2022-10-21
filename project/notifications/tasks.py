@@ -12,12 +12,13 @@ from channels.layers import get_channel_layer
 
 def send_to_user(user: User, message_type: str, data: dict[str, Union[str, int, datetime, bool]] = None) -> None:
     channel_layer = get_channel_layer()
-    Notification.objects.create(user = user)
+    notification = Notification.objects.create(user = user)
     async_to_sync(channel_layer.group_send)(
         user.group_name,
         {
             'type': 'kafka.message',
             'message_type': message_type, 
+            'notification_id': notification.id,
             'data': data
         }
     )

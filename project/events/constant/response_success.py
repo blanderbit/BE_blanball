@@ -1,4 +1,4 @@
-EVENT_DELETED_SUCCESS: dict[str, str] = {'success':  'Event deleted'}
+EVENT_DELETED_SUCCESS: dict[str, str] = {'success': 'Event deleted'}
 EVENT_UPDATE_SUCCESS: dict[str, str] = {'success': 'Event updated'}
 
 APPLICATION_FOR_PARTICIPATION_SUCCESS: dict[str, str] = {'success': 'Your application for participation has been sent to the author of the event'}

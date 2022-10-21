@@ -4,9 +4,13 @@ from collections import OrderedDict
 from reviews.models import Review
 from authentication.models import User
 
-from reviews.constants import (
-    REVIEW_CREATE_ERROR, REVIEW_CREATE_MESSAGE_TYPE,
+from reviews.constant.errors import (
+    REVIEW_CREATE_ERROR,
 )
+from reviews.constant.notification_types import (
+    REVIEW_CREATE_NOTIFICATION_TYPE,
+)
+
 from notifications.tasks import send_to_user
 
 from rest_framework.status import (
@@ -34,7 +38,7 @@ class CreateReviewSerializer(ModelSerializer):
 
     def create(self, validated_data: dict[str, Any]) -> Review:
         user: User = User.objects.get(email = validated_data['user'])
-        send_to_user(user = user, message_type = REVIEW_CREATE_MESSAGE_TYPE)
+        send_to_user(user = user, message_type = REVIEW_CREATE_NOTIFICATION_TYPE)
         review: Review = Review.objects.create(email = self.context['request'].user.email, **validated_data)
         user: User = User.objects.get(email = validated_data['user'])
         for item in user.reviews.all():

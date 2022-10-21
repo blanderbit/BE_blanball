@@ -14,9 +14,13 @@ from authentication.models import (
 )
 from authentication.validators import CodeValidator
 
-from authentication.constants import (PASSWORD_CHANGE_CODE_TYPE, EMAIL_CHANGE_CODE_TYPE, EMAIL_VERIFY_CODE_TYPE, PHONE_CHANGE_CODE_TYPE, 
-    ACCOUNT_DELETE_CODE_TYPE, PASSWORD_RESET_CODE_TYPE, INVALID_CREDENTIALS_ERROR, PASSWORDS_DO_NOT_MATCH, CONFIGURATION_IS_REQUIRED_ERROR,
+from authentication.constant.errors import (
+    INVALID_CREDENTIALS_ERROR, PASSWORDS_DO_NOT_MATCH_ERROR, CONFIGURATION_IS_REQUIRED_ERROR,
     GET_PLANNED_IVENTS_ERROR, NO_SUCH_USER_ERROR, GET_PLANNED_IVENTS_ERROR
+)
+from authentication.constant.code_types import (
+    PASSWORD_CHANGE_CODE_TYPE, EMAIL_CHANGE_CODE_TYPE, EMAIL_VERIFY_CODE_TYPE, 
+    PHONE_CHANGE_CODE_TYPE, ACCOUNT_DELETE_CODE_TYPE, PASSWORD_RESET_CODE_TYPE, 
 )
 
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
@@ -121,7 +125,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         re_password: str = attrs.get('re_password', '')
         
         if password != re_password :
-            raise serializers.ValidationError(PASSWORDS_DO_NOT_MATCH, HTTP_400_BAD_REQUEST) 
+            raise serializers.ValidationError(PASSWORDS_DO_NOT_MATCH_ERROR, HTTP_400_BAD_REQUEST) 
         return attrs
 
     def create(self, validated_data: dict[str, Any]) -> User:

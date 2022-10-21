@@ -7,8 +7,8 @@ from events.services import (
     send_notification_to_subscribe_event_user,
     send_to_user,
 )
-from events.constants import (
-    EVENT_DELETE_MESSAGE_TYPE, NEW_REQUEST_TO_PARTICIPATION_MESSAGE_TYPE
+from events.constant.notification_types import (
+    EVENT_DELETE_NOTIFICATION_TYPE, NEW_REQUEST_TO_PARTICIPATION_NOTIFICATION_TYPE
 )
 
 from django.db.models.signals import pre_delete, post_save
@@ -20,13 +20,13 @@ from events.middlewares import current_request
 @receiver(pre_delete, sender = Event)
 def delete_event(sender: Event, instance, **kwargs) -> None:
     send_notification_to_subscribe_event_user(event = instance,
-    message_type = EVENT_DELETE_MESSAGE_TYPE)
+    message_type = EVENT_DELETE_NOTIFICATION_TYPE)
 
 
 @receiver(post_save, sender = RequestToParticipation)
 def after_send_request_to_PARTICIPATION(sender: RequestToParticipation, instance, **kwargs) -> None:
     send_to_user(user = instance.event.author,
-    message_type = NEW_REQUEST_TO_PARTICIPATION_MESSAGE_TYPE, 
+    message_type = NEW_REQUEST_TO_PARTICIPATION_NOTIFICATION_TYPE, 
     data = {
     'recipient': {
         'id': instance.event.author.id, 

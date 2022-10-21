@@ -16,10 +16,13 @@ from django.conf import settings
 
 from rest_framework.serializers import Serializer
 
-from authentication.constants import (
-    PHONE_CHANGE_CODE_TYPE, EMAIL_MESSAGE_TEMPLATE_TITLE, EMAIL_CHANGE_CODE_TYPE, ACCOUNT_DELETE_CODE_TYPE, 
-    PASSWORD_CHANGE_CODE_TYPE, EMAIL_VERIFY_CODE_TYPE, PASSWORD_RESET_CODE_TYPE,
-    TEMPLATE_SUCCESS_BODY_TITLE, TEMPLATE_SUCCESS_TITLE, TEMPLATE_SUCCESS_TEXT,
+from authentication.constant.success import (
+    EMAIL_MESSAGE_TEMPLATE_TITLE, TEMPLATE_SUCCESS_BODY_TITLE, 
+    TEMPLATE_SUCCESS_TITLE, TEMPLATE_SUCCESS_TEXT,
+)
+from authentication.constant.code_types import (
+    PHONE_CHANGE_CODE_TYPE, EMAIL_CHANGE_CODE_TYPE, ACCOUNT_DELETE_CODE_TYPE, 
+    PASSWORD_CHANGE_CODE_TYPE, PASSWORD_RESET_CODE_TYPE, EMAIL_VERIFY_CODE_TYPE,
 )
     
 def count_age(*, profile: Profile, data: dict[str, Any]) -> Profile:

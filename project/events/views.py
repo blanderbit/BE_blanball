@@ -1,4 +1,4 @@
-from typing import Any, Type, final
+from typing import Any, Type, final, overload
 
 from events.models import (
     Event,
@@ -76,17 +76,20 @@ from rest_framework.exceptions import PermissionDenied
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from events.constants import (
-    SENT_INVATION_SUCCESS,
-    ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, EVENT_NOT_FOUND_ERROR, EVENT_UPDATE_MESSAGE_TYPE,
-    EVENT_UPDATE_SUCCESS, JOIN_TO_EVENT_SUCCESS, APPLICATION_FOR_PARTICIPATION_SUCCESS, 
-    NO_IN_EVENT_FANS_LIST_ERROR, DISCONNECT_FROM_EVENT_SUCCESS, EVENT_TEMPLATE_UPDATE_SUCCESS, 
+from events.constant.response_success import (
+    SENT_INVATION_SUCCESS, JOIN_TO_EVENT_SUCCESS, APPLICATION_FOR_PARTICIPATION_SUCCESS,
+    EVENT_UPDATE_SUCCESS, DISCONNECT_FROM_EVENT_SUCCESS, EVENT_TEMPLATE_UPDATE_SUCCESS, 
+    USER_REMOVED_FROM_EVENT_SUCCESS,
+)
+from events.constant.response_error import (
+    ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, EVENT_NOT_FOUND_ERROR, NO_IN_EVENT_FANS_LIST_ERROR,
     NO_IN_EVENT_MEMBERS_LIST_ERROR, EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,
-    USER_REMOVED_FROM_EVENT_SUCCESS, LEAVE_USER_FROM_THE_EVENT_MESSAGE_TYPE
-
+)
+from events.constant.notification_types import (
+    EVENT_UPDATE_NOTIFICATION_TYPE, LEAVE_USER_FROM_THE_EVENT_NOTIFICATION_TYPE, 
 )
 
-from authentication.constants import (
+from authentication.constant.errors import (
     NO_SUCH_USER_ERROR
 )
 
@@ -177,7 +180,7 @@ class UpdateEvent(GenericAPIView):
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
         event: Event = self.queryset.filter(id = pk).select_related('author').prefetch_related('current_users', 'current_fans')
-        send_notification_to_subscribe_event_user(event = event[0], message_type = EVENT_UPDATE_MESSAGE_TYPE)
+        send_notification_to_subscribe_event_user(event = event[0], message_type = EVENT_UPDATE_NOTIFICATION_TYPE)
         event.update(**serializer.validated_data)
         return Response(EVENT_UPDATE_SUCCESS, status = HTTP_200_OK)
   
@@ -253,7 +256,7 @@ class LeaveFromEvent(GenericAPIView):
         event: Event = Event.objects.get(id = serializer.data['event_id'])
         if user.current_rooms.filter(id = serializer.data['event_id']).exists():
             user.current_rooms.remove(event)
-            send_to_user(user = event.author, message_type = LEAVE_USER_FROM_THE_EVENT_MESSAGE_TYPE, 
+            send_to_user(user = event.author, message_type = LEAVE_USER_FROM_THE_EVENT_NOTIFICATION_TYPE, 
             data = {
                 'recipient': {
                     'id': event.author.id,
@@ -300,7 +303,6 @@ class RemoveUserFromEvent(GenericAPIView):
             reason = serializer.validated_data['reason'])
         return Response(USER_REMOVED_FROM_EVENT_SUCCESS, status = HTTP_200_OK)
 
-
 class EventList(ListAPIView):
     '''class that allows you to get a complete list of events'''
     serializer_class: Type[Serializer] = EventListSerializer
@@ -310,8 +312,10 @@ class EventList(ListAPIView):
     filterset_class = EventDateTimeRangeFilter
     queryset: QuerySet[Event] = Event.get_all()
 
+    @final
     def get_queryset(self) -> QuerySet[Event]:
         return self.queryset.filter(~Q(black_list__in = [self.request.user.id]))
+    
 
 class EventsRelevantList(ListAPIView):
     filter_backends = [RankedFuzzySearchFilter]

@@ -1,0 +1,1 @@
+MAINTENANCE_UPDATED_SUCCESS: dict[str, str] = {'success': 'Maintenance updated success'}

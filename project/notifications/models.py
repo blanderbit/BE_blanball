@@ -3,6 +3,7 @@ from typing import final
 from datetime import datetime
 from authentication.models import User
 
+from django.db.models.query import QuerySet
 from django.db import models
 
 
@@ -20,6 +21,11 @@ class Notification(models.Model):
     @final
     def __repr__ (self) -> str:
         return '<Notification %s>' % self.id
+
+    @final
+    @staticmethod
+    def get_all() -> QuerySet['Notification']:
+        return Notification.objects.all().select_related('user').order_by('-id')
 
     @final
     def __str__(self) -> str:
