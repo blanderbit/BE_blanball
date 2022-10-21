@@ -1,0 +1,1 @@
+CHANGE_MAINTENANCE_NOTIFICATION_TYPE: str = 'change_maintenance'

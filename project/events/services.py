@@ -211,13 +211,6 @@ def send_notification_to_event_author(*, event: Event, request_user: User) -> No
             }
         })
 
-
-def validate_get_user_planned_events(*, pk: int, request_user: User) -> None:
-    user: User = User.objects.get(id = pk)
-    if user.configuration['show_my_planned_events'] == False and request_user.id != user.id:
-        raise ValidationError(GET_PLANNED_EVENTS_ERROR, HTTP_400_BAD_REQUEST)  
-
-
 def filter_event_by_user_planned_events_time(*, pk: int, queryset: QuerySet[Event]) -> QuerySet[Event]:
     user: User =  User.objects.get(id = pk)
     num: str = re.findall(r'\d{1,10}', user.get_planned_events)[0]
