@@ -1,5 +1,5 @@
 import json
-from typing import Any
+from typing import Any, Type
 
 from notifications.serializers import (
     NotificationSerializer,
@@ -24,6 +24,9 @@ from rest_framework.generics import (
     ListAPIView,
     GenericAPIView,
 )
+from rest_framework.serializers import (
+    Serializer,
+)
 
 from notifications.services import (
     bulk_delete_notifications,
@@ -31,14 +34,18 @@ from notifications.services import (
     bulk_read_notifications,
 )
 
-from notifications.constaints import (MAINTENANCE_UPDATED_SUCCESS, MAINTENANCE_CAN_NOT_UPDATE_ERROR, CONFIG_FILE_ERROR)
+from notifications.constant.errors import (
+    MAINTENANCE_CAN_NOT_UPDATE_ERROR, CONFIG_FILE_ERROR,
+)
+from notifications.constant.success import (
+    MAINTENANCE_UPDATED_SUCCESS,
+)
 
 class NotificationsList(ListAPIView):
-    serializer_class = NotificationSerializer
-    pagination_class = CustomPagination
-    filter_backends = (OrderingFilter, )
-    ordering_fields = ('id', )
-    queryset = Notification.objects.all().select_related('user').order_by('-id')
+    serializer_class: Type[Serializer] = NotificationSerializer
+    filter_backends = [OrderingFilter, ]
+    ordering_fields: list[str] = ['id', ]
+    queryset: QuerySet[Notification] = Notification.get_all()
 
 class UserNotificationsList(NotificationsList):
        
@@ -46,27 +53,27 @@ class UserNotificationsList(NotificationsList):
         return self.queryset.filter(user_id = self.request.user.id)
 
 class ReadNotifications(GenericAPIView):
-    serializer_class = ReadOrDeleteNotificationsSerializer
-    queryset = Notification.objects.all()
+    serializer_class: Type[Serializer] = ReadOrDeleteNotificationsSerializer
+    queryset: QuerySet[Notification] = Notification.get_all()
     
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)        
-        return Response(bulk_read_notifications(data = serializer.validated_data['notifications'],
+        return Response(bulk_read_notifications(data = serializer.validated_data['ids'],
             queryset = self.queryset), status = HTTP_200_OK)
 
 class DeleteNotifcations(GenericAPIView):
-    serializer_class = ReadOrDeleteNotificationsSerializer
-    queryset = Notification.objects.all()
+    serializer_class: Type[Serializer] = ReadOrDeleteNotificationsSerializer
+    queryset: QuerySet[Notification] = Notification.get_all()
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
-        return Response(bulk_delete_notifications(data = serializer.validated_data['notifications'],
+        return Response(bulk_delete_notifications(data = serializer.validated_data['ids'],
             queryset = self.queryset, user = request.user), status = HTTP_200_OK)
 
 class ChangeMaintenance(GenericAPIView):
-    serializer_class = ChangeMaintenanceSerializer
+    serializer_class: Type[Serializer] = ChangeMaintenanceSerializer
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)

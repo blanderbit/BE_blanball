@@ -258,7 +258,6 @@ class TestEventsViews(SetUpEventsViews):
             'ids': [RequestToParticipation.objects.first().id],
             'type': True
         })
-        print(accept_request_to_participation.data)
         self.assertEqual(Event.objects.first().count_current_users, 1)
         self.assertEqual(event_join.status_code, HTTP_200_OK)
 

@@ -1,3 +1,5 @@
+from typing import Union
+
 from notifications.views import (
     NotificationsList,
     UserNotificationsList,
@@ -9,8 +11,12 @@ from notifications.views import (
 )   
 
 from django.urls import path
+from django.urls.resolvers import (
+   URLResolver, 
+   URLPattern,
+)
 
-urlpatterns = [
+urlpatterns: list[Union[URLResolver, URLPattern]] = [
     # endpoint where user can get list of notifications
     path('admin/notifications/list', NotificationsList.as_view(),
         name = 'notifications-list'),
