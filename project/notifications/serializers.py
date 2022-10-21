@@ -17,7 +17,8 @@ class UserNotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model: Notification = Notification
         fields: Union[str, list[str]] = [
-            'notification_text',
+            'id',
+            'type',
             'time_created',
         ]
 

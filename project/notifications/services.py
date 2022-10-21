@@ -7,7 +7,7 @@ from django.db.models.query import QuerySet
 from notifications.tasks import send_to_user
 
 from notifications.constants import (
-    CHANGE_MAINTENANCE_MESSAGE_TYPE, MAINTENANCE_FALSE_NOTIFICATION_TEXT, MAINTENANCE_TRUE_NOTIFICATION_TEXT,
+    CHANGE_MAINTENANCE_MESSAGE_TYPE,
 )
 
 from notifications.models import Notification
@@ -24,14 +24,18 @@ def update_maintenance(data: dict[str, str]) -> None:
         f.write(json.dumps(json_data))
 
         for user in User.get_all():
-            if json_data['isMaintenance'] == True:
-                notification_text = MAINTENANCE_TRUE_NOTIFICATION_TEXT.format(
-                username = user.profile.name)
-            else:
-                notification_text = MAINTENANCE_FALSE_NOTIFICATION_TEXT.format(
-                username = user.profile.name)
-            send_to_user(user = user, notification_text = notification_text, 
-                message_type = CHANGE_MAINTENANCE_MESSAGE_TYPE)
+            send_to_user(user = user, 
+                message_type = CHANGE_MAINTENANCE_MESSAGE_TYPE,
+                data = {
+                    'recipient':{
+                        'id': user.id,
+                        'name': user.profile.name,
+                        'last_name': user.profile.last_name,
+                    },
+                    'maintenance': {
+                        'type': data['isMaintenance'],
+                    }
+                })
 
 def bulk_delete_notifications(data: dict[str, Any], queryset: QuerySet[Notification], user: User) -> bulk:
     for notification in data:

@@ -67,7 +67,6 @@ class UserConsumer(AsyncWebsocketConsumer):
     async def kafka_message(self, event: dict[str, Any]) -> None:
         # Send message to WebSocket
         text_data: bytes = json.dumps({
-            'message': event['message'],
             'date_time': str(timezone.now()),
             'message_type': event['message_type'],
             'data': event['data']

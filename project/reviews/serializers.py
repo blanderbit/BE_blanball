@@ -34,8 +34,7 @@ class CreateReviewSerializer(ModelSerializer):
 
     def create(self, validated_data: dict[str, Any]) -> Review:
         user: User = User.objects.get(email = validated_data['user'])
-        send_to_user(user = user, notification_text = 'Review Create',
-            message_type = REVIEW_CREATE_MESSAGE_TYPE)
+        send_to_user(user = user, message_type = REVIEW_CREATE_MESSAGE_TYPE)
         review: Review = Review.objects.create(email = self.context['request'].user.email, **validated_data)
         user: User = User.objects.get(email = validated_data['user'])
         for item in user.reviews.all():

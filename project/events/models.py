@@ -2,6 +2,7 @@ from datetime import (
     date, 
     datetime,
 )
+import profile
 from typing import Any, final
 from authentication.models import (
     User,
@@ -20,7 +21,7 @@ from notifications.tasks import (
     send_to_user,
 )
 from events.constants import (
-    INVITE_USER_NOTIFICATION, INVITE_USER_TO_EVENT_MESSAGE_TYPE,
+    INVITE_USER_TO_EVENT_MESSAGE_TYPE,
     USER_CAN_NOT_INVITE_TO_THIS_EVENT_ERROR, SENT_INVATION_ERROR,
     AUTHOR_CAN_NOT_INVITE_ERROR, USER_IN_BLACK_LIST_ERROR
 )
@@ -186,11 +187,22 @@ class InviteToEventManager(models.Manager):
         if request_user.id == event.author.id or request_user.id in event.current_users.all():
             invite = self.model(recipient = invite_user, event = event, sender = request_user)
             invite.save()
-            send_to_user(user = invite_user, notification_text =
-                INVITE_USER_NOTIFICATION.format(user_name = invite_user.profile.name,
-                inviter_name = request_user.profile.name, event_id = event.id),
-                message_type = INVITE_USER_TO_EVENT_MESSAGE_TYPE, data = {
-                    'invite_id': invite.id})
+            send_to_user(user = invite_user, message_type = INVITE_USER_TO_EVENT_MESSAGE_TYPE, 
+                data = {
+                    'recipient': {
+                        'id': invite_user.id, 
+                        'name': invite_user.profile.name , 
+                        'last_name': invite_user.profile.last_name,
+                    },
+                    'event': {
+                        'id': event.id
+                    },
+                    'sender': {
+                        'id': request_user.id,
+                        'name': request_user.profile.name,
+                        'last_name': request_user.profile.last_name,
+                    }
+                })
             return invite
         else:
             raise ValidationError(USER_CAN_NOT_INVITE_TO_THIS_EVENT_ERROR, HTTP_403_FORBIDDEN)

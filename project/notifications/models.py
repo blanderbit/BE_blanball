@@ -14,7 +14,6 @@ class Notification(models.Model):
         read: str = 'Read'
 
     user: User = models.ForeignKey(User, on_delete = models.CASCADE)
-    notification_text: str = models.CharField(max_length = 100)
     type: str = models.CharField(choices = Type.choices, max_length = 6,default = 'Unread')
     time_created: datetime = models.DateTimeField(auto_now_add=True)
 
@@ -24,7 +23,7 @@ class Notification(models.Model):
 
     @final
     def __str__(self) -> str:
-        return self.notification_text
+        return str(self.id)
 
     class Meta:
         db_table: str = 'notification'

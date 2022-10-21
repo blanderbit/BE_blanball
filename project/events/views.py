@@ -77,18 +77,17 @@ from rest_framework.exceptions import PermissionDenied
 from django_filters.rest_framework import DjangoFilterBackend
 
 from events.constants import (
-    SENT_INVATION_ERROR, INVITE_USER_TO_EVENT_MESSAGE_TYPE, INVITE_USER_NOTIFICATION, SENT_INVATION_SUCCESS,
-    ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, EVENT_NOT_FOUND_ERROR, EVENT_DELETED_SUCCESS, EVENT_UPDATE_MESSAGE_TYPE,
-    EVENT_UPDATE_SUCCESS, JOIN_TO_EVENT_SUCCESS, NEW_REQUEST_TO_PARTICIPATION_MESSAGE_TYPE, NEW_REQUEST_TO_PARTICIPATION, 
-    APPLICATION_FOR_PARTICIPATION_SUCCESS, NO_IN_EVENT_FANS_LIST_ERROR, DISCONNECT_FROM_EVENT_SUCCESS, 
-    EVENT_TEMPLATE_UPDATE_SUCCESS, EVENT_TEMPLATE_NOT_FOUND_ERROR, LEAVE_USER_FROM_THE_EVENT_NOTIFICATION, 
-    NO_IN_EVENT_MEMBERS_LIST_ERROR, EVENT_UPDATE_TEXT, AUTHOR_CAN_NOT_INVITE_ERROR, EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,
+    SENT_INVATION_SUCCESS,
+    ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, EVENT_NOT_FOUND_ERROR, EVENT_UPDATE_MESSAGE_TYPE,
+    EVENT_UPDATE_SUCCESS, JOIN_TO_EVENT_SUCCESS, APPLICATION_FOR_PARTICIPATION_SUCCESS, 
+    NO_IN_EVENT_FANS_LIST_ERROR, DISCONNECT_FROM_EVENT_SUCCESS, EVENT_TEMPLATE_UPDATE_SUCCESS, 
+    NO_IN_EVENT_MEMBERS_LIST_ERROR, EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,
     USER_REMOVED_FROM_EVENT_SUCCESS, LEAVE_USER_FROM_THE_EVENT_MESSAGE_TYPE
 
 )
 
 from authentication.constants import (
-    NO_SUCH_USER_ERROR, NO_PERMISSIONS_ERROR
+    NO_SUCH_USER_ERROR
 )
 
 
@@ -178,8 +177,7 @@ class UpdateEvent(GenericAPIView):
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
         event: Event = self.queryset.filter(id = pk).select_related('author').prefetch_related('current_users', 'current_fans')
-        send_notification_to_subscribe_event_user(event = event[0],
-        notification_text = EVENT_UPDATE_TEXT.format(event_id = event[0].id), message_type = EVENT_UPDATE_MESSAGE_TYPE)
+        send_notification_to_subscribe_event_user(event = event[0], message_type = EVENT_UPDATE_MESSAGE_TYPE)
         event.update(**serializer.validated_data)
         return Response(EVENT_UPDATE_SUCCESS, status = HTTP_200_OK)
   
@@ -209,7 +207,7 @@ class JoinToEvent(GenericAPIView):
         validate_user_before_join_to_event(user = user, event = event)
         if not event.privacy:
             user.current_rooms.add(event)
-            send_notification_to_event_author(event = event)
+            send_notification_to_event_author(event = event, request_user = request.user)
             return Response(JOIN_TO_EVENT_SUCCESS, status = HTTP_200_OK)
         else:
             RequestToParticipation.objects.create(user = user, event_id = event.id, event_author = event.author)
@@ -255,9 +253,22 @@ class LeaveFromEvent(GenericAPIView):
         event: Event = Event.objects.get(id = serializer.data['event_id'])
         if user.current_rooms.filter(id = serializer.data['event_id']).exists():
             user.current_rooms.remove(event)
-            send_to_user(user = event.author, notification_text =
-                LEAVE_USER_FROM_THE_EVENT_NOTIFICATION.format(author_name = event.author.profile.name, event_id = event.id),
-                message_type = LEAVE_USER_FROM_THE_EVENT_MESSAGE_TYPE)
+            send_to_user(user = event.author, message_type = LEAVE_USER_FROM_THE_EVENT_MESSAGE_TYPE, 
+            data = {
+                'recipient': {
+                    'id': event.author.id,
+                    'name': event.author.profile.name,
+                    'last_name': event.author.profile.last_name
+                },
+                'event': {
+                    'id': event.id
+                },
+                'sender': {
+                    'id': user.id,
+                    'name': user.profile.name,
+                    'last_name': user.profile.last_name
+                }
+            })
             return Response(DISCONNECT_FROM_EVENT_SUCCESS, status = HTTP_200_OK)
         return Response(NO_IN_EVENT_MEMBERS_LIST_ERROR, status = HTTP_400_BAD_REQUEST)
 
