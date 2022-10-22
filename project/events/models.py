@@ -25,7 +25,7 @@ from events.constant.response_error import (
     AUTHOR_CAN_NOT_INVITE_ERROR, USER_IN_BLACK_LIST_ERROR
 )
 from events.constant.notification_types import (
-    INVITE_USER_TO_EVENT_NOTIFICATION_TYPEE
+    INVITE_USER_TO_EVENT_NOTIFICATION_TYPE
 )
 
 from rest_framework.serializers import ValidationError
@@ -190,7 +190,7 @@ class InviteToEventManager(models.Manager):
         if request_user.id == event.author.id or request_user.id in event.current_users.all():
             invite = self.model(recipient = invite_user, event = event, sender = request_user)
             invite.save()
-            send_to_user(user = invite_user, message_type = INVITE_USER_TO_EVENT_NOTIFICATION_TYPEE, 
+            send_to_user(user = invite_user, message_type = INVITE_USER_TO_EVENT_NOTIFICATION_TYPE, 
                 data = {
                     'recipient': {
                         'id': invite_user.id, 

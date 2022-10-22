@@ -1,1 +1,0 @@
-CHANGE_MAINTENANCE_MESSAGE_TYPE: str = 'change_maintenance'

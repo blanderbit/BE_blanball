@@ -156,7 +156,8 @@ def send_notification_to_subscribe_event_user(*, event: Event, message_type: str
         start_time: datetime = None,
         time_to_start: int = None) -> None:
     for user in event.current_users.all():
-        send_to_user(user = user, message_type = message_type, data = {
+        send_to_user(user = user, message_type = message_type, 
+        data = {
             'recipient': {
                 'id': user.id, 
                 'name': user.profile.name, 
@@ -169,7 +170,8 @@ def send_notification_to_subscribe_event_user(*, event: Event, message_type: str
             }
         })
     for fan in event.current_fans.all():
-        send_to_user(user = fan, message_type = message_type, data = {
+        send_to_user(user = fan, message_type = message_type, 
+        data = {
             'recipient': {
                 'id': fan.id, 
                 'name': fan.profile.name, 

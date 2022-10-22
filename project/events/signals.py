@@ -28,20 +28,20 @@ def after_send_request_to_PARTICIPATION(sender: RequestToParticipation, instance
     send_to_user(user = instance.event.author,
     message_type = NEW_REQUEST_TO_PARTICIPATION_NOTIFICATION_TYPE, 
     data = {
-    'recipient': {
-        'id': instance.event.author.id, 
-        'name': instance.event.author.profile.name, 
-        'last_name': instance.event.author.profile.last_name,
-    },
-    'request': {
-        'id': instance.id
-    },
-    'sender': {
-        'id': current_request().user, 
-        'name': current_request().user.profile.name, 
-        'last_name': current_request().user.profile.last_name,
-    },
-    'event': {
-        'id': instance.event.id
-    }
-})
+        'recipient': {
+            'id': instance.event.author.id, 
+            'name': instance.event.author.profile.name, 
+            'last_name': instance.event.author.profile.last_name,
+        },
+        'request': {
+            'id': instance.id
+        },
+        'sender': {
+            'id': current_request().user, 
+            'name': current_request().user.profile.name, 
+            'last_name': current_request().user.profile.last_name,
+        },
+        'event': {
+            'id': instance.event.id
+        }
+    })
