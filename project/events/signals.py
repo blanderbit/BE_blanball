@@ -25,23 +25,24 @@ def delete_event(sender: Event, instance, **kwargs) -> None:
 
 @receiver(post_save, sender = RequestToParticipation)
 def after_send_request_to_PARTICIPATION(sender: RequestToParticipation, instance, **kwargs) -> None:
-    send_to_user(user = instance.event.author,
+    send_to_user(user = instance.recipient,
     message_type = NEW_REQUEST_TO_PARTICIPATION_NOTIFICATION_TYPE, 
     data = {
         'recipient': {
-            'id': instance.event.author.id, 
-            'name': instance.event.author.profile.name, 
-            'last_name': instance.event.author.profile.last_name,
+            'id': instance.recipient.id, 
+            'name': instance.recipient.profile.name, 
+            'last_name': instance.recipient.profile.last_name,
         },
         'request': {
             'id': instance.id
         },
         'sender': {
-            'id': current_request().user, 
-            'name': current_request().user.profile.name, 
-            'last_name': current_request().user.profile.last_name,
+            'id': instance.sender.id, 
+            'name': instance.sender.profile.name, 
+            'last_name': instance.sender.profile.last_name,
         },
         'event': {
-            'id': instance.event.id
+            'id': instance.event.id,
+            'name': instance.event.name,
         }
     })

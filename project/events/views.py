@@ -213,7 +213,7 @@ class JoinToEvent(GenericAPIView):
             send_notification_to_event_author(event = event, request_user = request.user)
             return Response(JOIN_TO_EVENT_SUCCESS, status = HTTP_200_OK)
         else:
-            RequestToParticipation.objects.create(user = user, event_id = event.id, event_author = event.author)
+            RequestToParticipation.objects.create(recipient = event.author, sender = user, event = event)
             return Response(APPLICATION_FOR_PARTICIPATION_SUCCESS, status = HTTP_200_OK)
 
 
@@ -264,7 +264,8 @@ class LeaveFromEvent(GenericAPIView):
                     'last_name': event.author.profile.last_name
                 },
                 'event': {
-                    'id': event.id
+                    'id': event.id,
+                    'name': event.name,
                 },
                 'sender': {
                     'id': user.id,
