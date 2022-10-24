@@ -19,7 +19,6 @@ from events.views import (
     RequestToParticipationsList,
     BulkAcceptOrDeclineRequestToParticipation,
     UserParticipantEvents,
-    UserEventsSceduler,
     InvitesToEventList,
     BulkAcceptOrDeclineInvitesToEvent,
     RemoveUserFromEvent,
@@ -47,9 +46,6 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
      #endpoint where user can get list of events
     path('client/invites/to/events/list', InvitesToEventList.as_view(), 
         name = 'invites-to-events-list'),
-    #endpoint where user can get list of events
-    path('client/user/events/sceduler', UserEventsSceduler.as_view(), 
-        name = 'events-sceduler'),
     # endpoint where user can bulk delete events
     path('client/events/delete', DeleteEvents.as_view(),
         name = 'bulk-delete-events'),

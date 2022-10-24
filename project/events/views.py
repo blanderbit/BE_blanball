@@ -224,19 +224,6 @@ class LeaveFromEvent(GenericAPIView):
             return Response(DISCONNECT_FROM_EVENT_SUCCESS, status = HTTP_200_OK)
         return Response(NO_IN_EVENT_MEMBERS_LIST_ERROR, status = HTTP_400_BAD_REQUEST)
 
-from django.utils import timezone
-
-
-class UserEventsSceduler(ListAPIView):
-    serializer_class: Type[Serializer] = EventListSerializer
-    queryset: QuerySet[Event] = Event.get_all()
-
-    def get_queryset(self) -> QuerySet[Event]:
-        # query = Q(current_users__in = [self.request.user.id])
-        # query.add(Q(current_users__in = [self.request.user.id]))
-        print(timezone.now().date().weekday())
-        return self.queryset.filter(Q(author_id = self.request.user.id) | Q(current_users__in = [self.request.user.id]))
-
 
 class RemoveUserFromEvent(GenericAPIView):
     serializer_class: Type[Serializer] = RemoveUserFromEventSerializer
