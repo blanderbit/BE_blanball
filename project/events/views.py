@@ -162,9 +162,8 @@ class JoinToEvent(GenericAPIView):
             user.current_rooms.add(event)
             send_notification_to_event_author(event = event, request_user = request.user)
             return Response(JOIN_TO_EVENT_SUCCESS, status = HTTP_200_OK)
-        else:
-            RequestToParticipation.objects.create(user = user, event_id = event.id, event_author = event.author)
-            return Response(APPLICATION_FOR_PARTICIPATION_SUCCESS, status = HTTP_200_OK)
+        RequestToParticipation.objects.create(recipient = event.author, sender = user, event = event)
+        return Response(APPLICATION_FOR_PARTICIPATION_SUCCESS, status = HTTP_200_OK)
 
 
 class FanJoinToEvent(GenericAPIView):

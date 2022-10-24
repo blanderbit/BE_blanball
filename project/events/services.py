@@ -1,3 +1,4 @@
+from calendar import day_abbr
 from datetime import datetime
 import json
 import re
@@ -12,7 +13,6 @@ from rest_framework.serializers import ValidationError
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_404_NOT_FOUND,
-    HTTP_403_FORBIDDEN,
 )
 from django.db import transaction
 
@@ -59,14 +59,8 @@ def bulk_accept_or_decline_invites_to_events(*, data: dict[str, Union[list[int],
             if invite.recipient.id == request_user.id:
                 if invite.event.current_users.count() < invite.event.amount_members:
                     if data['type'] == True:
-                        response_type: str = 'accept'
-                        if invite.event.privacy == False:
-                            invite.recipient.current_rooms.add(invite.event)
-                        else:
-                            RequestToParticipation.objects.create(user = invite.recipient, 
-                                event_id = invite.event.id, event_author = invite.event.author)
-                    else:
-                        response_type: str = 'decline'
+                        invite.recipient.current_rooms.add(invite.event)
+
                     yield {'success': invite_id}
                     send_to_user(user = invite.sender,
                     message_type = RESPONSE_TO_THE_INVITE_TO_EVENT_NOTIFICATION_TYPE,
@@ -77,11 +71,12 @@ def bulk_accept_or_decline_invites_to_events(*, data: dict[str, Union[list[int],
                             'last_name': invite.sender.profile.last_name,
                         },
                         'event': {
-                            'id': invite.event.id
+                            'id': invite.event.id,
+                            'name': invite.event.name,
                         },
                         'invite': {
                             'id': invite.id,
-                            'response': response_type,
+                            'response': data['type'],
                         },
                         'sender': {
                             'id': invite.recipient.id,
@@ -98,33 +93,31 @@ def bulk_accpet_or_decline_requests_to_participation(*, data: dict[str, Union[li
     for request_id in data['ids']:
         try:
             request_to_p = RequestToParticipation.objects.get(id = request_id)
-            if request_to_p.event_author.id == user.id:
+            if request_to_p.recipient == user.id:
                 if data['type'] == True:
-                    response_type: str = 'accepted'
                     if request_to_p.event.current_users.count() < request_to_p.event.amount_members:
                         request_to_p.user.current_rooms.add(request_to_p.event)
-                else:
-                    response_type: str = 'declined'
                 yield {'success': request_id}
-                send_to_user(user = request_to_p.user,
+                send_to_user(user = request_to_p.sender,
                     message_type = RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_NOTIFICATION_TYPE,
                     data = {
                         'recipient': {
-                            'id': request_to_p.user.id, 
-                            'name': request_to_p.user.profile.name , 
-                            'last_name': request_to_p.user.profile.last_name,
+                            'id': request_to_p.sender.id, 
+                            'name': request_to_p.sender.profile.name , 
+                            'last_name': request_to_p.sender.profile.last_name,
                         },
                         'event': {
-                            'id': request_to_p.event.id
+                            'id': request_to_p.event.id,
+                            'name': request_to_p.event.name,
                         },
                         'invite': {
                             'id': request_to_p.id,
-                            'response': response_type,
+                            'response': data['type'],
                         },
                         'sender': {
-                            'id': request_to_p.event_author.id,
-                            'name': request_to_p.event_author.profile.name,
-                            'last_name': request_to_p.event_author.profile.last_name,
+                            'id': request_to_p.recipient.id,
+                            'name': request_to_p.recipient.profile.name,
+                            'last_name': request_to_p.recipient.profile.last_name,
                         }
                     })
                 request_to_p.delete()
@@ -154,7 +147,8 @@ def send_notification_to_subscribe_event_user(*, event: Event, message_type: str
         start_time: datetime = None,
         time_to_start: int = None) -> None:
     for user in event.current_users.all():
-        send_to_user(user = user, message_type = message_type, data = {
+        send_to_user(user = user, message_type = message_type, 
+        data = {
             'recipient': {
                 'id': user.id, 
                 'name': user.profile.name, 
@@ -167,7 +161,8 @@ def send_notification_to_subscribe_event_user(*, event: Event, message_type: str
             }
         })
     for fan in event.current_fans.all():
-        send_to_user(user = fan, message_type = message_type, data = {
+        send_to_user(user = fan, message_type = message_type, 
+        data = {
             'recipient': {
                 'id': fan.id, 
                 'name': fan.profile.name, 
@@ -175,8 +170,9 @@ def send_notification_to_subscribe_event_user(*, event: Event, message_type: str
             },
             'event': {
                 'id': event.id,
+                'name': event.name,
                 'start_time': start_time,
-                'time_to_start': time_to_start
+                'time_to_start': time_to_start,
             }
         })
 
@@ -189,7 +185,7 @@ def validate_user_before_join_to_event(*, user: User, event: Event) -> None:
         raise ValidationError(EVENT_AUTHOR_CAN_NOT_JOIN_ERROR, HTTP_400_BAD_REQUEST)
     if user in event.black_list.all():
         raise PermissionDenied()
-    if RequestToParticipation.objects.filter(user = user,event = event.id, event_author = event.author):
+    if RequestToParticipation.objects.filter(sender = user, event = event.id, recipient = event.author):
         raise ValidationError(ALREADY_SENT_REQUEST_TO_PARTICIPATE_ERROR, HTTP_400_BAD_REQUEST)
 
 def send_notification_to_event_author(*, event: Event, request_user: User) -> None:
@@ -202,7 +198,8 @@ def send_notification_to_event_author(*, event: Event, request_user: User) -> No
                 'last_name': event.author.profile.last_name,
             },
             'event': {
-                'id': event.id
+                'id': event.id,
+                'name': event.name,
             },
             'sender': {
                 'id': request_user.id,
@@ -210,6 +207,13 @@ def send_notification_to_event_author(*, event: Event, request_user: User) -> No
                 'last_name': request_user.profile.last_name,
             }
         })
+
+
+def validate_get_user_planned_events(*, pk: int, request_user: User) -> None:
+    user: User = User.objects.get(id = pk)
+    if user.configuration['show_my_planned_events'] == False and request_user.id != user.id:
+        raise ValidationError(GET_PLANNED_EVENTS_ERROR, HTTP_400_BAD_REQUEST)  
+
 
 def filter_event_by_user_planned_events_time(*, pk: int, queryset: QuerySet[Event]) -> QuerySet[Event]:
     user: User =  User.objects.get(id = pk)
@@ -261,6 +265,7 @@ def remove_user_from_event(*, user: User, event: Event, reason: str) -> None:
                 'text': reason
             },
             'event': {
-                'id': event.id
+                'id': event.id,
+                'name': event.name,
             }
         })

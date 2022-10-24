@@ -38,8 +38,18 @@ class CreateReviewSerializer(ModelSerializer):
 
     def create(self, validated_data: dict[str, Any]) -> Review:
         user: User = User.objects.get(email = validated_data['user'])
-        send_to_user(user = user, message_type = REVIEW_CREATE_NOTIFICATION_TYPE)
         review: Review = Review.objects.create(email = self.context['request'].user.email, **validated_data)
+        send_to_user(user = user, message_type = REVIEW_CREATE_NOTIFICATION_TYPE, 
+            data = {
+                'recipient': {
+                    'id': user.id,
+                    'name': user.profile.name,
+                    'last_name': user.profile.last_name,
+                },
+                'review': {
+                    'id': review.id,
+                }
+            })
         user: User = User.objects.get(email = validated_data['user'])
         for item in user.reviews.all():
             stars = item.stars
@@ -58,4 +68,5 @@ class ReviewUpdateSerializer(ModelSerializer):
         model: Review = Review
         fields: Union[str, list[str]] = [
             'text', 
+            'stars',
         ]
