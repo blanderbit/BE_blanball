@@ -335,5 +335,5 @@ class BulkAcceptOrDeclineRequestToParticipation(GenericAPIView):
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
         data: dict[str, list[int]] = bulk_accpet_or_decline_requests_to_participation(
-            data = serializer.validated_data, user = request.user)
+            data = serializer.validated_data, request_user = request.user)
         return Response(data, status = HTTP_200_OK)

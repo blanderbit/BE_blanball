@@ -203,14 +203,11 @@ class RemoveUserFromEventSerializer(serializers.Serializer):
             raise serializers.ValidationError(EVENT_NOT_FOUND_ERROR, HTTP_404_NOT_FOUND)
 
 class RequestToParticipationSerializer(serializers.ModelSerializer):
-    user = EventUsersSerializer()
+    sender = EventUsersSerializer()
+    event = InInvitesEventSerializer()
     class Meta:
         model: RequestToParticipation = RequestToParticipation
-        fields: Union[str, list[str]] = [
-            'id',
-            'user',
-            'time_created',
-        ]
+        fields: Union[str, list[str]] = '__all__'
 
 class BulkAcceptOrDeclineRequestToParticipationSerializer(serializers.Serializer):
     ids: list[int] = serializers.ListField(child = serializers.IntegerField(min_value = 0))
