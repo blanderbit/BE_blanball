@@ -95,10 +95,10 @@ def bulk_accpet_or_decline_requests_to_participation(*, data: dict[str, Union[li
     for request_id in data['ids']:
         try:
             request_to_p = RequestToParticipation.objects.get(id = request_id)
-            if request_to_p.recipient == user.id:
+            if request_to_p.recipient.id == user.id:
                 if data['type'] == True:
                     if request_to_p.event.current_users.count() < request_to_p.event.amount_members:
-                        request_to_p.user.current_rooms.add(request_to_p.event)
+                        request_to_p.sender.current_rooms.add(request_to_p.event)
                 yield {'success': request_id}
                 send_to_user(user = request_to_p.sender,
                     message_type = RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_NOTIFICATION_TYPE,
