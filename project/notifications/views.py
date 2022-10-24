@@ -1,3 +1,4 @@
+from email import message
 import json
 from typing import Any, Type
 
@@ -48,7 +49,7 @@ class NotificationsList(ListAPIView):
     queryset: QuerySet[Notification] = Notification.get_all()
 
 class UserNotificationsList(NotificationsList):
-       
+
     def get_queryset(self) -> QuerySet:
         return self.queryset.filter(user_id = self.request.user.id)
 
