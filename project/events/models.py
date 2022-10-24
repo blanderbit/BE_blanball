@@ -153,12 +153,12 @@ class InviteToEventManager(models.Manager):
 
     def send_invite(self, request_user: User, invite_user: User, event: Event) -> 'InviteToEvent':
 
-        # if invite_user.id == request_user.id:
-        #     raise ValidationError(SENT_INVATION_ERROR, HTTP_403_FORBIDDEN)
-        # if invite_user.id == event.author.id:
-        #     raise ValidationError(AUTHOR_CAN_NOT_INVITE_ERROR, HTTP_403_FORBIDDEN)
-        # if invite_user in event.black_list.all():
-        #     raise ValidationError(USER_IN_BLACK_LIST_ERROR, HTTP_403_FORBIDDEN)
+        if invite_user.id == request_user.id:
+            raise ValidationError(SENT_INVATION_ERROR, HTTP_403_FORBIDDEN)
+        if invite_user.id == event.author.id:
+            raise ValidationError(AUTHOR_CAN_NOT_INVITE_ERROR, HTTP_403_FORBIDDEN)
+        if invite_user in event.black_list.all():
+            raise ValidationError(USER_IN_BLACK_LIST_ERROR, HTTP_403_FORBIDDEN)
 
         if request_user.id == event.author.id or request_user.id in event.current_users.all():
             invite = self.model(recipient = invite_user, event = event, sender = request_user)
