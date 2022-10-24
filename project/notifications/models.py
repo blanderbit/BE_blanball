@@ -1,4 +1,4 @@
-from typing import final
+from typing import Any, final
 
 from datetime import datetime
 from authentication.models import User
@@ -15,8 +15,11 @@ class Notification(models.Model):
         read: str = 'Read'
 
     user: User = models.ForeignKey(User, on_delete = models.CASCADE)
-    type: str = models.CharField(choices = Type.choices, max_length = 6,default = 'Unread')
-    time_created: datetime = models.DateTimeField(auto_now_add=True)
+    type: str = models.CharField(choices = Type.choices, max_length = 6, default = 'Unread')
+    time_created: datetime = models.DateTimeField(auto_now_add = True)
+    message_type: str = models.CharField(max_length = 100)
+    data: dict[str, Any] = models.JSONField()
+
 
     @final
     def __repr__ (self) -> str:

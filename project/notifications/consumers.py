@@ -69,6 +69,7 @@ class UserConsumer(AsyncWebsocketConsumer):
         text_data: bytes = json.dumps({
             'date_time': str(timezone.now()),
             'message_type': event['message_type'],
+            'notification_id': event['notification_id'],
             'data': event['data']
         }, ensure_ascii = False).encode('utf-8')
 

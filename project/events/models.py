@@ -124,10 +124,11 @@ class Event(models.Model):
         
 
 class RequestToParticipation(models.Model):
-    user: User = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'user')
+    recipient: User = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'recipient')
     time_created: datetime = models.DateTimeField(auto_now_add = True)
     event: Event = models.ForeignKey(Event, on_delete = models.CASCADE)
-    event_author: User = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'author')
+    sender: User = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'sender')
+
 
     @final
     def __repr__ (self) -> str:
@@ -140,7 +141,7 @@ class RequestToParticipation(models.Model):
     @final
     @staticmethod
     def get_all() -> QuerySet['RequestToParticipation']:
-        return RequestToParticipation.objects.all().select_related('user', 'event_author', 'event').order_by('-id')
+        return RequestToParticipation.objects.all().select_related('recipient', 'event', 'sender').order_by('-id')
     
     class Meta:
         db_table: str = 'request_to_participation'
@@ -184,11 +185,7 @@ class InviteToEventManager(models.Manager):
 
 
 
-class InviteToEvent(models.Model):
-    recipient: User = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'recipient')
-    time_created: datetime = models.DateTimeField(auto_now_add = True)
-    event: Event = models.ForeignKey(Event, on_delete = models.CASCADE)
-    sender: User = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'sender')
+class InviteToEvent(RequestToParticipation):
 
     objects = InviteToEventManager()
 
