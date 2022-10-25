@@ -30,6 +30,7 @@ def send_to_scedular(user: User, data: dict[str, Any]) -> None:
         {
             'type': 'kafka.message',
             'message_type': 'scedular', 
+            'notification_id': None,
             'data': data
         }
     )

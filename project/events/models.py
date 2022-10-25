@@ -38,38 +38,38 @@ class Event(models.Model):
     
     class Type(models.TextChoices):
         '''ivent  type choices'''
-        football: str = 'Football'
-        futsal: str = 'Futsal'
+        FOOTBALL: str = 'Football'
+        FUTSAL: str = 'Futsal'
 
     class CloseType(models.TextChoices):
-        shirt_front: str = 'Shirt-Front'
-        t_shirt: str = 'T-Shirt'
-        any: str = 'Any'
+        SHIRT_FRONT: str = 'Shirt-Front'
+        T_SHIRT: str = 'T-Shirt'
+        ANY: str = 'Any'
 
     class Status(models.TextChoices):
-        planned: str = 'Planned'
-        active: str = 'Active'
-        finished: str = 'Finished'
+        PLANNED: str = 'Planned'
+        ACTIVE: str = 'Active'
+        FINISHED: str = 'Finished'
 
     class Duration(models.IntegerChoices):
-        minutes_10: int = 10
-        minutes_20: int = 20
-        minutes_30: int = 30
-        minutes_40: int = 40
-        minutes_50: int = 50
-        minutes_60: int = 60
-        minutes_70: int = 70
-        minutes_80: int = 80
-        minutes_90: int = 90
-        minutes_100: int = 100
-        minutes_110: int = 110
-        minutes_120: int = 120
-        minutes_130: int = 130
-        minutes_140: int = 140
-        minutes_150: int = 150
-        minutes_160: int = 160
-        minutes_170: int = 170
-        minutes_180: int = 180
+        MINUTES_10: int = 10
+        MINUTES_20: int = 20
+        MINUTES_30: int = 30
+        MINUTES_40: int = 40
+        MINUTES_50: int = 50
+        MINUTES_60: int = 60
+        MINUTES_70: int = 70
+        MINUTES_80: int = 80
+        MINUTES_90: int = 90
+        MINUTES_100: int = 100
+        MINUTES_110: int = 110
+        MINUTES_120: int = 120
+        MINUTES_130: int = 130
+        MINUTES_140: int = 140
+        MINUTES_150: int = 150
+        MINUTES_160: int = 160
+        MINUTES_170: int = 170
+        MINUTES_180: int = 180
 
     author: User = models.ForeignKey(User, on_delete = models.CASCADE)
     name: str = models.CharField(max_length = 255)
@@ -181,12 +181,12 @@ class InviteToEventManager(models.Manager):
 
     def send_invite(self, request_user: User, invite_user: User, event: Event) -> 'InviteToEvent':
 
-        if invite_user.id == request_user.id:
-            raise ValidationError(SENT_INVATION_ERROR, HTTP_403_FORBIDDEN)
-        if invite_user.id == event.author.id:
-            raise ValidationError(AUTHOR_CAN_NOT_INVITE_ERROR, HTTP_403_FORBIDDEN)
-        if invite_user in event.black_list.all():
-            raise ValidationError(USER_IN_BLACK_LIST_ERROR, HTTP_403_FORBIDDEN)
+        # if invite_user.id == request_user.id:
+        #     raise ValidationError(SENT_INVATION_ERROR, HTTP_403_FORBIDDEN)
+        # if invite_user.id == event.author.id:
+        #     raise ValidationError(AUTHOR_CAN_NOT_INVITE_ERROR, HTTP_403_FORBIDDEN)
+        # if invite_user in event.black_list.all():
+        #     raise ValidationError(USER_IN_BLACK_LIST_ERROR, HTTP_403_FORBIDDEN)
 
         if request_user.id == event.author.id or request_user.id in event.current_users.all():
             invite = self.model(recipient = invite_user, event = event, sender = request_user)

@@ -218,7 +218,7 @@ def validate_get_user_planned_events(*, pk: int, request_user: User) -> None:
 
 
 def filter_event_by_user_planned_events_time(*, pk: int, queryset: QuerySet[Event]) -> QuerySet[Event]:
-    user: User =  User.objects.get(id = pk)
+    user: User = User.objects.get(id = pk)
     num: str = re.findall(r'\d{1,10}', user.get_planned_events)[0]
     string: str = re.findall(r'\D', user.get_planned_events)[0]
     if string == 'd':
