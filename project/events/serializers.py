@@ -66,7 +66,7 @@ class EventTemplateListSerializer(serializers.ModelSerializer):
             'status',
             'current_fans',
             'current_users',
-            'description',
+            'black_list',
         ]
 
 class TemplateListSerializer(serializers.ModelSerializer):
@@ -84,7 +84,7 @@ class TemplateListSerializer(serializers.ModelSerializer):
 
 class UpdateEventSerializer(serializers.ModelSerializer):
     class Meta:
-        model: EventTemplate = Event
+        model: Event = Event
         validators = [EventDateTimeValidator()]
         exclude: Union[str, list[str]] = [
             'author',
