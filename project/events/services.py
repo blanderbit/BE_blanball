@@ -59,8 +59,12 @@ def bulk_accept_or_decline_invites_to_events(*, data: dict[str, Union[list[int],
             if invite.recipient.id == request_user.id:
                 if invite.event.current_users.count() < invite.event.amount_members:
                     if data['type'] == True:
+                        invite.status = InviteToEvent.Status.ACCEPTED
                         invite.recipient.current_rooms.add(invite.event)
-
+                    else:
+                        invite.status = InviteToEvent.Status.DECLINED
+                        
+                    invite.save()
                     send_to_user(user = invite.sender,
                     message_type = RESPONSE_TO_THE_INVITE_TO_EVENT_NOTIFICATION_TYPE,
                     data = {
@@ -83,7 +87,6 @@ def bulk_accept_or_decline_invites_to_events(*, data: dict[str, Union[list[int],
                             'last_name': invite.recipient.profile.last_name,
                         }
                     })
-                    invite.delete()
                     yield {'success': invite_id}
 
         except InviteToEvent.DoesNotExist:
