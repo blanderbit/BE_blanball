@@ -7,7 +7,6 @@ from notifications.serializers import (
     ChangeMaintenanceSerializer,
 )
 from notifications.models import Notification
-from project.pagination import CustomPagination
 
 from django.db.models.query import QuerySet
 
@@ -48,7 +47,7 @@ class NotificationsList(ListAPIView):
     queryset: QuerySet[Notification] = Notification.get_all()
 
 class UserNotificationsList(NotificationsList):
-       
+    
     def get_queryset(self) -> QuerySet:
         return self.queryset.filter(user_id = self.request.user.id)
 
