@@ -213,7 +213,8 @@ class LeaveFromEvent(GenericAPIView):
                     'last_name': event.author.profile.last_name
                 },
                 'event': {
-                    'id': event.id
+                    'id': event.id,
+                    'name': event.name, #+++++++++++++++++++++++++++++
                 },
                 'sender': {
                     'id': user.id,

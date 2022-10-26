@@ -171,7 +171,8 @@ class InviteToEventManager(models.Manager):
                         'last_name': invite_user.profile.last_name,
                     },
                     'event': {
-                        'id': event.id
+                        'id': event.id,
+                        'name': event.name #+++++++++++++++++++++++++++++++++++
                     },
                     'sender': {
                         'id': request_user.id,
