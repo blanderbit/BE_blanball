@@ -11,9 +11,7 @@ from authentication.serializers import EventUsersSerializer
 from rest_framework import serializers
 
 from rest_framework.status import (
-    HTTP_404_NOT_FOUND,
     HTTP_400_BAD_REQUEST,
-    HTTP_403_FORBIDDEN,
 )
 
 from events.validators import EventDateTimeValidator
@@ -22,9 +20,9 @@ from events.constant.response_error import (
     EVENT_TIME_EXPIRED_ERROR, NO_EVENT_PLACE_ERROR, EVENT_NOT_FOUND_ERROR,
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, ALREADY_IN_EVENT_FANS_LIST_ERROR, NO_IN_EVENT_MEMBERS_LIST_ERROR,
 )
-from authentication.constant.errors import (
-    NO_SUCH_USER_ERROR,
-)
+
+
+from project.exceptions import _404
 
 from authentication.models import User
 
@@ -147,7 +145,7 @@ class JoinOrRemoveRoomSerializer(serializers.Serializer):
                 raise serializers.ValidationError(NO_EVENT_PLACE_ERROR, HTTP_400_BAD_REQUEST)
             return super().validate(attrs)
         except Event.DoesNotExist:
-            raise serializers.ValidationError(EVENT_NOT_FOUND_ERROR, HTTP_404_NOT_FOUND)
+            raise _404(object = Event)
 
 class InviteUserToEventSerializer(serializers.Serializer):
     user_id: int = serializers.IntegerField(min_value = 0)
@@ -171,9 +169,9 @@ class InviteUserToEventSerializer(serializers.Serializer):
                 raise serializers.ValidationError(ALREADY_IN_EVENT_FANS_LIST_ERROR, HTTP_400_BAD_REQUEST)
             return super().validate(attrs)
         except User.DoesNotExist:
-            raise serializers.ValidationError(NO_SUCH_USER_ERROR, HTTP_404_NOT_FOUND)
+            raise _404(object = User)
         except Event.DoesNotExist:
-            raise serializers.ValidationError(EVENT_NOT_FOUND_ERROR, HTTP_404_NOT_FOUND)
+            raise _404(object = Event)
 
 
 class RemoveUserFromEventSerializer(serializers.Serializer):
@@ -198,9 +196,9 @@ class RemoveUserFromEventSerializer(serializers.Serializer):
                 raise serializers.ValidationError(NO_IN_EVENT_MEMBERS_LIST_ERROR, HTTP_400_BAD_REQUEST)
             return super().validate(attrs)
         except User.DoesNotExist:
-            raise serializers.ValidationError(NO_SUCH_USER_ERROR, HTTP_404_NOT_FOUND)
+            raise _404(object = User)
         except Event.DoesNotExist:
-            raise serializers.ValidationError(EVENT_NOT_FOUND_ERROR, HTTP_404_NOT_FOUND)
+            raise _404(object = Event)
 
 class RequestToParticipationSerializer(serializers.ModelSerializer):
     sender = EventUsersSerializer()

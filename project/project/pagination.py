@@ -6,7 +6,6 @@ from django.conf import settings
 
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK
 
 
 class CustomPagination(PageNumberPagination):
@@ -20,8 +19,6 @@ class CustomPagination(PageNumberPagination):
             ('current_page', self.page.number),
             ('next', self.get_next_link() or None),
             ('previous', self.get_previous_link() or None),
-            ('status', HTTP_200_OK),
-            ('message', ('Success')),
             ('success', True),
             ('results', results)
         ])

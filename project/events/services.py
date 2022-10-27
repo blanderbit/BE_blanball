@@ -12,7 +12,6 @@ from django.db.models.query import QuerySet
 from rest_framework.serializers import ValidationError
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
-    HTTP_404_NOT_FOUND,
 )
 from django.db import transaction
 
@@ -39,6 +38,8 @@ from events.constant.notification_types import (
 
 from notifications.tasks import send_to_user
 
+from project.exceptions import _404
+
 bulk = TypeVar(Optional[Generator[list[dict[str, int]], None, None]])
 
 
@@ -52,11 +53,12 @@ def bulk_delete_events(*, data: dict[str, Any], queryset: QuerySet[Event], user:
         except Event.DoesNotExist:
             pass
 
+
 def bulk_accept_or_decline_invites_to_events(*, data: dict[str, Union[list[int], bool]], request_user: User) -> bulk: 
     for invite_id in data['ids']:
         try:
             invite: InviteToEvent = InviteToEvent.objects.get(id = invite_id)
-            if invite.recipient.id == request_user.id:
+            if invite.recipient.id == request_user.id and invite.status == InviteToEvent.Status.WAITING:
                 if invite.event.current_users.count() < invite.event.amount_members:
                     if data['type'] == True:
                         invite.status = InviteToEvent.Status.ACCEPTED
@@ -224,7 +226,7 @@ def only_author(Object):
                     return func(self, request, pk, *args, **kwargs)
                 raise PermissionDenied()
             except Object.DoesNotExist:
-                return Response({'error': f'{json.dumps(Object.__name__)} not found'}, status = HTTP_404_NOT_FOUND)
+                raise _404(object = Object)
         return called
     return wrap
 
@@ -235,7 +237,7 @@ def not_in_black_list(func: Callable[[Request, int, ...], Response]) -> Callable
                 raise PermissionDenied()
             return func(self, request, pk, *args, **kwargs)
         except Event.DoesNotExist:
-            return Response(EVENT_NOT_FOUND_ERROR, HTTP_404_NOT_FOUND)
+            raise _404(object = Event)
         
     return wrap
     

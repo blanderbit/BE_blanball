@@ -195,7 +195,7 @@ class InviteToEvent(RequestToParticipation):
         DECLINED: str = 'Declined'
 
 
-    status: Optional[str] = models.CharField(choices = Status.choices, max_length = 10, default = Status.WAITING)
+    status: str = models.CharField(choices = Status.choices, max_length = 10, default = Status.WAITING)
 
     objects = InviteToEventManager()
 
