@@ -11,8 +11,8 @@ class Notification(models.Model):
 
     class Type(models.TextChoices):
         '''gender choices'''
-        unread: str = 'Unread'
-        read: str = 'Read'
+        UNREAD: str = 'Unread'
+        READ: str = 'Read'
 
     user: User = models.ForeignKey(User, on_delete = models.CASCADE)
     type: str = models.CharField(choices = Type.choices, max_length = 6, default = 'Unread')
