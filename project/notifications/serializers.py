@@ -23,7 +23,16 @@ class UserNotificationSerializer(serializers.ModelSerializer):
             'type',
             'time_created',
         ]
+    
+class UserNotificationsCount(serializers.Serializer):
+    all_notifications_count: int = serializers.IntegerField(min_value = 0)
+    not_read_notifications_count: int = serializers.IntegerField(min_value = 0)
 
+    class Meta:
+        fields: Union[str, list[str]] = [
+            'all_notifications_count'
+            'not_read_notifications_count', 
+        ]
 
 class ReadOrDeleteNotificationsSerializer(serializers.Serializer):
     ids: list[int] = serializers.ListField(child = serializers.IntegerField(min_value = 0))

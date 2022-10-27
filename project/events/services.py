@@ -53,6 +53,7 @@ def bulk_delete_events(*, data: dict[str, Any], queryset: QuerySet[Event], user:
         except Event.DoesNotExist:
             pass
 
+
 def bulk_accept_or_decline_invites_to_events(*, data: dict[str, Union[list[int], bool]], request_user: User) -> bulk: 
     for invite_id in data['ids']:
         try:
