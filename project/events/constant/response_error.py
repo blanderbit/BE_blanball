@@ -23,7 +23,7 @@ EVENT_TEMPLATE_NOT_FOUND_ERROR: dict[str, str] = {'error': 'Event template not f
 
 USER_CAN_NOT_INVITE_TO_THIS_EVENT_ERROR: dict[str, str] = {'error': 'You cannot invite users to this event'}
 
-USER_IN_BLACK_LIST_ERROR: dict[str, str] = {'error': 'This user cannot be invited to this event'}
+THIS_USER_CAN_NOT_BE_INVITED: dict[str, str] = {'error': 'This user cannot be invited to this event'}
 
 
 NO_PRICE_DESK_ERROR: dict[str, str] = {'error': 'If the price is greater than 0 you must provide a description of what it is for'}
