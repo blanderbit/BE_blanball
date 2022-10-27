@@ -5,6 +5,7 @@ from notifications.serializers import (
     NotificationSerializer,
     ReadOrDeleteNotificationsSerializer,
     ChangeMaintenanceSerializer,
+    UserNotificationsCount,
 )
 from notifications.models import Notification
 
@@ -48,8 +49,22 @@ class NotificationsList(ListAPIView):
 
 class UserNotificationsList(NotificationsList):
     
-    def get_queryset(self) -> QuerySet:
+    def get_queryset(self) -> QuerySet[Notification]:
         return self.queryset.filter(user_id = self.request.user.id)
+
+class UserNotificaitonsCount(GenericAPIView):
+    queryset: QuerySet[Notification] = Notification.get_all().filter()
+    serializer_class: Type[Serializer] = UserNotificationsCount
+
+    def get(self, request: Request) -> Response:
+        data: dict[str, int] = {
+            'all_notifications_count': self.queryset.filter(user_id = self.request.user.id).count(),
+            'not_read_notifications_count': self.queryset.filter(type = Notification.Type.UNREAD, user_id = self.request.user.id).count()
+        }
+        serializer = self.serializer_class(data = data)
+        serializer.is_valid(raise_exception = True)
+        return Response(serializer.data)
+
 
 class ReadNotifications(GenericAPIView):
     serializer_class: Type[Serializer] = ReadOrDeleteNotificationsSerializer
