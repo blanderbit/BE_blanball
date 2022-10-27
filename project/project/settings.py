@@ -192,6 +192,9 @@ REST_FRAMEWORK: dict[str, Any]  = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'project.renderers.CustomRenderer',
+    ),
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
     'DEFAULT_PAGINATION_CLASS': 'project.pagination.CustomPagination',
 }
