@@ -59,8 +59,12 @@ def bulk_accept_or_decline_invites_to_events(*, data: dict[str, Union[list[int],
             if invite.recipient.id == request_user.id:
                 if invite.event.current_users.count() < invite.event.amount_members:
                     if data['type'] == True:
+                        invite.status = InviteToEvent.Status.ACCEPTED
                         invite.recipient.current_rooms.add(invite.event)
-
+                    else:
+                        invite.status = InviteToEvent.Status.DECLINED
+                        
+                    invite.save()
                     send_to_user(user = invite.sender,
                     message_type = RESPONSE_TO_THE_INVITE_TO_EVENT_NOTIFICATION_TYPE,
                     data = {
@@ -83,7 +87,6 @@ def bulk_accept_or_decline_invites_to_events(*, data: dict[str, Union[list[int],
                             'last_name': invite.recipient.profile.last_name,
                         }
                     })
-                    invite.delete()
                     yield {'success': invite_id}
 
         except InviteToEvent.DoesNotExist:
@@ -146,7 +149,7 @@ def event_create(*, data: Union[dict[str, Any], OrderedDict[str, Any]], request_
 def send_notification_to_subscribe_event_user(*, event: Event, message_type: str,
         start_time: datetime = None,
         time_to_start: int = None) -> None:
-    for user in event.current_users.all():
+    for user in (list(event.current_users.all()) + list(event.current_fans.all())):
         send_to_user(user = user, message_type = message_type, 
         data = {
             'recipient': {
@@ -158,21 +161,6 @@ def send_notification_to_subscribe_event_user(*, event: Event, message_type: str
                 'id': event.id,
                 'start_time': start_time,
                 'time_to_start': time_to_start
-            }
-        })
-    for fan in event.current_fans.all():
-        send_to_user(user = fan, message_type = message_type, 
-        data = {
-            'recipient': {
-                'id': fan.id, 
-                'name': fan.profile.name, 
-                'last_name': fan.profile.last_name,
-            },
-            'event': {
-                'id': event.id,
-                'name': event.name,
-                'start_time': start_time,
-                'time_to_start': time_to_start,
             }
         })
 

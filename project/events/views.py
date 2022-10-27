@@ -213,7 +213,8 @@ class LeaveFromEvent(GenericAPIView):
                     'last_name': event.author.profile.last_name
                 },
                 'event': {
-                    'id': event.id
+                    'id': event.id,
+                    'name': event.name, #+++++++++++++++++++++++++++++
                 },
                 'sender': {
                     'id': user.id,
@@ -248,7 +249,6 @@ class EventList(ListAPIView):
     filterset_class = EventDateTimeRangeFilter
     queryset: QuerySet[Event] = Event.get_all()
 
-    @final
     def get_queryset(self) -> QuerySet[Event]:
         return self.queryset.filter(~Q(black_list__in = [self.request.user.id]))
     
@@ -270,7 +270,10 @@ class UserEventsRelevantList(EventsRelevantList):
 
 class InvitesToEventList(ListAPIView):
     serializer_class: Type[Serializer] = InvitesToEventListSerializer
-    queryset: QuerySet[Event] = InviteToEvent.get_all()
+    queryset: QuerySet[InviteToEvent] = InviteToEvent.get_all().filter(status = InviteToEvent.Status.WAITING)
+
+    def get_queryset(self) -> QuerySet[InviteToEvent]:
+        return self.queryset.filter(recipient = self.request.user)
 
 class BulkAcceptOrDeclineInvitesToEvent(GenericAPIView):
     serializer_class: Type[Serializer] = BulkAcceptOrDeclineRequestToParticipationSerializer
