@@ -58,7 +58,7 @@ def bulk_accept_or_decline_invites_to_events(*, data: dict[str, Union[list[int],
     for invite_id in data['ids']:
         try:
             invite: InviteToEvent = InviteToEvent.objects.get(id = invite_id)
-            if invite.recipient.id == request_user.id:
+            if invite.recipient.id == request_user.id and invite.status == InviteToEvent.Status.WAITING:
                 if invite.event.current_users.count() < invite.event.amount_members:
                     if data['type'] == True:
                         invite.status = InviteToEvent.Status.ACCEPTED

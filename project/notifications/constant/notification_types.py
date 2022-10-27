@@ -1,1 +1,5 @@
 CHANGE_MAINTENANCE_NOTIFICATION_TYPE: str = 'change_maintenance'
+
+NOTIFICATION_DELETE_NOTIFICATION_TYPE: str = 'notification_delete'
+
+NOTIFICATION_READ_NOTIFICATION_TYPE: str  = 'notification_read'
