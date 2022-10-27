@@ -183,7 +183,7 @@ class RequestPasswordReset(GenericAPIView):
         '''send request to reset user password by email'''
         email: str = request.data.get('email', '')
         try:
-            User.objects.get(email = email).exists()
+            User.objects.get(email = email)
             code_create(email = email, type = PASSWORD_RESET_CODE_TYPE, dop_info = None)
             return Response(SENT_CODE_TO_EMAIL_SUCCESS, status = HTTP_200_OK)
         except User.DoesNotExist:

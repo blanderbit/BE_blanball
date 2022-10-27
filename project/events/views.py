@@ -143,8 +143,8 @@ class DeleteEvents(GenericAPIView):
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
-        data: dict[str, list[int]] = dict(bulk_delete_events(
-            data = serializer.validated_data['ids'], queryset = self.queryset, user = request.user))
+        data: dict[str, list[int]] = bulk_delete_events(
+            data = serializer.validated_data['ids'], queryset = self.queryset, user = request.user)
         return Response(data, status = HTTP_200_OK)
 
 

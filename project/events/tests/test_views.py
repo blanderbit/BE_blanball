@@ -5,6 +5,7 @@ from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_200_OK,
     HTTP_403_FORBIDDEN,
+    HTTP_404_NOT_FOUND,
 
 )
 from events.models import (
@@ -57,7 +58,7 @@ class TestEventsViews(SetUpEventsViews):
         self.auth()
         self.client.post(reverse('event-create'), self.event_create_data)
         response = self.client.post(reverse('join-to-event'), self.event_join_data)
-        self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, HTTP_404_NOT_FOUND)
     
     @freeze_time('2022-9-29')
     def test_event_join(self) -> None:

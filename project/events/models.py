@@ -28,7 +28,6 @@ from events.constant.response_error import (
 from events.constant.notification_types import (
     INVITE_USER_TO_EVENT_NOTIFICATION_TYPEE
 )
-from project.notifications.models import Notification
 
 from rest_framework.serializers import ValidationError
 from rest_framework.status import (
