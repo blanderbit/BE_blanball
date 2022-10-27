@@ -4,7 +4,6 @@ from rest_framework.status import (
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
     HTTP_200_OK,
-    HTTP_404_NOT_FOUND,
     HTTP_403_FORBIDDEN,
 
 )

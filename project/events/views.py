@@ -56,7 +56,6 @@ from rest_framework.serializers import (
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_201_CREATED,
-    HTTP_404_NOT_FOUND,
     HTTP_200_OK,
 )
 from rest_framework.filters import (
@@ -86,13 +85,13 @@ from events.constant.notification_types import (
 from authentication.constant.errors import (
     NO_SUCH_USER_ERROR
 )
-
+from project.exceptions import _404
 
 class CreateEvent(GenericAPIView):
     '''class that allows you to create a new event'''
     serializer_class: Type[Serializer] = CreateEventSerializer
     queryset: QuerySet[Event] = Event.get_all()
-
+    
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
@@ -144,8 +143,8 @@ class DeleteEvents(GenericAPIView):
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
-        data: dict[str, list[int]] = bulk_delete_events(
-            data = serializer.validated_data['ids'], queryset = self.queryset, user = request.user)
+        data: dict[str, list[int]] = dict(bulk_delete_events(
+            data = serializer.validated_data['ids'], queryset = self.queryset, user = request.user))
         return Response(data, status = HTTP_200_OK)
 
 
@@ -327,7 +326,7 @@ class RequestToParticipationsList(ListAPIView):
             serializer = self.serializer_class(queryset, many = True)
             return Response(serializer.data, status = HTTP_200_OK)
         except Event.DoesNotExist:
-            return Response(EVENT_NOT_FOUND_ERROR, status = HTTP_404_NOT_FOUND)
+            raise _404(object = RequestToParticipation)
 
     
 class BulkAcceptOrDeclineRequestToParticipation(GenericAPIView):

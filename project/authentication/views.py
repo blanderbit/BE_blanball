@@ -18,7 +18,6 @@ from rest_framework.status import (
     HTTP_201_CREATED,
     HTTP_200_OK,
     HTTP_400_BAD_REQUEST,
-    HTTP_404_NOT_FOUND
 )
 from rest_framework.serializers import (
     Serializer,
@@ -79,6 +78,7 @@ from authentication.constant.code_types import (
     PASSWORD_CHANGE_CODE_TYPE, PASSWORD_RESET_CODE_TYPE, ACCOUNT_DELETE_CODE_TYPE,
     EMAIL_VERIFY_CODE_TYPE, PHONE_CHANGE_CODE_TYPE, EMAIL_CHANGE_CODE_TYPE,
 )
+from project.exceptions import _404
 
 
 class RegisterUser(GenericAPIView):
@@ -119,8 +119,8 @@ class UserOwnerProfile(GenericAPIView):
     def delete(self, request: Request) -> Response:
         '''submitting an account deletion request'''
         code_create(email = request.user.email, type = ACCOUNT_DELETE_CODE_TYPE,
-        dop_info = request.user.email)
-        return Response(SENT_CODE_TO_EMAIL_SUCCESS, status=HTTP_200_OK)
+            dop_info = request.user.email)
+        return Response(SENT_CODE_TO_EMAIL_SUCCESS, status = HTTP_200_OK)
 
 class UpdateProfile(GenericAPIView):
     serializer_class: Type[Serializer] = UpdateProfileSerializer
@@ -152,7 +152,7 @@ class UserProfile(GenericAPIView):
                     serializer = self.serializer_class(user, fields = (fields))
             return Response(serializer.data, status = HTTP_200_OK)
         except User.DoesNotExist:
-            return Response(NO_SUCH_USER_ERROR, status = HTTP_404_NOT_FOUND)
+            raise _404(object = User)
 
 class UserList(ListAPIView):
     '''get all users list'''
@@ -182,11 +182,12 @@ class RequestPasswordReset(GenericAPIView):
     def post(self, request: Request) -> Response:
         '''send request to reset user password by email'''
         email: str = request.data.get('email', '')
-        if User.objects.filter(email = email).exists():
+        try:
+            User.objects.get(email = email).exists()
             code_create(email = email, type = PASSWORD_RESET_CODE_TYPE, dop_info = None)
             return Response(SENT_CODE_TO_EMAIL_SUCCESS, status = HTTP_200_OK)
-        else:
-            return Response(NO_SUCH_USER_ERROR, status = HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            raise _404(object = User)
 
 class ResetPassword(GenericAPIView):
     '''password reset on a previously sent request'''
@@ -200,7 +201,7 @@ class ResetPassword(GenericAPIView):
             reset_password(data = serializer.validated_data)
             return Response(PASSWORD_RESET_SUCCESS, status = HTTP_200_OK)
         except User.DoesNotExist:
-            return Response(NO_SUCH_USER_ERROR, status = HTTP_404_NOT_FOUND) 
+            raise _404(object = User)
 
 class RequestChangePassword(GenericAPIView):
     serializer_class: Type[Serializer] = RequestChangePasswordSerializer
@@ -256,7 +257,7 @@ class GetImage(APIView):
                 img_bytes: bytes = image.read()
                 return Response(img_bytes, status = HTTP_200_OK)
         except URLError:
-            return Response(NO_SUCH_IMAGE_ERROR, status = HTTP_404_NOT_FOUND)
+            raise _404(detail = NO_SUCH_IMAGE_ERROR)
 
 class CheckCode(GenericAPIView):
     '''password reset on a previously sent request'''

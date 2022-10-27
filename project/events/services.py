@@ -12,7 +12,6 @@ from django.db.models.query import QuerySet
 from rest_framework.serializers import ValidationError
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
-    HTTP_404_NOT_FOUND,
 )
 from django.db import transaction
 
@@ -38,6 +37,8 @@ from events.constant.notification_types import (
 )
 
 from notifications.tasks import send_to_user
+
+from project.exceptions import _404
 
 bulk = TypeVar(Optional[Generator[list[dict[str, int]], None, None]])
 
@@ -224,7 +225,7 @@ def only_author(Object):
                     return func(self, request, pk, *args, **kwargs)
                 raise PermissionDenied()
             except Object.DoesNotExist:
-                return Response({'error': f'{json.dumps(Object.__name__)} not found'}, status = HTTP_404_NOT_FOUND)
+                raise _404(object = Object)
         return called
     return wrap
 
@@ -235,7 +236,7 @@ def not_in_black_list(func: Callable[[Request, int, ...], Response]) -> Callable
                 raise PermissionDenied()
             return func(self, request, pk, *args, **kwargs)
         except Event.DoesNotExist:
-            return Response(EVENT_NOT_FOUND_ERROR, HTTP_404_NOT_FOUND)
+            raise _404(object = Event)
         
     return wrap
     
