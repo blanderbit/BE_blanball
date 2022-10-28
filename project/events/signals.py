@@ -11,6 +11,7 @@ from events.services import (
 from events.constant.notification_types import (
     EVENT_DELETE_NOTIFICATION_TYPE, NEW_REQUEST_TO_PARTICIPATION_NOTIFICATION_TYPE,
     RESPONSE_TO_THE_INVITE_TO_EVENT_NOTIFICATION_TYPE,
+    UPDATE_MESSAGE_ACCEPT_OR_DECLINE_INVITE_TO_EVENT,
 )
 
 from django.db.models.signals import pre_delete, post_save
@@ -38,7 +39,8 @@ def send_message_after_response_to_invite(sender: Notification, instance: Notifi
         send(user = user, 
         data = {
             'type': 'kafka.message',
-            'message_type': RESPONSE_TO_THE_INVITE_TO_EVENT_NOTIFICATION_TYPE, 
+            'new_message_type': UPDATE_MESSAGE_ACCEPT_OR_DECLINE_INVITE_TO_EVENT, 
+            'old_message_type': RESPONSE_TO_THE_INVITE_TO_EVENT_NOTIFICATION_TYPE,
             'notification_id': instance.id,
             'response_type': response_type
         })
