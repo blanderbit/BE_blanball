@@ -85,7 +85,7 @@ from events.constant.notification_types import (
 from authentication.constant.errors import (
     NO_SUCH_USER_ERROR
 )
-from project.exceptions import _404
+from config.exceptions import _404
 
 class CreateEvent(GenericAPIView):
     '''class that allows you to create a new event'''

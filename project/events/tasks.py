@@ -2,7 +2,7 @@ from events.models import (
     Event,
     RequestToParticipation,
 )
-from project.celery import app
+from config.celery import app
 from events.services import send_notification_to_subscribe_event_user
 from events.constant.notification_types import (
     EVENT_TIME_NOTIFICATION_TYPE,

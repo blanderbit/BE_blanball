@@ -21,11 +21,11 @@ bulk = TypeVar(Optional[Generator[list[dict[str, int]], None, None]])
 
 def update_maintenance(data: dict[str, str]) -> None:
 
-    with open('./project/config.json', 'r') as f:
+    with open('./config/config.json', 'r') as f:
         json_data = json.load(f)
         json_data['isMaintenance'] = data['isMaintenance']
 
-    with open('./project/config.json', 'w') as f:
+    with open('./config/config.json', 'w') as f:
         f.write(json.dumps(json_data))
 
         for user in User.get_all():

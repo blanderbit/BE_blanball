@@ -5,7 +5,7 @@ import threading
 from dateutil.relativedelta import relativedelta
 
 from .models import Code,Profile
-from project.celery import app
+from config.celery import app
 
 from django.core.mail import EmailMessage
 

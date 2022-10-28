@@ -1,6 +1,6 @@
 from typing import Union
 
-from project.yasg import urlpatterns as doc_urls
+from config.yasg import urlpatterns as doc_urls
 
 from django.urls import (
     path,

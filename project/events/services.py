@@ -38,7 +38,7 @@ from events.constant.notification_types import (
 
 from notifications.tasks import send_to_user
 
-from project.exceptions import _404
+from config.exceptions import _404
 
 bulk = TypeVar(Optional[Generator[list[dict[str, int]], None, None]])
 
