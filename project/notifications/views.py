@@ -103,7 +103,7 @@ class GetMaintenance(APIView):
 
     def get(self, request: Request) -> Response:
         try:
-            with open('./project/config.json', 'r') as f:
+            with open('./config/config.json', 'r') as f:
                 data = f.read()
             return Response({self.key: json.loads(data)[self.key]}, status = HTTP_200_OK)
         except:

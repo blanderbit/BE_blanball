@@ -78,7 +78,7 @@ from authentication.constant.code_types import (
     PASSWORD_CHANGE_CODE_TYPE, PASSWORD_RESET_CODE_TYPE, ACCOUNT_DELETE_CODE_TYPE,
     EMAIL_VERIFY_CODE_TYPE, PHONE_CHANGE_CODE_TYPE, EMAIL_CHANGE_CODE_TYPE,
 )
-from project.exceptions import _404
+from config.exceptions import _404
 
 
 class RegisterUser(GenericAPIView):

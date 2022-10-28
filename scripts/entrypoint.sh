@@ -22,13 +22,13 @@ Daphne()
 
 CeleryWorker()
 {
-    celery -A project worker --loglevel=INFO --concurrency=8 -O fair -P prefork -n cel_app_worker
+    celery -A config worker --loglevel=INFO --concurrency=8 -O fair -P prefork -n cel_app_worker
 }
 
 
 CeleryBeat()
 {
-    celery -A project beat -l info 
+    celery -A config beat -l info 
 }
 
 
