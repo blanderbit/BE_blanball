@@ -32,6 +32,7 @@ paramiko = "^2.11.0"
 freezegun = "^1.2.2"
 uWSGI = "^2.0.20"
 django-cors-headers = "^3.13.0"
+django-split-settings = "^1.2.0"
 
 [tool.poetry.dev-dependencies]
 
