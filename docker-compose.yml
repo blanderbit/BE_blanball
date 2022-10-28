@@ -1,5 +1,24 @@
 version: "3.8"
 
+x-api-common: &api-common
+  env_file: 
+    - .env
+  entrypoint: scripts/entrypoint.sh
+  build: 
+    context: .
+    dockerfile: Dockerfile
+  volumes: 
+    - .:/usr/src/blanball
+  networks:
+    - app-network
+  depends_on:
+    db: 
+      condition: service_healthy
+    redis: 
+      condition: service_healthy
+  links: 
+    - redis
+
 services:
   db:
     container_name: db
@@ -17,29 +36,6 @@ services:
       timeout: 5s
       retries: 20
 
-  api:
-    container_name: api
-    env_file: 
-      - .env
-    entrypoint: scripts/entrypoint.sh
-    command: api
-    build: 
-      context: .
-      dockerfile: Dockerfile
-    volumes: 
-      - .:/usr/src/blanball
-    networks:
-      - app-network
-    ports: 
-      - 8000:8000
-    depends_on:
-      db: 
-        condition: service_healthy
-      redis: 
-        condition: service_healthy
-    links: 
-      - redis
-
   redis:
     container_name: redis
     env_file: 
@@ -54,44 +50,24 @@ services:
       timeout: 5s
       retries: 20
 
+  api:
+    <<: *api-common
+    container_name: api
+    command: api
+    ports: 
+      - 8000:8000
+
   celery-worker: 
+    <<: *api-common
     container_name: celery-worker
-    user: deploy
-    env_file: 
-      - .env
-    entrypoint: scripts/entrypoint.sh
     command: celery-worker
-    build: 
-      context: .
-      dockerfile: Dockerfile
-    volumes: 
-      - .:/usr/src/blanball
-    networks:
-      - app-network
-    depends_on:
-      db:
-        condition: service_started
-      api:
-        condition: service_started
+    user: deploy
 
   celery-beat:
+    <<: *api-common
     container_name: celery-beat
-    env_file: 
-      - .env
-    entrypoint: scripts/entrypoint.sh
     command: celery-beat
-    build: 
-      context: .
-      dockerfile: Dockerfile
-    volumes: 
-      - .:/usr/src/blanball
-    networks:
-      - app-network
-    depends_on:
-      db:
-        condition: service_started
-      api:
-        condition: service_started
+    user: deploy
 
   ftp-server:
     container_name: ftp-server
@@ -113,3 +89,6 @@ networks:
 volumes:
   redis-data:
   ftp-server-data:
+  data1-1:
+  data1-2:
+
