@@ -125,10 +125,17 @@ class Event(models.Model):
         
 
 class RequestToParticipation(models.Model):
+    
+    class Status(models.TextChoices):
+        WAITING: str = 'Waiting'
+        ACCEPTED: str = 'Accepted'
+        DECLINED: str = 'Declined'
+
     recipient: User = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'recipient')
     time_created: datetime = models.DateTimeField(auto_now_add = True)
     event: Event = models.ForeignKey(Event, on_delete = models.CASCADE)
     sender: User = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'sender')
+    status: str = models.CharField(choices = Status.choices, max_length = 10, default = Status.WAITING)
 
 
     def __repr__ (self) -> str:
@@ -188,14 +195,6 @@ class InviteToEventManager(models.Manager):
 
 
 class InviteToEvent(RequestToParticipation):
-
-    class Status(models.TextChoices):
-        WAITING: str = 'Waiting'
-        ACCEPTED: str = 'Accepted'
-        DECLINED: str = 'Declined'
-
-
-    status: str = models.CharField(choices = Status.choices, max_length = 10, default = Status.WAITING)
 
     objects = InviteToEventManager()
 
