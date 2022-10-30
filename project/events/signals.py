@@ -1,5 +1,5 @@
-from email import message
-from requests import request
+from typing import Any
+
 from events.models import (
     Event,
     RequestToParticipation,
@@ -12,6 +12,7 @@ from events.constant.notification_types import (
     EVENT_DELETE_NOTIFICATION_TYPE, NEW_REQUEST_TO_PARTICIPATION_NOTIFICATION_TYPE,
     RESPONSE_TO_THE_INVITE_TO_EVENT_NOTIFICATION_TYPE,
     UPDATE_MESSAGE_ACCEPT_OR_DECLINE_INVITE_TO_EVENT,
+    INVITE_USER_TO_EVENT_NOTIFICATION_TYPE,
 )
 
 from django.db.models.signals import pre_delete, post_save
@@ -29,44 +30,49 @@ def delete_event(sender: Event, instance: Event, **kwargs) -> None:
     message_type = EVENT_DELETE_NOTIFICATION_TYPE)
 
 
-@receiver(post_save, sender = Notification)
-def send_message_after_response_to_invite(sender: Notification, instance: Notification, **kwargs) -> None:
-    if instance.message_type == RESPONSE_TO_THE_INVITE_TO_EVENT_NOTIFICATION_TYPE:
-        user: User = InviteToEvent.objects.get(id = instance.data['invite']['id']).recipient
-        if InviteToEvent.objects.get(id = instance.data['invite']['id']).status == InviteToEvent.Status.ACCEPTED:
-            response_type = True
-        else:
-            response_type = False
-        send(user = user, 
-        data = {
-            'type': 'kafka.message',
-            'new_message_type': UPDATE_MESSAGE_ACCEPT_OR_DECLINE_INVITE_TO_EVENT, 
-            'old_message_type': RESPONSE_TO_THE_INVITE_TO_EVENT_NOTIFICATION_TYPE,
-            'notification_id': instance.id,
-            'response_type': response_type
-        })
+@receiver(post_save, sender = InviteToEvent)
+def send_message_after_response_to_invite(sender: InviteToEvent, instance: InviteToEvent, **kwargs: Any) -> None:
+    print(instance)
+    if instance.status != instance.Status.WAITING:
+        try:
+            status: dict[str, bool] = {instance.Status.ACCEPTED: True, instance.Status.DECLINED: False}
+            notification = Notification.objects.get(message_type = INVITE_USER_TO_EVENT_NOTIFICATION_TYPE, data__invite__id = instance.id)
+            send(user = instance.recipient, 
+                data = {
+                    'type': 'kafka.message',
+                    'notification': {
+                        'id': notification.id,
+                        'message_type': notification.message_type,
+                        'response': status[instance.status]
+                    },
+                    'new_message_type': UPDATE_MESSAGE_ACCEPT_OR_DECLINE_INVITE_TO_EVENT,
+                })
+        except Notification.DoesNotExist:
+            pass
+
 
 
 @receiver(post_save, sender = RequestToParticipation)
-def after_send_request_to_PARTICIPATION(sender: RequestToParticipation, instance, **kwargs) -> None:
-    send_to_user(user = instance.recipient,
-    message_type = NEW_REQUEST_TO_PARTICIPATION_NOTIFICATION_TYPE, 
-    data = {
-        'recipient': {
-            'id': instance.recipient.id, 
-            'name': instance.recipient.profile.name, 
-            'last_name': instance.recipient.profile.last_name,
-        },
-        'request': {
-            'id': instance.id
-        },
-        'sender': {
-            'id': instance.sender.id, 
-            'name': instance.sender.profile.name, 
-            'last_name': instance.sender.profile.last_name,
-        },
-        'event': {
-            'id': instance.event.id,
-            'name': instance.event.name,
-        }
-    })
+def after_send_request_to_PARTICIPATION(sender: RequestToParticipation, instance: RequestToParticipation, **kwargs: Any) -> None:
+    if instance.status == instance.Status.WAITING:
+        send_to_user(user = instance.recipient,
+            message_type = NEW_REQUEST_TO_PARTICIPATION_NOTIFICATION_TYPE, 
+            data = {
+                'recipient': {
+                    'id': instance.recipient.id, 
+                    'name': instance.recipient.profile.name, 
+                    'last_name': instance.recipient.profile.last_name,
+                },
+                'request': {
+                    'id': instance.id
+                },
+                'sender': {
+                    'id': instance.sender.id, 
+                    'name': instance.sender.profile.name, 
+                    'last_name': instance.sender.profile.last_name,
+                },
+                'event': {
+                    'id': instance.event.id,
+                    'name': instance.event.name,
+                }
+            })

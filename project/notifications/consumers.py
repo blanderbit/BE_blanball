@@ -68,6 +68,7 @@ class UserConsumer(AsyncWebsocketConsumer):
         # Send message to WebSocket
         text_data: bytes = json.dumps({
             'message': event,
+            'date_time': str(timezone.now())
         }, ensure_ascii = False).encode('utf-8')
 
         await self.send(text_data.decode())
