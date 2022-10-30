@@ -1,4 +1,5 @@
 from email import message
+from typing import Any
 from requests import request
 from events.models import (
     Event,
@@ -12,6 +13,7 @@ from events.constant.notification_types import (
     EVENT_DELETE_NOTIFICATION_TYPE, NEW_REQUEST_TO_PARTICIPATION_NOTIFICATION_TYPE,
     RESPONSE_TO_THE_INVITE_TO_EVENT_NOTIFICATION_TYPE,
     UPDATE_MESSAGE_ACCEPT_OR_DECLINE_INVITE_TO_EVENT,
+    INVITE_USER_TO_EVENT_NOTIFICATION_TYPE
 )
 
 from django.db.models.signals import pre_delete, post_save
@@ -28,24 +30,13 @@ def delete_event(sender: Event, instance: Event, **kwargs) -> None:
     send_notification_to_subscribe_event_user(event = instance,
     message_type = EVENT_DELETE_NOTIFICATION_TYPE)
 
+print(Notification.objects.filter(message_type = INVITE_USER_TO_EVENT_NOTIFICATION_TYPE).last().data)
 
-@receiver(post_save, sender = Notification)
-def send_message_after_response_to_invite(sender: Notification, instance: Notification, **kwargs) -> None:
-    if instance.message_type == RESPONSE_TO_THE_INVITE_TO_EVENT_NOTIFICATION_TYPE:
-        user: User = InviteToEvent.objects.get(id = instance.data['invite']['id']).recipient
-        if InviteToEvent.objects.get(id = instance.data['invite']['id']).status == InviteToEvent.Status.ACCEPTED:
-            response_type = True
-        else:
-            response_type = False
-        send(user = user, 
-        data = {
-            'type': 'kafka.message',
-            'new_message_type': UPDATE_MESSAGE_ACCEPT_OR_DECLINE_INVITE_TO_EVENT, 
-            'old_message_type': RESPONSE_TO_THE_INVITE_TO_EVENT_NOTIFICATION_TYPE,
-            'notification_id': instance.id,
-            'response_type': response_type
-        })
-
+@receiver(post_save, sender = InviteToEvent)
+def send_message_after_response_to_invite(sender: InviteToEvent, instance: InviteToEvent, **kwargs: Any) -> None:
+    if instance.status in [instance.Status.ACCEPTED, instance.Status.DECLINED]:
+        Notification.objects.filter(data__event__id = 1)
+        print(instance.id)
 
 @receiver(post_save, sender = RequestToParticipation)
 def after_send_request_to_PARTICIPATION(sender: RequestToParticipation, instance, **kwargs) -> None:
