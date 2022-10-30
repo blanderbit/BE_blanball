@@ -29,10 +29,10 @@ def delete_event(sender: Event, instance: Event, **kwargs) -> None:
     send_notification_to_subscribe_event_user(event = instance,
     message_type = EVENT_DELETE_NOTIFICATION_TYPE)
 
+print(Notification.objects.filter(message_type = INVITE_USER_TO_EVENT_NOTIFICATION_TYPE).last().data)
 
 @receiver(post_save, sender = InviteToEvent)
 def send_message_after_response_to_invite(sender: InviteToEvent, instance: InviteToEvent, **kwargs: Any) -> None:
-    print(instance)
     if instance.status != instance.Status.WAITING:
         try:
             status: dict[str, bool] = {instance.Status.ACCEPTED: True, instance.Status.DECLINED: False}
