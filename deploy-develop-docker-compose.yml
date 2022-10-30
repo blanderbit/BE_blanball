@@ -1,5 +1,23 @@
 version: "3.8"
 
+x-api-common: &api-common
+  image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
+
+  env_file: 
+    - stack.env
+  user: deploy
+  entrypoint: scripts/entrypoint.sh
+
+  depends_on:
+    db:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+  networks:
+    - app-network    
+  links:
+    - redis
+
 services: 
 
   proxy:
@@ -16,44 +34,28 @@ services:
         condition: service_started
       
   api:
+    <<: *api-common
     container_name: api
-    env_file: 
-      - stack.env
-    image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
-    user: deploy
-    entrypoint: scripts/entrypoint.sh
     command: api-deploy
     ports:
       - 49200:8000
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - app-network    
-    links:
-      - redis
 
   daphne:
+    <<: *api-common
     container_name: daphne
-    env_file: 
-      - stack.env
-    image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
-    user: deploy
-    entrypoint: scripts/entrypoint.sh
     command: daphne
     ports:
       - 49290:9000
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - app-network    
-    links:
-      - redis
+
+  celery-worker:
+    <<: *api-common
+    container_name: celery-worker
+    command: celery-worker
+
+  celery-beat:
+    <<: *api-common
+    container_name: celery-beat
+    command: celery-beat
 
   db:
     container_name: db
@@ -84,33 +86,6 @@ services:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
       timeout: 3s
       retries: 5
-
-  celery-worker:
-    env_file: 
-      - stack.env
-    container_name: celery-worker
-    image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
-    user: deploy
-    entrypoint: scripts/entrypoint.sh
-    command: celery-worker
-    networks:
-      - app-network  
-    depends_on:
-      redis:
-        condition: service_healthy
-
-  celery-beat:
-    container_name: celery-beat
-    env_file: 
-      - stack.env
-    image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
-    entrypoint: scripts/entrypoint.sh
-    command: celery-beat
-    networks:
-      - app-network
-    depends_on:
-      redis:
-        condition: service_healthy
 
   pgadmin:
     container_name: pgadmin

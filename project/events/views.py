@@ -317,7 +317,7 @@ class UserPlannedEvents(UserEvents):
 
 class RequestToParticipationsList(ListAPIView):
     serializer_class: Type[Serializer] = RequestToParticipationSerializer
-    queryset: QuerySet[RequestToParticipation] = RequestToParticipation.get_all()
+    queryset: QuerySet[RequestToParticipation] = RequestToParticipation.get_all().filter(status = RequestToParticipation.Status.WAITING)
     
     def list(self, request: Request, pk: int) -> Response:
         try:
@@ -326,7 +326,7 @@ class RequestToParticipationsList(ListAPIView):
             serializer = self.serializer_class(queryset, many = True)
             return Response(serializer.data, status = HTTP_200_OK)
         except Event.DoesNotExist:
-            raise _404(object = RequestToParticipation)
+            raise _404(object = Event)
 
     
 class BulkAcceptOrDeclineRequestToParticipation(GenericAPIView):

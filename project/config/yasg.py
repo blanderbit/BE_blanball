@@ -17,7 +17,7 @@ schema_view = get_schema_view(
    openapi.Info(
       title = 'Blanball',
       default_version = get_current_version_for_swagger(),
-      license=openapi.License(name = 'BSD License'),
+      license = openapi.License(name = 'BSD License'),
    ),
    public=True,
    permission_classes=(permissions.AllowAny, ),

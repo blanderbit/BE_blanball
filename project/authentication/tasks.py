@@ -24,7 +24,12 @@ class EmailThread(threading.Thread):
 @final
 class Util: 
     @staticmethod
-    @app.task
+    @app.task(
+        ignore_result = True,
+        time_limit = 5,
+        soft_time_limit = 3,
+        default_retry_delay = 5,
+    )
     def send_email(*, data: dict[str, Any]) -> None:
         send: EmailMessage = EmailMessage(
         subject = BLANBALL, body = data['email_body'], to = [data['to_email']])

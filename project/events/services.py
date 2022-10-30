@@ -58,13 +58,13 @@ def bulk_accept_or_decline_invites_to_events(*, data: dict[str, Union[list[int],
     for invite_id in data['ids']:
         try:
             invite: InviteToEvent = InviteToEvent.objects.get(id = invite_id)
-            if invite.recipient.id == request_user.id and invite.status == InviteToEvent.Status.WAITING:
+            if invite.recipient.id == request_user.id and invite.status == invite.Status.WAITING:
                 if invite.event.current_users.count() < invite.event.amount_members:
                     if data['type'] == True:
-                        invite.status = InviteToEvent.Status.ACCEPTED
+                        invite.status = invite.Status.ACCEPTED
                         invite.recipient.current_rooms.add(invite.event)
                     else:
-                        invite.status = InviteToEvent.Status.DECLINED
+                        invite.status = invite.Status.DECLINED
                         
                     invite.save()
                     send_to_user(user = invite.sender,
@@ -98,11 +98,14 @@ def bulk_accpet_or_decline_requests_to_participation(*, data: dict[str, Union[li
     for request_id in data['ids']:
         try:
             request_to_p: RequestToParticipation = RequestToParticipation.objects.get(id = request_id)
-            if request_to_p.recipient.id == request_user.id:
+            if request_to_p.recipient.id == request_user.id and request_to_p.status == request_to_p.Status.WAITING:
                 if data['type'] == True:
                     if request_to_p.event.current_users.count() < request_to_p.event.amount_members:
+                        request_to_p.status = request_to_p.Status.ACCEPTED
                         request_to_p.sender.current_rooms.add(request_to_p.event)
-                yield {'success': request_id}
+                else:
+                    request_to_p.status = request_to_p.Status.DECLINED
+                request_to_p.save()
                 send_to_user(user = request_to_p.sender,
                     message_type = RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_NOTIFICATION_TYPE,
                     data = {
@@ -125,7 +128,7 @@ def bulk_accpet_or_decline_requests_to_participation(*, data: dict[str, Union[li
                             'last_name': request_to_p.recipient.profile.last_name,
                         }
                     })
-                request_to_p.delete()
+                yield {'success': request_id}
 
         except RequestToParticipation.DoesNotExist:
             pass

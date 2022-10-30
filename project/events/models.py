@@ -26,7 +26,7 @@ from events.constant.response_error import (
     AUTHOR_CAN_NOT_INVITE_ERROR, THIS_USER_CAN_NOT_BE_INVITED
 )
 from events.constant.notification_types import (
-    INVITE_USER_TO_EVENT_NOTIFICATION_TYPEE
+    INVITE_USER_TO_EVENT_NOTIFICATION_TYPE
 )
 
 from rest_framework.serializers import ValidationError
@@ -125,10 +125,17 @@ class Event(models.Model):
         
 
 class RequestToParticipation(models.Model):
+    
+    class Status(models.TextChoices):
+        WAITING: str = 'Waiting'
+        ACCEPTED: str = 'Accepted'
+        DECLINED: str = 'Declined'
+
     recipient: User = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'recipient')
     time_created: datetime = models.DateTimeField(auto_now_add = True)
     event: Event = models.ForeignKey(Event, on_delete = models.CASCADE)
     sender: User = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'sender')
+    status: str = models.CharField(choices = Status.choices, max_length = 10, default = Status.WAITING)
 
 
     def __repr__ (self) -> str:
@@ -164,7 +171,7 @@ class InviteToEventManager(models.Manager):
         if request_user.id == event.author.id or request_user.id in event.current_users.all():
             invite = self.model(recipient = invite_user, event = event, sender = request_user)
             invite.save()
-            send_to_user(user = invite_user, message_type = INVITE_USER_TO_EVENT_NOTIFICATION_TYPEE, 
+            send_to_user(user = invite_user, message_type = INVITE_USER_TO_EVENT_NOTIFICATION_TYPE, 
                 data = {
                     'recipient': {
                         'id': invite_user.id, 
@@ -174,6 +181,9 @@ class InviteToEventManager(models.Manager):
                     'event': {
                         'id': event.id,
                         'name': event.name 
+                    },
+                    'invite': {
+                        'id': invite.id,
                     },
                     'sender': {
                         'id': request_user.id,
@@ -188,14 +198,6 @@ class InviteToEventManager(models.Manager):
 
 
 class InviteToEvent(RequestToParticipation):
-
-    class Status(models.TextChoices):
-        WAITING: str = 'Waiting'
-        ACCEPTED: str = 'Accepted'
-        DECLINED: str = 'Declined'
-
-
-    status: str = models.CharField(choices = Status.choices, max_length = 10, default = Status.WAITING)
 
     objects = InviteToEventManager()
 
