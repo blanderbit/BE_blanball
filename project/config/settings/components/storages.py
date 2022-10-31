@@ -7,7 +7,7 @@ from decouple import config
 
 if os.environ.get('GITHUB_WORKFLOW'):
     REDIS_HOST: str = '127.0.0.1'
-    
+
     DATABASES: dict[str, Any] = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -16,7 +16,7 @@ if os.environ.get('GITHUB_WORKFLOW'):
             'PASSWORD': 'postgres_test',
             'HOST': '127.0.0.1',
             'PORT': 5432,
-        }
+        } 
     }
 else:
     REDIS_HOST: str = config('REDIS_HOST', cast = str)

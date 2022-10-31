@@ -22,7 +22,6 @@ from notifications.models import Notification
 from notifications.tasks import (
     send_to_user, send
 )
-from authentication.models import User
 
 @receiver(pre_delete, sender = Event)
 def delete_event(sender: Event, instance: Event, **kwargs) -> None:
