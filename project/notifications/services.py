@@ -56,12 +56,12 @@ def bulk_delete_notifications(data: dict[str, Any], queryset: QuerySet[Notificat
                 yield {'success': notification}
                 send(user = notify.user,
                     data = {
-                    'type': 'kafka.message',
-                    'message_type': NOTIFICATION_DELETE_NOTIFICATION_TYPE, 
-                    'notification': {
-                        'id': notify.id,
-                    }
-                })
+                        'type': 'kafka.message',
+                        'message_type': NOTIFICATION_DELETE_NOTIFICATION_TYPE, 
+                        'notification': {
+                            'id': notify.id,
+                        }
+                    })
         except Notification.DoesNotExist:
             pass
 
@@ -75,12 +75,12 @@ def bulk_read_notifications(data: dict[str, Any], queryset: QuerySet[Notificatio
                 yield {'success': notification}
                 send(user = notify.user,
                     data = {
-                    'type': 'kafka.message',
-                    'message_type': NOTIFICATION_READ_NOTIFICATION_TYPE, 
-                    'notification': {
-                        'id': notify.id,
-                        'type': notify.type,
-                    }
-                })
+                        'type': 'kafka.message',
+                        'message_type': NOTIFICATION_READ_NOTIFICATION_TYPE, 
+                        'notification': {
+                            'id': notify.id,
+                            'type': notify.type,
+                        }
+                    })
         except Notification.DoesNotExist:
             pass

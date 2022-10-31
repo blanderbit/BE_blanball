@@ -118,7 +118,7 @@ def bulk_accpet_or_decline_requests_to_participation(*, data: dict[str, Union[li
                             'id': request_to_p.event.id,
                             'name': request_to_p.event.name,
                         },
-                        'invite': {
+                        'request': {
                             'id': request_to_p.id,
                             'response': data['type'],
                         },

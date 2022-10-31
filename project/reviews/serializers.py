@@ -48,6 +48,11 @@ class CreateReviewSerializer(ModelSerializer):
                 },
                 'review': {
                     'id': review.id,
+                },
+                'sender': {
+                    'id': self.context['request'].user.id,
+                    'name': self.context['request'].user.profile.name,
+                    'last_name': self.context['request'].user.profile.last_name,
                 }
             })
         user: User = User.objects.get(email = validated_data['user'])

@@ -65,6 +65,7 @@ class UserConsumer(AsyncWebsocketConsumer):
             await self.delete_user_from_active()
 
     async def kafka_message(self, event: dict[str, Any]) -> None:
+        print(event)
         # Send message to WebSocket
         text_data: bytes = json.dumps({
             'message': event,

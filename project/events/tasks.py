@@ -15,19 +15,19 @@ def check_event_start_time() -> None:
     for event in Event.get_all():
         if event.date_and_time - timezone.now() == timezone.timedelta(minutes = 1440):
             send_notification_to_subscribe_event_user(event = event, 
-            message_type = EVENT_TIME_NOTIFICATION_TYPE,
-            start_time = event.date_and_time,
-            time_to_start = 1440)
+                message_type = EVENT_TIME_NOTIFICATION_TYPE,
+                start_time = str(event.date_and_time),
+                time_to_start = 1440)
         elif event.date_and_time - timezone.now() == timezone.timedelta(minutes = 120):
             send_notification_to_subscribe_event_user(event = event, 
-            message_type = EVENT_TIME_NOTIFICATION_TYPE,
-            start_time = event.date_and_time,
-            time_to_start = 120)
+                message_type = EVENT_TIME_NOTIFICATION_TYPE,
+                start_time = str(event.date_and_time),
+                time_to_start = 120)
         elif event.date_and_time - timezone.now() == timezone.timedelta(minutes = 10):
             send_notification_to_subscribe_event_user(event = event, 
-            message_type = EVENT_TIME_NOTIFICATION_TYPE,
-            start_time = event.date_and_time,
-            time_to_start = 10)
+                message_type = EVENT_TIME_NOTIFICATION_TYPE,
+                start_time = str(event.date_and_time),
+                time_to_start = 10)
         elif event.date_and_time == timezone.now():
             event.status = 'Active'
             event.save()
