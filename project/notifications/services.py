@@ -28,23 +28,19 @@ def update_maintenance(data: dict[str, str]) -> None:
     with open('./config/config.json', 'w') as f:
         f.write(json.dumps(json_data))
 
-        for user in User.get_all():
-            async_to_sync(get_channel_layer().group_send)(
-                user.group_name,
-                {
-                    'type': 'kafka.message',
+        async_to_sync(get_channel_layer().group_send)(
+            'general',
+            {
+                'type': 'general.message',
+                'message': {
                     'message_type': CHANGE_MAINTENANCE_NOTIFICATION_TYPE, 
-                    'notification_id': None,
                     'data': {
-                    'recipient':{
-                        'id': user.id,
-                        'name': user.profile.name,
-                        'last_name': user.profile.last_name,
-                    },
-                    'maintenance': {
-                        'type': data['isMaintenance'],
-                    }
-                }})
+                        'maintenance': {
+                            'type': data['isMaintenance'],
+                        }
+                    }   
+                }
+            })
                 
     
 def bulk_delete_notifications(data: dict[str, Any], queryset: QuerySet[Notification], user: User) -> bulk:
@@ -57,9 +53,11 @@ def bulk_delete_notifications(data: dict[str, Any], queryset: QuerySet[Notificat
                 send(user = notify.user,
                     data = {
                         'type': 'kafka.message',
-                        'message_type': NOTIFICATION_DELETE_NOTIFICATION_TYPE, 
-                        'notification': {
-                            'id': notify.id,
+                        'message': {
+                            'message_type': NOTIFICATION_DELETE_NOTIFICATION_TYPE, 
+                            'notification': {
+                                'id': notify.id,
+                            }
                         }
                     })
         except Notification.DoesNotExist:
@@ -76,10 +74,12 @@ def bulk_read_notifications(data: dict[str, Any], queryset: QuerySet[Notificatio
                 send(user = notify.user,
                     data = {
                         'type': 'kafka.message',
-                        'message_type': NOTIFICATION_READ_NOTIFICATION_TYPE, 
-                        'notification': {
-                            'id': notify.id,
-                            'type': notify.type,
+                        'message': {
+                            'message_type': NOTIFICATION_READ_NOTIFICATION_TYPE, 
+                            'notification': {
+                                'id': notify.id,
+                                'type': notify.type,
+                            }
                         }
                     })
         except Notification.DoesNotExist:

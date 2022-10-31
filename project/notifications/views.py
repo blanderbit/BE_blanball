@@ -92,11 +92,11 @@ class ChangeMaintenance(GenericAPIView):
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
-        try:
-            update_maintenance(data = request.data)
-            return Response(MAINTENANCE_UPDATED_SUCCESS, status = HTTP_200_OK)
-        except:
-            return Response(MAINTENANCE_CAN_NOT_UPDATE_ERROR, status = HTTP_400_BAD_REQUEST)
+        # try:
+        update_maintenance(data = request.data)
+        return Response(MAINTENANCE_UPDATED_SUCCESS, status = HTTP_200_OK)
+        # except:
+        #     return Response(MAINTENANCE_CAN_NOT_UPDATE_ERROR, status = HTTP_400_BAD_REQUEST)
 
 class GetMaintenance(APIView):
     key: str = 'isMaintenance'

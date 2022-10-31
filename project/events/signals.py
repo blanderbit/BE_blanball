@@ -22,7 +22,6 @@ from notifications.models import Notification
 from notifications.tasks import (
     send_to_user, send
 )
-from authentication.models import User
 
 @receiver(pre_delete, sender = Event)
 def delete_event(sender: Event, instance: Event, **kwargs) -> None:
@@ -37,12 +36,14 @@ def send_update_message_after_response(*, instance: Union[InviteToEvent, Request
             send(user = instance.recipient, 
                 data = {
                     'type': 'kafka.message',
-                    'notification': {
-                        'id': notification.id,
-                        'message_type': notification.message_type,
-                        'response': status[instance.status]
-                    },
-                    'message_type': message_type,
+                    'message': {
+                        'message_type': message_type,
+                        'notification': {
+                            'id': notification.id,
+                            'message_type': notification.message_type,
+                            'response': status[instance.status]
+                        },
+                    }
                 })
             notification.data.update({'response': status[instance.status]})
             notification.save()
