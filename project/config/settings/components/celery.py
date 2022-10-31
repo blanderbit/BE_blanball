@@ -1,10 +1,16 @@
 from decouple import config
+from os import environ
 
 #celery framework settings
-CELERY_BROKER_URL: str = config('CELERY_BROKER_URL', cast = str, 
-    default = 'redis://127.0.0.1:6379')
-CELERY_RESULT_BACKEND: str = config('CELERY_RESULT_BACKEND', cast = str, 
-    default = 'redis://127.0.0.1:6379')
+
+if environ.get('GITHUB_WORKFLOW'):
+    CELERY_BROKER_URL: str = 'redis://127.0.0.1:6379'
+    CELERY_RESULT_BACKEND: str = 'redis://127.0.0.1:6379'
+else:
+    CELERY_BROKER_URL: str = config('CELERY_BROKER_URL', cast = str)
+    CELERY_RESULT_BACKEND: str = config('CELERY_RESULT_BACKEND', cast = str)
+
+
 CELERY_TASK_SERIALIZER: str = 'json'
 CELERY_RESULT_SERIALIZER: str = 'json'
 CELERY_ACKS_LATE: bool = True

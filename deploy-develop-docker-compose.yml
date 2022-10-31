@@ -5,7 +5,6 @@ x-api-common: &api-common
 
   env_file: 
     - stack.env
-  user: deploy
   entrypoint: scripts/entrypoint.sh
 
   depends_on:
@@ -37,6 +36,7 @@ services:
     <<: *api-common
     container_name: api
     command: api-deploy
+      user: deploy
     ports:
       - 49200:8000
 
@@ -44,12 +44,14 @@ services:
     <<: *api-common
     container_name: daphne
     command: daphne
+    user: deploy
     ports:
       - 49290:9000
 
   celery-worker:
     <<: *api-common
     container_name: celery-worker
+    user: deploy
     command: celery-worker
 
   celery-beat:

@@ -1,29 +1,31 @@
-import os
-
+from os import environ
 from typing import Any
-
 from decouple import config
 
 
-if os.environ.get('GITHUB_WORKFLOW'):
-    REDIS_HOST: str = '127.0.0.1'
-
-    DATABASES: dict[str, Any] = {
+if environ.get('GITHUB_WORKFLOW'):
+    DATABASES: dict[str, Any]= {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'postgres_test',
-            'USER': 'postgres_test',
-            'PASSWORD': 'postgres_test',
-            'HOST': '127.0.0.1',
-            'PORT': 5432,
-        } 
+           'ENGINE': 'django.db.backends.postgresql_psycopg2',
+           'NAME': 'postgres_test',
+           'USER': 'postgres_test',
+           'PASSWORD': 'postgres_test',
+           'HOST': '127.0.0.1',
+           'PORT': 5432,
+        }
+    }
+    CHANNEL_LAYERS: dict[str, Any] = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                'hosts': [('127.0.0.1', config('REDIS_PORT', cast = int))],
+            },
+        },
     }
 else:
-    REDIS_HOST: str = config('REDIS_HOST', cast = str)
-
-    DATABASES: dict[str, Any] = {
+    DATABASES: dict[str,Any] = {
         'default': {
-            'ENGINE': config('DB_ENGINE', cast = str),
+            'ENGINE':config('DB_ENGINE', cast = str),
             'NAME': config('DB_NAME', cast = str),
             'USER': config('DB_USER', cast = str),
             'PASSWORD': config('DB_PASSWORD', cast = str),
@@ -31,16 +33,14 @@ else:
             'PORT': config('DB_PORT', cast = int),
         }
     }
-    
-CHANNEL_LAYERS: dict[str, Any] = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            'hosts': [(REDIS_HOST, config('REDIS_PORT', cast = int, 
-                default = 6379))],
+    CHANNEL_LAYERS: dict[str, Any] = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                'hosts': [('redis', config('REDIS_PORT', cast = int))],
+            },
         },
-    },
-}
+    }
 
 DEFAULT_FILE_STORAGE: str = config('FILE_STORAGE', cast = str)
 FTP_USER: str = config('FTP_USER', cast = str)
