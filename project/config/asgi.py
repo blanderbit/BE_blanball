@@ -9,11 +9,9 @@ import notifications.routing
 
 from authentication.middlewares import  JwtAuthMiddlewareStack
 
+
 application = ProtocolTypeRouter({
+  'websocket': JwtAuthMiddlewareStack(URLRouter(notifications.routing.websocket_urlpatterns)),
   "http": django_asgi_app,
-  "websocket": JwtAuthMiddlewareStack(URLRouter(
-        notifications.routing.websocket_urlpatterns
-    )
-  )
 })
  

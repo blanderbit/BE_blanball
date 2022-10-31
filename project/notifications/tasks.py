@@ -22,7 +22,9 @@ def send_to_user(user: User, message_type: str, data: dict[str, Union[str, int, 
     send(user = user, 
         data = {
             'type': 'kafka.message',
-            'message_type': message_type, 
-            'notification_id': notification.id,
-            'data': data
+            'message': {
+                'message_type': message_type, 
+                'notification_id': notification.id,
+                'data': data
+            }
         })
