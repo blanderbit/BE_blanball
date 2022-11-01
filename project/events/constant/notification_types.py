@@ -9,4 +9,5 @@ UPDATE_MESSAGE_ACCEPT_OR_DECLINE_INVITE_TO_EVENT: str = 'update_message_accept_o
 UPDATE_MESSAGE_ACCEPT_OR_DECLINE_REQUEST_TO_PARTICIPATION: str = 'update_message_accept_or_decline_invite_to_event' 
 RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_NOTIFICATION_TYPE: str = 'response_to_request_for_participation' 
 NEW_USER_ON_THE_EVENT_NOTIFICATION_TYPE: str = 'new_user_on_the_event'
+LAST_USER_ON_THE_EVENT_NOTIFICATION_TYPE: str = 'last_user_on_the_event'
 USER_REMOVE_FROM_EVENT_NOTIFICATION_TYPE: str = 'remove_from_event'

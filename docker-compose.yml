@@ -61,13 +61,11 @@ services:
     <<: *api-common
     container_name: celery-worker
     command: celery-worker
-    user: deploy
 
   celery-beat:
     <<: *api-common
     container_name: celery-beat
     command: celery-beat
-    user: deploy
 
   ftp-server:
     container_name: ftp-server

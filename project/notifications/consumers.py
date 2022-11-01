@@ -84,7 +84,6 @@ class GeneralConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def general_message(self, event: dict[str, Any]) -> None:
-        print(event)
         text_data: bytes = json.dumps({
             'message': event['message'],
             'date_time': str(timezone.now())
