@@ -10,5 +10,6 @@ UPDATE_MESSAGE_ACCEPT_OR_DECLINE_REQUEST_TO_PARTICIPATION: str = 'update_message
 RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_NOTIFICATION_TYPE: str = 'response_to_request_for_participation' 
 NEW_USER_ON_THE_EVENT_NOTIFICATION_TYPE: str = 'new_user_on_the_event'
 LAST_USER_ON_THE_EVENT_NOTIFICATION_TYPE: str = 'last_user_on_the_event'
+YOU_ARE_LAST_USER_ON_THE_EVENT_NOTIFICATION_TYPE: str = 'you_are_last_user_on_the_event'
 USER_REMOVE_FROM_EVENT_NOTIFICATION_TYPE: str = 'remove_from_event'
 EVENT_HAS_BEEN_ENDEN_NOTIFICATION_TYPE: str = 'event_has_been_ended'
