@@ -36,7 +36,7 @@ services:
     <<: *api-common
     container_name: api
     command: api-deploy
-      user: deploy
+    user: deploy
     ports:
       - 49200:8000
 

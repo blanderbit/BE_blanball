@@ -47,7 +47,6 @@ jobs:
         cd project
         poetry run python3 manage.py migrate
         poetry run python3 manage.py test --no-input
-
   auto_deploy:
     runs-on: ubuntu-latest
     needs: run_tests
