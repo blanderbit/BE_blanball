@@ -87,6 +87,4 @@ networks:
 volumes:
   redis-data:
   ftp-server-data:
-  data1-1:
-  data1-2:
 

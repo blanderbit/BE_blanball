@@ -66,7 +66,7 @@ services:
     image: postgres:latest
     restart: always
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
     networks:
       - app-network
     healthcheck:
@@ -138,3 +138,4 @@ volumes:
   pgadmin-data:
   db-backup-data:
   ftp-server-data:
+  db-data:
