@@ -15,7 +15,7 @@ from events.constant.notification_types import (
     INVITE_USER_TO_EVENT_NOTIFICATION_TYPE,
     UPDATE_MESSAGE_ACCEPT_OR_DECLINE_REQUEST_TO_PARTICIPATION,
     LAST_USER_ON_THE_EVENT_NOTIFICATION_TYPE,
-    EVENT_HAS_BEEN_ENDEN,
+    EVENT_HAS_BEEN_ENDEN_NOTIFICATION_TYPE,
 )
 
 from django.db.models.signals import pre_delete, post_save, m2m_changed
