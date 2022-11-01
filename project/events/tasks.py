@@ -9,10 +9,11 @@ from events.constant.notification_types import (
 )
 
 from django.utils import timezone
+from django.db.models import Q
 
 @app.task
 def check_event_start_time() -> None:
-    for event in Event.get_all():
+    for event in Event.get_all().filter(~Q(status = Event.Status.FINISHED)):
         if event.date_and_time - timezone.now() == timezone.timedelta(minutes = 1440):
             send_notification_to_subscribe_event_user(event = event, 
                 message_type = EVENT_TIME_NOTIFICATION_TYPE,
@@ -29,14 +30,8 @@ def check_event_start_time() -> None:
                 start_time = str(event.date_and_time),
                 time_to_start = 10)
         elif event.date_and_time == timezone.now():
-            event.status = 'Active'
+            event.status = event.Status.ACTIVE
             event.save()
         elif ((event.date_and_time - timezone.now()) / timezone.timedelta(days = 1)) * 1440 + event.duration <= 0:
-            event.status = 'Finished'
+            event.status = event.Status.FINISHED
             event.save()
-
-@app.task
-def delete_requests_to_participation() -> None:
-    for request in RequestToParticipation.get_all():
-        if request.event.status == 'Finished':
-            request.delete()

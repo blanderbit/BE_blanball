@@ -1,3 +1,4 @@
+from gettext import install
 from typing import Any, Union
 
 from events.models import (
@@ -9,19 +10,69 @@ from events.services import (
     send_notification_to_subscribe_event_user,
 )
 from events.constant.notification_types import (
-    EVENT_DELETE_NOTIFICATION_TYPE, NEW_REQUEST_TO_PARTICIPATION_NOTIFICATION_TYPE,
+    EVENT_DELETE_NOTIFICATION_TYPE, 
+    NEW_REQUEST_TO_PARTICIPATION_NOTIFICATION_TYPE,
     UPDATE_MESSAGE_ACCEPT_OR_DECLINE_INVITE_TO_EVENT,
     INVITE_USER_TO_EVENT_NOTIFICATION_TYPE,
-    UPDATE_MESSAGE_ACCEPT_OR_DECLINE_REQUEST_TO_PARTICIPATION
+    UPDATE_MESSAGE_ACCEPT_OR_DECLINE_REQUEST_TO_PARTICIPATION,
+    LAST_USER_ON_THE_EVENT_NOTIFICATION_TYPE,
+    EVENT_HAS_BEEN_ENDEN_NOTIFICATION_TYPE,
 )
 
-from django.db.models.signals import pre_delete, post_save
+from django.db.models.signals import pre_delete, post_save, m2m_changed
 from django.dispatch import receiver
 
 from notifications.models import Notification
 from notifications.tasks import (
     send_to_user, send
 )
+
+from authentication.models import User
+
+
+def send_to_all_event_users(*, event: Event, message_type: str, data: dict[str, Any]) -> None:
+    for user in (list(event.current_users.all()) + [event.author]):
+        send_to_user(
+            user,
+            message_type = message_type,
+            data = data
+        )
+
+@receiver(m2m_changed, sender = Event.current_users.through)
+def send_to_scedular_after_new_user_join_to_event(sender: User, instance: User, **kwargs: Any) -> None:
+    action: str = kwargs.pop('action', None)
+    if action == 'pre_add':
+        event: Event = instance.current_rooms.through.objects.last().event
+        if event.current_users.all().count() + 1 == event.amount_members:
+            send_to_all_event_users(event = event, message_type = LAST_USER_ON_THE_EVENT_NOTIFICATION_TYPE,
+                data = {
+                    'event': {
+                        'id': event.id,
+                        'name': event.name,
+                    }
+                }
+            )
+
+
+@receiver(post_save, sender = Event)
+def send_message_the_end_of_event(sender: Event, instance: Event, **kwargs) -> None:
+    if instance.status == instance.Status.FINISHED:
+        send_to_all_event_users(event = instance, message_type = EVENT_HAS_BEEN_ENDEN_NOTIFICATION_TYPE,
+            data = {
+                'event': {
+                    'id': instance.id,
+                    'name': instance.name,
+                }
+            }
+        )
+
+@receiver(post_save, sender = Event)
+def delete_all_event_relations_after_finished(sender: Event, instance: Event, **kwargs) -> None:
+    if instance.status == instance.Status.FINISHED:
+        instance.invites.all().delete()
+        for notification in Notification.objects.filter(data__event__id = instance.id):
+            notification.data['event'].update({'finished': True})
+            notification.save()
 
 @receiver(pre_delete, sender = Event)
 def delete_event(sender: Event, instance: Event, **kwargs) -> None:
@@ -50,6 +101,8 @@ def send_update_message_after_response(*, instance: Union[InviteToEvent, Request
             
         except Notification.DoesNotExist:
             pass
+
+
 
 @receiver(post_save, sender = InviteToEvent)
 def send_message_after_response_to_invite_to_event(sender: InviteToEvent, instance: InviteToEvent, **kwargs: Any) -> None:

@@ -59,3 +59,5 @@ RUN target="$POETRY_CACHE_DIR" \
 
 # copy ource code to project workind directory
 COPY . $APP_PATH
+
+RUN chmod 777 project/config/config.json

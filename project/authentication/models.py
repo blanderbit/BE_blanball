@@ -150,7 +150,7 @@ class User(AbstractBaseUser):
     @final
     @staticmethod
     def get_all() -> QuerySet['User']:
-        return User.objects.all().select_related('profile').order_by('-id')
+        return User.objects.select_related('profile').order_by('-id')
 
     @final
     def tokens(self) -> dict[str, str]:
