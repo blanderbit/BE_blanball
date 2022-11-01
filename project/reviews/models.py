@@ -29,7 +29,7 @@ class Review(models.Model):
     @final
     @staticmethod
     def get_all() -> QuerySet['Review']:
-        return Review.objects.all().select_related('user').order_by('-id')
+        return Review.objects.select_related('user').order_by('-id')
 
     @final
     def __str__(self) -> str:

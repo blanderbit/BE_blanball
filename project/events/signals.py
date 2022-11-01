@@ -1,3 +1,4 @@
+from gettext import install
 from typing import Any, Union
 
 from events.models import (
@@ -54,7 +55,7 @@ def send_to_scedular_after_new_user_join_to_event(sender: User, instance: User, 
 
 
 @receiver(post_save, sender = Event)
-def delete_event(sender: Event, instance: Event, **kwargs) -> None:
+def send_message_the_end_of_event(sender: Event, instance: Event, **kwargs) -> None:
     if instance.status == instance.Status.FINISHED:
         send_to_all_event_users(event = instance, message_type = EVENT_HAS_BEEN_ENDEN_NOTIFICATION_TYPE,
             data = {
@@ -64,6 +65,14 @@ def delete_event(sender: Event, instance: Event, **kwargs) -> None:
                 }
             }
         )
+
+@receiver(post_save, sender = Event)
+def delete_all_event_relations_after_finished(sender: Event, instance: Event, **kwargs) -> None:
+    if instance.status == instance.Status.FINISHED:
+        instance.invites.all().delete()
+        for notification in Notification.objects.filter(data__event__id = instance.id):
+            notification.data['event'].update({'finished': True})
+            notification.save()
 
 @receiver(pre_delete, sender = Event)
 def delete_event(sender: Event, instance: Event, **kwargs) -> None:
