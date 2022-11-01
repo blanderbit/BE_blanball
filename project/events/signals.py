@@ -15,6 +15,7 @@ from events.constant.notification_types import (
     INVITE_USER_TO_EVENT_NOTIFICATION_TYPE,
     UPDATE_MESSAGE_ACCEPT_OR_DECLINE_REQUEST_TO_PARTICIPATION,
     LAST_USER_ON_THE_EVENT_NOTIFICATION_TYPE,
+    EVENT_HAS_BEEN_ENDEN,
 )
 
 from django.db.models.signals import pre_delete, post_save, m2m_changed
@@ -41,7 +42,7 @@ def send_to_scedular_after_new_user_join_to_event(sender: User, instance: User, 
     action: str = kwargs.pop('action', None)
     if action == 'pre_add':
         event: Event = instance.current_rooms.through.objects.last().event
-        if event.current_users.all().count() + 1 != event.amount_members:
+        if event.current_users.all().count() + 1 == event.amount_members:
             send_to_all_event_users(event = event, message_type = LAST_USER_ON_THE_EVENT_NOTIFICATION_TYPE,
                 data = {
                     'event': {
@@ -55,7 +56,7 @@ def send_to_scedular_after_new_user_join_to_event(sender: User, instance: User, 
 @receiver(post_save, sender = Event)
 def delete_event(sender: Event, instance: Event, **kwargs) -> None:
     if instance.status == instance.Status.FINISHED:
-        send_to_all_event_users(event = instance, message_type = LAST_USER_ON_THE_EVENT_NOTIFICATION_TYPE,
+        send_to_all_event_users(event = instance, message_type = EVENT_HAS_BEEN_ENDEN_NOTIFICATION_TYPE,
             data = {
                 'event': {
                     'id': instance.id,
