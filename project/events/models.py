@@ -137,6 +137,8 @@ class RequestToParticipation(models.Model):
     sender: User = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'sender')
     status: str = models.CharField(choices = Status.choices, max_length = 10, default = Status.WAITING)
 
+    # def _type(self):
+    #     return self.__class__.__name__
 
     def __repr__ (self) -> str:
         return '<RequestToParticipation %s>' % self.id
@@ -198,6 +200,7 @@ class InviteToEventManager(models.Manager):
 
 
 class InviteToEvent(RequestToParticipation):
+
 
     objects = InviteToEventManager()
 

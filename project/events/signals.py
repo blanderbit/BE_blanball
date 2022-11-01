@@ -1,3 +1,4 @@
+from gettext import install
 from typing import Any, Union
 
 from events.models import (
@@ -65,14 +66,13 @@ def send_message_the_end_of_event(sender: Event, instance: Event, **kwargs) -> N
             }
         )
 
-# print(Event.objects.get(id = 34).invites.select_related('recipient', 'event', 'sender'))
-
-# @receiver(post_save, sender = Event)
-# def delete_all_event_relations_after_finished(sender: Event, instance: Event, **kwargs) -> None:
-#     if instance.status == instance.Status.FINISHED:
-#         for i in instance.invites.select_related('recipient', 'event', 'sender'):
-#             print('fdfd')
-
+@receiver(post_save, sender = Event)
+def delete_all_event_relations_after_finished(sender: Event, instance: Event, **kwargs) -> None:
+    if instance.status == instance.Status.FINISHED:
+        instance.invites.all().delete()
+        for notification in Notification.objects.filter(data__event__id = instance.id):
+            notification.data['event'].update({'finished': True})
+            notification.save()
 
 @receiver(pre_delete, sender = Event)
 def delete_event(sender: Event, instance: Event, **kwargs) -> None:

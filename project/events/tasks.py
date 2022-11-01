@@ -11,8 +11,6 @@ from events.constant.notification_types import (
 from django.utils import timezone
 from django.db.models import Q
 
-
-
 @app.task
 def check_event_start_time() -> None:
     for event in Event.get_all().filter(~Q(status = Event.Status.FINISHED)):
