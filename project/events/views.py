@@ -130,7 +130,7 @@ class UpdateEvent(GenericAPIView):
     def put(self, request: Request, pk: int) -> Response:
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
-        event: Event = self.queryset.filter(id = pk).select_related('author').prefetch_related('current_users', 'current_fans')
+        event: Event = self.queryset.filter(id = pk)
         send_notification_to_subscribe_event_user(event = event[0], message_type = EVENT_UPDATE_NOTIFICATION_TYPE)
         event.update(**serializer.validated_data)
         return Response(EVENT_UPDATE_SUCCESS, status = HTTP_200_OK)

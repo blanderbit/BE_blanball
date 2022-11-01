@@ -116,7 +116,7 @@ class Event(models.Model):
     @final
     @staticmethod
     def get_all() -> QuerySet['Event']:
-        return Event.objects.all().filter().select_related('author').prefetch_related('current_users', 'current_fans').order_by('-id')
+        return Event.objects.select_related('author').prefetch_related('current_users', 'current_fans').order_by('-id')
     
     class Meta:
         db_table: str = 'event'
@@ -133,7 +133,7 @@ class RequestToParticipation(models.Model):
 
     recipient: User = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'recipient')
     time_created: datetime = models.DateTimeField(auto_now_add = True)
-    event: Event = models.ForeignKey(Event, on_delete = models.CASCADE)
+    event: Event = models.ForeignKey(Event, on_delete = models.CASCADE, related_name = 'invites')
     sender: User = models.ForeignKey(User, on_delete = models.CASCADE, related_name = 'sender')
     status: str = models.CharField(choices = Status.choices, max_length = 10, default = Status.WAITING)
 
@@ -146,7 +146,7 @@ class RequestToParticipation(models.Model):
 
     @staticmethod
     def get_all() -> QuerySet['RequestToParticipation']:
-        return RequestToParticipation.objects.all().select_related('recipient', 'event', 'sender').order_by('-id')
+        return RequestToParticipation.objects.select_related('recipient', 'event', 'sender').order_by('-id')
     
     class Meta:
         db_table: str = 'request_to_participation'
@@ -212,7 +212,7 @@ class InviteToEvent(RequestToParticipation):
     @final
     @staticmethod
     def get_all() -> QuerySet['InviteToEvent']:
-        return InviteToEvent.objects.all().select_related('recipient', 'event', 'sender').order_by('-id')
+        return InviteToEvent.objects.select_related('recipient', 'event', 'sender').order_by('-id')
 
     class Meta:
         db_table: str = 'invite_to_event'

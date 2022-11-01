@@ -28,7 +28,7 @@ class Notification(models.Model):
     @final
     @staticmethod
     def get_all() -> QuerySet['Notification']:
-        return Notification.objects.all().select_related('user').order_by('-id')
+        return Notification.objects.select_related('user').order_by('-id')
 
     @final
     def __str__(self) -> str:
