@@ -138,7 +138,7 @@ class JoinOrRemoveRoomSerializer(serializers.Serializer):
         event_id: int = attrs.get('event_id')
         try:
             event: Event = Event.objects.get(id = event_id)
-            if event.status != 'Planned':
+            if event.status != event.Status.PLANNED:
                 raise serializers.ValidationError(EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST)
             if event.amount_members < event.count_current_users + 1:
                 raise serializers.ValidationError(NO_EVENT_PLACE_ERROR, HTTP_400_BAD_REQUEST)
@@ -160,7 +160,7 @@ class InviteUserToEventSerializer(serializers.Serializer):
         try:
             invite_user: User = User.objects.get(id = attrs.get('user_id'))
             event: Event = Event.objects.get(id = attrs.get('event_id'))
-            if event.status == 'Finished':
+            if event.status == Event.Status.FINISHED:
                 raise serializers.ValidationError(EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST)
             if invite_user.current_rooms.filter(id = event.id).exists():
                 raise serializers.ValidationError(ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, HTTP_400_BAD_REQUEST)
@@ -189,7 +189,7 @@ class RemoveUserFromEventSerializer(serializers.Serializer):
         try:
             removed_user: User = User.objects.get(id = attrs.get('user_id'))
             event: Event = Event.objects.get(id = attrs.get('event_id'))
-            if event.status == 'Finished':
+            if event.status == event.Status.FINISHED:
                 raise serializers.ValidationError(EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST)
             if not removed_user.current_rooms.filter(id = event.id).exists():
                 raise serializers.ValidationError(NO_IN_EVENT_MEMBERS_LIST_ERROR, HTTP_400_BAD_REQUEST)

@@ -19,11 +19,11 @@ schema_view = get_schema_view(
       default_version = get_current_version_for_swagger(),
       license = openapi.License(name = 'BSD License'),
    ),
-   public=True,
-   permission_classes=(permissions.AllowAny, ),
+   public = True,
+   permission_classes = (permissions.AllowAny, ),
 )
 
 urlpatterns = [
-   path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), 
+   path('api/v1/swagger/', schema_view.with_ui('swagger', cache_timeout = 0), 
       name = 'schema-swagger-ui'),
 ]

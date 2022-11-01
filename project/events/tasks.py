@@ -29,14 +29,14 @@ def check_event_start_time() -> None:
                 start_time = str(event.date_and_time),
                 time_to_start = 10)
         elif event.date_and_time == timezone.now():
-            event.status = 'Active'
+            event.status = event.Status.ACTIVE
             event.save()
         elif ((event.date_and_time - timezone.now()) / timezone.timedelta(days = 1)) * 1440 + event.duration <= 0:
-            event.status = 'Finished'
+            event.status = event.Status.FINISHED
             event.save()
 
 @app.task
 def delete_requests_to_participation() -> None:
     for request in RequestToParticipation.get_all():
-        if request.event.status == 'Finished':
+        if request.event.status == request.event.Status.FINISHED:
             request.delete()
