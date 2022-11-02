@@ -98,7 +98,6 @@ class RegisterUser(GenericAPIView):
         return Response(user.tokens(), status = HTTP_201_CREATED)
 
 class LoginUser(GenericAPIView):
-    '''user login'''
     serializer_class: Type[Serializer] = LoginSerializer
     permission_classes = [IsNotAuthenticated, ]
 
