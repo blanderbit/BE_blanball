@@ -82,7 +82,11 @@ from config.exceptions import _404
 
 
 class RegisterUser(GenericAPIView):
-    '''register user'''
+    '''
+    This class allows the user to register in the application.
+    If the user entered the correct data, 
+    he will receive 2 tokens [Access and Refresh] otherwise there will be an error.
+    '''
     serializer_class: Type[Serializer] = RegisterSerializer
     permission_classes = [IsNotAuthenticated, ]
 
@@ -98,6 +102,17 @@ class RegisterUser(GenericAPIView):
         return Response(user.tokens(), status = HTTP_201_CREATED)
 
 class LoginUser(GenericAPIView):
+    '''
+    This class gives the user the  ability to log in to the site. 
+    If the user entered the correct data, пe will receive 2 tokens 
+    [Access and Refresh] otherwise there will be an error.
+
+    Example request: 
+    {
+        "email": "user@example.com",
+        "password": "stringst"
+    }
+    '''
     serializer_class: Type[Serializer] = LoginSerializer
     permission_classes = [IsNotAuthenticated, ]
 
@@ -107,10 +122,15 @@ class LoginUser(GenericAPIView):
         return Response(serializer.data, status = HTTP_200_OK)
 
 class UserOwnerProfile(GenericAPIView):
+    '''
+    This class allows an authorized user to 
+    get detailed information about their profile, 
+    as well as send a request to delete it
+    '''
     serializer_class = UserSerializer
     
     def get(self, request: Request) -> Response: 
-        '''get detailed information about your profile'''
+        '''get detail information about profile'''
         user: User = User.objects.get(id = self.request.user.id)
         serializer = self.serializer_class(user)
         return Response(serializer.data, status = HTTP_200_OK)
@@ -122,11 +142,14 @@ class UserOwnerProfile(GenericAPIView):
         return Response(SENT_CODE_TO_EMAIL_SUCCESS, status = HTTP_200_OK)
 
 class UpdateProfile(GenericAPIView):
+    '''
+    This class allows an authorized 
+    user to change their profile information.
+    '''
     serializer_class: Type[Serializer] = UpdateProfileSerializer
     queryset: QuerySet[User] = User.get_all()
 
     def put(self, request: Request) -> Response: 
-        '''changing profile information'''
         user: User = self.queryset.get(id = self.request.user.id)
         serializer = self.serializer_class(user, data = request.data)
         profile_update(user = user, serializer = serializer)
@@ -134,12 +157,18 @@ class UpdateProfile(GenericAPIView):
 
 
 class UserProfile(GenericAPIView):
-    '''get public user profile'''
+    '''
+    This class makes it possible to 
+    get information about any user of the application
+
+
+    !! It is important that the profile information may differ, 
+    because information about the phone number and mail may be hidden !!
+    '''
     serializer_class: Type[Serializer] = UserSerializer
     queryset: QuerySet[User] = User.get_all()
 
     def get(self, request: Request, pk: int) -> Response:
-        '''getting a public user profile'''
         fields: list = ['configuration']
         try:
             user: User = self.queryset.get(id = pk)
@@ -154,16 +183,29 @@ class UserProfile(GenericAPIView):
             raise _404(object = User)
 
 class UserList(ListAPIView):
-    '''get all users list'''
+    '''
+    This class makes it possible to 
+    get a list of all users of the application.
+
+    The list can also be filtered by such parameters as (ordering, search filter).
+    Possible filter options are specified in the 
+    ordering_fields and search_fields parameters, respectively.
+    '''
     serializer_class: Type[Serializer] = UsersListSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter, ]
     filterset_class = UserAgeRangeFilter
-    search_fields: list[str] = ['profile__name', 'profile__gender', 'profile__last_name']
     ordering_fields: list[str] = ['id', 'profile__age', 'raiting']
+    search_fields: list[str] = ['profile__name', 'profile__gender', 'profile__last_name']
     queryset: QuerySet[User] = User.get_all().filter(role = 'User')
 
 class UsersRelevantList(ListAPIView):
-    '''getting the 5 most relevant users for your query'''
+    '''
+    This class makes it possible to get the 5 most 
+    relevant users for a search query.
+
+    The fields for which you can make a request are indicated in search_fields
+    
+    '''
     filter_backends = [RankedFuzzySearchFilter, ]
     serializer_class: Type[Serializer] = UsersListSerializer
     queryset: QuerySet[User] = User.get_all().filter(role = 'User')
@@ -174,7 +216,12 @@ class AdminUsersList(UserList):
     def get_queryset(self) -> QuerySet[User]:
         return self.queryset.filter(role = 'Admin')
 
-class RequestPasswordReset(GenericAPIView):
+class RequestPasswordReset(GenericAPIView): 
+    '''
+    This class allows an unauthorized user to request a password reset. 
+    After submitting the application, a confirmation code will be sent 
+    to the email specified by the user.
+    '''
     serializer_class: Type[Serializer] = EmailSerializer
     permission_classes = [IsNotAuthenticated, ]
 
@@ -189,7 +236,11 @@ class RequestPasswordReset(GenericAPIView):
             raise _404(object = User)
 
 class ResetPassword(GenericAPIView):
-    '''password reset on a previously sent request'''
+    '''
+    This class makes it possible to confirm a password 
+    reset request using the code that was sent to the
+    mail after the request was sent.
+    '''
     serializer_class: Type[Serializer] = ResetPasswordSerializer
     permission_classes = [IsNotAuthenticated, ]
 
@@ -203,6 +254,11 @@ class ResetPassword(GenericAPIView):
             raise _404(object = User)
 
 class RequestChangePassword(GenericAPIView):
+    '''
+    This class allows an authorized user to request a password change.
+    After submitting the application, a confirmation code will be sent.
+    to the email address provided by the user.
+    '''
     serializer_class: Type[Serializer] = RequestChangePasswordSerializer
 
     def post(self, request: Request) -> Response:
@@ -215,6 +271,13 @@ class RequestChangePassword(GenericAPIView):
         return Response(SENT_CODE_TO_EMAIL_SUCCESS, status = HTTP_200_OK)
 
 class RequestEmailVerify(GenericAPIView):
+    '''
+    This class allows an authorized user to request account verification.
+    After submission, a confirmation code will be sent.
+    to the email address provided by the user.
+    
+    If the user is already verified, he cannot send a second request
+    '''
     serializer_class: Type[Serializer] = EmailSerializer
 
     def get(self, request: Request) -> Response:
@@ -226,6 +289,11 @@ class RequestEmailVerify(GenericAPIView):
         return Response(SENT_CODE_TO_EMAIL_SUCCESS, status = HTTP_200_OK)
 
 class RequetChangeEmail(GenericAPIView):
+    '''
+    This class allows an authorized user to request a email change.
+    After submitting the application, a confirmation code will be sent.
+    to the email address provided by the user.
+    '''
     serializer_class: Type[Serializer] = EmailSerializer
 
     def post(self, request: Request) -> Response:
@@ -238,6 +306,11 @@ class RequetChangeEmail(GenericAPIView):
         return Response(THIS_EMAIL_ALREADY_IN_USE_ERROR, status = HTTP_400_BAD_REQUEST)
 
 class RequestChangePhone(GenericAPIView):
+    '''
+    This class allows an authorized user to request a phone change.
+    After submitting the application, a confirmation code will be sent.
+    to the email address provided by the user.
+    '''
     serializer_class: Type[Serializer] = RequestChangePhoneSerializer
 
     def post(self, request: Request) -> Response:
@@ -247,16 +320,6 @@ class RequestChangePhone(GenericAPIView):
         dop_info = serializer.validated_data['phone'])
         return Response(SENT_CODE_TO_EMAIL_SUCCESS, status = HTTP_200_OK)
 
-
-class GetImage(APIView):
-
-    def get(self, request: Request, image_path: str) -> Response:
-        try:
-            with urllib.request.urlopen(f'{settings.FTP_STORAGE_LOCATION}/users/{image_path}') as image:
-                img_bytes: bytes = image.read()
-                return Response(img_bytes, status = HTTP_200_OK)
-        except URLError:
-            raise _404(detail = NO_SUCH_IMAGE_ERROR)
 
 class CheckCode(GenericAPIView):
     '''password reset on a previously sent request'''
