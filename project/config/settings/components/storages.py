@@ -43,7 +43,9 @@ else:
     }
 
 DEFAULT_FILE_STORAGE: str = config('FILE_STORAGE', cast = str)
-FTP_USER: str = config('FTP_USER', cast = str)
-FTP_PASS: str = config('FTP_PASS', cast = str)
-FTP_PORT: str = config('FTP_PORT', cast = str)
-FTP_STORAGE_LOCATION: str = 'ftp://' + FTP_USER + ':' + FTP_PASS + '@ftp-server:' + FTP_PORT
+MINIO_STORAGE_ACCESS_KEY: str = config('FILE_STORAGE_ACCESS_KEY', cast = str)
+MINIO_STORAGE_SECRET_KEY: str = config('FILE_STORAGE_SECRET_KEY', cast = str)
+MINIO_STORAGE_ENDPOINT: str = config('FILE_STORAGE_ENDPOINT', cast = str)
+MINIO_STORAGE_USE_HTTPS: bool = config('FILE_STORAGE_USE_HTTPS', cast = bool)
+MINIO_STORAGE_MEDIA_BUCKET_NAME: str = config('FILE_STORAGE_MEDIA_BUCKET_NAME', cast = str)
+MINIO_STORAGE_AUTO_CREATE_MEDIA_BUCKET: bool = config('FILE_STORAGE_AUTO_CREATE_MEDIA_BUCKET', cast = bool)
