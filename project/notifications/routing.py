@@ -12,8 +12,8 @@ from django.urls.resolvers import (
 )
 
 websocket_urlpatterns: list[Union[URLResolver, URLPattern]] = [
-    path('my/notifications/', UserConsumer.as_asgi(), 
+    path('ws/notifications/', UserConsumer.as_asgi(), 
         name = 'user-notifications'),
-    path('general/', GeneralConsumer.as_asgi(), 
+    path('ws/general/', GeneralConsumer.as_asgi(), 
         name = 'general'),
 ]

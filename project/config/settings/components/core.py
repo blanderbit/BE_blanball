@@ -19,6 +19,8 @@ INSTALLED_APPS: list[str] = [
     'django.contrib.staticfiles',
 
     # Other libs apps:
+    'minio_storage',
+
     'corsheaders',
     'rest_framework_swagger',
     'rest_framework',
@@ -46,6 +48,8 @@ MIDDLEWARE: list[str] = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     
+    # 'django_minio_backend.apps.DjangoMinioBackendConfig',
+
     'events.middlewares.RequestMiddleware',
 ]
 

@@ -93,7 +93,7 @@ class Profile(models.Model):
     last_name: str = models.CharField(max_length = 255)
     gender: str = models.CharField(choices = Gender.choices, max_length = 10)
     birthday: date = models.DateField(blank = True, null = True, validators = [validate_birthday])
-    avatar: Image = models.ImageField(null = True, blank=True, upload_to = image_file_name)
+    avatar: Image = models.ImageField(null = True, blank = True, upload_to = image_file_name)
     age: int = models.PositiveSmallIntegerField(null = True, blank = True)
     height: int = models.PositiveSmallIntegerField(null = True, blank = True, validators=[
             MinValueValidator(30),
