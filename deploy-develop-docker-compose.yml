@@ -46,7 +46,7 @@ services:
     command: daphne
     user: deploy
     ports:
-      - 49290:9000
+      - 49290:10000
 
   celery-worker:
     <<: *api-common
@@ -116,16 +116,22 @@ services:
       db:
         condition: service_started
 
-  ftp-server:
-    container_name: ftp-server
+  minio:
+    container_name: minio
     env_file: 
       - stack.env
-    image: garethflowers/ftp-server
-    ports:
-      - '20-21:20-21/tcp'
-      - '40000-40009:40000-40009/tcp'
+    image: minio/minio
     volumes:
-      - ftp-server-data:/home/user
+      - minio-data:/minio-data
+    command: 'minio server /minio-data --console-address ":9001"'
+    ports:
+      - 9000:9000
+      - 9001:9001
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
     networks:
       - app-network
 
@@ -137,5 +143,5 @@ volumes:
   redis-data:
   pgadmin-data:
   db-backup-data:
-  ftp-server-data:
+  minio-data:
   db-data:

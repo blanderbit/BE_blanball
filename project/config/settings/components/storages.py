@@ -43,8 +43,8 @@ else:
     }
 
 DEFAULT_FILE_STORAGE: str = config('FILE_STORAGE', cast = str)
-MINIO_STORAGE_ACCESS_KEY: str = config('FILE_STORAGE_ACCESS_KEY', cast = str)
-MINIO_STORAGE_SECRET_KEY: str = config('FILE_STORAGE_SECRET_KEY', cast = str)
+MINIO_STORAGE_ACCESS_KEY: str = config('MINIO_ROOT_USER', cast = str)
+MINIO_STORAGE_SECRET_KEY: str = config('MINIO_ROOT_PASSWORD', cast = str)
 MINIO_STORAGE_ENDPOINT: str = config('FILE_STORAGE_ENDPOINT', cast = str)
 MINIO_STORAGE_USE_HTTPS: bool = config('FILE_STORAGE_USE_HTTPS', cast = bool)
 MINIO_STORAGE_MEDIA_BUCKET_NAME: str = config('FILE_STORAGE_MEDIA_BUCKET_NAME', cast = str)
