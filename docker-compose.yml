@@ -68,20 +68,7 @@ services:
     container_name: celery-beat
     command: celery-beat
     user: deploy
-
-  ftp-server:
-    container_name: ftp-server
-    env_file: 
-      - .env
-    image: garethflowers/ftp-server
-    ports:
-      - '20-21:20-21/tcp'
-      - '40000-40009:40000-40009/tcp'
-    volumes:
-      - ftp-server-data:/home/user
-    networks:
-      - app-network
-
+    
   minio:
     container_name: minio
     env_file: 
