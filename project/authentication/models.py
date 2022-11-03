@@ -83,7 +83,7 @@ def validate_birthday(value: date) -> None:
 def configuration_dict() -> dict[str, bool]:
     return {'email': True, 'phone': True, 'send_email': True}
 
-def image_file_name(instance, filename: str) -> str:
+def image_file_name(instance: 'Profile', filename: str) -> str:
     filename: uuid.UUID = (uuid.uuid4())
 
     return os.path.join('users', str(filename))

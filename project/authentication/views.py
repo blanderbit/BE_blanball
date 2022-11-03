@@ -253,6 +253,7 @@ class ResetPassword(GenericAPIView):
         except User.DoesNotExist:
             raise _404(object = User)
 
+
 class RequestChangePassword(GenericAPIView):
     '''
     This class allows an authorized user to request a password change.
