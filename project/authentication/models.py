@@ -95,11 +95,11 @@ class Profile(models.Model):
     birthday: date = models.DateField(blank = True, null = True, validators = [validate_birthday])
     avatar: Image = models.ImageField(null = True, blank = True, upload_to = image_file_name)
     age: int = models.PositiveSmallIntegerField(null = True, blank = True)
-    height: int = models.PositiveSmallIntegerField(null = True, blank = True, validators=[
+    height: int = models.PositiveSmallIntegerField(null = True, blank = True, validators = [
             MinValueValidator(30),
             MaxValueValidator(210),
         ])
-    weight: int = models.PositiveSmallIntegerField(null = True, blank = True, validators=[
+    weight: int = models.PositiveSmallIntegerField(null = True, blank = True, validators = [
             MinValueValidator(30),
             MaxValueValidator(210),
         ])
@@ -133,7 +133,7 @@ class User(AbstractBaseUser):
     updated_at: str = models.DateTimeField(auto_now = True)
     raiting: float = models.FloatField(null = True, blank= True)
     profile: Profile = models.ForeignKey(Profile, on_delete = models.CASCADE, blank = True, null = True, related_name = 'user')
-    configuration: dict = models.JSONField(default = configuration_dict)
+    configuration: dict[str, bool] = models.JSONField(default = configuration_dict)
 
     USERNAME_FIELD: str = 'email'
 

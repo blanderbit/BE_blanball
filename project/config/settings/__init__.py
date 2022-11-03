@@ -4,6 +4,7 @@ from pathlib import Path
 
 _BASE_DIR = Path(__file__).parent.parent.parent
 
+
 _base_settings: list[str] = [
     'components/core.py',
     'components/storages.py',

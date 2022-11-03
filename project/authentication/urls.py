@@ -16,7 +16,6 @@ from authentication.views import (
     RequetChangeEmail,
     RequestChangePhone,
     RequestEmailVerify,
-    GetImage,
 )
 
 from django.urls import path
@@ -72,6 +71,4 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     # endpoint where user can request verify email
     path('client/request-verify/email', RequestEmailVerify.as_view(), 
         name = 'request-email-verify'),
-    path('client/get/image/<str:image_path>', GetImage.as_view(), 
-        name = 'get-image'),
 ]
