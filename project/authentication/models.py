@@ -45,7 +45,7 @@ class UserManager(BaseUserManager):
 class Gender(models.TextChoices):
     '''gender choices'''
     MAN: str = 'Man'
-    WOOMAN: str = 'Wooman'
+    WOMAN: str = 'Woman'
 
 
 class Position(models.TextChoices):
