@@ -1,6 +1,7 @@
 from typing import Any, Type
 
 from django.db.models.query import QuerySet
+from django.db import transaction
 from django.conf import settings
 
 from rest_framework.filters import (
@@ -56,8 +57,6 @@ from authentication.filters import (
     RankedFuzzySearchFilter,
     UserAgeRangeFilter,
 )
-import urllib.request
-from urllib.error import URLError
 
 from authentication.constant.success import (
     REGISTER_SUCCESS_BODY_TITLE, REGISTER_SUCCESS_TITLE, REGISTER_SUCCESS_TEXT,
@@ -71,7 +70,7 @@ from authentication.constant.success import (
 
 )
 from authentication.constant.errors import (
-    NO_SUCH_USER_ERROR, WRONG_PASSWORD_ERROR, ALREADY_VERIFIED_ERROR, 
+    WRONG_PASSWORD_ERROR, ALREADY_VERIFIED_ERROR, 
     THIS_EMAIL_ALREADY_IN_USE_ERROR, NO_PERMISSIONS_ERROR, NO_SUCH_IMAGE_ERROR
 )
 from authentication.constant.code_types import (
@@ -90,6 +89,7 @@ class RegisterUser(GenericAPIView):
     serializer_class: Type[Serializer] = RegisterSerializer
     permission_classes = [IsNotAuthenticated, ]
 
+    @transaction.atomic
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
@@ -180,7 +180,7 @@ class UserProfile(GenericAPIView):
                     serializer = self.serializer_class(user, fields = (fields))
             return Response(serializer.data, status = HTTP_200_OK)
         except User.DoesNotExist:
-            raise _404(object = User)
+            raise _404()
 
 class UserList(ListAPIView):
     '''
@@ -233,7 +233,7 @@ class RequestPasswordReset(GenericAPIView):
             code_create(email = email, type = PASSWORD_RESET_CODE_TYPE, dop_info = None)
             return Response(SENT_CODE_TO_EMAIL_SUCCESS, status = HTTP_200_OK)
         except User.DoesNotExist:
-            raise _404(object = User)
+            raise _404()
 
 class ResetPassword(GenericAPIView):
     '''
@@ -251,7 +251,7 @@ class ResetPassword(GenericAPIView):
             reset_password(data = serializer.validated_data)
             return Response(PASSWORD_RESET_SUCCESS, status = HTTP_200_OK)
         except User.DoesNotExist:
-            raise _404(object = User)
+            raise _404()
 
 
 class RequestChangePassword(GenericAPIView):
