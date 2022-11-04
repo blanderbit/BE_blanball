@@ -12,13 +12,10 @@ from django.utils.encoding import force_str
 class _404(APIException):
 
     status_code: int = HTTP_404_NOT_FOUND
-    default_detail: str = '{object_name} not found.'
+    default_detail: str = 'Not found.'
 
-    def __init__(self, *, object = None, detail: Optional[Union[dict[str, str]]] = None):
-        if object is None and detail is None:
-            raise Exception('detail or object must be set') 
-        if detail is None:
-            detail = force_str(self.default_detail).format(object_name = object.__name__)
+    def __init__(self):
+        detail = force_str(self.default_detail)
         super().__init__(detail)
 
 @final

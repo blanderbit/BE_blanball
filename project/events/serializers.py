@@ -144,7 +144,7 @@ class JoinOrRemoveRoomSerializer(serializers.Serializer):
                 raise serializers.ValidationError(NO_EVENT_PLACE_ERROR, HTTP_400_BAD_REQUEST)
             return super().validate(attrs)
         except Event.DoesNotExist:
-            raise _404(object = Event)
+            raise _404()
 
 class InviteUserToEventSerializer(serializers.Serializer):
     user_id: int = serializers.IntegerField(min_value = 0)
@@ -168,9 +168,9 @@ class InviteUserToEventSerializer(serializers.Serializer):
                 raise serializers.ValidationError(ALREADY_IN_EVENT_FANS_LIST_ERROR, HTTP_400_BAD_REQUEST)
             return super().validate(attrs)
         except User.DoesNotExist:
-            raise _404(object = User)
+            raise _404()
         except Event.DoesNotExist:
-            raise _404(object = Event)
+            raise _404()
 
 
 class RemoveUserFromEventSerializer(serializers.Serializer):
@@ -195,9 +195,9 @@ class RemoveUserFromEventSerializer(serializers.Serializer):
                 raise serializers.ValidationError(NO_IN_EVENT_MEMBERS_LIST_ERROR, HTTP_400_BAD_REQUEST)
             return super().validate(attrs)
         except User.DoesNotExist:
-            raise _404(object = User)
+            raise _404()
         except Event.DoesNotExist:
-            raise _404(object = Event)
+            raise _404()
 
 class RequestToParticipationSerializer(serializers.ModelSerializer):
     sender = EventUsersSerializer()

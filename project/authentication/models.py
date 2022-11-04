@@ -1,5 +1,4 @@
 import os
-import uuid
 
 from datetime import date, datetime
 
@@ -12,6 +11,9 @@ from django.db.models.query import QuerySet
 
 from django.contrib.auth.models import AbstractBaseUser
 from django.utils import timezone
+from django.utils.encoding import smart_bytes
+from django.conf import settings
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.core.validators import (
     MaxValueValidator, 
     MinValueValidator,
@@ -30,6 +32,9 @@ from rest_framework.status import HTTP_400_BAD_REQUEST
 from authentication.constant.errors import (
     MIN_AGE_VALUE_ERROR, MAX_AGE_VALUE_ERROR
 )
+
+from minio import Minio
+from minio.commonconfig import REPLACE, CopySource
 
 
 class UserManager(BaseUserManager):
@@ -84,28 +89,31 @@ def configuration_dict() -> dict[str, bool]:
     return {'email': True, 'phone': True, 'send_email': True}
 
 def image_file_name(instance: 'Profile', filename: str) -> str:
-    filename: uuid.UUID = (uuid.uuid4())
-
     return os.path.join('users', str(filename))
+
+def validate_image(image: Image) -> str:
+    megabyte_limit: float = 1.0
+    if image.size > megabyte_limit*1024*1024:
+        raise ValidationError('Max file size is %sMB' % str(megabyte_limit))
 
 class Profile(models.Model):
     name: str = models.CharField(max_length = 255)
     last_name: str = models.CharField(max_length = 255)
     gender: str = models.CharField(choices = Gender.choices, max_length = 10)
-    birthday: date = models.DateField(blank = True, null = True, validators = [validate_birthday])
-    avatar: Image = models.ImageField(null = True, blank = True, upload_to = image_file_name)
-    age: int = models.PositiveSmallIntegerField(null = True, blank = True)
-    height: int = models.PositiveSmallIntegerField(null = True, blank = True, validators = [
+    birthday: date = models.DateField(null = True, validators = [validate_birthday])
+    avatar: Image = models.ImageField(null = True, upload_to = image_file_name, validators = [validate_image])
+    age: int = models.PositiveSmallIntegerField(null = True)
+    height: int = models.PositiveSmallIntegerField(null = True, validators = [
             MinValueValidator(30),
             MaxValueValidator(210),
         ])
-    weight: int = models.PositiveSmallIntegerField(null = True, blank = True, validators = [
+    weight: int = models.PositiveSmallIntegerField(null = True, validators = [
             MinValueValidator(30),
             MaxValueValidator(210),
         ])
-    position: str = models.CharField(choices = Position.choices, max_length = 255, null = True, blank = True)
+    position: str = models.CharField(choices = Position.choices, max_length = 255, null = True)
     created_at: datetime = models.DateTimeField(auto_now_add = True)
-    about_me: str =  models.TextField(blank = True, null = True)
+    about_me: str =  models.TextField(null = True)
 
     @final
     def __repr__ (self) -> str:
@@ -115,12 +123,29 @@ class Profile(models.Model):
     def __str__(self) -> str:
         return self.name
 
+    @final
+    def save(self, *args: Any, **kwargs: Any) -> None:
+        super(Profile, self).save(*args, **kwargs)
+        if self.avatar != None:
+            client: Minio = Minio(
+                settings.MINIO_ENDPOINT,
+                access_key = settings.MINIO_ACCESS_KEY,
+                secret_key = settings.MINIO_SECRET_KEY,
+                secure = False,
+            )
+            new_image_name: str = f'users/{urlsafe_base64_encode(smart_bytes(self.id))}_{timezone.now().date()}'
+            client.copy_object(
+                settings.MINIO_MEDIA_FILES_BUCKET,
+                new_image_name,
+                CopySource(settings.MINIO_MEDIA_FILES_BUCKET, self.avatar.name), 
+                metadata_directive = REPLACE,
+            )
+            self.avatar.name = new_image_name
 
     class Meta:
         db_table: str = 'profile'
         verbose_name: str = 'profile'
         verbose_name_plural: str = 'profiles'
-
 
 class User(AbstractBaseUser):
     '''basic user model'''
@@ -129,10 +154,10 @@ class User(AbstractBaseUser):
     is_verified: bool = models.BooleanField(default = False)
     is_online: bool = models.BooleanField(default = False)
     get_planned_events: str = models.CharField(max_length = 10, default = '1m') 
-    role: str = models.CharField(choices = Role.choices, max_length = 10, blank = True, null = True)
+    role: str = models.CharField(choices = Role.choices, max_length = 10, null = True)
     updated_at: str = models.DateTimeField(auto_now = True)
-    raiting: float = models.FloatField(null = True, blank= True)
-    profile: Profile = models.ForeignKey(Profile, on_delete = models.CASCADE, blank = True, null = True, related_name = 'user')
+    raiting: float = models.FloatField(null = True)
+    profile: Profile = models.ForeignKey(Profile, on_delete = models.CASCADE, null = True, related_name = 'user')
     configuration: dict[str, bool] = models.JSONField(default = configuration_dict)
 
     USERNAME_FIELD: str = 'email'
@@ -173,10 +198,10 @@ class User(AbstractBaseUser):
 
 class Code(models.Model):
     verify_code: str = models.CharField(max_length = 5, unique = True)
-    life_time: datetime = models.DateTimeField(null = True, blank = True)
+    life_time: datetime = models.DateTimeField(null = True)
     type: str = models.CharField(max_length = 20)
     user_email: str = models.CharField(max_length = 255)
-    dop_info: str = models.CharField(max_length = 255, null = True, blank = True)
+    dop_info: str = models.CharField(max_length = 255, null = True)
 
     @final
     def __repr__ (self) -> str:
