@@ -68,37 +68,20 @@ services:
     container_name: celery-beat
     command: celery-beat
     user: deploy
-
-  ftp-server:
-    container_name: ftp-server
-    env_file: 
-      - .env
-    image: garethflowers/ftp-server
-    ports:
-      - '20-21:20-21/tcp'
-      - '40000-40009:40000-40009/tcp'
-    volumes:
-      - ftp-server-data:/home/user
-    networks:
-      - app-network
-
+    
   minio:
     container_name: minio
     env_file: 
       - .env
     image: minio/minio
-    hostname: "minio"
     volumes:
       - minio-data:/minio-data
     command: 'minio server /minio-data --console-address ":9001"'
     ports:
       - 9000:9000
       - 9001:9001
-    environment:
-      MINIO_ROOT_USER: access-key
-      MINIO_ROOT_PASSWORD: secret-key
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
       timeout: 20s
       retries: 3

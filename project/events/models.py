@@ -78,16 +78,16 @@ class Event(models.Model):
     place: str = models.CharField(max_length = 255)
     gender: str = models.CharField(choices = Gender.choices, max_length = 10)
     date_and_time: datetime = models.DateTimeField()
-    contact_number: str = PhoneNumberField(null = True, blank = True)
+    contact_number: str = PhoneNumberField(null = True)
     need_ball: bool = models.BooleanField()
     amount_members: int = models.PositiveSmallIntegerField(validators = [
             MinValueValidator(6),
             MaxValueValidator(50)],
             default = 6)
     type: str = models.CharField(choices = Type.choices, max_length = 15)
-    price: int = models.PositiveSmallIntegerField(null = True, blank= True, validators = [
+    price: int = models.PositiveSmallIntegerField(null = True, validators = [
         MinValueValidator(1)])
-    price_description: str = models.CharField(max_length = 500, null = True, blank= True)
+    price_description: str = models.CharField(max_length = 500, null = True)
     need_form: bool = models.BooleanField()
     privacy: bool = models.BooleanField()
     duration: int = models.PositiveSmallIntegerField(choices = Duration.choices)
