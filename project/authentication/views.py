@@ -180,7 +180,7 @@ class UserProfile(GenericAPIView):
                     serializer = self.serializer_class(user, fields = (fields))
             return Response(serializer.data, status = HTTP_200_OK)
         except User.DoesNotExist:
-            raise _404()
+            raise _404(object = User)
 
 class UserList(ListAPIView):
     '''
@@ -233,7 +233,7 @@ class RequestPasswordReset(GenericAPIView):
             code_create(email = email, type = PASSWORD_RESET_CODE_TYPE, dop_info = None)
             return Response(SENT_CODE_TO_EMAIL_SUCCESS, status = HTTP_200_OK)
         except User.DoesNotExist:
-            raise _404()
+            raise _404(object = User)
 
 class ResetPassword(GenericAPIView):
     '''
@@ -251,7 +251,7 @@ class ResetPassword(GenericAPIView):
             reset_password(data = serializer.validated_data)
             return Response(PASSWORD_RESET_SUCCESS, status = HTTP_200_OK)
         except User.DoesNotExist:
-            raise _404()
+            raise _404(object = User)
 
 
 class RequestChangePassword(GenericAPIView):

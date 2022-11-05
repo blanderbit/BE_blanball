@@ -4,7 +4,7 @@ from decouple import config
 
 
 if environ.get('GITHUB_WORKFLOW'):
-    DATABASES: dict[str, Any]= {
+    DATABASES: dict[str, Any] = {
         'default': {
            'ENGINE': 'django.db.backends.postgresql_psycopg2',
            'NAME': 'postgres_test',
@@ -43,8 +43,13 @@ else:
     }
 
 
+
+if environ.get('GITHUB_WORKFLOW'):
+    MINIO_ENDPOINT: str = 'localhost:9000'
+else:
+    MINIO_ENDPOINT: str = config('FILE_STORAGE_ENDPOINT', cast = str)
+
 DEFAULT_FILE_STORAGE: str = config('FILE_STORAGE', cast = str)
-MINIO_ENDPOINT: str = config('FILE_STORAGE_ENDPOINT', cast = str)
 MINIO_MEDIA_FILES_BUCKET: str = config('FILE_STORAGE_MEDIA_BUCKET_NAME', cast = str)
 MINIO_USE_HTTPS: bool = config('FILE_STORAGE_USE_HTTPS', cast = bool)
 MINIO_CONSISTENCY_CHECK_ON_START = True

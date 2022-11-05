@@ -229,7 +229,7 @@ def only_author(Object):
                     return func(self, request, pk, *args, **kwargs)
                 raise PermissionDenied()
             except Object.DoesNotExist:
-                raise _404()
+                raise _404(object = Object)
         return called
     return wrap
 
@@ -240,7 +240,7 @@ def not_in_black_list(func: Callable[[Request, int, ...], Response]) -> Callable
                 raise PermissionDenied()
             return func(self, request, pk, *args, **kwargs)
         except Event.DoesNotExist:
-            raise _404()
+            raise _404(object = Event)
         
     return wrap
     

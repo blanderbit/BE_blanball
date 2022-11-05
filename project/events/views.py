@@ -326,7 +326,7 @@ class RequestToParticipationsList(ListAPIView):
             serializer = self.serializer_class(queryset, many = True)
             return Response(serializer.data, status = HTTP_200_OK)
         except Event.DoesNotExist:
-            raise _404()
+            raise _404(object = Event)
 
     
 class BulkAcceptOrDeclineRequestToParticipation(GenericAPIView):
