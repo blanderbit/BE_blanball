@@ -43,7 +43,7 @@ else:
     }
 
 if environ.get('GITHUB_WORKFLOW'):
-    MINIO_ENDPOINT: str = 'localhost:9000'
+    MINIO_ENDPOINT: str = '127.0.0.1:9000'
 else:
     MINIO_ENDPOINT: str = config('FILE_STORAGE_ENDPOINT', cast = str)
 DEFAULT_FILE_STORAGE: str = config('FILE_STORAGE', cast = str)
