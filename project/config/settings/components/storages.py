@@ -42,13 +42,16 @@ else:
         },
     }
 
+if environ.get('GITHUB_WORKFLOW'):
+    MINIO_ENDPOINT: str = 'localhost:9000'
+else:
     MINIO_ENDPOINT: str = config('FILE_STORAGE_ENDPOINT', cast = str)
-    DEFAULT_FILE_STORAGE: str = config('FILE_STORAGE', cast = str)
-    MINIO_MEDIA_FILES_BUCKET: str = config('FILE_STORAGE_MEDIA_BUCKET_NAME', cast = str)
-    MINIO_USE_HTTPS: bool = config('FILE_STORAGE_USE_HTTPS', cast = bool)
-    MINIO_CONSISTENCY_CHECK_ON_START = True
-    MINIO_BUCKET_CHECK_ON_SAVE = True
-    MINIO_ACCESS_KEY = config('MINIO_ROOT_USER', cast = str)
-    MINIO_SECRET_KEY = config('MINIO_ROOT_PASSWORD', cast = str)
-    MINIO_PUBLIC_BUCKETS = []
-    MINIO_PUBLIC_BUCKETS.append(MINIO_MEDIA_FILES_BUCKET)
+DEFAULT_FILE_STORAGE: str = config('FILE_STORAGE', cast = str)
+MINIO_MEDIA_FILES_BUCKET: str = config('FILE_STORAGE_MEDIA_BUCKET_NAME', cast = str)
+MINIO_USE_HTTPS: bool = config('FILE_STORAGE_USE_HTTPS', cast = bool)
+MINIO_CONSISTENCY_CHECK_ON_START: bool = True
+MINIO_BUCKET_CHECK_ON_SAVE: bool = True
+MINIO_ACCESS_KEY: str = config('MINIO_ROOT_USER', cast = str)
+MINIO_SECRET_KEY: str = config('MINIO_ROOT_PASSWORD', cast = str)
+MINIO_PUBLIC_BUCKETS: list[str] = []
+MINIO_PUBLIC_BUCKETS.append(MINIO_MEDIA_FILES_BUCKET)
