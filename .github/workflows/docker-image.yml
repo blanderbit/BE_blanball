@@ -24,16 +24,6 @@ jobs:
         image: redis:7.0.4-alpine
         ports:
           - 6379:6379
-      minio:
-        image: minio/minio
-        env:
-          MINIO_ROOT_USER: minio_test
-          MINIO_ROOT_PASSWORD: minio_test
-        volumes:
-          - minio-data:/minio-data
-        ports:
-          - 9000:9000
-          - 9001:9001
     steps:
     - uses: actions/checkout@master
     - name: Set up Python ${{ env.PYTHON_VERSION }}
