@@ -1,15 +1,15 @@
-from typing import Any, final
-from django.utils import timezone
 import threading
+from typing import Any, final
 
-from dateutil.relativedelta import relativedelta
-
-from .models import Code,Profile
+from authentication.constant.success import (
+    BLANBALL,
+)
 from config.celery import app
-
+from dateutil.relativedelta import relativedelta
 from django.core.mail import EmailMessage
+from django.utils import timezone
 
-from authentication.constant.success import BLANBALL
+from .models import Code, Profile
 
 
 class EmailThread(threading.Thread):

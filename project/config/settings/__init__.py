@@ -1,6 +1,6 @@
-from split_settings.tools import include
-
 from pathlib import Path
+
+from split_settings.tools import include
 
 _BASE_DIR = Path(__file__).parent.parent.parent
 

@@ -1,30 +1,37 @@
-from datetime import date
-from typing import Any
-from django.utils import timezone
-from authentication.models import (
-    User,
-    Profile,
-    Code,
-)
-from django.template.loader import render_to_string
-from .tasks import Util
-
 import random
 import string
+from datetime import date
+from typing import Any
 
+from authentication.constant.code_types import (
+    ACCOUNT_DELETE_CODE_TYPE,
+    EMAIL_CHANGE_CODE_TYPE,
+    EMAIL_VERIFY_CODE_TYPE,
+    PASSWORD_CHANGE_CODE_TYPE,
+    PASSWORD_RESET_CODE_TYPE,
+    PHONE_CHANGE_CODE_TYPE,
+)
+from authentication.constant.success import (
+    EMAIL_MESSAGE_TEMPLATE_TITLE,
+    TEMPLATE_SUCCESS_BODY_TITLE,
+    TEMPLATE_SUCCESS_TEXT,
+    TEMPLATE_SUCCESS_TITLE,
+)
+from authentication.models import (
+    Code,
+    Profile,
+    User,
+)
 from django.conf import settings
-
+from django.template.loader import (
+    render_to_string,
+)
+from django.utils import timezone
 from rest_framework.serializers import Serializer
 
-from authentication.constant.success import (
-    EMAIL_MESSAGE_TEMPLATE_TITLE, TEMPLATE_SUCCESS_BODY_TITLE, 
-    TEMPLATE_SUCCESS_TITLE, TEMPLATE_SUCCESS_TEXT,
-)
-from authentication.constant.code_types import (
-    PHONE_CHANGE_CODE_TYPE, EMAIL_CHANGE_CODE_TYPE, ACCOUNT_DELETE_CODE_TYPE, 
-    PASSWORD_CHANGE_CODE_TYPE, PASSWORD_RESET_CODE_TYPE, EMAIL_VERIFY_CODE_TYPE,
-)
-    
+from .tasks import Util
+
+
 def count_age(*, profile: Profile, data: dict[str, Any]) -> Profile:
     '''calculation of age after registration by the birthday parameter'''
     for item in data:

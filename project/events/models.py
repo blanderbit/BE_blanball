@@ -1,38 +1,35 @@
-from datetime import (
-    date, 
-    datetime,
-)
-from email.policy import default
 import profile
+from datetime import date, datetime
+from email.policy import default
 from typing import Any, Optional, final
-from authentication.models import (
-    User,
-    Gender,
-)
-from django.db import models
+
+from authentication.models import Gender, User
 from django.core.validators import (
-    MaxValueValidator, 
+    MaxValueValidator,
     MinValueValidator,
 )
+from django.db import models
 from django.db.models.query import QuerySet
-
-from phonenumber_field.modelfields import PhoneNumberField
-
-from notifications.tasks import (
-    send_to_user,
+from events.constant.notification_types import (
+    INVITE_USER_TO_EVENT_NOTIFICATION_TYPE,
 )
 from events.constant.response_error import (
-    USER_CAN_NOT_INVITE_TO_THIS_EVENT_ERROR, SENT_INVATION_ERROR,
-    AUTHOR_CAN_NOT_INVITE_ERROR, THIS_USER_CAN_NOT_BE_INVITED
+    AUTHOR_CAN_NOT_INVITE_ERROR,
+    SENT_INVATION_ERROR,
+    THIS_USER_CAN_NOT_BE_INVITED,
+    USER_CAN_NOT_INVITE_TO_THIS_EVENT_ERROR,
 )
-from events.constant.notification_types import (
-    INVITE_USER_TO_EVENT_NOTIFICATION_TYPE
+from notifications.tasks import send_to_user
+from phonenumber_field.modelfields import (
+    PhoneNumberField,
 )
-
-from rest_framework.serializers import ValidationError
+from rest_framework.serializers import (
+    ValidationError,
+)
 from rest_framework.status import (
     HTTP_403_FORBIDDEN,
 )
+
 
 class Event(models.Model):
     '''footbal ivent model'''

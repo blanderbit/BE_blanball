@@ -1,25 +1,22 @@
-from typing import Any, Union
 from collections import OrderedDict
+from typing import Any, Union
 
-from reviews.models import Review
 from authentication.models import User
-
+from notifications.tasks import send_to_user
+from rest_framework.serializers import (
+    ModelSerializer,
+    ValidationError,
+)
+from rest_framework.status import (
+    HTTP_400_BAD_REQUEST,
+)
 from reviews.constant.errors import (
     REVIEW_CREATE_ERROR,
 )
 from reviews.constant.notification_types import (
     REVIEW_CREATE_NOTIFICATION_TYPE,
 )
-
-from notifications.tasks import send_to_user
-
-from rest_framework.status import (
-    HTTP_400_BAD_REQUEST,
-)
-from rest_framework.serializers import (
-    ModelSerializer,
-    ValidationError
-)
+from reviews.models import Review
 
 
 class CreateReviewSerializer(ModelSerializer):

@@ -1,19 +1,20 @@
 from types import NoneType
-from django.urls import reverse
-from authentication.models import (
-    User,
-    Profile,
-    Code,
-)
-from .set_up import SetUpAauthenticationViews
-from freezegun import freeze_time
 
-from rest_framework.status import (
-    HTTP_201_CREATED,
-    HTTP_403_FORBIDDEN,
-    HTTP_400_BAD_REQUEST,
-    HTTP_200_OK,
+from authentication.models import (
+    Code,
+    Profile,
+    User,
 )
+from django.urls import reverse
+from freezegun import freeze_time
+from rest_framework.status import (
+    HTTP_200_OK,
+    HTTP_201_CREATED,
+    HTTP_400_BAD_REQUEST,
+    HTTP_403_FORBIDDEN,
+)
+
+from .set_up import SetUpAauthenticationViews
 
 
 class TestAuthenticationViews(SetUpAauthenticationViews):

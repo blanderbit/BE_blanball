@@ -1,40 +1,44 @@
 import os
-
 from datetime import date, datetime
-
 from typing import Any, final
 
-from PIL import Image
-
-from django.db import models
-from django.db.models.query import QuerySet
-
-from django.contrib.auth.models import AbstractBaseUser
-from django.utils import timezone
-from django.utils.encoding import smart_bytes
+from authentication.constant.errors import (
+    MAX_AGE_VALUE_ERROR,
+    MIN_AGE_VALUE_ERROR,
+)
 from django.conf import settings
-from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    BaseUserManager,
+)
 from django.core.validators import (
-    MaxValueValidator, 
+    MaxValueValidator,
     MinValueValidator,
 )
-from django.contrib.auth.models import BaseUserManager
-
-from phonenumber_field.modelfields import PhoneNumberField
-
-from rest_framework_simplejwt.tokens import (
-    RefreshToken,
-    AccessToken,
+from django.db import models
+from django.db.models.query import QuerySet
+from django.utils import timezone
+from django.utils.encoding import smart_bytes
+from django.utils.http import (
+    urlsafe_base64_decode,
+    urlsafe_base64_encode,
 )
-from rest_framework.serializers import ValidationError
-from rest_framework.status import HTTP_400_BAD_REQUEST
-
-from authentication.constant.errors import (
-    MIN_AGE_VALUE_ERROR, MAX_AGE_VALUE_ERROR
-)
-
 from minio import Minio
 from minio.commonconfig import REPLACE, CopySource
+from phonenumber_field.modelfields import (
+    PhoneNumberField,
+)
+from PIL import Image
+from rest_framework.serializers import (
+    ValidationError,
+)
+from rest_framework.status import (
+    HTTP_400_BAD_REQUEST,
+)
+from rest_framework_simplejwt.tokens import (
+    AccessToken,
+    RefreshToken,
+)
 
 
 class UserManager(BaseUserManager):

@@ -1,15 +1,18 @@
 from collections import OrderedDict
-
-from django.utils import timezone
 from datetime import datetime
 
-from rest_framework.serializers import ValidationError
-from rest_framework.status import HTTP_400_BAD_REQUEST
-
-
+from django.utils import timezone
 from events.constant.response_error import (
-    BAD_EVENT_TIME_CREATE_ERROR, NO_PRICE_DESK_ERROR, 
+    BAD_EVENT_TIME_CREATE_ERROR,
+    NO_PRICE_DESK_ERROR,
 )
+from rest_framework.serializers import (
+    ValidationError,
+)
+from rest_framework.status import (
+    HTTP_400_BAD_REQUEST,
+)
+
 
 class EventDateTimeValidator:
 

@@ -1,15 +1,9 @@
+import datetime
+import os
 from typing import Any
 
-from decouple import config, Csv
-
-import os
-
-from decouple import config
-
-import datetime
-
+from decouple import Csv, config
 from django.conf import settings
-
 
 INSTALLED_APPS: list[str] = [
     'django.contrib.auth',

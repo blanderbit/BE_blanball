@@ -1,7 +1,10 @@
-from events.models import Event
-from django_filters import rest_framework as filters
-
 from typing import Union
+
+from django_filters import (
+    rest_framework as filters,
+)
+from events.models import Event
+
 
 class EventDateTimeRangeFilter(filters.FilterSet):
     date_and_time = filters.DateFromToRangeFilter()

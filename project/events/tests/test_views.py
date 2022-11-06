@@ -1,25 +1,23 @@
 from types import NoneType
-from .set_up import SetUpEventsViews
-from rest_framework.status import (
-    HTTP_201_CREATED,
-    HTTP_400_BAD_REQUEST,
-    HTTP_200_OK,
-    HTTP_403_FORBIDDEN,
-    HTTP_404_NOT_FOUND,
 
-)
+from authentication.models import User
+from django.db.models.query import QuerySet
+from django.urls import reverse
 from events.models import (
     Event,
-    RequestToParticipation
+    RequestToParticipation,
 )
-from django.db.models.query import QuerySet
-
-from authentication.models import(
-    User,
-)
-from django.urls import reverse
-from notifications.models import Notification
 from freezegun import freeze_time
+from notifications.models import Notification
+from rest_framework.status import (
+    HTTP_200_OK,
+    HTTP_201_CREATED,
+    HTTP_400_BAD_REQUEST,
+    HTTP_403_FORBIDDEN,
+    HTTP_404_NOT_FOUND,
+)
+
+from .set_up import SetUpEventsViews
 
 
 class TestEventsViews(SetUpEventsViews):

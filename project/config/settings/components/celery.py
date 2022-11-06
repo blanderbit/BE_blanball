@@ -1,5 +1,6 @@
-from decouple import config
 from os import environ
+
+from decouple import config
 
 #celery framework settings
 
