@@ -1,23 +1,23 @@
 import itertools
-
 from typing import Any
 
-from django.db.models import (
-    Value,
-    TextField,
-    FloatField,
+from authentication.models import User
+from django.contrib.postgres.search import (
+    TrigramSimilarity,
 )
-
+from django.db.models import (
+    FloatField,
+    TextField,
+    Value,
+)
 from django.db.models.functions import Concat
-from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models.query import QuerySet
-
-from django_filters import rest_framework as filters
-
+from django_filters import (
+    rest_framework as filters,
+)
 from rest_framework.filters import SearchFilter
 from rest_framework.request import Request
 
-from authentication.models import User
 
 class MySearchFilter(SearchFilter):
 

@@ -1,21 +1,15 @@
 from typing import Type
 
-from reviews.serializers import (
-    CreateReviewSerializer,
-    ReviewListSerializer,
-)
-from reviews.models import (
-    Review,
-)
-
 from django.db.models.query import QuerySet
-
 from rest_framework.generics import (
     CreateAPIView,
     ListAPIView,
 )
-from rest_framework.serializers import (
-    Serializer,
+from rest_framework.serializers import Serializer
+from reviews.models import Review
+from reviews.serializers import (
+    CreateReviewSerializer,
+    ReviewListSerializer,
 )
 
 

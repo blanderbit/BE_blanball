@@ -1,14 +1,13 @@
 from typing import Union
 
+from django.urls import path
+from django.urls.resolvers import (
+    URLPattern,
+    URLResolver,
+)
 from reviews.views import (
     ReviewCreate,
     UserReviewsList,
-)
-
-from django.urls import path
-from django.urls.resolvers import (
-   URLResolver, 
-   URLPattern,
 )
 
 urlpatterns: list[Union[URLResolver, URLPattern]] = [

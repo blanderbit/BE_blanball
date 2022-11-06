@@ -1,45 +1,40 @@
 import json
 from typing import Any, Type
 
-from notifications.serializers import (
-    NotificationSerializer,
-    ReadOrDeleteNotificationsSerializer,
-    ChangeMaintenanceSerializer,
-    UserNotificationsCount,
-)
-from notifications.models import Notification
-
 from django.db.models.query import QuerySet
-
-from rest_framework.filters import OrderingFilter
-from rest_framework.response import Response
-from rest_framework.request import Request
-
-from rest_framework.views import APIView
-from rest_framework.status import (
-    HTTP_200_OK,
-    HTTP_400_BAD_REQUEST,
-)
-from rest_framework.generics import (
-    ListAPIView,
-    GenericAPIView,
-)
-from rest_framework.serializers import (
-    Serializer,
-)
-
-from notifications.services import (
-    bulk_delete_notifications,
-    update_maintenance,
-    bulk_read_notifications,
-)
-
 from notifications.constant.errors import (
-    MAINTENANCE_CAN_NOT_UPDATE_ERROR, CONFIG_FILE_ERROR,
+    CONFIG_FILE_ERROR,
+    MAINTENANCE_CAN_NOT_UPDATE_ERROR,
 )
 from notifications.constant.success import (
     MAINTENANCE_UPDATED_SUCCESS,
 )
+from notifications.models import Notification
+from notifications.serializers import (
+    ChangeMaintenanceSerializer,
+    NotificationSerializer,
+    ReadOrDeleteNotificationsSerializer,
+    UserNotificationsCount,
+)
+from notifications.services import (
+    bulk_delete_notifications,
+    bulk_read_notifications,
+    update_maintenance,
+)
+from rest_framework.filters import OrderingFilter
+from rest_framework.generics import (
+    GenericAPIView,
+    ListAPIView,
+)
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.serializers import Serializer
+from rest_framework.status import (
+    HTTP_200_OK,
+    HTTP_400_BAD_REQUEST,
+)
+from rest_framework.views import APIView
+
 
 class NotificationsList(ListAPIView):
     serializer_class: Type[Serializer] = NotificationSerializer

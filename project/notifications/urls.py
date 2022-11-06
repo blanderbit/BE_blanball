@@ -1,20 +1,19 @@
 from typing import Union
 
-from notifications.views import (
-    NotificationsList,
-    UserNotificationsList,
-    ReadNotifications,
-    DeleteNotifcations,
-    ChangeMaintenance,
-    GetMaintenance,
-    GetCurrentVersion,
-    UserNotificaitonsCount,
-)   
-
 from django.urls import path
 from django.urls.resolvers import (
-   URLResolver, 
-   URLPattern,
+    URLPattern,
+    URLResolver,
+)
+from notifications.views import (
+    ChangeMaintenance,
+    DeleteNotifcations,
+    GetCurrentVersion,
+    GetMaintenance,
+    NotificationsList,
+    ReadNotifications,
+    UserNotificaitonsCount,
+    UserNotificationsList,
 )
 
 urlpatterns: list[Union[URLResolver, URLPattern]] = [

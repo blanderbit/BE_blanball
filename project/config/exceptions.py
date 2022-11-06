@@ -2,13 +2,13 @@
 
 from typing import Optional, Union, final
 
-from rest_framework.exceptions import APIException
-
-from rest_framework.status import (
-    HTTP_404_NOT_FOUND,
-    HTTP_403_FORBIDDEN,
-)
 from django.utils.encoding import force_str
+from rest_framework.exceptions import APIException
+from rest_framework.status import (
+    HTTP_403_FORBIDDEN,
+    HTTP_404_NOT_FOUND,
+)
+
 
 @final
 class _404(APIException):

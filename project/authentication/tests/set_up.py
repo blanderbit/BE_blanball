@@ -1,12 +1,9 @@
 
 
-from typing import Any
-from authentication.models import (
-    User,
-    Profile,
-)
-
 from collections import OrderedDict
+from typing import Any
+
+from authentication.models import Profile, User
 from rest_framework.test import APITestCase
 
 

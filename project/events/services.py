@@ -1,44 +1,53 @@
-from calendar import day_abbr
-from datetime import datetime
 import json
 import re
-from typing import Any, Optional, Union, Generator, TypeVar, Callable
 from collections import OrderedDict
+from datetime import datetime
+from typing import (
+    Any,
+    Callable,
+    Generator,
+    Optional,
+    TypeVar,
+    Union,
+)
+
 import pandas
-
-from django.utils import timezone
+from authentication.models import User
+from config.exceptions import _404
+from django.db import transaction
 from django.db.models.query import QuerySet
-
-from rest_framework.serializers import ValidationError
+from django.utils import timezone
+from events.constant.notification_types import (
+    NEW_USER_ON_THE_EVENT_NOTIFICATION_TYPE,
+    RESPONSE_TO_THE_INVITE_TO_EVENT_NOTIFICATION_TYPE,
+    RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_NOTIFICATION_TYPE,
+    USER_REMOVE_FROM_EVENT_NOTIFICATION_TYPE,
+)
+from events.constant.response_error import (
+    ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR,
+    ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,
+    ALREADY_SENT_REQUEST_TO_PARTICIPATE_ERROR,
+    EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,
+    EVENT_NOT_FOUND_ERROR,
+    GET_PLANNED_EVENTS_ERROR,
+)
+from events.models import (
+    Event,
+    InviteToEvent,
+    RequestToParticipation,
+)
+from notifications.tasks import send_to_user
+from rest_framework.exceptions import (
+    PermissionDenied,
+)
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.serializers import (
+    ValidationError,
+)
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
-from django.db import transaction
-
-from rest_framework.exceptions import PermissionDenied
-from rest_framework.response import Response
-from rest_framework.request import Request
-
-from authentication.models import User
-from events.models import (
-    Event,
-    RequestToParticipation,
-    InviteToEvent,
-)
-
-from events.constant.response_error import (
-    ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR, 
-    EVENT_AUTHOR_CAN_NOT_JOIN_ERROR, ALREADY_SENT_REQUEST_TO_PARTICIPATE_ERROR,
-    EVENT_NOT_FOUND_ERROR, GET_PLANNED_EVENTS_ERROR
-)
-from events.constant.notification_types import (
-    NEW_USER_ON_THE_EVENT_NOTIFICATION_TYPE, RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_NOTIFICATION_TYPE,
-    RESPONSE_TO_THE_INVITE_TO_EVENT_NOTIFICATION_TYPE, USER_REMOVE_FROM_EVENT_NOTIFICATION_TYPE 
-)
-
-from notifications.tasks import send_to_user
-
-from config.exceptions import _404
 
 bulk = TypeVar(Optional[Generator[list[dict[str, int]], None, None]])
 

@@ -1,83 +1,99 @@
 from typing import Any, Type
 
-from django.db.models.query import QuerySet
-from django.db import transaction
+from authentication.constant.code_types import (
+    ACCOUNT_DELETE_CODE_TYPE,
+    EMAIL_CHANGE_CODE_TYPE,
+    EMAIL_VERIFY_CODE_TYPE,
+    PASSWORD_CHANGE_CODE_TYPE,
+    PASSWORD_RESET_CODE_TYPE,
+    PHONE_CHANGE_CODE_TYPE,
+)
+from authentication.constant.errors import (
+    ALREADY_VERIFIED_ERROR,
+    NO_PERMISSIONS_ERROR,
+    NO_SUCH_IMAGE_ERROR,
+    THIS_EMAIL_ALREADY_IN_USE_ERROR,
+    WRONG_PASSWORD_ERROR,
+)
+from authentication.constant.success import (
+    ACCOUNT_DELETE_SUCCESS_BODY_TITLE,
+    ACCOUNT_DELETE_SUCCESS_TEXT,
+    ACCOUNT_DELETE_SUCCESS_TITLE,
+    ACCOUNT_DELETED_SUCCESS,
+    ACTIVATION_SUCCESS,
+    CHANGE_EMAIL_SUCCESS,
+    CHANGE_PASSWORD_SUCCESS,
+    CHANGE_PHONE_SUCCESS,
+    EMAIL_VERIFY_SUCCESS_BODY_TITLE,
+    EMAIL_VERIFY_SUCCESS_TEXT,
+    EMAIL_VERIFY_SUCCESS_TITLE,
+    PASSWORD_RESET_SUCCESS,
+    REGISTER_SUCCESS_BODY_TITLE,
+    REGISTER_SUCCESS_TEXT,
+    REGISTER_SUCCESS_TITLE,
+    SENT_CODE_TO_EMAIL_SUCCESS,
+    TEMPLATE_SUCCESS_BODY_TITLE,
+    TEMPLATE_SUCCESS_TEXT,
+    TEMPLATE_SUCCESS_TITLE,
+)
+from authentication.filters import (
+    RankedFuzzySearchFilter,
+    UserAgeRangeFilter,
+)
+from authentication.models import (
+    Code,
+    Profile,
+    User,
+)
+from authentication.permisions import (
+    IsNotAuthenticated,
+)
+from authentication.serializers import (
+    CheckCodeSerializer,
+    EmailSerializer,
+    LoginSerializer,
+    RegisterSerializer,
+    RequestChangePasswordSerializer,
+    RequestChangePhoneSerializer,
+    ResetPasswordSerializer,
+    UpdateProfileSerializer,
+    UserSerializer,
+    UsersListSerializer,
+)
+from authentication.services import (
+    code_create,
+    count_age,
+    profile_update,
+    reset_password,
+    send_email_template,
+)
+from config.exceptions import _404
 from django.conf import settings
-
+from django.db import transaction
+from django.db.models.query import QuerySet
+from django_filters.rest_framework import (
+    DjangoFilterBackend,
+)
 from rest_framework.filters import (
-    SearchFilter,
     OrderingFilter,
+    SearchFilter,
 )
 from rest_framework.generics import (
     GenericAPIView,
     ListAPIView,
 )
-from rest_framework.views import (
-    APIView
-)
-from rest_framework.status import (
-    HTTP_201_CREATED,
-    HTTP_200_OK,
-    HTTP_400_BAD_REQUEST,
-)
+from rest_framework.request import Request
+from rest_framework.response import Response
 from rest_framework.serializers import (
     Serializer,
     ValidationError,
 )
-from rest_framework.response import Response
-from rest_framework.request import Request
-from django_filters.rest_framework import DjangoFilterBackend
-
-from authentication.models import (
-    User,
-    Profile,
-    Code,
+from rest_framework.status import (
+    HTTP_200_OK,
+    HTTP_201_CREATED,
+    HTTP_400_BAD_REQUEST,
 )
-from authentication.serializers import (
-    RegisterSerializer,
-    LoginSerializer,
-    UserSerializer,
-    UpdateProfileSerializer,
-    UsersListSerializer,
-    EmailSerializer,
-    ResetPasswordSerializer,
-    RequestChangePasswordSerializer,
-    RequestChangePhoneSerializer,
-    CheckCodeSerializer,
-)
-from authentication.services import (
-    count_age,
-    send_email_template,
-    code_create,
-    profile_update,
-    reset_password,
-)
-from authentication.permisions import IsNotAuthenticated
-from authentication.filters import (
-    RankedFuzzySearchFilter,
-    UserAgeRangeFilter,
-)
-
-from authentication.constant.success import (
-    REGISTER_SUCCESS_BODY_TITLE, REGISTER_SUCCESS_TITLE, REGISTER_SUCCESS_TEXT,
-    SENT_CODE_TO_EMAIL_SUCCESS, PASSWORD_RESET_SUCCESS, TEMPLATE_SUCCESS_BODY_TITLE,
-    TEMPLATE_SUCCESS_BODY_TITLE, TEMPLATE_SUCCESS_TEXT, TEMPLATE_SUCCESS_TITLE,
-    ACTIVATION_SUCCESS, CHANGE_PHONE_SUCCESS, CHANGE_PASSWORD_SUCCESS, 
-    EMAIL_VERIFY_SUCCESS_BODY_TITLE, EMAIL_VERIFY_SUCCESS_TITLE,
-    CHANGE_EMAIL_SUCCESS, ACCOUNT_DELETED_SUCCESS, 
-    EMAIL_VERIFY_SUCCESS_TEXT, ACCOUNT_DELETE_SUCCESS_TEXT, 
-    ACCOUNT_DELETE_SUCCESS_BODY_TITLE, ACCOUNT_DELETE_SUCCESS_TITLE, 
-
-)
-from authentication.constant.errors import (
-    WRONG_PASSWORD_ERROR, ALREADY_VERIFIED_ERROR, 
-    THIS_EMAIL_ALREADY_IN_USE_ERROR, NO_PERMISSIONS_ERROR, NO_SUCH_IMAGE_ERROR
-)
-from authentication.constant.code_types import (
-    PASSWORD_CHANGE_CODE_TYPE, PASSWORD_RESET_CODE_TYPE, ACCOUNT_DELETE_CODE_TYPE,
-    EMAIL_VERIFY_CODE_TYPE, PHONE_CHANGE_CODE_TYPE, EMAIL_CHANGE_CODE_TYPE,
-)
-from config.exceptions import _404
+from rest_framework.views import APIView
 
 
 class RegisterUser(GenericAPIView):

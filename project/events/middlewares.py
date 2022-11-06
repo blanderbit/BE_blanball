@@ -1,7 +1,8 @@
 from threading import current_thread
 
-from django.utils.deprecation import MiddlewareMixin
-
+from django.utils.deprecation import (
+    MiddlewareMixin,
+)
 
 _requests = {}
 

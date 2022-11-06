@@ -1,33 +1,32 @@
 from typing import Union
 
-from events.views import (
-    CreateEvent,
-    GetEvent,
-    UpdateEvent,
-    EventList,
-    DeleteEvents,
-    JoinToEvent,
-    LeaveFromEvent,
-    FanJoinToEvent,
-    FanLeaveFromEvent,
-    UserEvents,
-    EventsRelevantList,
-    UserEventsRelevantList,
-    UserPlannedEvents,
-    PopularEvents,
-    InviteUserToEvent,
-    RequestToParticipationsList,
-    BulkAcceptOrDeclineRequestToParticipation,
-    UserParticipantEvents,
-    InvitesToEventList,
-    BulkAcceptOrDeclineInvitesToEvent,
-    RemoveUserFromEvent,
-)
-
 from django.urls import path
 from django.urls.resolvers import (
-   URLResolver, 
-   URLPattern,
+    URLPattern,
+    URLResolver,
+)
+from events.views import (
+    BulkAcceptOrDeclineInvitesToEvent,
+    BulkAcceptOrDeclineRequestToParticipation,
+    CreateEvent,
+    DeleteEvents,
+    EventList,
+    EventsRelevantList,
+    FanJoinToEvent,
+    FanLeaveFromEvent,
+    GetEvent,
+    InvitesToEventList,
+    InviteUserToEvent,
+    JoinToEvent,
+    LeaveFromEvent,
+    PopularEvents,
+    RemoveUserFromEvent,
+    RequestToParticipationsList,
+    UpdateEvent,
+    UserEvents,
+    UserEventsRelevantList,
+    UserParticipantEvents,
+    UserPlannedEvents,
 )
 
 urlpatterns: list[Union[URLResolver, URLPattern]] = [

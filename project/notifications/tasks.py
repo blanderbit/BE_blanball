@@ -1,17 +1,14 @@
 from datetime import datetime
 from typing import Any, Union
 
-from notifications.models import Notification
-from authentication.models import (
-    User,
-)
-
 from asgiref.sync import async_to_sync
+from authentication.models import User
 from channels.layers import get_channel_layer
-
 from notifications.constant.notification_types import (
-    CHANGE_MAINTENANCE_NOTIFICATION_TYPE
+    CHANGE_MAINTENANCE_NOTIFICATION_TYPE,
 )
+from notifications.models import Notification
+
 
 def send(user: User, data: dict[str, Any]) -> None:
     async_to_sync(get_channel_layer().group_send)(user.group_name, data)

@@ -1,12 +1,16 @@
-from authentication.models import Code
 from collections import OrderedDict
-from django.utils import timezone
-
-from rest_framework.status import  HTTP_400_BAD_REQUEST
-from rest_framework.serializers import ValidationError
 
 from authentication.constant.errors import (
-    BAD_CODE_ERROR, CODE_EXPIRED_ERROR,
+    BAD_CODE_ERROR,
+    CODE_EXPIRED_ERROR,
+)
+from authentication.models import Code
+from django.utils import timezone
+from rest_framework.serializers import (
+    ValidationError,
+)
+from rest_framework.status import (
+    HTTP_400_BAD_REQUEST,
 )
 
 

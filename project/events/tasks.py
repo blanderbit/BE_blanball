@@ -1,15 +1,17 @@
+from config.celery import app
+from django.db.models import Q
+from django.utils import timezone
+from events.constant.notification_types import (
+    EVENT_TIME_NOTIFICATION_TYPE,
+)
 from events.models import (
     Event,
     RequestToParticipation,
 )
-from config.celery import app
-from events.services import send_notification_to_subscribe_event_user
-from events.constant.notification_types import (
-    EVENT_TIME_NOTIFICATION_TYPE,
+from events.services import (
+    send_notification_to_subscribe_event_user,
 )
 
-from django.utils import timezone
-from django.db.models import Q
 
 @app.task
 def check_event_start_time() -> None:
