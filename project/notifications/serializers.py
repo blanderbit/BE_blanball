@@ -3,7 +3,6 @@
 from typing import Union
 
 from notifications.models import Notification
-
 from rest_framework import serializers
 
 

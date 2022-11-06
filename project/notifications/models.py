@@ -1,10 +1,9 @@
+from datetime import datetime
 from typing import Any, final
 
-from datetime import datetime
 from authentication.models import User
-
-from django.db.models.query import QuerySet
 from django.db import models
+from django.db.models.query import QuerySet
 
 
 class Notification(models.Model):

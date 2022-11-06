@@ -1,8 +1,5 @@
 import jwt
-from authentication.models import (
-    Profile,
-    User,
-)
+from authentication.models import Profile, User
 from django.conf import settings
 
 from .set_up import SetUpAuthenticationModels

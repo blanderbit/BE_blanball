@@ -1,15 +1,13 @@
 import json
 from types import NoneType
-from typing import Any, Optional, Literal
+from typing import Any, Literal, Optional
 
-from authentication.models import (
-    User,
-)
-
-from django.utils import timezone
-
-from channels.generic.websocket import AsyncWebsocketConsumer
+from authentication.models import User
 from channels.db import database_sync_to_async
+from channels.generic.websocket import (
+    AsyncWebsocketConsumer,
+)
+from django.utils import timezone
 
 
 class UserConsumer(AsyncWebsocketConsumer):

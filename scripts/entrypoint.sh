@@ -17,7 +17,7 @@ Backend()
 
 Daphne()
 {
-    daphne config.asgi:application --port 9000 --bind 0.0.0.0 -v2
+    daphne config.asgi:application --port 10000 --bind 0.0.0.0 -v2
 }
 
 CeleryWorker()

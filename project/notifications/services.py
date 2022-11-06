@@ -1,21 +1,22 @@
 import json
+from typing import (
+    Any,
+    Generator,
+    Optional,
+    TypeVar,
+)
 
-from typing import Any, Optional, TypeVar, Generator
-
+from asgiref.sync import async_to_sync
 from authentication.models import User
+from channels.layers import get_channel_layer
 from django.db.models.query import QuerySet
-from notifications.tasks import send
-
 from notifications.constant.notification_types import (
     CHANGE_MAINTENANCE_NOTIFICATION_TYPE,
     NOTIFICATION_DELETE_NOTIFICATION_TYPE,
     NOTIFICATION_READ_NOTIFICATION_TYPE,
 )
-
 from notifications.models import Notification
-
-from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer
+from notifications.tasks import send
 
 bulk = TypeVar(Optional[Generator[list[dict[str, int]], None, None]])
 

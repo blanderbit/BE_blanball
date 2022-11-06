@@ -1,18 +1,13 @@
 from typing import Union
 
 from config.yasg import urlpatterns as doc_urls
-
-from django.urls import (
-    path,
-    include,
-)
-from django.urls.resolvers import (
-    URLResolver, 
-    URLPattern,
-)
-
-from django.conf.urls.static import static
 from django.conf import settings
+from django.conf.urls.static import static
+from django.urls import include, path
+from django.urls.resolvers import (
+    URLPattern,
+    URLResolver,
+)
 
 urlpatterns: list[Union[URLResolver, URLPattern]] = [
     path('api/v1/events/', include('events.urls'), 

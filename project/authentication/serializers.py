@@ -1,27 +1,32 @@
 import re
-
 from collections import OrderedDict
-from typing import Any, Union, List
+from typing import Any, List, Union
 
-from django.contrib import auth
-
-from rest_framework import serializers
-from rest_framework.status import HTTP_400_BAD_REQUEST
-
-from authentication.models import (
-    User,
-    Profile,
-)
-from authentication.validators import CodeValidator
-
-from authentication.constant.errors import (
-    INVALID_CREDENTIALS_ERROR, PASSWORDS_DO_NOT_MATCH_ERROR, CONFIGURATION_IS_REQUIRED_ERROR,
-    GET_PLANNED_IVENTS_ERROR, NO_SUCH_USER_ERROR, GET_PLANNED_IVENTS_ERROR
-)
 from authentication.constant.code_types import (
-    PASSWORD_CHANGE_CODE_TYPE, EMAIL_CHANGE_CODE_TYPE, EMAIL_VERIFY_CODE_TYPE, 
-    PHONE_CHANGE_CODE_TYPE, ACCOUNT_DELETE_CODE_TYPE, PASSWORD_RESET_CODE_TYPE, 
+    ACCOUNT_DELETE_CODE_TYPE,
+    EMAIL_CHANGE_CODE_TYPE,
+    EMAIL_VERIFY_CODE_TYPE,
+    PASSWORD_CHANGE_CODE_TYPE,
+    PASSWORD_RESET_CODE_TYPE,
+    PHONE_CHANGE_CODE_TYPE,
 )
+from authentication.constant.errors import (
+    CONFIGURATION_IS_REQUIRED_ERROR,
+    GET_PLANNED_IVENTS_ERROR,
+    INVALID_CREDENTIALS_ERROR,
+    NO_SUCH_USER_ERROR,
+    PASSWORDS_DO_NOT_MATCH_ERROR,
+)
+from authentication.models import Profile, User
+from authentication.validators import (
+    CodeValidator,
+)
+from django.contrib import auth
+from rest_framework import serializers
+from rest_framework.status import (
+    HTTP_400_BAD_REQUEST,
+)
+
 
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs) -> None:

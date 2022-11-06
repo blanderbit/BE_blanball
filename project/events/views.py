@@ -1,48 +1,79 @@
 from typing import Any, Type, final
 
+from authentication.constant.errors import (
+    NO_SUCH_USER_ERROR,
+)
+from authentication.filters import (
+    RankedFuzzySearchFilter,
+)
+from config.exceptions import _404
+from django.db.models import Count, Q
+from django.db.models.query import QuerySet
+from django_filters.rest_framework import (
+    DjangoFilterBackend,
+)
+from events.constant.notification_types import (
+    EVENT_UPDATE_NOTIFICATION_TYPE,
+    LEAVE_USER_FROM_THE_EVENT_NOTIFICATION_TYPE,
+)
+from events.constant.response_error import (
+    ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,
+    EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,
+    EVENT_NOT_FOUND_ERROR,
+    NO_IN_EVENT_FANS_LIST_ERROR,
+    NO_IN_EVENT_MEMBERS_LIST_ERROR,
+)
+from events.constant.response_success import (
+    APPLICATION_FOR_PARTICIPATION_SUCCESS,
+    DISCONNECT_FROM_EVENT_SUCCESS,
+    EVENT_UPDATE_SUCCESS,
+    JOIN_TO_EVENT_SUCCESS,
+    SENT_INVATION_SUCCESS,
+    USER_REMOVED_FROM_EVENT_SUCCESS,
+)
+from events.filters import (
+    EventDateTimeRangeFilter,
+)
 from events.models import (
     Event,
-    RequestToParticipation,
     InviteToEvent,
+    RequestToParticipation,
 )
 from events.serializers import (
     BulkAcceptOrDeclineRequestToParticipationSerializer,
-    RequestToParticipationSerializer,
-    PopularIventsListSerializer,
-    JoinOrRemoveRoomSerializer,
+    CreateEventSerializer,
     DeleteIventsSerializer,
     EventListSerializer,
-    UpdateEventSerializer,
     EventSerializer,
-    InviteUserToEventSerializer,
-    CreateEventSerializer,
     InvitesToEventListSerializer,
+    InviteUserToEventSerializer,
+    JoinOrRemoveRoomSerializer,
+    PopularIventsListSerializer,
     RemoveUserFromEventSerializer,
+    RequestToParticipationSerializer,
+    UpdateEventSerializer,
 )
 from events.services import (
-    validate_user_before_join_to_event,
-    filter_event_by_user_planned_events_time,
+    bulk_accept_or_decline_invites_to_events,
     bulk_accpet_or_decline_requests_to_participation,
     bulk_delete_events,
+    event_create,
+    filter_event_by_user_planned_events_time,
+    not_in_black_list,
+    only_author,
+    remove_user_from_event,
     send_notification_to_event_author,
     send_notification_to_subscribe_event_user,
-    event_create,
-    only_author,
-    bulk_accept_or_decline_invites_to_events,
-    remove_user_from_event,
-    not_in_black_list,
+    validate_user_before_join_to_event,
 )
-from events.filters import (
-    EventDateTimeRangeFilter, 
-)
-
 from notifications.tasks import *
-from authentication.filters import RankedFuzzySearchFilter
-
-from django.db.models import Count
-from django.db.models.query import QuerySet
-from django.db.models import Q
-
+from rest_framework.exceptions import (
+    PermissionDenied,
+)
+from rest_framework.filters import (
+    OrderingFilter,
+    SearchFilter,
+)
 from rest_framework.generics import (
     GenericAPIView,
     ListAPIView,
@@ -50,42 +81,18 @@ from rest_framework.generics import (
 from rest_framework.mixins import (
     RetrieveModelMixin,
 )
+from rest_framework.request import Request
+from rest_framework.response import Response
 from rest_framework.serializers import (
     Serializer,
+    ValidationError,
 )
 from rest_framework.status import (
-    HTTP_400_BAD_REQUEST,
-    HTTP_201_CREATED,
     HTTP_200_OK,
-)
-from rest_framework.filters import (
-    SearchFilter,
-    OrderingFilter,
-)
-from rest_framework.serializers import ValidationError
-from rest_framework.response import Response
-from rest_framework.request import Request
-from rest_framework.exceptions import PermissionDenied
-
-from django_filters.rest_framework import DjangoFilterBackend
-
-from events.constant.response_success import (
-    SENT_INVATION_SUCCESS, JOIN_TO_EVENT_SUCCESS, APPLICATION_FOR_PARTICIPATION_SUCCESS,
-    EVENT_UPDATE_SUCCESS, DISCONNECT_FROM_EVENT_SUCCESS,
-    USER_REMOVED_FROM_EVENT_SUCCESS,
-)
-from events.constant.response_error import (
-    ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, EVENT_NOT_FOUND_ERROR, NO_IN_EVENT_FANS_LIST_ERROR,
-    NO_IN_EVENT_MEMBERS_LIST_ERROR, EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,
-)
-from events.constant.notification_types import (
-    EVENT_UPDATE_NOTIFICATION_TYPE, LEAVE_USER_FROM_THE_EVENT_NOTIFICATION_TYPE, 
+    HTTP_201_CREATED,
+    HTTP_400_BAD_REQUEST,
 )
 
-from authentication.constant.errors import (
-    NO_SUCH_USER_ERROR
-)
-from config.exceptions import _404
 
 class CreateEvent(GenericAPIView):
     '''class that allows you to create a new event'''

@@ -1,27 +1,26 @@
 from typing import Union
 
 from authentication.views import (
-    RegisterUser,
-    LoginUser,
-    UserList,
-    UsersRelevantList,
     AdminUsersList,
-    UserOwnerProfile,
-    UserProfile,
-    RequestPasswordReset,
-    ResetPassword,
-    RequestChangePassword,
     CheckCode,
-    UpdateProfile,
-    RequetChangeEmail,
+    LoginUser,
+    RegisterUser,
+    RequestChangePassword,
     RequestChangePhone,
     RequestEmailVerify,
+    RequestPasswordReset,
+    RequetChangeEmail,
+    ResetPassword,
+    UpdateProfile,
+    UserList,
+    UserOwnerProfile,
+    UserProfile,
+    UsersRelevantList,
 )
-
 from django.urls import path
 from django.urls.resolvers import (
-   URLResolver, 
-   URLPattern,
+    URLPattern,
+    URLResolver,
 )
 
 urlpatterns: list[Union[URLResolver, URLPattern]] = [

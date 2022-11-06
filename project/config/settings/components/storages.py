@@ -1,7 +1,7 @@
 from os import environ
 from typing import Any
-from decouple import config
 
+from decouple import config
 
 if environ.get('GITHUB_WORKFLOW'):
     DATABASES: dict[str, Any] = {

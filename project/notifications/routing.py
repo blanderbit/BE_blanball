@@ -1,14 +1,13 @@
 from typing import Union
 
-from notifications.consumers import (
-    UserConsumer,
-    GeneralConsumer,
-)
-
 from django.urls import path
 from django.urls.resolvers import (
-   URLResolver, 
-   URLPattern,
+    URLPattern,
+    URLResolver,
+)
+from notifications.consumers import (
+    GeneralConsumer,
+    UserConsumer,
 )
 
 websocket_urlpatterns: list[Union[URLResolver, URLPattern]] = [

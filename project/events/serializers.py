@@ -1,29 +1,32 @@
 from collections import OrderedDict
 from typing import Any, Union
 
+from authentication.models import User
+from authentication.serializers import (
+    EventUsersSerializer,
+)
+from config.exceptions import _404
+from events.constant.response_error import (
+    ALREADY_IN_EVENT_FANS_LIST_ERROR,
+    ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,
+    EVENT_NOT_FOUND_ERROR,
+    EVENT_TIME_EXPIRED_ERROR,
+    NO_EVENT_PLACE_ERROR,
+    NO_IN_EVENT_MEMBERS_LIST_ERROR,
+)
 from events.models import (
     Event,
-    RequestToParticipation,
     InviteToEvent,
+    RequestToParticipation,
 )
-from authentication.serializers import EventUsersSerializer
-
+from events.validators import (
+    EventDateTimeValidator,
+)
 from rest_framework import serializers
-
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
 
-from events.validators import EventDateTimeValidator
-
-from events.constant.response_error import (
-    EVENT_TIME_EXPIRED_ERROR, NO_EVENT_PLACE_ERROR, EVENT_NOT_FOUND_ERROR,
-    ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, ALREADY_IN_EVENT_FANS_LIST_ERROR, NO_IN_EVENT_MEMBERS_LIST_ERROR,
-)
-
-from config.exceptions import _404
-
-from authentication.models import User
 
 class CreateEventSerializer(serializers.ModelSerializer):
     class Meta:
