@@ -19,8 +19,6 @@ INSTALLED_APPS: list[str] = [
     'django.contrib.staticfiles',
 
     # Other libs apps:
-    'django_minio_backend.apps.DjangoMinioBackendConfig',
-
     'corsheaders',
     'rest_framework_swagger',
     'rest_framework',
@@ -36,6 +34,9 @@ INSTALLED_APPS: list[str] = [
     'notifications.apps.NotificationsConfig',
     'reviews.apps.ReviewsConfig',
 ]
+
+if not os.environ.get('GITHUB_WORKFLOW'):
+    INSTALLED_APPS.append('django_minio_backend.apps.DjangoMinioBackendConfig')
 
 MIDDLEWARE: list[str] = [
     'corsheaders.middleware.CorsMiddleware',
