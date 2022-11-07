@@ -9,6 +9,7 @@ from notifications.tasks import send
 
 from notifications.constant.notification_types import (
     NOTIFICATION_DELETE_NOTIFICATION_TYPE,
+    NOTIFICATION_READ_NOTIFICATION_TYPE
 )
 
 
@@ -25,3 +26,19 @@ def send_update_message_after_delete_notification(sender: Notification, instance
             }
         }
     )
+
+@receiver(post_save, sender = Notification)
+def send_update_message_after_read_notification(sender: Notification, instance: Notification, **kwargs) -> None:
+    if instance.type == instance.Type.READ:
+        send(user = instance.user,
+            data = {
+                'type': 'kafka.message',
+                'message': {
+                    'message_type': NOTIFICATION_READ_NOTIFICATION_TYPE, 
+                    'notification': {
+                        'id': instance.id,
+                        'type': instance.type,
+                    }
+                }
+            }
+        )

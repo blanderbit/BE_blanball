@@ -8,10 +8,18 @@ from notifications.constant.notification_types import (
     CHANGE_MAINTENANCE_NOTIFICATION_TYPE,
 )
 from notifications.models import Notification
+from config.celery import app
+from django.db.models import QuerySet
 
-
+@app.task(
+    ignore_result = True,
+    time_limit = 5,
+    soft_time_limit = 3,
+    default_retry_delay = 5,
+)
 def send(user: User, data: dict[str, Any]) -> None:
     async_to_sync(get_channel_layer().group_send)(user.group_name, data)
+
 
 def send_to_user(user: User, message_type: str, data: dict[str, Union[str, int, datetime, bool]] = None) -> None:
     if message_type != CHANGE_MAINTENANCE_NOTIFICATION_TYPE:
@@ -24,4 +32,26 @@ def send_to_user(user: User, message_type: str, data: dict[str, Union[str, int, 
                 'notification_id': notification.id,
                 'data': data
             }
-        })
+        }
+    )
+
+@app.task(
+    ignore_result = True,
+    time_limit = 5,
+    soft_time_limit = 3,
+    default_retry_delay = 5,
+)
+def read_all_user_notifications(*, request_user_id: int) -> None:
+    for notification in Notification.get_all().filter(user_id = request_user_id, 
+            type = Notification.Type.UNREAD):
+        notification.type = notification.Type.READ
+        notification.save()
+
+@app.task(
+    ignore_result = True,
+    time_limit = 5,
+    soft_time_limit = 3,
+    default_retry_delay = 5,
+)
+def delete_all_user_notifications(*, request_user_id: int) -> None:
+    Notification.get_all().filter(user_id = request_user_id).delete()

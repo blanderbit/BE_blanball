@@ -15,6 +15,7 @@ from notifications.views import (
     UserNotificaitonsCount,
     UserNotificationsList,
     DeleteAllUserNotifications,
+    ReadAllUserNotifications,
 )
 
 urlpatterns: list[Union[URLResolver, URLPattern]] = [
@@ -27,6 +28,9 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     # endpoint where a use can get list of her notifications
     path('client/my/not-read/notifications/count', UserNotificaitonsCount.as_view(), 
         name = 'user-not-read-notifications-count'),
+    # endpoint where user can read all her notificaions
+    path('client/read/all/notifications', ReadAllUserNotifications.as_view(), 
+        name = 'read-all-notifications'),
     # endpoint where user can bulk read her notificaions
     path('client/read/notifications', ReadNotifications.as_view(), 
         name = 'bulk-read-notifications'),
