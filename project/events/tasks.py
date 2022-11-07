@@ -6,7 +6,6 @@ from events.constant.notification_types import (
 )
 from events.models import (
     Event,
-    RequestToParticipation,
 )
 from events.services import (
     send_notification_to_subscribe_event_user,

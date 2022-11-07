@@ -12,14 +12,12 @@ from channels.layers import get_channel_layer
 from django.db.models.query import QuerySet
 from notifications.constant.notification_types import (
     CHANGE_MAINTENANCE_NOTIFICATION_TYPE,
-    NOTIFICATION_READ_NOTIFICATION_TYPE,
 )
 from notifications.models import Notification
-from notifications.tasks import send
 
 bulk = TypeVar(Optional[Generator[list[dict[str, int]], None, None]])
 
-def update_maintenance(data: dict[str, str]) -> None:
+def update_maintenance(*, data: dict[str, str]) -> None:
 
     with open('./config/config.json', 'r') as f:
         json_data = json.load(f)
@@ -43,7 +41,7 @@ def update_maintenance(data: dict[str, str]) -> None:
             })
                 
     
-def bulk_delete_notifications(data: dict[str, Any], queryset: QuerySet[Notification], user: User) -> bulk:
+def bulk_delete_notifications(*, data: dict[str, Any], queryset: QuerySet[Notification], user: User) -> bulk:
     for notification in data:
         try:
             notify = queryset.get(id = notification)
@@ -53,7 +51,7 @@ def bulk_delete_notifications(data: dict[str, Any], queryset: QuerySet[Notificat
         except Notification.DoesNotExist:
             pass
 
-def bulk_read_notifications(data: dict[str, Any], queryset: QuerySet[Notification]) -> bulk:
+def bulk_read_notifications(*, data: dict[str, Any], queryset: QuerySet[Notification]) -> bulk:
     for notification in data:
         try: 
             notify = queryset.get(id = notification)
@@ -61,16 +59,5 @@ def bulk_read_notifications(data: dict[str, Any], queryset: QuerySet[Notificatio
                 notify.type = 'Read'
                 notify.save()
                 yield {'success': notification}
-                send(user = notify.user,
-                    data = {
-                        'type': 'kafka.message',
-                        'message': {
-                            'message_type': NOTIFICATION_READ_NOTIFICATION_TYPE, 
-                            'notification': {
-                                'id': notify.id,
-                                'type': notify.type,
-                            }
-                        }
-                    })
         except Notification.DoesNotExist:
             pass

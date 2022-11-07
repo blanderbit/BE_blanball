@@ -9,6 +9,7 @@ from notifications.constant.errors import (
 from notifications.constant.success import (
     MAINTENANCE_UPDATED_SUCCESS,
     NOTIFICATIONS_DELETED_SUCCESS,
+    NOTIFICATIONS_READED_SUCCESS,
 )
 from notifications.models import Notification
 from notifications.serializers import (
@@ -21,6 +22,10 @@ from notifications.services import (
     bulk_delete_notifications,
     bulk_read_notifications,
     update_maintenance,
+)
+from notifications.tasks import (
+    read_all_user_notifications,
+    delete_all_user_notifications,
 )
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import (
@@ -118,7 +123,18 @@ class GetCurrentVersion(GetMaintenance):
 
 
 class DeleteAllUserNotifications(GenericAPIView):
+    queryset: QuerySet[Notification] = Notification.get_all()
 
     def delete(self, request: Request) -> Response:
-        Notification.objects.filter(user = request.user).delete()
+        delete_all_user_notifications.delay(request_user_id = request.user.id)
         return Response(NOTIFICATIONS_DELETED_SUCCESS, status = HTTP_200_OK)
+
+
+class ReadAllUserNotifications(GenericAPIView):
+    queryset: QuerySet[Notification] = Notification.get_all()
+
+    def get(self, request: Request) -> Response:
+        read_all_user_notifications.delay(request_user_id = request.user.id)
+        for i in range(100):
+            Notification.objects.create(user = request.user, message_type = 'fdfd', data = {})
+        return Response(NOTIFICATIONS_READED_SUCCESS, status = HTTP_200_OK)
