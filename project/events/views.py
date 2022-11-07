@@ -97,6 +97,7 @@ from rest_framework.status import (
 from drf_yasg.utils import swagger_auto_schema
 from config.yasg import skip_param
 
+
 class CreateEvent(GenericAPIView):
     '''class that allows you to create a new event'''
     serializer_class: Type[Serializer] = CreateEventSerializer
