@@ -33,6 +33,7 @@ from rest_framework.status import (
     HTTP_200_OK,
     HTTP_400_BAD_REQUEST,
 )
+from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
@@ -101,6 +102,7 @@ class ChangeMaintenance(GenericAPIView):
 
 class GetMaintenance(APIView):
     key: str = 'isMaintenance'
+    permission_classes = [AllowAny]
 
     def get(self, request: Request) -> Response:
         try:
