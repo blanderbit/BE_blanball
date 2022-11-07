@@ -16,6 +16,7 @@ from authentication.models import User
 from config.exceptions import _404
 from django.db import transaction
 from django.db.models.query import QuerySet
+from django.db.models import Q
 from django.utils import timezone
 from events.constant.notification_types import (
     NEW_USER_ON_THE_EVENT_NOTIFICATION_TYPE,
@@ -271,3 +272,16 @@ def remove_user_from_event(*, user: User, event: Event, reason: str) -> None:
                 'name': event.name,
             }
         })
+
+def skip_objects_from_response_by_id(func: Callable[[..., ...], QuerySet[Any]]) -> Callable[[..., ...], QuerySet[Any]]:
+    def wrap(self, *args: Any, **kwargs: Any) -> Any:
+        try:
+            self.queryset = self.queryset.filter(~Q(id__in = list(self.request.query_params['skipids'].split(','))))
+            return func(self, *args, **kwargs)
+        except KeyError:
+            pass
+        except ValueError:
+            pass
+        finally:
+            return func(self, *args, **kwargs)
+    return wrap

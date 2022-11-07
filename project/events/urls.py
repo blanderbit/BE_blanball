@@ -10,7 +10,7 @@ from events.views import (
     BulkAcceptOrDeclineRequestToParticipation,
     CreateEvent,
     DeleteEvents,
-    EventList,
+    EventsList,
     EventsRelevantList,
     FanJoinToEvent,
     FanLeaveFromEvent,
@@ -23,10 +23,10 @@ from events.views import (
     RemoveUserFromEvent,
     RequestToParticipationsList,
     UpdateEvent,
-    UserEvents,
+    UserEventsList,
     UserEventsRelevantList,
-    UserParticipantEvents,
-    UserPlannedEvents,
+    UserParticipantEventsList,
+    UserPlannedEventsList,
 )
 
 urlpatterns: list[Union[URLResolver, URLPattern]] = [
@@ -40,7 +40,7 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     path('client/event/update/<int:pk>', UpdateEvent.as_view(),
         name = 'update-event'),
     #endpoint where user can get list of events
-    path('client/events/list', EventList.as_view(), 
+    path('client/events/list', EventsList.as_view(), 
         name = 'events-list'),
      #endpoint where user can get list of events
     path('client/invites/to/events/list', InvitesToEventList.as_view(), 
@@ -64,10 +64,10 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     path('client/fan/event/leave', FanLeaveFromEvent.as_view(), 
         name = 'spectator-leave-from-event'),
     # endpoint where user can get list of your events
-    path('client/my/events/list', UserEvents.as_view(), 
+    path('client/my/events/list', UserEventsList.as_view(), 
         name = 'user-events-list'),
     # endpoint where user can get list of your events
-    path('client/my/participant/events/list', UserParticipantEvents.as_view(), 
+    path('client/my/participant/events/list', UserParticipantEventsList.as_view(), 
         name = 'user-participant-events-list'),
     # endpoint where user can get relevant list of events
     path('client/relevant/events/list', EventsRelevantList.as_view(), 
@@ -76,7 +76,7 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     path('client/my/relevant/events/list', UserEventsRelevantList.as_view(), 
         name = 'relevant-user-events-list'),
     # endpoint where a user can get list of other user scheduled events
-    path('client/user/planned/events/list/<int:pk>', UserPlannedEvents.as_view(), 
+    path('client/user/planned/events/list/<int:pk>', UserPlannedEventsList.as_view(), 
         name = 'user-planned-events-list'),
     # endpoint where a user can get list of the most popular events
     path('client/popular/events/list', PopularEvents.as_view(), 
