@@ -71,6 +71,7 @@ from config.exceptions import _404
 from django.conf import settings
 from django.db import transaction
 from django.db.models.query import QuerySet
+from django.utils.decorators import method_decorator
 from django_filters.rest_framework import (
     DjangoFilterBackend,
 )
@@ -93,7 +94,9 @@ from rest_framework.status import (
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
 )
-from rest_framework.views import APIView
+from drf_yasg.utils import swagger_auto_schema
+from config.yasg import skip_param
+from events.services import skip_objects_from_response_by_id
 
 
 class RegisterUser(GenericAPIView):
@@ -198,7 +201,8 @@ class UserProfile(GenericAPIView):
         except User.DoesNotExist:
             raise _404(object = User)
 
-class UserList(ListAPIView):
+@method_decorator(swagger_auto_schema(manual_parameters = [skip_param]), name  = 'get')
+class UsersList(ListAPIView):
     '''
     This class makes it possible to 
     get a list of all users of the application.
@@ -212,8 +216,13 @@ class UserList(ListAPIView):
     filterset_class = UserAgeRangeFilter
     ordering_fields: list[str] = ['id', 'profile__age', 'raiting']
     search_fields: list[str] = ['profile__name', 'profile__gender', 'profile__last_name']
-    queryset: QuerySet[User] = User.get_all().filter(role = 'User')
+    queryset: QuerySet[User] = User.get_all()
 
+    @skip_objects_from_response_by_id
+    def get_queryset(self) -> QuerySet[User]:
+        return self.queryset.filter(role = 'User')
+
+@method_decorator(swagger_auto_schema(manual_parameters = [skip_param]), name  = 'get')
 class UsersRelevantList(ListAPIView):
     '''
     This class makes it possible to get the 5 most 
@@ -224,13 +233,11 @@ class UsersRelevantList(ListAPIView):
     '''
     filter_backends = [RankedFuzzySearchFilter, ]
     serializer_class: Type[Serializer] = UsersListSerializer
-    queryset: QuerySet[User] = User.get_all().filter(role = 'User')
+    queryset: QuerySet[User] = User.get_all()
     search_fields: list[str] = ['profile__name', 'profile__last_name']
 
-class AdminUsersList(UserList):
-    '''displaying the full list of admin users'''
     def get_queryset(self) -> QuerySet[User]:
-        return self.queryset.filter(role = 'Admin')
+        return UsersList.get_queryset(self)
 
 class RequestPasswordReset(GenericAPIView): 
     '''

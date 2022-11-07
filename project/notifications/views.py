@@ -34,6 +34,10 @@ from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
 from rest_framework.views import APIView
+from django.utils.decorators import method_decorator
+from drf_yasg.utils import swagger_auto_schema
+from config.yasg import skip_param
+from events.services import skip_objects_from_response_by_id
 
 
 class NotificationsList(ListAPIView):
@@ -42,8 +46,10 @@ class NotificationsList(ListAPIView):
     ordering_fields: list[str] = ['id', ]
     queryset: QuerySet[Notification] = Notification.get_all()
 
+@method_decorator(swagger_auto_schema(manual_parameters = [skip_param]), name  = 'get')
 class UserNotificationsList(NotificationsList):
     
+    @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Notification]:
         return self.queryset.filter(user_id = self.request.user.id)
 
@@ -87,11 +93,11 @@ class ChangeMaintenance(GenericAPIView):
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data = request.data)
         serializer.is_valid(raise_exception = True)
-        # try:
-        update_maintenance(data = request.data)
-        return Response(MAINTENANCE_UPDATED_SUCCESS, status = HTTP_200_OK)
-        # except:
-        #     return Response(MAINTENANCE_CAN_NOT_UPDATE_ERROR, status = HTTP_400_BAD_REQUEST)
+        try:
+            update_maintenance(data = request.data)
+            return Response(MAINTENANCE_UPDATED_SUCCESS, status = HTTP_200_OK)
+        except:
+            return Response(MAINTENANCE_CAN_NOT_UPDATE_ERROR, status = HTTP_400_BAD_REQUEST)
 
 class GetMaintenance(APIView):
     key: str = 'isMaintenance'

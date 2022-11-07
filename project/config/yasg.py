@@ -27,3 +27,7 @@ urlpatterns = [
 ]
 
 
+skip_param = openapi.Parameter('skipids', openapi.IN_QUERY, 
+   description = 'skip objects example query: 1,2,3,4,5', 
+   type = openapi.TYPE_STRING,
+)

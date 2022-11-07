@@ -9,6 +9,7 @@ from authentication.filters import (
 from config.exceptions import _404
 from django.db.models import Count, Q
 from django.db.models.query import QuerySet
+from django.utils.decorators import method_decorator
 from django_filters.rest_framework import (
     DjangoFilterBackend,
 )
@@ -65,6 +66,7 @@ from events.services import (
     send_notification_to_event_author,
     send_notification_to_subscribe_event_user,
     validate_user_before_join_to_event,
+    skip_objects_from_response_by_id,
 )
 from notifications.tasks import *
 from rest_framework.exceptions import (
@@ -92,6 +94,8 @@ from rest_framework.status import (
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
 )
+from drf_yasg.utils import swagger_auto_schema
+from config.yasg import skip_param
 
 
 class CreateEvent(GenericAPIView):
@@ -246,7 +250,9 @@ class RemoveUserFromEvent(GenericAPIView):
             reason = serializer.validated_data['reason'])
         return Response(USER_REMOVED_FROM_EVENT_SUCCESS, status = HTTP_200_OK)
 
-class EventList(ListAPIView):
+
+@method_decorator(swagger_auto_schema(manual_parameters = [skip_param]), name  = 'get')
+class EventsList(ListAPIView):
     '''class that allows you to get a complete list of events'''
     serializer_class: Type[Serializer] = EventListSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter, ]
@@ -255,31 +261,39 @@ class EventList(ListAPIView):
     filterset_class = EventDateTimeRangeFilter
     queryset: QuerySet[Event] = Event.get_all()
 
+    @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Event]:
         return self.queryset.filter(~Q(black_list__in = [self.request.user.id]))
     
 
+@method_decorator(swagger_auto_schema(manual_parameters = [skip_param]), name  = 'get')
 class EventsRelevantList(ListAPIView):
     filter_backends = [RankedFuzzySearchFilter]
     serializer_class: Type[Serializer] = EventListSerializer
     queryset: QuerySet[Event] = Event.get_all()
     search_fields: list[str] = ['name']
 
+    @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Event]:
-        return EventList.get_queryset(self)
+        return EventsList.get_queryset(self)
 
 
 class UserEventsRelevantList(EventsRelevantList):
 
+    @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Event]:
         return self.queryset.filter(author_id = self.request.user.id)
 
+
+@method_decorator(swagger_auto_schema(manual_parameters = [skip_param]), name  = 'get')
 class InvitesToEventList(ListAPIView):
     serializer_class: Type[Serializer] = InvitesToEventListSerializer
     queryset: QuerySet[InviteToEvent] = InviteToEvent.get_all().filter(status = InviteToEvent.Status.WAITING)
 
+    @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[InviteToEvent]:
         return self.queryset.filter(recipient = self.request.user)
+
 
 class BulkAcceptOrDeclineInvitesToEvent(GenericAPIView):
     serializer_class: Type[Serializer] = BulkAcceptOrDeclineRequestToParticipationSerializer
@@ -292,27 +306,33 @@ class BulkAcceptOrDeclineInvitesToEvent(GenericAPIView):
             data = serializer.validated_data, request_user = request.user)
         return Response(data, status = HTTP_200_OK)
 
-class UserEvents(EventList):
+
+class UserEventsList(EventsList):
 
     def get_queryset(self) -> QuerySet[Event]:
-        return EventList.get_queryset(self).filter(author_id = self.request.user.id) 
+        return EventsList.get_queryset(self).filter(author_id = self.request.user.id) 
 
-class UserParticipantEvents(UserEvents):
 
+class UserParticipantEventsList(UserEventsList):
+
+    @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Event]:
         return self.queryset.filter(current_users__in = [self.request.user.id])
 
-class PopularEvents(UserEvents):
+
+class PopularEvents(UserEventsList):
     serializer_class: Type[Serializer] = PopularIventsListSerializer
     queryset: QuerySet[Event] = Event.get_all().filter(status = 'Planned')
-
+    
     def get_queryset(self) -> QuerySet[Event]:
-        return EventList.get_queryset(self).annotate(count = Count('current_users')).order_by('-count')[:10]
+        return EventsList.get_queryset(self).annotate(count = Count('current_users')).order_by('-count')[:10]
 
-class UserPlannedEvents(UserEvents):
+
+class UserPlannedEventsList(UserEventsList):
     serializer_class: Type[Serializer] = PopularIventsListSerializer
     queryset: QuerySet[Event] = Event.get_all().filter(status = 'Planned')
 
+    @skip_objects_from_response_by_id
     def list(self, request: Request, pk: int) -> Response:
         try:
             serializer = self.serializer_class(
@@ -322,10 +342,12 @@ class UserPlannedEvents(UserEvents):
             return Response(NO_SUCH_USER_ERROR, status = HTTP_400_BAD_REQUEST)
 
 
+@method_decorator(swagger_auto_schema(manual_parameters = [skip_param]), name  = 'get')
 class RequestToParticipationsList(ListAPIView):
     serializer_class: Type[Serializer] = RequestToParticipationSerializer
     queryset: QuerySet[RequestToParticipation] = RequestToParticipation.get_all().filter(status = RequestToParticipation.Status.WAITING)
     
+    @skip_objects_from_response_by_id
     def list(self, request: Request, pk: int) -> Response:
         try:
             event: Event =  Event.objects.get(id = pk)

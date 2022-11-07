@@ -1,7 +1,6 @@
 from typing import Union
 
 from authentication.views import (
-    AdminUsersList,
     CheckCode,
     LoginUser,
     RegisterUser,
@@ -12,7 +11,7 @@ from authentication.views import (
     RequetChangeEmail,
     ResetPassword,
     UpdateProfile,
-    UserList,
+    UsersList,
     UserOwnerProfile,
     UserProfile,
     UsersRelevantList,
@@ -31,14 +30,11 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     path('client/login', LoginUser.as_view(), 
         name = 'login'),
     # endpoint where user can get users list
-    path('client/users/list', UserList.as_view(), 
+    path('client/users/list', UsersList.as_view(), 
         name = 'users-list'),
     # endpoint where user can get relevant users list
     path('client/users/relevant/list', UsersRelevantList.as_view(),
         name = 'users-relevant-list'),
-    # endpoint where user can get admins list
-    path('admins/list', AdminUsersList.as_view(), 
-        name = 'admins-list'),
     # endpoint where user can get his profile
     path('client/me', UserOwnerProfile.as_view(), 
         name = 'my-profile'),
