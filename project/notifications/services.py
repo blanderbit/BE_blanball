@@ -12,7 +12,6 @@ from channels.layers import get_channel_layer
 from django.db.models.query import QuerySet
 from notifications.constant.notification_types import (
     CHANGE_MAINTENANCE_NOTIFICATION_TYPE,
-    NOTIFICATION_DELETE_NOTIFICATION_TYPE,
     NOTIFICATION_READ_NOTIFICATION_TYPE,
 )
 from notifications.models import Notification
@@ -51,16 +50,6 @@ def bulk_delete_notifications(data: dict[str, Any], queryset: QuerySet[Notificat
             if notify.user == user:
                 notify.delete()
                 yield {'success': notification}
-                send(user = notify.user,
-                    data = {
-                        'type': 'kafka.message',
-                        'message': {
-                            'message_type': NOTIFICATION_DELETE_NOTIFICATION_TYPE, 
-                            'notification': {
-                                'id': notify.id,
-                            }
-                        }
-                    })
         except Notification.DoesNotExist:
             pass
 

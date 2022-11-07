@@ -14,6 +14,7 @@ from notifications.views import (
     ReadNotifications,
     UserNotificaitonsCount,
     UserNotificationsList,
+    DeleteAllUserNotifications,
 )
 
 urlpatterns: list[Union[URLResolver, URLPattern]] = [
@@ -32,6 +33,9 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     # endpoint where user can bulk  delete her her notificaions
     path('client/delete/notifications', DeleteNotifcations.as_view(), 
         name = 'bulk-delete-notifications'),
+    # endpoint where user can delete all her her notificaions
+    path('client/delete/all/notifications', DeleteAllUserNotifications.as_view(), 
+        name = 'delete-all-notifications'),
     # endpoint where admin can change maintenance
     path('admin/change/maintenance', ChangeMaintenance.as_view(), 
         name = 'change-maintenance'),

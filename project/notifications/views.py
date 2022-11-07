@@ -8,6 +8,7 @@ from notifications.constant.errors import (
 )
 from notifications.constant.success import (
     MAINTENANCE_UPDATED_SUCCESS,
+    NOTIFICATIONS_DELETED_SUCCESS,
 )
 from notifications.models import Notification
 from notifications.serializers import (
@@ -114,3 +115,10 @@ class GetMaintenance(APIView):
 
 class GetCurrentVersion(GetMaintenance):
     key: str = 'version'
+
+
+class DeleteAllUserNotifications(GenericAPIView):
+
+    def delete(self, request: Request) -> Response:
+        Notification.objects.filter(user = request.user).delete()
+        return Response(NOTIFICATIONS_DELETED_SUCCESS, status = HTTP_200_OK)
