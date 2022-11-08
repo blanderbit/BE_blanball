@@ -2,8 +2,7 @@ on: [push, workflow_dispatch]
 
 jobs:
   run_tests:
-    if: (contains(fromJson('["push"]'), github.event_name) && github.ref == 'refs/heads/develop' || 
-    github.ref == 'refs/heads/main') || (contains(fromJson('["workflow_dispatch"]'), github.event_name)
+    if: ((contains(fromJson('["push"]'), github.event_name) && github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')) || (contains(fromJson('["workflow_dispatch"]'), github.event_name)
     runs-on: ubuntu-latest
     env:
       ENV_FILE: ${{ secrets.ENV_FILE }}
