@@ -7,6 +7,7 @@ env:
 
 jobs:
   build_proxy:
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
     - name: Login to GitHub Container Registry
