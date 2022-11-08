@@ -98,7 +98,7 @@ def validate_birthday(value: date) -> None:
 
 @final
 def configuration_dict() -> dict[str, bool]:
-    return {"email": True, "phone": True, "send_email": True}
+    return {"email": True, "phone": True}
 
 
 def image_file_name(instance: "Profile", filename: str) -> str:

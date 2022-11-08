@@ -1,7 +1,7 @@
 ALREADY_VERIFIED_ERROR: dict[str, str] = {"error": "Your account is already verified"}
 
 CONFIGURATION_IS_REQUIRED_ERROR: dict[str, str] = {
-    "error": "Сonfiguration should contain fields like: email,phone,send_email,show_my_planned_events"
+    "error": "Сonfiguration should contain fields like: email,phone,show_my_planned_events"
 }
 
 GET_PLANNED_IVENTS_ERROR: dict[str, str] = {

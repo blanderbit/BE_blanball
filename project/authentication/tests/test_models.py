@@ -15,7 +15,7 @@ class TestAuthenticationModels(SetUpAuthenticationModels):
 
     def test_user_configuration(self) -> None:
         self.assertEqual(
-            self.user.configuration, {"email": True, "phone": True, "send_email": True}
+            self.user.configuration, {"email": True, "phone": True}
         )
 
     def test_check_user_defalut_fields(self) -> None:

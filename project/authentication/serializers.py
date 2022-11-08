@@ -94,7 +94,7 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
         self, attrs: OrderedDict
     ) -> Union[serializers.ValidationError, OrderedDict]:
         conf: str = attrs.get("configuration")
-        keys: list[str] = ["email", "phone", "send_email"]
+        keys: list[str] = ["email", "phone"]
         planned_events = attrs.get("get_planned_events")
         string: str = re.findall(r"\D", planned_events)[0]
         if string not in ["d", "m", "y"]:
