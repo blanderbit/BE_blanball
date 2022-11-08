@@ -164,6 +164,4 @@ class ReadAllUserNotifications(GenericAPIView):
 
     def get(self, request: Request) -> Response:
         read_all_user_notifications.delay(request_user_id=request.user.id)
-        for i in range(100):
-            Notification.objects.create(user=request.user, message_type="fdfd", data={})
         return Response(NOTIFICATIONS_READED_SUCCESS, status=HTTP_200_OK)
