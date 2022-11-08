@@ -7,8 +7,6 @@ env:
 
 jobs:
   build_proxy:
-    if: contains(fromJson('["push"]'), github.event_name) && github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main') || contains(fromJson('["workflow_dispatch"]'), github.event_name)
-    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
     - name: Login to GitHub Container Registry
