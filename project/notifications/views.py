@@ -129,7 +129,9 @@ class ChangeMaintenance(GenericAPIView):
             update_maintenance(data=request.data)
             return Response(MAINTENANCE_UPDATED_SUCCESS, status=HTTP_200_OK)
         except:
-            return Response(MAINTENANCE_CAN_NOT_UPDATE_ERROR, status=HTTP_400_BAD_REQUEST)
+            return Response(
+                MAINTENANCE_CAN_NOT_UPDATE_ERROR, status=HTTP_400_BAD_REQUEST
+            )
 
 
 class GetMaintenance(APIView):
@@ -162,6 +164,4 @@ class ReadAllUserNotifications(GenericAPIView):
 
     def get(self, request: Request) -> Response:
         read_all_user_notifications.delay(request_user_id=request.user.id)
-        for i in range(100):
-            Notification.objects.create(user=request.user, message_type="fdfd", data={})
         return Response(NOTIFICATIONS_READED_SUCCESS, status=HTTP_200_OK)

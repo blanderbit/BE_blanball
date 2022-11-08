@@ -48,4 +48,6 @@ THIS_USER_CAN_NOT_BE_INVITED: dict[str, str] = {
 NO_PRICE_DESK_ERROR: dict[str, str] = {
     "error": "If the price is greater than 0 you must provide a description of what it is for"
 }
-SENT_INVATION_ERROR: dict[str, str] = {"error": "You cannot invite yourself to the event"}
+SENT_INVATION_ERROR: dict[str, str] = {
+    "error": "You cannot invite yourself to the event"
+}

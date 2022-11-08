@@ -191,7 +191,7 @@ class InviteToEventManager(models.Manager):
 
         if (
             request_user.id == event.author.id
-            or request_user.id in event.current_users.all()
+            or request_user in event.current_users.all()
         ):
             invite = self.model(recipient=invite_user, event=event, sender=request_user)
             invite.save()

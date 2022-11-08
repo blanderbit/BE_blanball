@@ -4,7 +4,9 @@ INVITE_USER_TO_EVENT_NOTIFICATION_TYPE: str = "invite_user_to_event"
 EVENT_DELETE_NOTIFICATION_TYPE: str = "event_deleted"
 EVENT_UPDATE_NOTIFICATION_TYPE: str = "event_updated"
 EVENT_TIME_NOTIFICATION_TYPE: str = "event_time_notification"
-RESPONSE_TO_THE_INVITE_TO_EVENT_NOTIFICATION_TYPE: str = "response_to_invite_user_to_event"
+RESPONSE_TO_THE_INVITE_TO_EVENT_NOTIFICATION_TYPE: str = (
+    "response_to_invite_user_to_event"
+)
 UPDATE_MESSAGE_ACCEPT_OR_DECLINE_INVITE_TO_EVENT: str = (
     "update_message_accept_or_decline_invite_to_event"
 )

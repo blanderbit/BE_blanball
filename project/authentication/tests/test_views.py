@@ -55,7 +55,9 @@ class TestAuthenticationViews(SetUpAauthenticationViews):
 
     def test_check_change_phone(self) -> None:
         self.auth()
-        self.client.post(reverse("request-change-phone"), self.request_change_phone_data)
+        self.client.post(
+            reverse("request-change-phone"), self.request_change_phone_data
+        )
         response = self.client.post(
             reverse("check-code"), {"verify_code": Code.objects.first().verify_code}
         )
@@ -87,7 +89,9 @@ class TestAuthenticationViews(SetUpAauthenticationViews):
 
     def test_change_email(self) -> None:
         self.auth()
-        self.client.post(reverse("request-change-email"), self.request_change_email_data)
+        self.client.post(
+            reverse("request-change-email"), self.request_change_email_data
+        )
         response = self.client.post(
             reverse("check-code"), {"verify_code": Code.objects.first().verify_code}
         )
@@ -180,7 +184,8 @@ class TestAuthenticationViews(SetUpAauthenticationViews):
     def test_request_reset_password_with_authorized(self) -> None:
         self.auth()
         request_reset = self.client.post(
-            reverse("request-reset-password"), {"email": self.user_register_data["email"]}
+            reverse("request-reset-password"),
+            {"email": self.user_register_data["email"]},
         )
         self.assertEqual(request_reset.status_code, HTTP_403_FORBIDDEN)
 

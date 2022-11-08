@@ -21,7 +21,9 @@ from notifications.views import (
 urlpatterns: list[Union[URLResolver, URLPattern]] = [
     # endpoint where user can get list of notifications
     path(
-        "admin/notifications/list", NotificationsList.as_view(), name="notifications-list"
+        "admin/notifications/list",
+        NotificationsList.as_view(),
+        name="notifications-list",
     ),
     # endpoint where a use can get list of her notifications
     path(
@@ -61,7 +63,9 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     ),
     # endpoint where admin can change maintenance
     path(
-        "admin/change/maintenance", ChangeMaintenance.as_view(), name="change-maintenance"
+        "admin/change/maintenance",
+        ChangeMaintenance.as_view(),
+        name="change-maintenance",
     ),
     # endpoint where admin can get maintenance
     path("admin/get/maintenance", GetMaintenance.as_view(), name="get-maintenance"),

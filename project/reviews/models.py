@@ -20,7 +20,9 @@ class Review(models.Model):
             MaxValueValidator(5),
         ]
     )
-    user: User = models.ForeignKey(User, on_delete=models.PROTECT, related_name="reviews")
+    user: User = models.ForeignKey(
+        User, on_delete=models.PROTECT, related_name="reviews"
+    )
 
     @final
     def __repr__(self) -> str:

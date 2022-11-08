@@ -35,9 +35,7 @@ REGISTER_SUCCESS_TEXT: str = (
 
 ACCOUNT_DELETE_SUCCESS_BODY_TITLE: str = "Account successfully deleted"
 ACCOUNT_DELETE_SUCCESS_TITLE: str = "Thank you for using our app"
-ACCOUNT_DELETE_SUCCESS_TEXT: str = (
-    "You received this message because your account has been deleted in the BlanBall app."
-)
+ACCOUNT_DELETE_SUCCESS_TEXT: str = "You received this message because your account has been deleted in the BlanBall app."
 
 TEMPLATE_SUCCESS_BODY_TITLE: str = "Change {key} passed successfully"
 TEMPLATE_SUCCESS_TITLE: str = "Your {key} changed!"
