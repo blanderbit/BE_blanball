@@ -134,7 +134,9 @@ class Migration(migrations.Migration):
                 (
                     "black_list",
                     models.ManyToManyField(
-                        blank=True, related_name="black_list", to=settings.AUTH_USER_MODEL
+                        blank=True,
+                        related_name="black_list",
+                        to=settings.AUTH_USER_MODEL,
                     ),
                 ),
                 (

@@ -40,12 +40,19 @@ def get_user(token: str) -> Union[AnonymousUser, User]:
 
 
 class TokenAuthMiddleware(BaseMiddleware):
-    async def __call__(self, scope: dict, receive, send) -> Union[ValueError, OrderedDict]:
+    async def __call__(
+        self, scope: dict, receive, send
+    ) -> Union[ValueError, OrderedDict]:
         if scope["path"] == "/ws/notifications/":
             close_old_connections()
             try:
                 token_key: str = (
-                    dict((x.split("=") for x in scope["query_string"].decode().split("&")))
+                    dict(
+                        (
+                            x.split("=")
+                            for x in scope["query_string"].decode().split("&")
+                        )
+                    )
                 ).get("token", None)
             except ValueError:
                 token_key = None

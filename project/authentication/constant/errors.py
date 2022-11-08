@@ -1,7 +1,7 @@
 ALREADY_VERIFIED_ERROR: dict[str, str] = {"error": "Your account is already verified"}
 
 CONFIGURATION_IS_REQUIRED_ERROR: dict[str, str] = {
-    "error": "Сonfiguration should contain fields like: email,phone,send_email,show_my_planned_events"
+    "error": "Сonfiguration should contain fields like: email,phone,show_my_planned_events"
 }
 
 GET_PLANNED_IVENTS_ERROR: dict[str, str] = {
@@ -23,4 +23,6 @@ BAD_CODE_ERROR: dict[str, str] = {"error": "Bad verify code"}
 CODE_EXPIRED_ERROR: dict[str, str] = {"error": "This code expired"}
 NO_SUCH_IMAGE_ERROR: dict[str, str] = {"error": "Image not found"}
 
-THIS_EMAIL_ALREADY_IN_USE_ERROR: dict[str, str] = {"error": "This email is already in use"}
+THIS_EMAIL_ALREADY_IN_USE_ERROR: dict[str, str] = {
+    "error": "This email is already in use"
+}

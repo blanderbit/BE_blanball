@@ -178,7 +178,9 @@ def event_create(
         contact_number: str = str(User.objects.get(id=request_user.id).phone)
     data["contact_number"] = contact_number
     data["date_and_time"] = (
-        pandas.to_datetime(data["date_and_time"].isoformat()).round("1min").to_pydatetime()
+        pandas.to_datetime(data["date_and_time"].isoformat())
+        .round("1min")
+        .to_pydatetime()
     )
     with transaction.atomic():
         event: Event = Event.objects.create(**data, author=request_user)
@@ -219,7 +221,9 @@ def validate_user_before_join_to_event(*, user: User, event: Event) -> None:
     if user.current_rooms.filter(id=event.id).exists():
         raise ValidationError(ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, HTTP_400_BAD_REQUEST)
     if user.current_views_rooms.filter(id=event.id).exists():
-        raise ValidationError(ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR, HTTP_400_BAD_REQUEST)
+        raise ValidationError(
+            ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR, HTTP_400_BAD_REQUEST
+        )
     if event.author.id == user.id:
         raise ValidationError(EVENT_AUTHOR_CAN_NOT_JOIN_ERROR, HTTP_400_BAD_REQUEST)
     if user in event.black_list.all():

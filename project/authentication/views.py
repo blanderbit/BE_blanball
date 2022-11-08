@@ -119,7 +119,9 @@ class RegisterUser(GenericAPIView):
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        profile: Profile = Profile.objects.create(**serializer.validated_data["profile"])
+        profile: Profile = Profile.objects.create(
+            **serializer.validated_data["profile"]
+        )
         count_age(profile=profile, data=serializer.validated_data["profile"].items())
         serializer.save(profile=profile)
         user: User = User.objects.get(profile=profile.id)
@@ -244,7 +246,11 @@ class UsersList(ListAPIView):
     ]
     filterset_class = UserAgeRangeFilter
     ordering_fields: list[str] = ["id", "profile__age", "raiting"]
-    search_fields: list[str] = ["profile__name", "profile__gender", "profile__last_name"]
+    search_fields: list[str] = [
+        "profile__name",
+        "profile__gender",
+        "profile__last_name",
+    ]
     queryset: QuerySet[User] = User.get_all()
 
     @skip_objects_from_response_by_id

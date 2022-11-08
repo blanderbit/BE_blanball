@@ -48,7 +48,9 @@ class UserManager(BaseUserManager):
     def create_user(
         self, email: str, phone: str, password: None = None, *agrs: Any, **kwargs: Any
     ) -> "User":
-        user = self.model(phone=phone, email=self.normalize_email(email), *agrs, **kwargs)
+        user = self.model(
+            phone=phone, email=self.normalize_email(email), *agrs, **kwargs
+        )
         user.set_password(password)
         user.role = "User"
         user.save()
@@ -98,7 +100,7 @@ def validate_birthday(value: date) -> None:
 
 @final
 def configuration_dict() -> dict[str, bool]:
-    return {"email": True, "phone": True, "send_email": True}
+    return {"email": True, "phone": True}
 
 
 def image_file_name(instance: "Profile", filename: str) -> str:
@@ -134,7 +136,9 @@ class Profile(models.Model):
             MaxValueValidator(210),
         ],
     )
-    position: str = models.CharField(choices=Position.choices, max_length=255, null=True)
+    position: str = models.CharField(
+        choices=Position.choices, max_length=255, null=True
+    )
     created_at: datetime = models.DateTimeField(auto_now_add=True)
     about_me: str = models.TextField(null=True)
 

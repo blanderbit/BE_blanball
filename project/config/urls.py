@@ -11,7 +11,9 @@ from django.urls.resolvers import (
 
 urlpatterns: list[Union[URLResolver, URLPattern]] = [
     path("api/v1/events/", include("events.urls"), name="events"),
-    path("api/v1/authentication/", include("authentication.urls"), name="authentication"),
+    path(
+        "api/v1/authentication/", include("authentication.urls"), name="authentication"
+    ),
     path("api/v1/notifications/", include("notifications.urls"), name="notifications"),
     path("api/v1/reviews/", include("reviews.urls"), name="reviews"),
 ]

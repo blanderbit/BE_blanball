@@ -58,7 +58,9 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     path("client/event/leave", LeaveFromEvent.as_view(), name="leave-from-event"),
     # endpoint where user can join to event like a spectator
     path(
-        "client/fan/event/join", FanJoinToEvent.as_view(), name="spectator-join-to-event"
+        "client/fan/event/join",
+        FanJoinToEvent.as_view(),
+        name="spectator-join-to-event",
     ),
     # endpoint where spectator can leave from event
     path(
@@ -94,11 +96,15 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     ),
     # endpoint where a user can get list of the most popular events
     path(
-        "client/popular/events/list", PopularEvents.as_view(), name="popular-events-list"
+        "client/popular/events/list",
+        PopularEvents.as_view(),
+        name="popular-events-list",
     ),
     # endpoint where a user can invite other user to ivent
     path(
-        "client/invite/user/to/event", InviteUserToEvent.as_view(), name="invite-to-event"
+        "client/invite/user/to/event",
+        InviteUserToEvent.as_view(),
+        name="invite-to-event",
     ),
     # endpoint where user can get list of your requests-participations
     path(

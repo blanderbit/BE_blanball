@@ -205,7 +205,9 @@ class FanJoinToEvent(GenericAPIView):
         if not user.current_views_rooms.filter(id=serializer.data["event_id"]).exists():
             user.current_views_rooms.add(event)
             return Response(JOIN_TO_EVENT_SUCCESS, status=HTTP_200_OK)
-        return Response(ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, status=HTTP_400_BAD_REQUEST)
+        return Response(
+            ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, status=HTTP_400_BAD_REQUEST
+        )
 
 
 class FanLeaveFromEvent(GenericAPIView):
@@ -390,10 +392,13 @@ class UserPlannedEventsList(UserEventsList):
 @method_decorator(swagger_auto_schema(manual_parameters=[skip_param]), name="get")
 class RequestToParticipationsList(ListAPIView):
     serializer_class: Type[Serializer] = RequestToParticipationSerializer
-    queryset: QuerySet[RequestToParticipation] = RequestToParticipation.get_all().filter(
+    queryset: QuerySet[
+        RequestToParticipation
+    ] = RequestToParticipation.get_all().filter(
         status=RequestToParticipation.Status.WAITING
     )
 
+    @not_in_black_list
     @skip_objects_from_response_by_id
     def list(self, request: Request, pk: int) -> Response:
         try:

@@ -53,7 +53,9 @@ class UserConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, close_code: int) -> None:
         # Leave room group
         if await self.check_user():
-            await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+            await self.channel_layer.group_discard(
+                self.room_group_name, self.channel_name
+            )
             await self.delete_user_from_active()
 
     async def kafka_message(self, event: dict[str, Any]) -> None:
