@@ -17,47 +17,54 @@ from notifications.models import Notification
 
 bulk = TypeVar(Optional[Generator[list[dict[str, int]], None, None]])
 
+
 def update_maintenance(*, data: dict[str, str]) -> None:
 
-    with open('./config/config.json', 'r') as f:
+    with open("./config/config.json", "r") as f:
         json_data = json.load(f)
-        json_data['isMaintenance'] = data['isMaintenance']
+        json_data["isMaintenance"] = data["isMaintenance"]
 
-    with open('./config/config.json', 'w') as f:
+    with open("./config/config.json", "w") as f:
         f.write(json.dumps(json_data))
 
         async_to_sync(get_channel_layer().group_send)(
-            'general',
+            "general",
             {
-                'type': 'general.message',
-                'message': {
-                    'message_type': CHANGE_MAINTENANCE_NOTIFICATION_TYPE, 
-                    'data': {
-                        'maintenance': {
-                            'type': data['isMaintenance'],
+                "type": "general.message",
+                "message": {
+                    "message_type": CHANGE_MAINTENANCE_NOTIFICATION_TYPE,
+                    "data": {
+                        "maintenance": {
+                            "type": data["isMaintenance"],
                         }
-                    }   
-                }
-            })
-                
-    
-def bulk_delete_notifications(*, data: dict[str, Any], queryset: QuerySet[Notification], user: User) -> bulk:
+                    },
+                },
+            },
+        )
+
+
+def bulk_delete_notifications(
+    *, data: dict[str, Any], queryset: QuerySet[Notification], user: User
+) -> bulk:
     for notification in data:
         try:
-            notify = queryset.get(id = notification)
+            notify = queryset.get(id=notification)
             if notify.user == user:
                 notify.delete()
-                yield {'success': notification}
+                yield {"success": notification}
         except Notification.DoesNotExist:
             pass
 
-def bulk_read_notifications(*, data: dict[str, Any], queryset: QuerySet[Notification]) -> bulk:
+
+def bulk_read_notifications(
+    *, data: dict[str, Any], queryset: QuerySet[Notification]
+) -> bulk:
     for notification in data:
-        try: 
-            notify = queryset.get(id = notification)
-            if notify.type != 'Read':
-                notify.type = 'Read'
+        try:
+            notify = queryset.get(id=notification)
+            if notify.type != "Read":
+                notify.type = "Read"
                 notify.save()
-                yield {'success': notification}
+                yield {"success": notification}
         except Notification.DoesNotExist:
             pass

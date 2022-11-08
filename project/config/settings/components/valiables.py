@@ -15,33 +15,33 @@ from django.conf import settings
 
 FILE_UPLOAD_MAX_MEMORY_SIZE = 1024
 
-SECRET_KEY: str = config('SECRET_KEY', cast = str)
+SECRET_KEY: str = config("SECRET_KEY", cast=str)
 
-DEBUG: bool = config('DEBUG', cast = bool)
+DEBUG: bool = config("DEBUG", cast=bool)
 
-ALLOWED_HOSTS: list[str] = config('ALLOWED_HOSTS', cast = Csv())
+ALLOWED_HOSTS: list[str] = config("ALLOWED_HOSTS", cast=Csv())
 ################################################################
 
-STATIC_URL: str = '/api/static/'
-STATIC_ROOT: str = path.join(settings._BASE_DIR, 'static/')
+STATIC_URL: str = "/api/static/"
+STATIC_ROOT: str = path.join(settings._BASE_DIR, "static/")
 
-WSGI_APPLICATION: str = 'config.wsgi.application'
-ASGI_APPLICATION: str = 'config.asgi.application'
+WSGI_APPLICATION: str = "config.wsgi.application"
+ASGI_APPLICATION: str = "config.asgi.application"
 
-ROOT_URLCONF: str = 'config.urls'
+ROOT_URLCONF: str = "config.urls"
 
-LANGUAGE_CODE: str = config('LANGUAGE_CODE', cast = str)
+LANGUAGE_CODE: str = config("LANGUAGE_CODE", cast=str)
 
-TIME_ZONE: str = config('TIME_ZONE', cast = str)
-USE_I18N: bool = config('USE_I18N', cast = bool)
-USE_TZ: bool = config('USE_TZ', cast = bool)
+TIME_ZONE: str = config("TIME_ZONE", cast=str)
+USE_I18N: bool = config("USE_I18N", cast=bool)
+USE_TZ: bool = config("USE_TZ", cast=bool)
 
-DEFAULT_AUTO_FIELD: str = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD: str = "django.db.models.BigAutoField"
 
-PAGINATION_PAGE_SIZE: int = config('PAGINATION_PAGE_SIZE', cast = int)
+PAGINATION_PAGE_SIZE: int = config("PAGINATION_PAGE_SIZE", cast=int)
 
-AUTH_USER_MODEL: str = config('AUTH_USER_MODEL', cast = str)
+AUTH_USER_MODEL: str = config("AUTH_USER_MODEL", cast=str)
 
-CODE_EXPIRE_MINUTES_TIME: int = config('CODE_EXPIRE_MINUTES_TIME', cast = int)
+CODE_EXPIRE_MINUTES_TIME: int = config("CODE_EXPIRE_MINUTES_TIME", cast=int)
 
-ALGORITHM: str = config('ALGORITHM', cast = str)
+ALGORITHM: str = config("ALGORITHM", cast=str)

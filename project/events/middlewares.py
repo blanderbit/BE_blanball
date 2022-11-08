@@ -12,7 +12,6 @@ def current_request():
 
 
 class RequestMiddleware(MiddlewareMixin):
-
     def process_request(self, request):
         _requests[current_thread().ident] = request
 
@@ -20,7 +19,6 @@ class RequestMiddleware(MiddlewareMixin):
         # when response is ready, request should be flushed
         _requests.pop(current_thread().ident, None)
         return response
-
 
     def process_exception(self, request, exception):
         # if an exception has happened, request should be flushed too

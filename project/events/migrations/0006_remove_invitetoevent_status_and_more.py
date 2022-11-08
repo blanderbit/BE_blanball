@@ -6,17 +6,25 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('events', '0005_alter_event_author_alter_event_black_list_and_more'),
+        ("events", "0005_alter_event_author_alter_event_black_list_and_more"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='invitetoevent',
-            name='status',
+            model_name="invitetoevent",
+            name="status",
         ),
         migrations.AddField(
-            model_name='requesttoparticipation',
-            name='status',
-            field=models.CharField(choices=[('Waiting', 'Waiting'), ('Accepted', 'Accepted'), ('Declined', 'Declined')], default='Waiting', max_length=10),
+            model_name="requesttoparticipation",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("Waiting", "Waiting"),
+                    ("Accepted", "Accepted"),
+                    ("Declined", "Declined"),
+                ],
+                default="Waiting",
+                max_length=10,
+            ),
         ),
     ]
