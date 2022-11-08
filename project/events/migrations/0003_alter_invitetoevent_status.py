@@ -6,13 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('events', '0002_invitetoevent_status'),
+        ("events", "0002_invitetoevent_status"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='invitetoevent',
-            name='status',
-            field=models.CharField(choices=[('Accepted', 'Accepted'), ('Declined', 'Declined')], default=None, max_length=10, null=True),
+            model_name="invitetoevent",
+            name="status",
+            field=models.CharField(
+                choices=[("Accepted", "Accepted"), ("Declined", "Declined")],
+                default=None,
+                max_length=10,
+                null=True,
+            ),
         ),
     ]

@@ -15,19 +15,40 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Notification',
+            name="Notification",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('type', models.CharField(choices=[('Unread', 'Unread'), ('Read', 'Read')], default='Unread', max_length=6)),
-                ('time_created', models.DateTimeField(auto_now_add=True)),
-                ('message_type', models.CharField(max_length=100)),
-                ('data', models.JSONField()),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "type",
+                    models.CharField(
+                        choices=[("Unread", "Unread"), ("Read", "Read")],
+                        default="Unread",
+                        max_length=6,
+                    ),
+                ),
+                ("time_created", models.DateTimeField(auto_now_add=True)),
+                ("message_type", models.CharField(max_length=100)),
+                ("data", models.JSONField()),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'notification',
-                'verbose_name_plural': 'notifications',
-                'db_table': 'notification',
+                "verbose_name": "notification",
+                "verbose_name_plural": "notifications",
+                "db_table": "notification",
             },
         ),
     ]

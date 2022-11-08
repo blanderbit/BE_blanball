@@ -12,10 +12,10 @@ class EventDateTimeRangeFilter(filters.FilterSet):
     class Meta:
         model: Event = Event
         fields: Union[str, list[str]] = [
-            'date_and_time',
-            'type', 
-            'need_ball', 
-            'gender', 
-            'status', 
-            'duration',
+            "date_and_time",
+            "type",
+            "need_ball",
+            "gender",
+            "status",
+            "duration",
         ]

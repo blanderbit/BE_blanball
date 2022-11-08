@@ -14,22 +14,25 @@ from django.contrib.auth.models import (
 )
 from django.db import close_old_connections
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
+
 
 @database_sync_to_async
 def get_user(token: str) -> Union[AnonymousUser, User]:
     try:
-        payload: dict[str, Any] = jwt.decode(token, settings.SECRET_KEY, algorithms = settings.ALGORITHM)
+        payload: dict[str, Any] = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=settings.ALGORITHM
+        )
     except User.DoesNotExist:
         return AnonymousUser()
 
-    token_exp: datetime = datetime.fromtimestamp(payload['exp'])
+    token_exp: datetime = datetime.fromtimestamp(payload["exp"])
     if token_exp < datetime.utcnow():
         return AnonymousUser()
 
     try:
-        user: User = User.objects.get(id = payload['user_id'])
+        user: User = User.objects.get(id=payload["user_id"])
     except User.DoesNotExist:
         return AnonymousUser()
 
@@ -37,16 +40,17 @@ def get_user(token: str) -> Union[AnonymousUser, User]:
 
 
 class TokenAuthMiddleware(BaseMiddleware):
-
     async def __call__(self, scope: dict, receive, send) -> Union[ValueError, OrderedDict]:
-        if scope['path'] == '/ws/notifications/':
+        if scope["path"] == "/ws/notifications/":
             close_old_connections()
             try:
-                token_key: str = (dict((x.split('=') for x in scope['query_string'].decode().split('&')))).get('token', None)
+                token_key: str = (
+                    dict((x.split("=") for x in scope["query_string"].decode().split("&")))
+                ).get("token", None)
             except ValueError:
                 token_key = None
-    
-            scope['user'] = await get_user(token_key)
+
+            scope["user"] = await get_user(token_key)
             return await super().__call__(scope, receive, send)
         return await super().__call__(scope, receive, send)
 

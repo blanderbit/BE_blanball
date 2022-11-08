@@ -8,23 +8,27 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('events', '0008_alter_event_gender'),
+        ("events", "0008_alter_event_gender"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='contact_number',
-            field=phonenumber_field.modelfields.PhoneNumberField(max_length=128, null=True, region=None),
+            model_name="event",
+            name="contact_number",
+            field=phonenumber_field.modelfields.PhoneNumberField(
+                max_length=128, null=True, region=None
+            ),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='price',
-            field=models.PositiveSmallIntegerField(null=True, validators=[django.core.validators.MinValueValidator(1)]),
+            model_name="event",
+            name="price",
+            field=models.PositiveSmallIntegerField(
+                null=True, validators=[django.core.validators.MinValueValidator(1)]
+            ),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='price_description',
+            model_name="event",
+            name="price_description",
             field=models.CharField(max_length=500, null=True),
         ),
     ]

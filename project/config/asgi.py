@@ -15,8 +15,11 @@ from authentication.middlewares import (
     JwtAuthMiddlewareStack,
 )
 
-application = ProtocolTypeRouter({
-  'websocket': JwtAuthMiddlewareStack(URLRouter(notifications.routing.websocket_urlpatterns)),
-  'http': django_asgi_app,
-})
- 
+application = ProtocolTypeRouter(
+    {
+        "websocket": JwtAuthMiddlewareStack(
+            URLRouter(notifications.routing.websocket_urlpatterns)
+        ),
+        "http": django_asgi_app,
+    }
+)

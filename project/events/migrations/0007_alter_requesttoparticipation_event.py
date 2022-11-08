@@ -7,13 +7,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('events', '0006_remove_invitetoevent_status_and_more'),
+        ("events", "0006_remove_invitetoevent_status_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='requesttoparticipation',
-            name='event',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='invites', to='events.event'),
+            model_name="requesttoparticipation",
+            name="event",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="invites",
+                to="events.event",
+            ),
         ),
     ]

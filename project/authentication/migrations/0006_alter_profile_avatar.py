@@ -7,13 +7,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentication', '0005_alter_code_dop_info_alter_code_life_time_and_more'),
+        ("authentication", "0005_alter_code_dop_info_alter_code_life_time_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='profile',
-            name='avatar',
-            field=models.ImageField(null=True, upload_to=authentication.models.image_file_name, validators=[authentication.models.validate_image]),
+            model_name="profile",
+            name="avatar",
+            field=models.ImageField(
+                null=True,
+                upload_to=authentication.models.image_file_name,
+                validators=[authentication.models.validate_image],
+            ),
         ),
     ]

@@ -7,39 +7,55 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authentication', '0002_initial'),
-        ('events', '0004_alter_invitetoevent_status'),
+        ("authentication", "0002_initial"),
+        ("events", "0004_alter_invitetoevent_status"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='author',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='authentication.user'),
+            model_name="event",
+            name="author",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="authentication.user"
+            ),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='black_list',
-            field=models.ManyToManyField(blank=True, related_name='black_list', to='authentication.user'),
+            model_name="event",
+            name="black_list",
+            field=models.ManyToManyField(
+                blank=True, related_name="black_list", to="authentication.user"
+            ),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='current_fans',
-            field=models.ManyToManyField(blank=True, related_name='current_views_rooms', to='authentication.user'),
+            model_name="event",
+            name="current_fans",
+            field=models.ManyToManyField(
+                blank=True, related_name="current_views_rooms", to="authentication.user"
+            ),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='current_users',
-            field=models.ManyToManyField(blank=True, related_name='current_rooms', to='authentication.user'),
+            model_name="event",
+            name="current_users",
+            field=models.ManyToManyField(
+                blank=True, related_name="current_rooms", to="authentication.user"
+            ),
         ),
         migrations.AlterField(
-            model_name='requesttoparticipation',
-            name='recipient',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='recipient', to='authentication.user'),
+            model_name="requesttoparticipation",
+            name="recipient",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="recipient",
+                to="authentication.user",
+            ),
         ),
         migrations.AlterField(
-            model_name='requesttoparticipation',
-            name='sender',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='sender', to='authentication.user'),
+            model_name="requesttoparticipation",
+            name="sender",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="sender",
+                to="authentication.user",
+            ),
         ),
     ]
