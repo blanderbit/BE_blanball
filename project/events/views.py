@@ -394,6 +394,7 @@ class RequestToParticipationsList(ListAPIView):
         status=RequestToParticipation.Status.WAITING
     )
 
+    @not_in_black_list
     @skip_objects_from_response_by_id
     def list(self, request: Request, pk: int) -> Response:
         try:
