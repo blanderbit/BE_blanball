@@ -129,7 +129,9 @@ class ChangeMaintenance(GenericAPIView):
             update_maintenance(data=request.data)
             return Response(MAINTENANCE_UPDATED_SUCCESS, status=HTTP_200_OK)
         except:
-            return Response(MAINTENANCE_CAN_NOT_UPDATE_ERROR, status=HTTP_400_BAD_REQUEST)
+            return Response(
+                MAINTENANCE_CAN_NOT_UPDATE_ERROR, status=HTTP_400_BAD_REQUEST
+            )
 
 
 class GetMaintenance(APIView):

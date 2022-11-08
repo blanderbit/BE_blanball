@@ -23,4 +23,6 @@ BAD_CODE_ERROR: dict[str, str] = {"error": "Bad verify code"}
 CODE_EXPIRED_ERROR: dict[str, str] = {"error": "This code expired"}
 NO_SUCH_IMAGE_ERROR: dict[str, str] = {"error": "Image not found"}
 
-THIS_EMAIL_ALREADY_IN_USE_ERROR: dict[str, str] = {"error": "This email is already in use"}
+THIS_EMAIL_ALREADY_IN_USE_ERROR: dict[str, str] = {
+    "error": "This email is already in use"
+}

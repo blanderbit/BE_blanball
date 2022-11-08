@@ -34,7 +34,9 @@ class TestEventsViews(SetUpEventsViews):
             reverse("event-create"), self.event_create_withount_phone_data
         )
         self.assertEqual(Event.objects.count(), 1)
-        self.assertEqual(Event.objects.first().contact_number, User.objects.first().phone)
+        self.assertEqual(
+            Event.objects.first().contact_number, User.objects.first().phone
+        )
         self.assertEqual(response.status_code, HTTP_201_CREATED)
 
     @freeze_time("2022-9-29")

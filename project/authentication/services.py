@@ -37,7 +37,9 @@ def count_age(*, profile: Profile, data: dict[str, Any]) -> Profile:
     for item in data:
         if item[0] == "birthday":
             birthday: date = item[1]
-            age: int = (timezone.now().date() - birthday) // timezone.timedelta(days=365)
+            age: int = (timezone.now().date() - birthday) // timezone.timedelta(
+                days=365
+            )
             profile.age: int = age
             return profile.save()
 

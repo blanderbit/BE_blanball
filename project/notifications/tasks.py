@@ -23,7 +23,9 @@ def send(user: User, data: dict[str, Any]) -> None:
 
 
 def send_to_user(
-    user: User, message_type: str, data: dict[str, Union[str, int, datetime, bool]] = None
+    user: User,
+    message_type: str,
+    data: dict[str, Union[str, int, datetime, bool]] = None,
 ) -> None:
     if message_type != CHANGE_MAINTENANCE_NOTIFICATION_TYPE:
         notification = Notification.objects.create(

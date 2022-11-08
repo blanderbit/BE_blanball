@@ -117,7 +117,9 @@ class RegisterSerializer(serializers.ModelSerializer):
     """a class that serializes user registration"""
 
     password: str = serializers.CharField(max_length=68, min_length=8, write_only=True)
-    re_password: str = serializers.CharField(max_length=68, min_length=8, write_only=True)
+    re_password: str = serializers.CharField(
+        max_length=68, min_length=8, write_only=True
+    )
     profile: Profile = CreateUpdateProfileSerializer()
 
     class Meta:
@@ -194,6 +196,7 @@ class UserSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model: User = User
         fields: Union[str, list[str]] = [
+            "id",
             "email",
             "role",
             "phone",
@@ -262,8 +265,12 @@ class RequestChangePasswordSerializer(serializers.Serializer):
 
 
 class ResetPasswordSerializer(serializers.Serializer):
-    new_password: str = serializers.CharField(min_length=8, max_length=68, write_only=True)
-    verify_code: str = serializers.CharField(min_length=5, max_length=5, write_only=True)
+    new_password: str = serializers.CharField(
+        min_length=8, max_length=68, write_only=True
+    )
+    verify_code: str = serializers.CharField(
+        min_length=5, max_length=5, write_only=True
+    )
 
     class Meta:
         validators = [CodeValidator(token_type=PASSWORD_RESET_CODE_TYPE)]
@@ -274,7 +281,9 @@ class ResetPasswordSerializer(serializers.Serializer):
 
 
 class CheckCodeSerializer(serializers.Serializer):
-    verify_code: str = serializers.CharField(min_length=5, max_length=5, write_only=True)
+    verify_code: str = serializers.CharField(
+        min_length=5, max_length=5, write_only=True
+    )
 
     class Meta:
         validators = [

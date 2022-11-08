@@ -1,7 +1,8 @@
-on: [push,workflow_dispatch]
+on: [push, workflow_dispatch]
 
 jobs:
   run_tests:
+    if: (contains(fromJson('["push"]'), github.event_name) && github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
     env:
       ENV_FILE: ${{ secrets.ENV_FILE }}
@@ -53,7 +54,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Set env vars (TEST)
-      if: github.event_name == 'push' && github.ref == 'refs/heads/develop' || github.event_name == 'workflow_dispatch' && github.ref != 'refs/heads/main'
+      if: github.ref == 'refs/heads/develop'
       run: |
         echo "API_DOCKERFILE_PATH=Dockerfile" >> $GITHUB_ENV
         echo "WEBHOOK=${{ secrets.PORTAINER_WEBHOOK_URL_TEST }}" >> $GITHUB_ENV
