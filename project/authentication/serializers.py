@@ -50,6 +50,7 @@ class EventUsersProfileSerializer(DynamicFieldsModelSerializer):
             "last_name",
             "avatar",
             "position",
+            "working_leg"
         ]
 
 

@@ -151,7 +151,7 @@ class GetCurrentVersion(GetMaintenance):
     key: str = "version"
 
 
-class DeleteAllUserNotifications(GenericAPIView):
+class DeleteAllUserNotifications(APIView):
     queryset: QuerySet[Notification] = Notification.get_all()
 
     def delete(self, request: Request) -> Response:
@@ -159,7 +159,7 @@ class DeleteAllUserNotifications(GenericAPIView):
         return Response(NOTIFICATIONS_DELETED_SUCCESS, status=HTTP_200_OK)
 
 
-class ReadAllUserNotifications(GenericAPIView):
+class ReadAllUserNotifications(APIView):
     queryset: QuerySet[Notification] = Notification.get_all()
 
     def get(self, request: Request) -> Response:

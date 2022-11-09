@@ -64,31 +64,14 @@ class Gender(models.TextChoices):
     WOMAN: str = "Woman"
 
 
-class Position(models.TextChoices):
-    GK: str = "GK"
-    LB: str = "LB"
-    RB: str = "RB"
-    CB: str = "CB"
-    LWB: str = "LWB"
-    RWB: str = "RWB"
-    CDM: str = "CDM"
-    CM: str = "CM"
-    CAM: str = "CAM"
-    RM: str = "RM"
-    LM: str = "LM"
-    RW: str = "RW"
-    LW: str = "LW"
-    RF: str = "RF"
-    CF: str = "CF"
-    LF: str = "LF"
-    ST: str = "ST"
-
 
 class Role(models.TextChoices):
     """role choices"""
 
     USER: str = "User"
     ADMIN: str = "Admin"
+
+
 
 
 def validate_birthday(value: date) -> None:
@@ -114,6 +97,29 @@ def validate_image(image: Image) -> str:
 
 
 class Profile(models.Model):
+    class Position(models.TextChoices):
+        GK: str = "GK"
+        LB: str = "LB"
+        RB: str = "RB"
+        CB: str = "CB"
+        LWB: str = "LWB"
+        RWB: str = "RWB"
+        CDM: str = "CDM"
+        CM: str = "CM"
+        CAM: str = "CAM"
+        RM: str = "RM"
+        LM: str = "LM"
+        RW: str = "RW"
+        LW: str = "LW"
+        RF: str = "RF"
+        CF: str = "CF"
+        LF: str = "LF"
+        ST: str = "ST"
+
+    class Leg(models.TextChoices):
+        LEFT: str = "Left"
+        RIGHT: str = "Right"
+
     name: str = models.CharField(max_length=255)
     last_name: str = models.CharField(max_length=255)
     gender: str = models.CharField(choices=Gender.choices, max_length=10)
@@ -141,6 +147,9 @@ class Profile(models.Model):
     )
     created_at: datetime = models.DateTimeField(auto_now_add=True)
     about_me: str = models.TextField(null=True)
+    working_leg: str = models.CharField(
+        choices=Leg.choices, max_length=255, null=True
+    )
 
     @final
     def __repr__(self) -> str:
