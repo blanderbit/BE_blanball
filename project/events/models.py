@@ -151,10 +151,6 @@ class RequestToParticipation(models.Model):
     status: str = models.CharField(
         choices=Status.choices, max_length=10, default=Status.WAITING
     )
-
-    # def _type(self):
-    #     return self.__class__.__name__
-
     def __repr__(self) -> str:
         return "<RequestToParticipation %s>" % self.id
 

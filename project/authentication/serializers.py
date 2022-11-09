@@ -103,10 +103,13 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
                 GET_PLANNED_IVENTS_ERROR, HTTP_400_BAD_REQUEST
             )
 
-        if sorted(conf) != sorted(keys):
-            raise serializers.ValidationError(
-                CONFIGURATION_IS_REQUIRED_ERROR, HTTP_400_BAD_REQUEST
-            )
+        try:
+            if sorted(conf) != sorted(keys):
+                raise serializers.ValidationError(
+                    CONFIGURATION_IS_REQUIRED_ERROR, HTTP_400_BAD_REQUEST
+                )
+        except TypeError:
+            pass
 
         return super().validate(attrs)
 

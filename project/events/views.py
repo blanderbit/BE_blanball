@@ -145,7 +145,7 @@ class UpdateEvent(GenericAPIView):
     queryset: QuerySet[Event] = Event.get_all()
 
     @only_author(Event)
-    def put(self, request: Request, pk: int) -> Response:
+    def patch(self, request: Request, pk: int) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         event: Event = self.queryset.filter(id=pk)

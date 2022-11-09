@@ -183,6 +183,7 @@ class UserOwnerProfile(GenericAPIView):
         return Response(SENT_CODE_TO_EMAIL_SUCCESS, status=HTTP_200_OK)
 
 
+
 class UpdateProfile(GenericAPIView):
     """
     This class allows an authorized
@@ -192,7 +193,7 @@ class UpdateProfile(GenericAPIView):
     serializer_class: Type[Serializer] = UpdateProfileSerializer
     queryset: QuerySet[User] = User.get_all()
 
-    def put(self, request: Request) -> Response:
+    def patch(self, request: Request) -> Response:
         user: User = self.queryset.get(id=self.request.user.id)
         serializer = self.serializer_class(user, data=request.data)
         profile_update(user=user, serializer=serializer)
