@@ -62,7 +62,9 @@ class EventSerializer(serializers.ModelSerializer):
 
     class Meta:
         model: Event = Event
-        fields: Union[str, list[str]] = "__all__"
+        exclude: Union[str, list[str]] = [
+            "black_list",
+        ]
 
 
 class PopularIventsListSerializer(serializers.ModelSerializer):
@@ -141,7 +143,7 @@ class JoinOrRemoveRoomSerializer(serializers.Serializer):
     def validate(self, attrs: OrderedDict) -> OrderedDict:
         event_id: int = attrs.get("event_id")
         try:
-            event: Event = Event.objects.get(id=event_id)
+            event: Event = Event.get_all().get(id=event_id)
             if event.status != event.Status.PLANNED:
                 raise serializers.ValidationError(
                     EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST
@@ -167,8 +169,8 @@ class InviteUserToEventSerializer(serializers.Serializer):
 
     def validate(self, attrs) -> OrderedDict[str, Any]:
         try:
-            invite_user: User = User.objects.get(id=attrs.get("user_id"))
-            event: Event = Event.objects.get(id=attrs.get("event_id"))
+            invite_user: User = User.get_all().get(id=attrs.get("user_id"))
+            event: Event = Event.get_all().get(id=attrs.get("event_id"))
             if event.status == Event.Status.FINISHED:
                 raise serializers.ValidationError(
                     EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST
@@ -202,8 +204,8 @@ class RemoveUserFromEventSerializer(serializers.Serializer):
 
     def validate(self, attrs) -> OrderedDict[str, Any]:
         try:
-            removed_user: User = User.objects.get(id=attrs.get("user_id"))
-            event: Event = Event.objects.get(id=attrs.get("event_id"))
+            removed_user: User = User.get_all().get(id=attrs.get("user_id"))
+            event: Event = Event.get_all().get(id=attrs.get("event_id"))
             if event.status == event.Status.FINISHED:
                 raise serializers.ValidationError(
                     EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST

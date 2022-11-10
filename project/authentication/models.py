@@ -64,31 +64,14 @@ class Gender(models.TextChoices):
     WOMAN: str = "Woman"
 
 
-class Position(models.TextChoices):
-    GK: str = "GK"
-    LB: str = "LB"
-    RB: str = "RB"
-    CB: str = "CB"
-    LWB: str = "LWB"
-    RWB: str = "RWB"
-    CDM: str = "CDM"
-    CM: str = "CM"
-    CAM: str = "CAM"
-    RM: str = "RM"
-    LM: str = "LM"
-    RW: str = "RW"
-    LW: str = "LW"
-    RF: str = "RF"
-    CF: str = "CF"
-    LF: str = "LF"
-    ST: str = "ST"
-
 
 class Role(models.TextChoices):
     """role choices"""
 
     USER: str = "User"
     ADMIN: str = "Admin"
+
+
 
 
 def validate_birthday(value: date) -> None:
@@ -114,6 +97,29 @@ def validate_image(image: Image) -> str:
 
 
 class Profile(models.Model):
+    class Position(models.TextChoices):
+        GK: str = "GK"
+        LB: str = "LB"
+        RB: str = "RB"
+        CB: str = "CB"
+        LWB: str = "LWB"
+        RWB: str = "RWB"
+        CDM: str = "CDM"
+        CM: str = "CM"
+        CAM: str = "CAM"
+        RM: str = "RM"
+        LM: str = "LM"
+        RW: str = "RW"
+        LW: str = "LW"
+        RF: str = "RF"
+        CF: str = "CF"
+        LF: str = "LF"
+        ST: str = "ST"
+
+    class Leg(models.TextChoices):
+        LEFT: str = "Left"
+        RIGHT: str = "Right"
+
     name: str = models.CharField(max_length=255)
     last_name: str = models.CharField(max_length=255)
     gender: str = models.CharField(choices=Gender.choices, max_length=10)
@@ -141,6 +147,9 @@ class Profile(models.Model):
     )
     created_at: datetime = models.DateTimeField(auto_now_add=True)
     about_me: str = models.TextField(null=True)
+    working_leg: str = models.CharField(
+        choices=Leg.choices, max_length=255, null=True
+    )
 
     @final
     def __repr__(self) -> str:
@@ -153,21 +162,24 @@ class Profile(models.Model):
     @final
     def save(self, *args: Any, **kwargs: Any) -> None:
         super(Profile, self).save(*args, **kwargs)
-        if self.avatar != None:
-            client: Minio = Minio(
-                settings.MINIO_ENDPOINT,
-                access_key=settings.MINIO_ACCESS_KEY,
-                secret_key=settings.MINIO_SECRET_KEY,
-                secure=False,
-            )
-            new_image_name: str = f"users/{urlsafe_base64_encode(smart_bytes(self.id))}_{timezone.now().date()}"
-            client.copy_object(
-                settings.MINIO_MEDIA_FILES_BUCKET,
-                new_image_name,
-                CopySource(settings.MINIO_MEDIA_FILES_BUCKET, self.avatar.name),
-                metadata_directive=REPLACE,
-            )
-            self.avatar.name = new_image_name
+        try:
+            if self.avatar != None:
+                client: Minio = Minio(
+                    settings.MINIO_ENDPOINT,
+                    access_key=settings.MINIO_ACCESS_KEY,
+                    secret_key=settings.MINIO_SECRET_KEY,
+                    secure=False,
+                )
+                new_image_name: str = f"users/{urlsafe_base64_encode(smart_bytes(self.id))}_{timezone.now().date()}"
+                client.copy_object(
+                    settings.MINIO_MEDIA_FILES_BUCKET,
+                    new_image_name,
+                    CopySource(settings.MINIO_MEDIA_FILES_BUCKET, self.avatar.name),
+                    metadata_directive=REPLACE,
+                )
+                self.avatar.name = new_image_name
+        except ValueError:
+            pass
 
     class Meta:
         db_table: str = "profile"

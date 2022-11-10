@@ -83,7 +83,7 @@ def delete_all_event_relations_after_finished(
 ) -> None:
     if instance.status == instance.Status.FINISHED:
         instance.invites.all().delete()
-        for notification in Notification.objects.filter(data__event__id=instance.id):
+        for notification in Notification.get_all().filter(data__event__id=instance.id):
             notification.data["event"].update({"finished": True})
             notification.save()
 
@@ -104,7 +104,7 @@ def send_update_message_after_response(
                 instance.Status.ACCEPTED: True,
                 instance.Status.DECLINED: False,
             }
-            notification = Notification.objects.get(
+            notification = Notification.get_all().get(
                 message_type=INVITE_USER_TO_EVENT_NOTIFICATION_TYPE,
                 data__invite__id=instance.id,
             )

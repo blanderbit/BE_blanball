@@ -50,6 +50,7 @@ class EventUsersProfileSerializer(DynamicFieldsModelSerializer):
             "last_name",
             "avatar",
             "position",
+            "working_leg"
         ]
 
 
@@ -102,10 +103,13 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
                 GET_PLANNED_IVENTS_ERROR, HTTP_400_BAD_REQUEST
             )
 
-        if sorted(conf) != sorted(keys):
-            raise serializers.ValidationError(
-                CONFIGURATION_IS_REQUIRED_ERROR, HTTP_400_BAD_REQUEST
-            )
+        try:
+            if sorted(conf) != sorted(keys):
+                raise serializers.ValidationError(
+                    CONFIGURATION_IS_REQUIRED_ERROR, HTTP_400_BAD_REQUEST
+                )
+        except TypeError:
+            pass
 
         return super().validate(attrs)
 
@@ -161,7 +165,7 @@ class LoginSerializer(serializers.ModelSerializer):
 
     def get_tokens(self, obj) -> dict[str, str]:
         """function that issues jwt tokens for an authorized user"""
-        user: User = User.objects.get(email=obj["email"])
+        user: User = User.get_all().get(email=obj["email"])
         return {"refresh": user.tokens()["refresh"], "access": user.tokens()["access"]}
 
     class Meta:
@@ -315,7 +319,7 @@ class CheckUserActiveSerializer(serializers.Serializer):
     ) -> Union[OrderedDict, serializers.ValidationError]:
         user_id: int = attrs.get("user_id")
         try:
-            User.objects.get(id=user_id)
+            User.get_all().get(id=user_id)
             return super().validate(attrs)
         except User.DoesNotExist:
             raise serializers.ValidationError(NO_SUCH_USER_ERROR, HTTP_400_BAD_REQUEST)

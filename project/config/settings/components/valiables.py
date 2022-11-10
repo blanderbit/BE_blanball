@@ -17,8 +17,6 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 1024
 
 SECRET_KEY: str = config("SECRET_KEY", cast=str)
 
-DEBUG: bool = config("DEBUG", cast=bool)
-
 ALLOWED_HOSTS: list[str] = config("ALLOWED_HOSTS", cast=Csv())
 ################################################################
 

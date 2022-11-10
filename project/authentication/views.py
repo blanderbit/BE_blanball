@@ -124,7 +124,7 @@ class RegisterUser(GenericAPIView):
         )
         count_age(profile=profile, data=serializer.validated_data["profile"].items())
         serializer.save(profile=profile)
-        user: User = User.objects.get(profile=profile.id)
+        user: User = User.get_all().get(profile=profile.id)
         send_email_template(
             user=user,
             body_title=REGISTER_SUCCESS_BODY_TITLE,
@@ -169,7 +169,7 @@ class UserOwnerProfile(GenericAPIView):
 
     def get(self, request: Request) -> Response:
         """get detail information about profile"""
-        user: User = User.objects.get(id=self.request.user.id)
+        user: User = User.get_all().get(id=self.request.user.id)
         serializer = self.serializer_class(user)
         return Response(serializer.data, status=HTTP_200_OK)
 
@@ -183,6 +183,7 @@ class UserOwnerProfile(GenericAPIView):
         return Response(SENT_CODE_TO_EMAIL_SUCCESS, status=HTTP_200_OK)
 
 
+
 class UpdateProfile(GenericAPIView):
     """
     This class allows an authorized
@@ -192,7 +193,7 @@ class UpdateProfile(GenericAPIView):
     serializer_class: Type[Serializer] = UpdateProfileSerializer
     queryset: QuerySet[User] = User.get_all()
 
-    def put(self, request: Request) -> Response:
+    def patch(self, request: Request) -> Response:
         user: User = self.queryset.get(id=self.request.user.id)
         serializer = self.serializer_class(user, data=request.data)
         profile_update(user=user, serializer=serializer)
@@ -295,7 +296,7 @@ class RequestPasswordReset(GenericAPIView):
         """send request to reset user password by email"""
         email: str = request.data.get("email", "")
         try:
-            User.objects.get(email=email)
+            User.get_all().get(email=email)
             code_create(email=email, type=PASSWORD_RESET_CODE_TYPE, dop_info=None)
             return Response(SENT_CODE_TO_EMAIL_SUCCESS, status=HTTP_200_OK)
         except User.DoesNotExist:
@@ -377,7 +378,7 @@ class RequetChangeEmail(GenericAPIView):
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        if not User.objects.filter(email=serializer.validated_data["email"]):
+        if not User.get_all().filter(email=serializer.validated_data["email"]):
             code_create(
                 email=request.user.email,
                 type=EMAIL_CHANGE_CODE_TYPE,
@@ -427,7 +428,7 @@ class CheckCode(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         verify_code: str = serializer.validated_data["verify_code"]
         self.code: Code = Code.objects.get(verify_code=verify_code)
-        self.user: User = User.objects.get(id=request.user.id)
+        self.user: User = User.get_all().get(id=request.user.id)
         if self.code.user_email != self.user.email:
             raise ValidationError(NO_PERMISSIONS_ERROR, HTTP_400_BAD_REQUEST)
 
@@ -453,7 +454,7 @@ class CheckCode(GenericAPIView):
                 title=ACCOUNT_DELETE_SUCCESS_TITLE,
                 text=ACCOUNT_DELETE_SUCCESS_TEXT,
             )
-            User.objects.filter(id=self.user.id).delete()
+            User.get_all().filter(id=self.user.id).delete()
             self.code.delete()
             return Response(ACCOUNT_DELETED_SUCCESS, status=HTTP_200_OK)
 

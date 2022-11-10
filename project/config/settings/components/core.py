@@ -88,6 +88,7 @@ SWAGGER_SETTINGS: dict[str, Any] = {
         "post",
         "put",
         "delete",
+        "patch",
     ),
 }
 
@@ -126,6 +127,7 @@ CORS_ALLOW_METHODS: list[str] = [
     "OPTIONS",
     "POST",
     "PUT",
+    "PATCH",
 ]
 
 CORS_ALLOW_HEADERS: list[str] = [
@@ -139,3 +141,4 @@ CORS_ALLOW_HEADERS: list[str] = [
     "x-csrftoken",
     "x-requested-with",
 ]
+
