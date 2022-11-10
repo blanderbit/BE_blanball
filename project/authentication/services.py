@@ -89,7 +89,7 @@ def code_create(*, email: str, type: str, dop_info: str) -> None:
         life_time=timezone.now()
         + timezone.timedelta(minutes=settings.CODE_EXPIRE_MINUTES_TIME),
     )
-    user: User = User.objects.get(email=email)
+    user: User = User.get_all().get(email=email)
     context: dict = {
         "title": check_code_type(code=code),
         "code": list(code.verify_code),
@@ -103,7 +103,7 @@ def code_create(*, email: str, type: str, dop_info: str) -> None:
 
 def profile_update(*, user: User, serializer: Serializer) -> None:
     serializer.is_valid(raise_exception=True)
-    profile: Profile = Profile.objects.filter(id=user.profile_id)
+    profile: Profile = Profile.get_all().filter(id=user.profile_id)
     profile.update(**serializer.validated_data["profile"])
     count_age(profile=profile[0], data=serializer.validated_data["profile"].items())
     serializer.validated_data.pop("profile")
@@ -113,7 +113,7 @@ def profile_update(*, user: User, serializer: Serializer) -> None:
 def reset_password(*, data: dict[str, Any]) -> None:
     verify_code: str = data["verify_code"]
     code: Code = Code.objects.get(verify_code=verify_code)
-    user: User = User.objects.get(email=code.user_email)
+    user: User = User.get_all().get(email=code.user_email)
     user.set_password(data["new_password"])
     user.save()
     code.delete()

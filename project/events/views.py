@@ -121,8 +121,8 @@ class InviteUserToEvent(GenericAPIView):
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        invite_user: User = User.objects.get(id=serializer.validated_data["user_id"])
-        event: Event = Event.objects.get(id=serializer.validated_data["event_id"])
+        invite_user: User = User.get_all().get(id=serializer.validated_data["user_id"])
+        event: Event = Event.get_all().get(id=serializer.validated_data["event_id"])
         InviteToEvent.objects.send_invite(
             request_user=request.user, invite_user=invite_user, event=event
         )
@@ -180,7 +180,7 @@ class JoinToEvent(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         user: User = request.user
-        event: Event = Event.objects.get(id=serializer.data["event_id"])
+        event: Event = Event.get_all().get(id=serializer.data["event_id"])
         validate_user_before_join_to_event(user=user, event=event)
         if not event.privacy:
             user.current_rooms.add(event)
@@ -199,7 +199,7 @@ class FanJoinToEvent(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         user: User = request.user
-        event: Event = Event.objects.get(id=serializer.data["event_id"])
+        event: Event = Event.get_all().get(id=serializer.data["event_id"])
         if event.author.id == request.user.id:
             raise ValidationError(EVENT_AUTHOR_CAN_NOT_JOIN_ERROR, HTTP_400_BAD_REQUEST)
         if not user.current_views_rooms.filter(id=serializer.data["event_id"]).exists():
@@ -217,7 +217,7 @@ class FanLeaveFromEvent(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         user: User = request.user
-        event: Event = Event.objects.get(id=serializer.data["event_id"])
+        event: Event = Event.get_all().get(id=serializer.data["event_id"])
         if user.current_views_rooms.filter(id=serializer.data["event_id"]).exists():
             user.current_views_rooms.remove(event)
             return Response(DISCONNECT_FROM_EVENT_SUCCESS, status=HTTP_200_OK)
@@ -231,7 +231,7 @@ class LeaveFromEvent(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         user: User = request.user
-        event: Event = Event.objects.get(id=serializer.data["event_id"])
+        event: Event = Event.get_all().get(id=serializer.data["event_id"])
         if user.current_rooms.filter(id=serializer.data["event_id"]).exists():
             user.current_rooms.remove(event)
             send_to_user(
@@ -264,8 +264,8 @@ class RemoveUserFromEvent(GenericAPIView):
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        event: Event = Event.objects.get(id=serializer.data["event_id"])
-        user: User = User.objects.get(id=serializer.data["user_id"])
+        event: Event = Event.get_all().get(id=serializer.data["event_id"])
+        user: User = User.get_all().get(id=serializer.data["user_id"])
         if request.user.id != event.author.id:
             raise PermissionDenied()
         remove_user_from_event(
@@ -402,7 +402,7 @@ class RequestToParticipationsList(ListAPIView):
     @skip_objects_from_response_by_id
     def list(self, request: Request, pk: int) -> Response:
         try:
-            event: Event = Event.objects.get(id=pk)
+            event: Event = Event.get_all().get(id=pk)
             queryset = self.queryset.filter(event=event)
             serializer = self.serializer_class(queryset, many=True)
             return Response(serializer.data, status=HTTP_200_OK)

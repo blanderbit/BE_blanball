@@ -23,10 +23,10 @@ class TestAuthenticationViews(SetUpAauthenticationViews):
         response = self.client.post(reverse("register"), self.user_register_data)
         self.assertEqual(User.objects.count(), 1)
         self.assertTrue(
-            User.objects.get(email=self.user_register_data["email"]).profile.age == 22
+            User.get_all().get(email=self.user_register_data["email"]).profile.age == 22
         )
         self.assertEqual(
-            "User", User.objects.get(email=self.user_register_data["email"]).role
+            "User", User.get_all().get(email=self.user_register_data["email"]).role
         )
         self.assertEqual(response.status_code, HTTP_201_CREATED)
 
@@ -272,5 +272,5 @@ class TestAuthenticationViews(SetUpAauthenticationViews):
 
     def auth(self) -> NoneType:
         self.client.post(reverse("register"), self.user_register_data)
-        user = User.objects.get(email=self.user_register_data["email"])
+        user = User.get_all().get(email=self.user_register_data["email"])
         return self.client.force_authenticate(user)

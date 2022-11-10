@@ -32,7 +32,7 @@ def get_user(token: str) -> Union[AnonymousUser, User]:
         return AnonymousUser()
 
     try:
-        user: User = User.objects.get(id=payload["user_id"])
+        user: User = User.get_all().get(id=payload["user_id"])
     except User.DoesNotExist:
         return AnonymousUser()
 

@@ -180,7 +180,7 @@ class InviteToEventManager(models.Manager):
             raise ValidationError(AUTHOR_CAN_NOT_INVITE_ERROR, HTTP_403_FORBIDDEN)
         if invite_user in event.black_list.all():
             raise ValidationError(THIS_USER_CAN_NOT_BE_INVITED, HTTP_403_FORBIDDEN)
-        if InviteToEvent.objects.filter(
+        if InviteToEvent.get_all().filter(
             recipient=invite_user, event=event, status=InviteToEvent.Status.DECLINED
         ).exists():
             raise ValidationError(THIS_USER_CAN_NOT_BE_INVITED, HTTP_403_FORBIDDEN)
