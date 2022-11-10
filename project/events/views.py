@@ -27,6 +27,7 @@ from events.constant.response_error import (
     EVENT_NOT_FOUND_ERROR,
     NO_IN_EVENT_FANS_LIST_ERROR,
     NO_IN_EVENT_MEMBERS_LIST_ERROR,
+    NOTHING_FOUND_FOR_USER_REQUEST_ERROR,
 )
 from events.constant.response_success import (
     APPLICATION_FOR_PARTICIPATION_SUCCESS,
@@ -57,6 +58,7 @@ from events.serializers import (
     RemoveUserFromEventSerializer,
     RequestToParticipationSerializer,
     UpdateEventSerializer,
+    GetCoordinatesByPlaceNameSerializer,
 )
 from events.services import (
     bulk_accept_or_decline_invites_to_events,
@@ -97,7 +99,10 @@ from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
+    HTTP_404_NOT_FOUND,
 )
+
+from geopy.geocoders import Nominatim
 
 
 class CreateEvent(GenericAPIView):
@@ -423,3 +428,24 @@ class BulkAcceptOrDeclineRequestToParticipation(GenericAPIView):
             data=serializer.validated_data, request_user=request.user
         )
         return Response(data, status=HTTP_200_OK)
+
+class GetCoordinatesByPlaceName(GenericAPIView):
+    serializer_class: Type[
+        Serializer
+    ] = GetCoordinatesByPlaceNameSerializer
+
+    def post(self, request: Request) -> Response:
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            geolocator = Nominatim(user_agent='events')
+            location = geolocator.geocode(serializer.data['place_name'])
+            return Response({
+                'name': location.raw['display_name'],
+                'lat': location.raw['lat'], 
+                'lon': location.raw['lon'],
+                }
+            )
+        except AttributeError:
+            return Response(NOTHING_FOUND_FOR_USER_REQUEST_ERROR, HTTP_404_NOT_FOUND)

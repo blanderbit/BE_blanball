@@ -51,3 +51,8 @@ NO_PRICE_DESK_ERROR: dict[str, str] = {
 SENT_INVATION_ERROR: dict[str, str] = {
     "error": "You cannot invite yourself to the event"
 }
+
+
+NOTHING_FOUND_FOR_USER_REQUEST_ERROR: dict[str, str] = {
+    "error": 'Nothing found for your request'
+}
