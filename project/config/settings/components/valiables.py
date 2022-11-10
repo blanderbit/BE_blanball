@@ -43,3 +43,5 @@ AUTH_USER_MODEL: str = config("AUTH_USER_MODEL", cast=str)
 CODE_EXPIRE_MINUTES_TIME: int = config("CODE_EXPIRE_MINUTES_TIME", cast=int)
 
 ALGORITHM: str = config("ALGORITHM", cast=str)
+
+DEBUG: bool = True
