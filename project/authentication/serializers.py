@@ -165,7 +165,7 @@ class LoginSerializer(serializers.ModelSerializer):
 
     def get_tokens(self, obj) -> dict[str, str]:
         """function that issues jwt tokens for an authorized user"""
-        user: User = User.objects.get(email=obj["email"])
+        user: User = User.get_all().get(email=obj["email"])
         return {"refresh": user.tokens()["refresh"], "access": user.tokens()["access"]}
 
     class Meta:
@@ -319,7 +319,7 @@ class CheckUserActiveSerializer(serializers.Serializer):
     ) -> Union[OrderedDict, serializers.ValidationError]:
         user_id: int = attrs.get("user_id")
         try:
-            User.objects.get(id=user_id)
+            User.get_all().get(id=user_id)
             return super().validate(attrs)
         except User.DoesNotExist:
             raise serializers.ValidationError(NO_SUCH_USER_ERROR, HTTP_400_BAD_REQUEST)

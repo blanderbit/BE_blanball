@@ -67,7 +67,7 @@ class TestEventsViews(SetUpEventsViews):
         self.client.force_authenticate(None)
         self.client.post(reverse("register"), self.user_reg_data_2)
         self.client.force_authenticate(
-            User.objects.get(email=self.user_reg_data_2["email"])
+            User.get_all().get(email=self.user_reg_data_2["email"])
         )
         response = self.client.post(
             reverse("join-to-event"), {"event_id": Event.objects.first().id}
@@ -137,7 +137,7 @@ class TestEventsViews(SetUpEventsViews):
         self.client.force_authenticate(None)
         self.client.post(reverse("register"), self.user_reg_data_2)
         self.client.force_authenticate(
-            User.objects.get(email=self.user_reg_data_2["email"])
+            User.get_all().get(email=self.user_reg_data_2["email"])
         )
         get_user_events_list_2 = self.client.get(reverse("user-events-list"))
         self.assertEqual(Event.objects.count(), 10)
@@ -173,7 +173,7 @@ class TestEventsViews(SetUpEventsViews):
         get_event = self.client.get(
             reverse("get-event", kwargs={"pk": Event.objects.first().id})
         )
-        response = self.client.put(
+        response = self.client.patch(
             reverse("update-event", kwargs={"pk": Event.objects.first().id}),
             self.event_update_data,
         )
@@ -190,7 +190,7 @@ class TestEventsViews(SetUpEventsViews):
     def test_no_author_update_event(self) -> None:
         self.create_events(1)
         self.register_second_user()
-        response = self.client.put(
+        response = self.client.patch(
             reverse("update-event", kwargs={"pk": Event.objects.first().id}),
             self.event_update_data,
         )
@@ -210,7 +210,7 @@ class TestEventsViews(SetUpEventsViews):
         response = self.client.post(
             reverse("invite-to-event"),
             {
-                "user_id": User.objects.get(email=self.user_reg_data_2["email"]).id,
+                "user_id": User.get_all().get(email=self.user_reg_data_2["email"]).id,
                 "event_id": Event.objects.first().id,
             },
         )
@@ -335,10 +335,10 @@ class TestEventsViews(SetUpEventsViews):
         register = self.client.post(reverse("register"), self.user_reg_data_2)
         self.assertEqual(register.status_code, HTTP_201_CREATED)
         return self.client.force_authenticate(
-            User.objects.get(email=self.user_reg_data_2["email"])
+            User.get_all().get(email=self.user_reg_data_2["email"])
         )
 
     def auth(self) -> NoneType:
         self.client.post(reverse("register"), self.user_reg_data)
-        user = User.objects.get(email=self.user_reg_data["email"])
+        user = User.get_all().get(email=self.user_reg_data["email"])
         return self.client.force_authenticate(user)
