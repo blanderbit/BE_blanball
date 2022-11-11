@@ -64,14 +64,11 @@ class Gender(models.TextChoices):
     WOMAN: str = "Woman"
 
 
-
 class Role(models.TextChoices):
     """role choices"""
 
     USER: str = "User"
     ADMIN: str = "Admin"
-
-
 
 
 def validate_birthday(value: date) -> None:
@@ -147,9 +144,7 @@ class Profile(models.Model):
     )
     created_at: datetime = models.DateTimeField(auto_now_add=True)
     about_me: str = models.TextField(null=True)
-    working_leg: str = models.CharField(
-        choices=Leg.choices, max_length=255, null=True
-    )
+    working_leg: str = models.CharField(choices=Leg.choices, max_length=255, null=True)
 
     @final
     def __repr__(self) -> str:

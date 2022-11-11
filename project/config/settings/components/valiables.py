@@ -13,7 +13,7 @@ from django.conf import settings
 # Build paths inside the project like this: BASE_DIR.joinpath('some')
 # `pathlib` is better than writing: dirname(dirname(dirname(__file__)))
 
-FILE_UPLOAD_MAX_MEMORY_SIZE = 1024
+FILE_UPLOAD_MAX_MEMORY_SIZE: int = 1024
 
 SECRET_KEY: str = config("SECRET_KEY", cast=str)
 
@@ -44,4 +44,4 @@ CODE_EXPIRE_MINUTES_TIME: int = config("CODE_EXPIRE_MINUTES_TIME", cast=int)
 
 ALGORITHM: str = config("ALGORITHM", cast=str)
 
-DEBUG: bool = True
+DEBUG: bool = config("DEBUG", cast=bool)
