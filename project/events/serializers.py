@@ -239,3 +239,23 @@ class BulkAcceptOrDeclineRequestToParticipationSerializer(serializers.Serializer
             "ids",
             "type",
         ]
+
+
+class GetCoordinatesByPlaceNameSerializer(serializers.Serializer):
+    place_name: bool = serializers.CharField(max_length=255)
+
+    class Meta:
+        fields: Union[str, list[str]] = [
+            "place_name",
+        ]
+
+
+class GetPlaceNameByCoordinatesSerializer(serializers.Serializer):
+    lat: bool = serializers.FloatField()
+    lon: bool = serializers.FloatField()
+
+    class Meta:
+        fields: Union[str, list[str]] = [
+            "lat",
+            "lon",
+        ]

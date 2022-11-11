@@ -27,6 +27,8 @@ from events.views import (
     UserEventsRelevantList,
     UserParticipantEventsList,
     UserPlannedEventsList,
+    GetCoordinatesByPlaceName,
+    GetPlaceNameByCoordinates,
 )
 
 urlpatterns: list[Union[URLResolver, URLPattern]] = [
@@ -122,5 +124,15 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
         "client/accept/or/decline/invites/to/events",
         BulkAcceptOrDeclineInvitesToEvent.as_view(),
         name="accept-decline-invites-to-event",
+    ),
+    path(
+        "client/get/coordinates/by/place/name",
+        GetCoordinatesByPlaceName.as_view(),
+        name="get-coordinates-by-place-name",
+    ),
+    path(
+        "client/get/place/name/by/coordinates",
+        GetPlaceNameByCoordinates.as_view(),
+        name="get-place-name-by-coordinates",
     ),
 ]
