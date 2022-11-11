@@ -59,6 +59,7 @@ from events.serializers import (
     RequestToParticipationSerializer,
     UpdateEventSerializer,
     GetCoordinatesByPlaceNameSerializer,
+    GetPlaceNameByCoordinatesSerializer,
 )
 from events.services import (
     bulk_accept_or_decline_invites_to_events,
@@ -429,22 +430,43 @@ class BulkAcceptOrDeclineRequestToParticipation(GenericAPIView):
         )
         return Response(data, status=HTTP_200_OK)
 
+
 class GetCoordinatesByPlaceName(GenericAPIView):
-    serializer_class: Type[
-        Serializer
-    ] = GetCoordinatesByPlaceNameSerializer
+    serializer_class: Type[Serializer] = GetCoordinatesByPlaceNameSerializer
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         try:
-            geolocator = Nominatim(user_agent='events')
-            location = geolocator.geocode(serializer.data['place_name'])
-            return Response({
-                'name': location.raw['display_name'],
-                'lat': location.raw['lat'], 
-                'lon': location.raw['lon'],
+            geolocator = Nominatim(user_agent="geoapiExercises")
+            location = geolocator.geocode(serializer.data["place_name"])
+            return Response(
+                {
+                    "name": location.raw["display_name"],
+                    "lat": location.raw["lat"],
+                    "lon": location.raw["lon"],
+                }
+            )
+        except AttributeError:
+            return Response(NOTHING_FOUND_FOR_USER_REQUEST_ERROR, HTTP_404_NOT_FOUND)
+
+
+class GetPlaceNameByCoordinates(GenericAPIView):
+    serializer_class: Type[Serializer] = GetPlaceNameByCoordinatesSerializer
+
+    def post(self, request: Request) -> Response:
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            geolocator = Nominatim(user_agent="geoapiExercises")
+            location = geolocator.reverse(
+                str(serializer.data["lat"]) + "," + str(serializer.data["lon"])
+            )
+            return Response(
+                {
+                    "name": location.raw["display_name"],
                 }
             )
         except AttributeError:

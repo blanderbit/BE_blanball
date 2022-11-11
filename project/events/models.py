@@ -147,10 +147,13 @@ class RequestToParticipation(models.Model):
     event: Event = models.ForeignKey(
         Event, on_delete=models.CASCADE, related_name="invites"
     )
-    sender: User = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sender")
+    sender: User = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="sender"
+    )
     status: str = models.CharField(
         choices=Status.choices, max_length=10, default=Status.WAITING
     )
+
     def __repr__(self) -> str:
         return "<RequestToParticipation %s>" % self.id
 
@@ -180,9 +183,13 @@ class InviteToEventManager(models.Manager):
             raise ValidationError(AUTHOR_CAN_NOT_INVITE_ERROR, HTTP_403_FORBIDDEN)
         if invite_user in event.black_list.all():
             raise ValidationError(THIS_USER_CAN_NOT_BE_INVITED, HTTP_403_FORBIDDEN)
-        if InviteToEvent.get_all().filter(
-            recipient=invite_user, event=event, status=InviteToEvent.Status.DECLINED
-        ).exists():
+        if (
+            InviteToEvent.get_all()
+            .filter(
+                recipient=invite_user, event=event, status=InviteToEvent.Status.DECLINED
+            )
+            .exists()
+        ):
             raise ValidationError(THIS_USER_CAN_NOT_BE_INVITED, HTTP_403_FORBIDDEN)
 
         if (

@@ -103,7 +103,7 @@ def code_create(*, email: str, type: str, dop_info: str) -> None:
 
 def profile_update(*, user: User, serializer: Serializer) -> None:
     serializer.is_valid(raise_exception=True)
-    profile: Profile = Profile.get_all().filter(id=user.profile_id)
+    profile: Profile = Profile.objects.filter(id=user.profile_id)
     profile.update(**serializer.validated_data["profile"])
     count_age(profile=profile[0], data=serializer.validated_data["profile"].items())
     serializer.validated_data.pop("profile")

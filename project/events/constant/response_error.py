@@ -54,5 +54,5 @@ SENT_INVATION_ERROR: dict[str, str] = {
 
 
 NOTHING_FOUND_FOR_USER_REQUEST_ERROR: dict[str, str] = {
-    "error": 'Nothing found for your request'
+    "error": "Nothing found for your request"
 }

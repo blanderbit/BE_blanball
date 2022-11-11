@@ -50,7 +50,7 @@ class EventUsersProfileSerializer(DynamicFieldsModelSerializer):
             "last_name",
             "avatar",
             "position",
-            "working_leg"
+            "working_leg",
         ]
 
 
@@ -79,9 +79,20 @@ class CreateUpdateProfileSerializer(serializers.ModelSerializer):
             "age",
         ]
 
+class UserConfigurationSerializer(serializers.Serializer):
+    email: bool = serializers.BooleanField()
+    phone: bool = serializers.BooleanField()
+
+    class Meta:
+        fields: Union[str, list[str]] = [
+            "email",
+            "phone",
+        ]
+
 
 class UpdateProfileSerializer(serializers.ModelSerializer):
     profile = CreateUpdateProfileSerializer()
+    configuration = UserConfigurationSerializer()
 
     class Meta:
         model: User = User
@@ -190,6 +201,7 @@ class LoginSerializer(serializers.ModelSerializer):
         return {"email": user.email, "tokens": user.tokens}
 
         return super().validate(attrs)
+
 
 
 class UserSerializer(DynamicFieldsModelSerializer):

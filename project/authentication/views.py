@@ -131,7 +131,7 @@ class RegisterUser(GenericAPIView):
             title=REGISTER_SUCCESS_TITLE,
             text=REGISTER_SUCCESS_TEXT,
         )
-        return Response(user.tokens(), status=HTTP_201_CREATED)
+        return Response({"refresh": user.tokens()["refresh"], "access": user.tokens()["access"]}, status=HTTP_201_CREATED)
 
 
 class LoginUser(GenericAPIView):
@@ -181,7 +181,6 @@ class UserOwnerProfile(GenericAPIView):
             dop_info=request.user.email,
         )
         return Response(SENT_CODE_TO_EMAIL_SUCCESS, status=HTTP_200_OK)
-
 
 
 class UpdateProfile(GenericAPIView):
