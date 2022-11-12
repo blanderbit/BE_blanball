@@ -29,6 +29,7 @@ from rest_framework.serializers import (
 from rest_framework.status import (
     HTTP_403_FORBIDDEN,
 )
+from django.contrib.gis.db.models import PointField
 
 
 class Event(models.Model):
@@ -73,7 +74,7 @@ class Event(models.Model):
     author: User = models.ForeignKey(User, on_delete=models.CASCADE)
     name: str = models.CharField(max_length=255)
     description: str = models.TextField()
-    place: str = models.CharField(max_length=255)
+    place: str = PointField(srid=3875)
     gender: str = models.CharField(choices=Gender.choices, max_length=10)
     date_and_time: datetime = models.DateTimeField()
     contact_number: str = PhoneNumberField(null=True)

@@ -7,7 +7,7 @@ from authentication.filters import (
     RankedFuzzySearchFilter,
 )
 from config.exceptions import _404
-from config.yasg import skip_param
+from config.yasg import skip_param, point
 from django.db.models import Count, Q
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
@@ -104,6 +104,7 @@ from rest_framework.status import (
 )
 
 from geopy.geocoders import Nominatim
+from rest_framework_gis.filters import DistanceToPointOrderingFilter
 
 
 class CreateEvent(GenericAPIView):
@@ -280,16 +281,11 @@ class RemoveUserFromEvent(GenericAPIView):
         return Response(USER_REMOVED_FROM_EVENT_SUCCESS, status=HTTP_200_OK)
 
 
-@method_decorator(swagger_auto_schema(manual_parameters=[skip_param]), name="get")
+@method_decorator(swagger_auto_schema(manual_parameters=[skip_param, point]), name="get")
 class EventsList(ListAPIView):
     """class that allows you to get a complete list of events"""
 
     serializer_class: Type[Serializer] = EventListSerializer
-    filter_backends = [
-        DjangoFilterBackend,
-        OrderingFilter,
-        SearchFilter,
-    ]
     search_fields: list[str] = [
         "id",
         "name",
@@ -303,6 +299,13 @@ class EventsList(ListAPIView):
     ]
     filterset_class = EventDateTimeRangeFilter
     queryset: QuerySet[Event] = Event.get_all()
+    filter_backends = [
+        DjangoFilterBackend,
+        OrderingFilter,
+        SearchFilter,
+        DistanceToPointOrderingFilter,
+    ]
+    distance_ordering_filter_field = "place"
 
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Event]:

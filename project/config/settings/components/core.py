@@ -15,6 +15,7 @@ INSTALLED_APPS: list[str] = [
     "corsheaders",
     "rest_framework_swagger",
     "rest_framework",
+    'rest_framework_gis',
     "django_inlinecss",
     "drf_yasg",
     "django_filters",
