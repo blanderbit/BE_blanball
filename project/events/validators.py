@@ -2,7 +2,7 @@ from collections import OrderedDict
 from datetime import datetime
 
 from django.utils import timezone
-from events.constant.response_error import (
+from events.constants.response_error import (
     BAD_EVENT_TIME_CREATE_ERROR,
     NO_PRICE_DESK_ERROR,
 )

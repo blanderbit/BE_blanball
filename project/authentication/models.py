@@ -2,7 +2,7 @@ import os
 from datetime import date, datetime
 from typing import Any, final
 
-from authentication.constant.errors import (
+from authentication.constants.errors import (
     MAX_AGE_VALUE_ERROR,
     MIN_AGE_VALUE_ERROR,
 )

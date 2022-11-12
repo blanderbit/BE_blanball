@@ -10,10 +10,10 @@ from django.core.validators import (
 )
 from django.db import models
 from django.db.models.query import QuerySet
-from events.constant.notification_types import (
+from events.constants.notification_types import (
     INVITE_USER_TO_EVENT_NOTIFICATION_TYPE,
 )
-from events.constant.response_error import (
+from events.constants.response_error import (
     AUTHOR_CAN_NOT_INVITE_ERROR,
     SENT_INVATION_ERROR,
     THIS_USER_CAN_NOT_BE_INVITED,

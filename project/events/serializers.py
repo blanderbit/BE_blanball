@@ -6,7 +6,7 @@ from authentication.serializers import (
     EventUsersSerializer,
 )
 from config.exceptions import _404
-from events.constant.response_error import (
+from events.constants.response_error import (
     ALREADY_IN_EVENT_FANS_LIST_ERROR,
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,
     EVENT_NOT_FOUND_ERROR,

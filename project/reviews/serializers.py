@@ -10,10 +10,10 @@ from rest_framework.serializers import (
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
-from reviews.constant.errors import (
+from reviews.constants.errors import (
     REVIEW_CREATE_ERROR,
 )
-from reviews.constant.notification_types import (
+from reviews.constants.notification_types import (
     REVIEW_CREATE_NOTIFICATION_TYPE,
 )
 from reviews.models import Review

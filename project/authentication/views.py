@@ -1,6 +1,6 @@
 from typing import Any, Type
 
-from authentication.constant.code_types import (
+from authentication.constants.code_types import (
     ACCOUNT_DELETE_CODE_TYPE,
     EMAIL_CHANGE_CODE_TYPE,
     EMAIL_VERIFY_CODE_TYPE,
@@ -8,14 +8,14 @@ from authentication.constant.code_types import (
     PASSWORD_RESET_CODE_TYPE,
     PHONE_CHANGE_CODE_TYPE,
 )
-from authentication.constant.errors import (
+from authentication.constants.errors import (
     ALREADY_VERIFIED_ERROR,
     NO_PERMISSIONS_ERROR,
     NO_SUCH_IMAGE_ERROR,
     THIS_EMAIL_ALREADY_IN_USE_ERROR,
     WRONG_PASSWORD_ERROR,
 )
-from authentication.constant.success import (
+from authentication.constants.success import (
     ACCOUNT_DELETE_SUCCESS_BODY_TITLE,
     ACCOUNT_DELETE_SUCCESS_TEXT,
     ACCOUNT_DELETE_SUCCESS_TITLE,

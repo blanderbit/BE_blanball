@@ -63,7 +63,7 @@ services:
     container_name: db
     env_file: 
       - stack.env
-    image: postgres:latest
+    image: postgis/postgis:latest
     restart: always
     volumes:
       - db-data:/var/lib/postgresql/data

@@ -10,7 +10,7 @@ from asgiref.sync import async_to_sync
 from authentication.models import User
 from channels.layers import get_channel_layer
 from django.db.models.query import QuerySet
-from notifications.constant.notification_types import (
+from notifications.constants.notification_types import (
     CHANGE_MAINTENANCE_NOTIFICATION_TYPE,
 )
 from notifications.models import Notification

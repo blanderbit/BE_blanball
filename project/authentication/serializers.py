@@ -2,7 +2,7 @@ import re
 from collections import OrderedDict
 from typing import Any, List, Union
 
-from authentication.constant.code_types import (
+from authentication.constants.code_types import (
     ACCOUNT_DELETE_CODE_TYPE,
     EMAIL_CHANGE_CODE_TYPE,
     EMAIL_VERIFY_CODE_TYPE,
@@ -10,7 +10,7 @@ from authentication.constant.code_types import (
     PASSWORD_RESET_CODE_TYPE,
     PHONE_CHANGE_CODE_TYPE,
 )
-from authentication.constant.errors import (
+from authentication.constants.errors import (
     CONFIGURATION_IS_REQUIRED_ERROR,
     GET_PLANNED_IVENTS_ERROR,
     INVALID_CREDENTIALS_ERROR,

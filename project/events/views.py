@@ -1,6 +1,6 @@
 from typing import Any, Type, final
 
-from authentication.constant.errors import (
+from authentication.constants.errors import (
     NO_SUCH_USER_ERROR,
 )
 from authentication.filters import (
@@ -17,11 +17,11 @@ from django_filters.rest_framework import (
     DjangoFilterBackend,
 )
 from drf_yasg.utils import swagger_auto_schema
-from events.constant.notification_types import (
+from events.constants.notification_types import (
     EVENT_UPDATE_NOTIFICATION_TYPE,
     LEAVE_USER_FROM_THE_EVENT_NOTIFICATION_TYPE,
 )
-from events.constant.response_error import (
+from events.constants.response_error import (
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,
     EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,
     EVENT_NOT_FOUND_ERROR,
@@ -29,7 +29,7 @@ from events.constant.response_error import (
     NO_IN_EVENT_MEMBERS_LIST_ERROR,
     NOTHING_FOUND_FOR_USER_REQUEST_ERROR,
 )
-from events.constant.response_success import (
+from events.constants.response_success import (
     APPLICATION_FOR_PARTICIPATION_SUCCESS,
     DISCONNECT_FROM_EVENT_SUCCESS,
     EVENT_UPDATE_SUCCESS,
