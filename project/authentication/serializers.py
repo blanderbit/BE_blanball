@@ -79,6 +79,7 @@ class CreateUpdateProfileSerializer(serializers.ModelSerializer):
             "age",
         ]
 
+
 class UserConfigurationSerializer(serializers.Serializer):
     email: bool = serializers.BooleanField()
     phone: bool = serializers.BooleanField()
@@ -201,7 +202,6 @@ class LoginSerializer(serializers.ModelSerializer):
         return {"email": user.email, "tokens": user.tokens}
 
         return super().validate(attrs)
-
 
 
 class UserSerializer(DynamicFieldsModelSerializer):

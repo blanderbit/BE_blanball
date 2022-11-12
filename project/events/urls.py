@@ -14,7 +14,9 @@ from events.views import (
     EventsRelevantList,
     FanJoinToEvent,
     FanLeaveFromEvent,
+    GetCoordinatesByPlaceName,
     GetEvent,
+    GetPlaceNameByCoordinates,
     InvitesToEventList,
     InviteUserToEvent,
     JoinToEvent,
@@ -27,8 +29,6 @@ from events.views import (
     UserEventsRelevantList,
     UserParticipantEventsList,
     UserPlannedEventsList,
-    GetCoordinatesByPlaceName,
-    GetPlaceNameByCoordinates,
 )
 
 urlpatterns: list[Union[URLResolver, URLPattern]] = [

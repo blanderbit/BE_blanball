@@ -6,6 +6,10 @@ from authentication.serializers import (
     EventUsersSerializer,
 )
 from config.exceptions import _404
+from django.core.validators import (
+    MaxValueValidator,
+    MinValueValidator,
+)
 from events.constants.response_error import (
     ALREADY_IN_EVENT_FANS_LIST_ERROR,
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,
@@ -28,7 +32,32 @@ from rest_framework.status import (
 )
 
 
+class EventPlaceSerializer(serializers.Serializer):
+    place_name: str = serializers.CharField(max_length=255)
+    lat: float = serializers.FloatField(
+        validators=[
+            MinValueValidator(-90),
+            MaxValueValidator(90),
+        ]
+    )
+    lon: float = serializers.FloatField(
+        validators=[
+            MinValueValidator(-180),
+            MaxValueValidator(180),
+        ]
+    )
+
+    class Meta:
+        fields = [
+            "place_name",
+            "lon",
+            "lat",
+        ]
+
+
 class CreateEventSerializer(serializers.ModelSerializer):
+    place = EventPlaceSerializer()
+
     class Meta:
         model: Event = Event
         validators = [EventDateTimeValidator()]
@@ -37,10 +66,13 @@ class CreateEventSerializer(serializers.ModelSerializer):
             "status",
             "current_fans",
             "black_list",
+            "coordinates",
         ]
 
 
 class UpdateEventSerializer(serializers.ModelSerializer):
+    place = EventPlaceSerializer()
+
     class Meta:
         model: Event = Event
         validators = [EventDateTimeValidator()]
@@ -50,6 +82,7 @@ class UpdateEventSerializer(serializers.ModelSerializer):
             "current_fans",
             "current_users",
             "black_list",
+            "coordinates",
         ]
 
     def update(self, instance, validated_data: dict) -> OrderedDict:
@@ -82,6 +115,8 @@ class PopularIventsListSerializer(serializers.ModelSerializer):
 
 
 class EventListSerializer(serializers.ModelSerializer):
+    place = EventPlaceSerializer()
+
     class Meta:
         model: Event = Event
         fields: Union[str, list[str]] = [

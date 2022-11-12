@@ -1,6 +1,6 @@
 import os
 from datetime import date, datetime
-from typing import Any, final
+from typing import Any, Optional, final
 
 from authentication.constants.errors import (
     MAX_AGE_VALUE_ERROR,
@@ -11,11 +11,17 @@ from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
 )
+from django.core.files.uploadedfile import (
+    TemporaryUploadedFile,
+)
 from django.core.validators import (
     MaxValueValidator,
     MinValueValidator,
 )
 from django.db import models
+from django.db.models.fields.files import (
+    ImageFieldFile,
+)
 from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.utils.encoding import smart_bytes
@@ -28,7 +34,6 @@ from minio.commonconfig import REPLACE, CopySource
 from phonenumber_field.modelfields import (
     PhoneNumberField,
 )
-from PIL import Image
 from rest_framework.serializers import (
     ValidationError,
 )
@@ -87,7 +92,7 @@ def image_file_name(instance: "Profile", filename: str) -> str:
     return os.path.join("users", str(filename))
 
 
-def validate_image(image: Image) -> str:
+def validate_image(image: TemporaryUploadedFile) -> str:
     megabyte_limit: float = 1.0
     if image.size > megabyte_limit * 1024 * 1024:
         raise ValidationError("Max file size is %sMB" % str(megabyte_limit))
@@ -120,31 +125,35 @@ class Profile(models.Model):
     name: str = models.CharField(max_length=255)
     last_name: str = models.CharField(max_length=255)
     gender: str = models.CharField(choices=Gender.choices, max_length=10)
-    birthday: date = models.DateField(null=True, validators=[validate_birthday])
-    avatar: Image = models.ImageField(
+    birthday: Optional[date] = models.DateField(
+        null=True, validators=[validate_birthday]
+    )
+    avatar: Optional[ImageFieldFile] = models.ImageField(
         null=True, upload_to=image_file_name, validators=[validate_image]
     )
-    age: int = models.PositiveSmallIntegerField(null=True)
-    height: int = models.PositiveSmallIntegerField(
+    age: Optional[int] = models.PositiveSmallIntegerField(null=True)
+    height: Optional[int] = models.PositiveSmallIntegerField(
         null=True,
         validators=[
             MinValueValidator(30),
             MaxValueValidator(210),
         ],
     )
-    weight: int = models.PositiveSmallIntegerField(
+    weight: Optional[int] = models.PositiveSmallIntegerField(
         null=True,
         validators=[
             MinValueValidator(30),
             MaxValueValidator(210),
         ],
     )
-    position: str = models.CharField(
+    position: Optional[str] = models.CharField(
         choices=Position.choices, max_length=255, null=True
     )
     created_at: datetime = models.DateTimeField(auto_now_add=True)
-    about_me: str = models.TextField(null=True)
-    working_leg: str = models.CharField(choices=Leg.choices, max_length=255, null=True)
+    about_me: Optional[str] = models.TextField(null=True)
+    working_leg: Optional[str] = models.CharField(
+        choices=Leg.choices, max_length=255, null=True
+    )
 
     @final
     def __repr__(self) -> str:

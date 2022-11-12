@@ -1,9 +1,13 @@
 import profile
 from datetime import date, datetime
 from email.policy import default
-from typing import Any, Optional, final
+from typing import Any, Optional, Union, final
 
 from authentication.models import Gender, User
+from django.contrib.gis.db.models import (
+    PointField,
+)
+from django.contrib.gis.geos import Point
 from django.core.validators import (
     MaxValueValidator,
     MinValueValidator,
@@ -29,7 +33,6 @@ from rest_framework.serializers import (
 from rest_framework.status import (
     HTTP_403_FORBIDDEN,
 )
-from django.contrib.gis.db.models import PointField
 
 
 class Event(models.Model):
@@ -74,7 +77,7 @@ class Event(models.Model):
     author: User = models.ForeignKey(User, on_delete=models.CASCADE)
     name: str = models.CharField(max_length=255)
     description: str = models.TextField()
-    place: str = PointField(srid=3875)
+    place: dict[str, Union[str, float]] = models.JSONField()
     gender: str = models.CharField(choices=Gender.choices, max_length=10)
     date_and_time: datetime = models.DateTimeField()
     contact_number: str = PhoneNumberField(null=True)
@@ -83,26 +86,27 @@ class Event(models.Model):
         validators=[MinValueValidator(6), MaxValueValidator(50)], default=6
     )
     type: str = models.CharField(choices=Type.choices, max_length=15)
-    price: int = models.PositiveSmallIntegerField(
+    price: Optional[int] = models.PositiveSmallIntegerField(
         null=True, validators=[MinValueValidator(1)]
     )
-    price_description: str = models.CharField(max_length=500, null=True)
+    price_description: Optional[str] = models.CharField(max_length=500, null=True)
     need_form: bool = models.BooleanField()
     privacy: bool = models.BooleanField()
     duration: int = models.PositiveSmallIntegerField(choices=Duration.choices)
     forms: str = models.CharField(choices=CloseType.choices, max_length=15)
     status: str = models.CharField(
-        choices=Status.choices, max_length=10, default="Planned"
+        choices=Status.choices, max_length=10, default=Status.PLANNED
     )
-    current_users: list[User] = models.ManyToManyField(
+    current_users: list[Optional[User]] = models.ManyToManyField(
         User, related_name="current_rooms", blank=True
     )
-    current_fans: list[User] = models.ManyToManyField(
+    current_fans: list[Optional[User]] = models.ManyToManyField(
         User, related_name="current_views_rooms", blank=True
     )
-    black_list: list[User] = models.ManyToManyField(
+    black_list: list[Optional[User]] = models.ManyToManyField(
         User, related_name="black_list", blank=True
     )
+    coordinates: Point = PointField(null=True, srid=4326)
 
     @property
     def count_current_users(self) -> int:
@@ -128,6 +132,12 @@ class Event(models.Model):
             .prefetch_related("current_users", "current_fans")
             .order_by("-id")
         )
+
+    @final
+    def save(self, *args: Any, **kwargs: Any) -> None:
+        if self.place != None:
+            self.coordinates = Point(self.place["lon"], self.place["lat"])
+        super(Event, self).save(*args, **kwargs)
 
     class Meta:
         db_table: str = "event"

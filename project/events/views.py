@@ -7,7 +7,7 @@ from authentication.filters import (
     RankedFuzzySearchFilter,
 )
 from config.exceptions import _404
-from config.yasg import skip_param, point
+from config.yasg import point, skip_param
 from django.db.models import Count, Q
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
@@ -51,6 +51,8 @@ from events.serializers import (
     DeleteIventsSerializer,
     EventListSerializer,
     EventSerializer,
+    GetCoordinatesByPlaceNameSerializer,
+    GetPlaceNameByCoordinatesSerializer,
     InvitesToEventListSerializer,
     InviteUserToEventSerializer,
     JoinOrRemoveRoomSerializer,
@@ -58,8 +60,6 @@ from events.serializers import (
     RemoveUserFromEventSerializer,
     RequestToParticipationSerializer,
     UpdateEventSerializer,
-    GetCoordinatesByPlaceNameSerializer,
-    GetPlaceNameByCoordinatesSerializer,
 )
 from events.services import (
     bulk_accept_or_decline_invites_to_events,
@@ -75,6 +75,7 @@ from events.services import (
     skip_objects_from_response_by_id,
     validate_user_before_join_to_event,
 )
+from geopy.geocoders import Nominatim
 from notifications.tasks import *
 from rest_framework.exceptions import (
     PermissionDenied,
@@ -102,9 +103,10 @@ from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_404_NOT_FOUND,
 )
-
-from geopy.geocoders import Nominatim
-from rest_framework_gis.filters import DistanceToPointOrderingFilter
+from rest_framework_gis.filters import (
+    DistanceToPointFilter,
+    DistanceToPointOrderingFilter,
+)
 
 
 class CreateEvent(GenericAPIView):
@@ -281,7 +283,9 @@ class RemoveUserFromEvent(GenericAPIView):
         return Response(USER_REMOVED_FROM_EVENT_SUCCESS, status=HTTP_200_OK)
 
 
-@method_decorator(swagger_auto_schema(manual_parameters=[skip_param, point]), name="get")
+@method_decorator(
+    swagger_auto_schema(manual_parameters=[skip_param, point]), name="get"
+)
 class EventsList(ListAPIView):
     """class that allows you to get a complete list of events"""
 
@@ -305,7 +309,7 @@ class EventsList(ListAPIView):
         SearchFilter,
         DistanceToPointOrderingFilter,
     ]
-    distance_ordering_filter_field = "place"
+    distance_ordering_filter_field: str = "coordinates"
 
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Event]:

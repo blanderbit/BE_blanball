@@ -14,7 +14,9 @@ class Notification(models.Model):
         READ: str = "Read"
 
     user: User = models.ForeignKey(User, on_delete=models.CASCADE)
-    type: str = models.CharField(choices=Type.choices, max_length=6, default="Unread")
+    type: str = models.CharField(
+        choices=Type.choices, max_length=6, default=Type.UNREAD
+    )
     time_created: datetime = models.DateTimeField(auto_now_add=True)
     message_type: str = models.CharField(max_length=100)
     data: dict[str, Any] = models.JSONField()
