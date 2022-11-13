@@ -103,6 +103,11 @@ from rest_framework.status import (
 )
 
 
+
+
+
+
+
 class RegisterUser(GenericAPIView):
     """
     This class allows the user to register in the application.

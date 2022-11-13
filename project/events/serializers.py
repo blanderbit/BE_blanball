@@ -285,9 +285,20 @@ class GetCoordinatesByPlaceNameSerializer(serializers.Serializer):
         ]
 
 
+
 class GetPlaceNameByCoordinatesSerializer(serializers.Serializer):
-    lat: bool = serializers.FloatField()
-    lon: bool = serializers.FloatField()
+    lat: float = serializers.FloatField(
+        validators=[
+            MinValueValidator(-90),
+            MaxValueValidator(90),
+        ]
+    )
+    lon: float = serializers.FloatField(
+        validators=[
+            MinValueValidator(-180),
+            MaxValueValidator(180),
+        ]
+    )
 
     class Meta:
         fields: Union[str, list[str]] = [
