@@ -3,7 +3,7 @@ from django.db.models.signals import (
     pre_delete,
 )
 from django.dispatch import receiver
-from notifications.constant.notification_types import (
+from notifications.constants.notification_types import (
     NOTIFICATION_DELETE_NOTIFICATION_TYPE,
     NOTIFICATION_READ_NOTIFICATION_TYPE,
 )

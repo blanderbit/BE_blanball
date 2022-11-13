@@ -10,11 +10,11 @@ from drf_yasg.utils import swagger_auto_schema
 from events.services import (
     skip_objects_from_response_by_id,
 )
-from notifications.constant.errors import (
+from notifications.constants.errors import (
     CONFIG_FILE_ERROR,
     MAINTENANCE_CAN_NOT_UPDATE_ERROR,
 )
-from notifications.constant.success import (
+from notifications.constants.success import (
     MAINTENANCE_UPDATED_SUCCESS,
     NOTIFICATIONS_DELETED_SUCCESS,
     NOTIFICATIONS_READED_SUCCESS,

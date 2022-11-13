@@ -1,6 +1,6 @@
 from collections import OrderedDict
 
-from authentication.constant.errors import (
+from authentication.constants.errors import (
     BAD_CODE_ERROR,
     CODE_EXPIRED_ERROR,
 )

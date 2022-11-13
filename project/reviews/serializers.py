@@ -10,10 +10,10 @@ from rest_framework.serializers import (
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
-from reviews.constant.errors import (
+from reviews.constants.errors import (
     REVIEW_CREATE_ERROR,
 )
-from reviews.constant.notification_types import (
+from reviews.constants.notification_types import (
     REVIEW_CREATE_NOTIFICATION_TYPE,
 )
 from reviews.models import Review
@@ -23,7 +23,7 @@ class CreateReviewSerializer(ModelSerializer):
     class Meta:
         model: Review = Review
         exclude: Union[str, list[str]] = [
-            "email",
+            "author",
         ]
 
     def validate(self, attrs) -> OrderedDict:
@@ -36,24 +36,24 @@ class CreateReviewSerializer(ModelSerializer):
     def create(self, validated_data: dict[str, Any]) -> Review:
         user: User = User.get_all().get(email=validated_data["user"])
         review: Review = Review.objects.create(
-            email=self.context["request"].user.email, **validated_data
+            author=self.context["request"].user, **validated_data
         )
         send_to_user(
             user=user,
             message_type=REVIEW_CREATE_NOTIFICATION_TYPE,
             data={
                 "recipient": {
-                    "id": user.id,
-                    "name": user.profile.name,
-                    "last_name": user.profile.last_name,
+                    "id": review.user.id,
+                    "name": review.user.profile.name,
+                    "last_name":review. user.profile.last_name,
                 },
                 "review": {
                     "id": review.id,
                 },
                 "sender": {
-                    "id": self.context["request"].user.id,
-                    "name": self.context["request"].user.profile.name,
-                    "last_name": self.context["request"].user.profile.last_name,
+                    "id": review.author.id,
+                    "name": review.author.profile.name,
+                    "last_name": review.author.profile.last_name,
                 },
             },
         )
@@ -68,13 +68,6 @@ class CreateReviewSerializer(ModelSerializer):
 class ReviewListSerializer(ModelSerializer):
     class Meta:
         model: Review = Review
-        fields: Union[str, list[str]] = "__all__"
-
-
-class ReviewUpdateSerializer(ModelSerializer):
-    class Meta:
-        model: Review = Review
-        fields: Union[str, list[str]] = [
-            "text",
-            "stars",
+        exclude: Union[str, list[str]] = [
+            "user",
         ]

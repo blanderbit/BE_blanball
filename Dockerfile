@@ -37,7 +37,11 @@ RUN apt-get update && apt-get upgrade -y \
   && apt-get install --no-install-recommends -y \
   && groupadd -g "${GID}" -r deploy \
   && useradd -d $APP_PATH -g deploy -l -r -u "${UID}" deploy \
-  && chown deploy:deploy -R $APP_PATH
+  && chown deploy:deploy -R $APP_PATH \
+  #setup project with postgis + GeoDjango
+  && apt-get install -y gdal-bin libgdal-dev \
+  && apt-get install -y python3-gdal \
+  && apt-get install -y binutils libproj-dev
 
 # Installing `poetry` package manager:
 # https://github.com/python-poetry/poetry

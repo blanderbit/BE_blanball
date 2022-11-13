@@ -1,7 +1,7 @@
 import threading
 from typing import Any, final
 
-from authentication.constant.success import (
+from authentication.constants.success import (
     BLANBALL,
 )
 from config.celery import app

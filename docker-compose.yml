@@ -24,7 +24,7 @@ services:
     container_name: db
     env_file: 
       - .env
-    image: postgres:latest
+    image: postgis/postgis:latest
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
     networks:
