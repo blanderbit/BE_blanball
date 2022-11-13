@@ -1,3 +1,5 @@
 CHANGE_MAINTENANCE_NOTIFICATION_TYPE: str = "change_maintenance"
-NOTIFICATION_DELETE_NOTIFICATION_TYPE: str = "notification_delete"
-NOTIFICATION_READ_NOTIFICATION_TYPE: str = "notification_read"
+NOTIFICATIONS_BULK_DELETE_NOTIFICATION_TYPE: str = "bulk_notifications_delete"
+NOTIFICATIONS_BULK_READ_NOTIFICATION_TYPE: str = "bulk_notifications_read"
+ALL_USER_NOTIFICATIONS_DELETED_NOTIFICATION_TYPE: str = "all_user_notifications_deleted"
+ALL_USER_NOTIFICATIONS_READED_NOTIFICATION_TYPE: str = "all_user_notifications_readed"

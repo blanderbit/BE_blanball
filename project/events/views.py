@@ -112,15 +112,15 @@ from rest_framework_gis.filters import (
 class CreateEvent(GenericAPIView):
     """
     This endpoint allows the user to create an event.
-    The user can also specify the ID of other users in 
+    The user can also specify the ID of other users in
     the current_users field to send them invitations.
 
-    privacy true - means that it will not be possible 
-    to simply connect to the event, everything will go 
-    through the rejection or acceptance of applications 
+    privacy true - means that it will not be possible
+    to simply connect to the event, everything will go
+    through the rejection or acceptance of applications
     by the author of the event.
 
-    privacy false - means that the event has open access 
+    privacy false - means that the event has open access
     and anyone can connect to it.
 
     gender field options: Man, Wooman
@@ -142,10 +142,11 @@ class CreateEvent(GenericAPIView):
 
 class InviteUserToEvent(GenericAPIView):
     """
-    This endpoint allows the author of the event 
-    and the user who is a participant in the event 
+    This endpoint allows the author of the event
+    and the user who is a participant in the event
     to send invitations to participate in this event
     """
+
     serializer_class: Type[Serializer] = InviteUserToEventSerializer
 
     def post(self, request: Request) -> Response:
@@ -161,7 +162,7 @@ class InviteUserToEvent(GenericAPIView):
 
 class GetEvent(RetrieveModelMixin, GenericAPIView):
     """
-    This endpoint allows the user to 
+    This endpoint allows the user to
     get detailed information about any event
     """
 
@@ -191,8 +192,8 @@ class UpdateEvent(GenericAPIView):
 
 class DeleteEvents(GenericAPIView):
     """
-    This endpoint allows the user to delete 
-    their events.If the user deletes the event, 
+    This endpoint allows the user to delete
+    their events.If the user deletes the event,
     it can no longer be restored.
     """
 
@@ -212,10 +213,11 @@ class DeleteEvents(GenericAPIView):
 
 class JoinToEvent(GenericAPIView):
     """
-    This endpoint allows a user who is not the 
-    author of this event and is not  already on the 
+    This endpoint allows a user who is not the
+    author of this event and is not  already on the
     participants or viewers list to enter the event as a participant.
     """
+
     serializer_class: Type[Serializer] = JoinOrRemoveRoomSerializer
 
     def post(self, request: Request) -> Response:
@@ -236,10 +238,11 @@ class JoinToEvent(GenericAPIView):
 
 class FanJoinToEvent(GenericAPIView):
     """
-    This endpoint allows a user who is not the 
-    author of this event and is not  already on the 
+    This endpoint allows a user who is not the
+    author of this event and is not  already on the
     participants or viewers list to enter the event as a viewer.
     """
+
     serializer_class: Type[Serializer] = JoinOrRemoveRoomSerializer
 
     def post(self, request: Request) -> Response:
@@ -259,9 +262,10 @@ class FanJoinToEvent(GenericAPIView):
 
 class FanLeaveFromEvent(GenericAPIView):
     """
-    This endpoint allows the user who is 
+    This endpoint allows the user who is
     at the event as a spectator to leave it
     """
+
     serializer_class: Type[Serializer] = JoinOrRemoveRoomSerializer
 
     def post(self, request: Request) -> Response:
@@ -277,9 +281,10 @@ class FanLeaveFromEvent(GenericAPIView):
 
 class LeaveFromEvent(GenericAPIView):
     """
-    This endpoint allows the user who is 
+    This endpoint allows the user who is
     at the event as a participant to leave it
     """
+
     serializer_class: Type[Serializer] = JoinOrRemoveRoomSerializer
 
     def post(self, request: Request) -> Response:
@@ -315,10 +320,11 @@ class LeaveFromEvent(GenericAPIView):
 
 class RemoveUserFromEvent(GenericAPIView):
     """
-    This endpoint allows the event author to 
-    remove (kick) the user from the event for 
+    This endpoint allows the event author to
+    remove (kick) the user from the event for
     one reason or another.
     """
+
     serializer_class: Type[Serializer] = RemoveUserFromEventSerializer
 
     def post(self, request: Request) -> Response:
@@ -384,9 +390,10 @@ class UserEventsRelevantList(EventsRelevantList):
 @method_decorator(swagger_auto_schema(manual_parameters=[skip_param]), name="get")
 class InvitesToEventList(ListAPIView):
     """
-    This endpoint allows the user to 
+    This endpoint allows the user to
     view all of his event invitations.
     """
+
     serializer_class: Type[Serializer] = InvitesToEventListSerializer
     queryset: QuerySet[InviteToEvent] = InviteToEvent.get_all().filter(
         status=InviteToEvent.Status.WAITING
@@ -399,9 +406,10 @@ class InvitesToEventList(ListAPIView):
 
 class BulkAcceptOrDeclineInvitesToEvent(GenericAPIView):
     """
-    This endpoint gives the user the ability to 
+    This endpoint gives the user the ability to
     accept or decline requests to participate in events.
     """
+
     serializer_class: Type[
         Serializer
     ] = BulkAcceptOrDeclineRequestToParticipationSerializer
@@ -460,10 +468,11 @@ class UserPlannedEventsList(UserEventsList):
 @method_decorator(swagger_auto_schema(manual_parameters=[skip_param]), name="get")
 class RequestToParticipationsList(ListAPIView):
     """
-    This endpoint allows all users to view 
-    applications for participation in a 
+    This endpoint allows all users to view
+    applications for participation in a
     particular private event
     """
+
     serializer_class: Type[Serializer] = RequestToParticipationSerializer
     queryset: QuerySet[
         RequestToParticipation
@@ -485,10 +494,11 @@ class RequestToParticipationsList(ListAPIView):
 
 class BulkAcceptOrDeclineRequestToParticipation(GenericAPIView):
     """
-    This endpoint allows the author of a private 
-    event to accept or reject applications for 
+    This endpoint allows the author of a private
+    event to accept or reject applications for
     participation in his event.
     """
+
     serializer_class: Type[
         Serializer
     ] = BulkAcceptOrDeclineRequestToParticipationSerializer
