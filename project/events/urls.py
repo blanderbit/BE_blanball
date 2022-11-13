@@ -102,7 +102,7 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
         PopularEvents.as_view(),
         name="popular-events-list",
     ),
-    # endpoint where a user can invite other user to ivent
+    # endpoint where a user can invite other user to event
     path(
         "client/invite/user/to/event",
         InviteUserToEvent.as_view(),

@@ -11,7 +11,7 @@ from django.db.models.query import QuerySet
 
 
 class Review(models.Model):
-    email: str = models.EmailField(max_length=255, db_index=True)
+    author: User = models.ForeignKey(User, on_delete=models.CASCADE, related_name="author")
     text: str = models.CharField(max_length=200)
     time_created: datetime = models.DateTimeField(auto_now_add=True)
     stars: int = models.PositiveSmallIntegerField(
@@ -31,11 +31,11 @@ class Review(models.Model):
     @final
     @staticmethod
     def get_all() -> QuerySet["Review"]:
-        return Review.objects.select_related("user").order_by("-id")
+        return Review.objects.select_related("user", "author").order_by("-id")
 
     @final
     def __str__(self) -> str:
-        return self.email
+        return str(self.id)
 
     class Meta:
         db_table: str = "review"

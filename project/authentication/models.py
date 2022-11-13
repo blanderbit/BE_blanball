@@ -245,7 +245,7 @@ class Code(models.Model):
     life_time: datetime = models.DateTimeField(null=True)
     type: str = models.CharField(max_length=20)
     user_email: str = models.CharField(max_length=255)
-    dop_info: str = models.CharField(max_length=255, null=True)
+    dop_info: Optional[str] = models.CharField(max_length=255, null=True)
 
     @final
     def __repr__(self) -> str:

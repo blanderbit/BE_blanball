@@ -48,7 +48,7 @@ from events.models import (
 from events.serializers import (
     BulkAcceptOrDeclineRequestToParticipationSerializer,
     CreateEventSerializer,
-    DeleteIventsSerializer,
+    DeleteEventsSerializer,
     EventListSerializer,
     EventSerializer,
     GetCoordinatesByPlaceNameSerializer,
@@ -56,7 +56,7 @@ from events.serializers import (
     InvitesToEventListSerializer,
     InviteUserToEventSerializer,
     JoinOrRemoveRoomSerializer,
-    PopularIventsListSerializer,
+    PopularEventsListSerializer,
     RemoveUserFromEventSerializer,
     RequestToParticipationSerializer,
     UpdateEventSerializer,
@@ -110,7 +110,23 @@ from rest_framework_gis.filters import (
 
 
 class CreateEvent(GenericAPIView):
-    """class that allows you to create a new event"""
+    """
+    This endpoint allows the user to create an event.
+    The user can also specify the ID of other users in 
+    the current_users field to send them invitations.
+
+    privacy true - means that it will not be possible 
+    to simply connect to the event, everything will go 
+    through the rejection or acceptance of applications 
+    by the author of the event.
+
+    privacy false - means that the event has open access 
+    and anyone can connect to it.
+
+    gender field options: Man, Wooman
+    type field options: Football, Futsal
+    forms field options: Shirt-Front, T-Shirt, Any
+    """
 
     serializer_class: Type[Serializer] = CreateEventSerializer
     queryset: QuerySet[Event] = Event.get_all()
@@ -139,7 +155,10 @@ class InviteUserToEvent(GenericAPIView):
 
 
 class GetEvent(RetrieveModelMixin, GenericAPIView):
-    """a class that allows you to get an event"""
+    """
+    This endpoint allows the user to 
+    get detailed information about any event
+    """
 
     serializer_class: Type[Serializer] = EventSerializer
     queryset: QuerySet[Event] = Event.get_all()
@@ -168,7 +187,7 @@ class UpdateEvent(GenericAPIView):
 class DeleteEvents(GenericAPIView):
     """class that allows you to delete multiple events at once"""
 
-    serializer_class: Type[Serializer] = DeleteIventsSerializer
+    serializer_class: Type[Serializer] = DeleteEventsSerializer
     queryset: QuerySet[Event] = Event.get_all()
 
     def post(self, request: Request) -> Response:
@@ -183,6 +202,11 @@ class DeleteEvents(GenericAPIView):
 
 
 class JoinToEvent(GenericAPIView):
+    """
+    This endpoint allows a user who is not the 
+    author of this event and is not  already on the 
+    participants or viewers list to enter the event as a participant.
+    """
     serializer_class: Type[Serializer] = JoinOrRemoveRoomSerializer
 
     def post(self, request: Request) -> Response:
@@ -202,6 +226,11 @@ class JoinToEvent(GenericAPIView):
 
 
 class FanJoinToEvent(GenericAPIView):
+    """
+    This endpoint allows a user who is not the 
+    author of this event and is not  already on the 
+    participants or viewers list to enter the event as a viewer.
+    """
     serializer_class: Type[Serializer] = JoinOrRemoveRoomSerializer
 
     def post(self, request: Request) -> Response:
@@ -220,6 +249,10 @@ class FanJoinToEvent(GenericAPIView):
 
 
 class FanLeaveFromEvent(GenericAPIView):
+    """
+    This endpoint allows the user who is 
+    at the event as a spectator to leave it
+    """
     serializer_class: Type[Serializer] = JoinOrRemoveRoomSerializer
 
     def post(self, request: Request) -> Response:
@@ -234,6 +267,10 @@ class FanLeaveFromEvent(GenericAPIView):
 
 
 class LeaveFromEvent(GenericAPIView):
+    """
+    This endpoint allows the user who is 
+    at the event as a participant to leave it
+    """
     serializer_class: Type[Serializer] = JoinOrRemoveRoomSerializer
 
     def post(self, request: Request) -> Response:
@@ -268,6 +305,11 @@ class LeaveFromEvent(GenericAPIView):
 
 
 class RemoveUserFromEvent(GenericAPIView):
+    """
+    This endpoint allows the event author to 
+    remove (kick) the user from the event for 
+    one reason or another.
+    """
     serializer_class: Type[Serializer] = RemoveUserFromEventSerializer
 
     def post(self, request: Request) -> Response:
@@ -287,15 +329,11 @@ class RemoveUserFromEvent(GenericAPIView):
     swagger_auto_schema(manual_parameters=[skip_param, point]), name="get"
 )
 class EventsList(ListAPIView):
-    """class that allows you to get a complete list of events"""
-
     serializer_class: Type[Serializer] = EventListSerializer
     search_fields: list[str] = [
         "id",
         "name",
         "price",
-        "place",
-        "date_and_time",
         "amount_members",
     ]
     ordering_fields: list[str] = [
@@ -336,6 +374,10 @@ class UserEventsRelevantList(EventsRelevantList):
 
 @method_decorator(swagger_auto_schema(manual_parameters=[skip_param]), name="get")
 class InvitesToEventList(ListAPIView):
+    """
+    This endpoint allows the user to 
+    view all of his event invitations.
+    """
     serializer_class: Type[Serializer] = InvitesToEventListSerializer
     queryset: QuerySet[InviteToEvent] = InviteToEvent.get_all().filter(
         status=InviteToEvent.Status.WAITING
@@ -347,6 +389,10 @@ class InvitesToEventList(ListAPIView):
 
 
 class BulkAcceptOrDeclineInvitesToEvent(GenericAPIView):
+    """
+    This endpoint gives the user the ability to 
+    accept or decline requests to participate in events.
+    """
     serializer_class: Type[
         Serializer
     ] = BulkAcceptOrDeclineRequestToParticipationSerializer
@@ -373,7 +419,7 @@ class UserParticipantEventsList(UserEventsList):
 
 
 class PopularEvents(UserEventsList):
-    serializer_class: Type[Serializer] = PopularIventsListSerializer
+    serializer_class: Type[Serializer] = PopularEventsListSerializer
     queryset: QuerySet[Event] = Event.get_all().filter(status="Planned")
 
     def get_queryset(self) -> QuerySet[Event]:
@@ -385,7 +431,7 @@ class PopularEvents(UserEventsList):
 
 
 class UserPlannedEventsList(UserEventsList):
-    serializer_class: Type[Serializer] = PopularIventsListSerializer
+    serializer_class: Type[Serializer] = PopularEventsListSerializer
     queryset: QuerySet[Event] = Event.get_all().filter(status="Planned")
 
     @skip_objects_from_response_by_id
@@ -404,6 +450,11 @@ class UserPlannedEventsList(UserEventsList):
 
 @method_decorator(swagger_auto_schema(manual_parameters=[skip_param]), name="get")
 class RequestToParticipationsList(ListAPIView):
+    """
+    This endpoint allows all users to view 
+    applications for participation in a 
+    particular private event
+    """
     serializer_class: Type[Serializer] = RequestToParticipationSerializer
     queryset: QuerySet[
         RequestToParticipation
@@ -424,6 +475,11 @@ class RequestToParticipationsList(ListAPIView):
 
 
 class BulkAcceptOrDeclineRequestToParticipation(GenericAPIView):
+    """
+    This endpoint allows the author of a private 
+    event to accept or reject applications for 
+    participation in his event.
+    """
     serializer_class: Type[
         Serializer
     ] = BulkAcceptOrDeclineRequestToParticipationSerializer

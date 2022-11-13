@@ -12,7 +12,7 @@ from authentication.constants.code_types import (
 )
 from authentication.constants.errors import (
     CONFIGURATION_IS_REQUIRED_ERROR,
-    GET_PLANNED_IVENTS_ERROR,
+    GET_PLANNED_EVENTS_ERROR,
     INVALID_CREDENTIALS_ERROR,
     NO_SUCH_USER_ERROR,
     PASSWORDS_DO_NOT_MATCH_ERROR,
@@ -112,7 +112,7 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
         string: str = re.findall(r"\D", planned_events)[0]
         if string not in ["d", "m", "y"]:
             raise serializers.ValidationError(
-                GET_PLANNED_IVENTS_ERROR, HTTP_400_BAD_REQUEST
+                GET_PLANNED_EVENTS_ERROR, HTTP_400_BAD_REQUEST
             )
 
         try:

@@ -4,8 +4,8 @@ CONFIGURATION_IS_REQUIRED_ERROR: dict[str, str] = {
     "error": "Сonfiguration should contain fields like: email,phone,show_my_planned_events"
 }
 
-GET_PLANNED_IVENTS_ERROR: dict[str, str] = {
-    "error": "Get planned ivents can only contain: day(d), month(m) and year(y)"
+GET_PLANNED_EVENTS_ERROR: dict[str, str] = {
+    "error": "Get planned events can only contain: day(d), month(m) and year(y)"
 }
 
 MAX_AGE_VALUE_ERROR: dict[str, str] = {"error": "Age must not exceed 100 years old"}

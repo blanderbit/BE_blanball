@@ -100,7 +100,7 @@ class EventSerializer(serializers.ModelSerializer):
         ]
 
 
-class PopularIventsListSerializer(serializers.ModelSerializer):
+class PopularEventsListSerializer(serializers.ModelSerializer):
     class Meta:
         model: Event = Event
         fields: Union[str, list[str]] = [
@@ -158,7 +158,7 @@ class InvitesToEventListSerializer(serializers.ModelSerializer):
         fields: Union[str, list[str]] = ["id", "time_created", "event", "sender"]
 
 
-class DeleteIventsSerializer(serializers.Serializer):
+class DeleteEventsSerializer(serializers.Serializer):
     ids: list[int] = serializers.ListField(child=serializers.IntegerField(min_value=0))
 
     class Meta:

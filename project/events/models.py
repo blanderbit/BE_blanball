@@ -1,4 +1,3 @@
-import profile
 from datetime import date, datetime
 from email.policy import default
 from typing import Any, Optional, Union, final
@@ -36,10 +35,10 @@ from rest_framework.status import (
 
 
 class Event(models.Model):
-    """footbal ivent model"""
+    """footbal Event model"""
 
     class Type(models.TextChoices):
-        """ivent  type choices"""
+        """Event  type choices"""
 
         FOOTBALL: str = "Football"
         FUTSAL: str = "Futsal"
@@ -169,7 +168,7 @@ class RequestToParticipation(models.Model):
         return "<RequestToParticipation %s>" % self.id
 
     def __str__(self) -> str:
-        return self.recipient.email
+        return str(self.id)
 
     @staticmethod
     def get_all() -> QuerySet["RequestToParticipation"]:
@@ -246,7 +245,7 @@ class InviteToEvent(RequestToParticipation):
 
     @final
     def __str__(self) -> str:
-        return self.recipient.profile.name
+        return str(self.id)
 
     @final
     @staticmethod
