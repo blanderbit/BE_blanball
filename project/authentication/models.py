@@ -181,6 +181,8 @@ class Profile(models.Model):
                     CopySource(settings.MINIO_MEDIA_FILES_BUCKET, self.avatar.name),
                     metadata_directive=REPLACE,
                 )
+                if self.avatar.name != new_image_name:
+                    client.remove_object(settings.MINIO_MEDIA_FILES_BUCKET, self.avatar.name)
                 self.avatar.name = new_image_name
         except ValueError:
             pass

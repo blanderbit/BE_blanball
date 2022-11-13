@@ -141,6 +141,11 @@ class CreateEvent(GenericAPIView):
 
 
 class InviteUserToEvent(GenericAPIView):
+    """
+    This endpoint allows the author of the event 
+    and the user who is a participant in the event 
+    to send invitations to participate in this event
+    """
     serializer_class: Type[Serializer] = InviteUserToEventSerializer
 
     def post(self, request: Request) -> Response:
@@ -185,7 +190,11 @@ class UpdateEvent(GenericAPIView):
 
 
 class DeleteEvents(GenericAPIView):
-    """class that allows you to delete multiple events at once"""
+    """
+    This endpoint allows the user to delete 
+    their events.If the user deletes the event, 
+    it can no longer be restored.
+    """
 
     serializer_class: Type[Serializer] = DeleteEventsSerializer
     queryset: QuerySet[Event] = Event.get_all()
