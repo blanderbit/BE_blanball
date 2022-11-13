@@ -285,7 +285,6 @@ class GetCoordinatesByPlaceNameSerializer(serializers.Serializer):
         ]
 
 
-
 class GetPlaceNameByCoordinatesSerializer(serializers.Serializer):
     lat: float = serializers.FloatField(
         validators=[

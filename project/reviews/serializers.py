@@ -45,7 +45,7 @@ class CreateReviewSerializer(ModelSerializer):
                 "recipient": {
                     "id": review.user.id,
                     "name": review.user.profile.name,
-                    "last_name":review. user.profile.last_name,
+                    "last_name": review.user.profile.last_name,
                 },
                 "review": {
                     "id": review.id,
