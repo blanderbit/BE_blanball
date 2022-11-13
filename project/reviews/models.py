@@ -11,7 +11,9 @@ from django.db.models.query import QuerySet
 
 
 class Review(models.Model):
-    author: User = models.ForeignKey(User, on_delete=models.CASCADE, related_name="author")
+    author: User = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="author"
+    )
     text: str = models.CharField(max_length=200)
     time_created: datetime = models.DateTimeField(auto_now_add=True)
     stars: int = models.PositiveSmallIntegerField(

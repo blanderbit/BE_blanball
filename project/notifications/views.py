@@ -96,7 +96,8 @@ class ReadNotifications(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         return Response(
             bulk_read_notifications(
-                data=serializer.validated_data["ids"], queryset=self.queryset
+                data=serializer.validated_data["ids"], queryset=self.queryset,
+                user=request.user
             ),
             status=HTTP_200_OK,
         )
