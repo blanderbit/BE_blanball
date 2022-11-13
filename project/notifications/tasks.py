@@ -6,8 +6,10 @@ from authentication.models import User
 from channels.layers import get_channel_layer
 from config.celery import app
 from django.db.models import QuerySet
-from notifications.constant.notification_types import (
+from notifications.constants.notification_types import (
     CHANGE_MAINTENANCE_NOTIFICATION_TYPE,
+    ALL_USER_NOTIFICATIONS_READED_NOTIFICATION_TYPE,
+    ALL_USER_NOTIFICATIONS_DELETED_NOTIFICATION_TYPE,
 )
 from notifications.models import Notification
 
@@ -51,11 +53,23 @@ def send_to_user(
     default_retry_delay=5,
 )
 def read_all_user_notifications(*, request_user_id: int) -> None:
-    for notification in Notification.get_all().filter(
+    user_notifications: QuerySet[Notification] = Notification.get_all().filter(
         user_id=request_user_id, type=Notification.Type.UNREAD
-    ):
-        notification.type = notification.Type.READ
-        notification.save()
+    )
+    if len(user_notifications) > 0:
+        user_notifications.update(type=Notification.Type.READ)
+        try:
+            send(
+                user=User.objects.get(id=request_user_id),
+                data={
+                    "type": "kafka.message",
+                    "message": {
+                        "message_type": ALL_USER_NOTIFICATIONS_READED_NOTIFICATION_TYPE,
+                    },
+                },
+            )
+        except User.DoesNotExist:
+            pass
 
 
 @app.task(
@@ -65,4 +79,20 @@ def read_all_user_notifications(*, request_user_id: int) -> None:
     default_retry_delay=5,
 )
 def delete_all_user_notifications(*, request_user_id: int) -> None:
-    Notification.get_all().filter(user_id=request_user_id).delete()
+    user_notifications: QuerySet[Notification] = Notification.get_all().filter(
+        user_id=request_user_id
+    )
+    if len(user_notifications) > 0:
+        user_notifications.delete()
+        try:
+            send(
+                user=User.objects.get(id=request_user_id),
+                data={
+                    "type": "kafka.message",
+                    "message": {
+                        "message_type": ALL_USER_NOTIFICATIONS_DELETED_NOTIFICATION_TYPE,
+                    },
+                },
+            )
+        except User.DoesNotExist:
+            pass

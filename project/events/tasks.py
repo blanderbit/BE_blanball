@@ -1,7 +1,7 @@
 from config.celery import app
 from django.db.models import Q
 from django.utils import timezone
-from events.constant.notification_types import (
+from events.constants.notification_types import (
     EVENT_TIME_NOTIFICATION_TYPE,
 )
 from events.models import Event

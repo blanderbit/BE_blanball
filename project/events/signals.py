@@ -8,7 +8,7 @@ from django.db.models.signals import (
     pre_delete,
 )
 from django.dispatch import receiver
-from events.constant.notification_types import (
+from events.constants.notification_types import (
     EVENT_DELETE_NOTIFICATION_TYPE,
     EVENT_HAS_BEEN_ENDEN_NOTIFICATION_TYPE,
     INVITE_USER_TO_EVENT_NOTIFICATION_TYPE,

@@ -14,7 +14,9 @@ from events.views import (
     EventsRelevantList,
     FanJoinToEvent,
     FanLeaveFromEvent,
+    GetCoordinatesByPlaceName,
     GetEvent,
+    GetPlaceNameByCoordinates,
     InvitesToEventList,
     InviteUserToEvent,
     JoinToEvent,
@@ -27,8 +29,6 @@ from events.views import (
     UserEventsRelevantList,
     UserParticipantEventsList,
     UserPlannedEventsList,
-    GetCoordinatesByPlaceName,
-    GetPlaceNameByCoordinates,
 )
 
 urlpatterns: list[Union[URLResolver, URLPattern]] = [
@@ -102,7 +102,7 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
         PopularEvents.as_view(),
         name="popular-events-list",
     ),
-    # endpoint where a user can invite other user to ivent
+    # endpoint where a user can invite other user to event
     path(
         "client/invite/user/to/event",
         InviteUserToEvent.as_view(),

@@ -2,7 +2,7 @@ import re
 from collections import OrderedDict
 from typing import Any, List, Union
 
-from authentication.constant.code_types import (
+from authentication.constants.code_types import (
     ACCOUNT_DELETE_CODE_TYPE,
     EMAIL_CHANGE_CODE_TYPE,
     EMAIL_VERIFY_CODE_TYPE,
@@ -10,9 +10,9 @@ from authentication.constant.code_types import (
     PASSWORD_RESET_CODE_TYPE,
     PHONE_CHANGE_CODE_TYPE,
 )
-from authentication.constant.errors import (
+from authentication.constants.errors import (
     CONFIGURATION_IS_REQUIRED_ERROR,
-    GET_PLANNED_IVENTS_ERROR,
+    GET_PLANNED_EVENTS_ERROR,
     INVALID_CREDENTIALS_ERROR,
     NO_SUCH_USER_ERROR,
     PASSWORDS_DO_NOT_MATCH_ERROR,
@@ -79,6 +79,7 @@ class CreateUpdateProfileSerializer(serializers.ModelSerializer):
             "age",
         ]
 
+
 class UserConfigurationSerializer(serializers.Serializer):
     email: bool = serializers.BooleanField()
     phone: bool = serializers.BooleanField()
@@ -111,7 +112,7 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
         string: str = re.findall(r"\D", planned_events)[0]
         if string not in ["d", "m", "y"]:
             raise serializers.ValidationError(
-                GET_PLANNED_IVENTS_ERROR, HTTP_400_BAD_REQUEST
+                GET_PLANNED_EVENTS_ERROR, HTTP_400_BAD_REQUEST
             )
 
         try:
@@ -201,7 +202,6 @@ class LoginSerializer(serializers.ModelSerializer):
         return {"email": user.email, "tokens": user.tokens}
 
         return super().validate(attrs)
-
 
 
 class UserSerializer(DynamicFieldsModelSerializer):
