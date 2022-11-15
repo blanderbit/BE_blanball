@@ -100,7 +100,7 @@ REST_FRAMEWORK: dict[str, Any] = {
     ),
     "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
-    "DEFAULT_RENDERER_CLASSES": ("config.renderers.CustomRenderer",),
+    # "DEFAULT_RENDERER_CLASSES": ("config.renderers.CustomRenderer",),
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
     "DEFAULT_PAGINATION_CLASS": "config.pagination.CustomPagination",
 }

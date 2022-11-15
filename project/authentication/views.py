@@ -68,7 +68,7 @@ from authentication.services import (
     send_email_template,
 )
 from config.exceptions import _404
-from config.yasg import skip_param
+from config.yasg import skip_param_query
 from django.conf import settings
 from django.db import transaction
 from django.db.models.query import QuerySet
@@ -230,7 +230,7 @@ class UserProfile(GenericAPIView):
             raise _404(object=User)
 
 
-@method_decorator(swagger_auto_schema(manual_parameters=[skip_param]), name="get")
+@method_decorator(swagger_auto_schema(manual_parameters=[skip_param_query]), name="get")
 class UsersList(ListAPIView):
     """
     This class makes it possible to
@@ -261,7 +261,7 @@ class UsersList(ListAPIView):
         return self.queryset.filter(role="User")
 
 
-@method_decorator(swagger_auto_schema(manual_parameters=[skip_param]), name="get")
+@method_decorator(swagger_auto_schema(manual_parameters=[skip_param_query]), name="get")
 class UsersRelevantList(ListAPIView):
     """
     This class makes it possible to get the 5 most
