@@ -1,7 +1,7 @@
 import json
 from typing import Any, Type
 
-from config.yasg import skip_param
+from config.yasg import skip_param_query
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
     method_decorator,
@@ -62,7 +62,7 @@ class NotificationsList(ListAPIView):
     queryset: QuerySet[Notification] = Notification.get_all()
 
 
-@method_decorator(swagger_auto_schema(manual_parameters=[skip_param]), name="get")
+@method_decorator(swagger_auto_schema(manual_parameters=[skip_param_query]), name="get")
 class UserNotificationsList(NotificationsList):
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Notification]:
@@ -96,8 +96,9 @@ class ReadNotifications(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         return Response(
             bulk_read_notifications(
-                data=serializer.validated_data["ids"], queryset=self.queryset,
-                user=request.user
+                data=serializer.validated_data["ids"],
+                queryset=self.queryset,
+                user=request.user,
             ),
             status=HTTP_200_OK,
         )

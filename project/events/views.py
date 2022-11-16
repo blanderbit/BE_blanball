@@ -1,13 +1,19 @@
 from typing import Any, Type, final
-
-from authentication.constants.errors import (
-    NO_SUCH_USER_ERROR,
-)
 from authentication.filters import (
     RankedFuzzySearchFilter,
 )
 from config.exceptions import _404
-from config.yasg import point, skip_param
+from config.yasg import (
+    point_query,
+    skip_param_query,
+    event_type_query,
+    event_status_query,
+    event_gender_query,
+    event_duration_query,
+    event_need_ball_query,
+    event_relevant_searh_query,
+    event_searh_query,
+)
 from django.db.models import Count, Q
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
@@ -126,6 +132,8 @@ class CreateEvent(GenericAPIView):
     gender field options: Man, Wooman
     type field options: Football, Futsal
     forms field options: Shirt-Front, T-Shirt, Any
+    duration field options: 10, 20, 30, 40, 50, 60, 70,
+    80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180",
     """
 
     serializer_class: Type[Serializer] = CreateEventSerializer
@@ -162,8 +170,9 @@ class InviteUserToEvent(GenericAPIView):
 
 class GetEvent(RetrieveModelMixin, GenericAPIView):
     """
-    This endpoint allows the user to
-    get detailed information about any event
+    This endpoint allows the user, with the exception
+    of those blacklisted for this event,
+    get detailed information about any event.
     """
 
     serializer_class: Type[Serializer] = EventSerializer
@@ -175,6 +184,11 @@ class GetEvent(RetrieveModelMixin, GenericAPIView):
 
 
 class UpdateEvent(GenericAPIView):
+    """
+    This endpoint allows the event author
+    to change any data on the event
+    """
+
     serializer_class: Type[Serializer] = UpdateEventSerializer
     queryset: QuerySet[Event] = Event.get_all()
 
@@ -341,9 +355,26 @@ class RemoveUserFromEvent(GenericAPIView):
 
 
 @method_decorator(
-    swagger_auto_schema(manual_parameters=[skip_param, point]), name="get"
+    swagger_auto_schema(
+        manual_parameters=[
+            skip_param_query,
+            point_query,
+            event_type_query,
+            event_status_query,
+            event_gender_query,
+            event_duration_query,
+            event_need_ball_query,
+            event_searh_query,
+        ]
+    ),
+    name="get",
 )
 class EventsList(ListAPIView):
+    """
+    This endpoint allows the user to receive,
+    filter and sort the complete list of site events.
+    """
+
     serializer_class: Type[Serializer] = EventListSerializer
     search_fields: list[str] = [
         "id",
@@ -369,8 +400,20 @@ class EventsList(ListAPIView):
         return self.queryset.filter(~Q(black_list__in=[self.request.user.id]))
 
 
-@method_decorator(swagger_auto_schema(manual_parameters=[skip_param]), name="get")
+@method_decorator(
+    swagger_auto_schema(
+        manual_parameters=[skip_param_query, event_relevant_searh_query]
+    ),
+    name="get",
+)
 class EventsRelevantList(ListAPIView):
+    """
+    This endpoint allows you to get the 5
+    most relevant events for the entered search term.
+    Endpoint supports searching with typos and grammatical
+    errors, as well as searching by the content of letters
+    """
+
     filter_backends = [RankedFuzzySearchFilter]
     serializer_class: Type[Serializer] = EventListSerializer
     queryset: QuerySet[Event] = Event.get_all()
@@ -382,12 +425,19 @@ class EventsRelevantList(ListAPIView):
 
 
 class UserEventsRelevantList(EventsRelevantList):
+    """
+    This endpoint allows you to get the 5
+    most relevant events for the entered search term.
+    Endpoint supports searching with typos and grammatical
+    errors, as well as searching by the content of letters
+    """
+
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Event]:
         return self.queryset.filter(author_id=self.request.user.id)
 
 
-@method_decorator(swagger_auto_schema(manual_parameters=[skip_param]), name="get")
+@method_decorator(swagger_auto_schema(manual_parameters=[skip_param_query]), name="get")
 class InvitesToEventList(ListAPIView):
     """
     This endpoint allows the user to
@@ -425,19 +475,30 @@ class BulkAcceptOrDeclineInvitesToEvent(GenericAPIView):
 
 
 class UserEventsList(EventsList):
+    """
+    This endpoint allows the user to get, filter,
+    sort the list of events on which he is the author
+    """
+
     def get_queryset(self) -> QuerySet[Event]:
         return EventsList.get_queryset(self).filter(author_id=self.request.user.id)
 
 
-class UserParticipantEventsList(UserEventsList):
+class UserParticipantEventsList(EventsList):
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Event]:
         return self.queryset.filter(current_users__in=[self.request.user.id])
 
 
-class PopularEvents(UserEventsList):
+class PopularEvents(EventsList):
+    """
+    This endpoint allows the user to get the first 10
+    scheduled events. Sorting occurs by the number of
+    active users at the event
+    """
+
     serializer_class: Type[Serializer] = PopularEventsListSerializer
-    queryset: QuerySet[Event] = Event.get_all().filter(status="Planned")
+    queryset: QuerySet[Event] = Event.get_all().filter(status=Event.Status.PLANNED)
 
     def get_queryset(self) -> QuerySet[Event]:
         return (
@@ -447,9 +508,19 @@ class PopularEvents(UserEventsList):
         )
 
 
-class UserPlannedEventsList(UserEventsList):
+class UserPlannedEventsList(EventsList):
+    """
+    This endpoint makes it possible to get
+    a list of other user's scheduled events.
+    Scheduled events are displayed depending
+    on the value in the user profile in the
+    get_planned_events field.
+    If the user has a value of 1m, then the
+    records will be displayed one month ahead.
+    """
+
     serializer_class: Type[Serializer] = PopularEventsListSerializer
-    queryset: QuerySet[Event] = Event.get_all().filter(status="Planned")
+    queryset: QuerySet[Event] = Event.get_all().filter(status=Event.Status.PLANNED)
 
     @skip_objects_from_response_by_id
     def list(self, request: Request, pk: int) -> Response:
@@ -462,10 +533,10 @@ class UserPlannedEventsList(UserEventsList):
             )
             return Response(serializer.data, status=HTTP_200_OK)
         except User.DoesNotExist:
-            return Response(NO_SUCH_USER_ERROR, status=HTTP_400_BAD_REQUEST)
+            raise _404(object=User)
 
 
-@method_decorator(swagger_auto_schema(manual_parameters=[skip_param]), name="get")
+@method_decorator(swagger_auto_schema(manual_parameters=[skip_param_query]), name="get")
 class RequestToParticipationsList(ListAPIView):
     """
     This endpoint allows all users to view
@@ -514,12 +585,26 @@ class BulkAcceptOrDeclineRequestToParticipation(GenericAPIView):
 
 
 class GetCoordinatesByPlaceName(GenericAPIView):
+    """
+    This endpoint makes it possible to get
+    the exact coordinates of a place by name
+    Example request:
+    {
+        "place_name": "Paris"
+    }Response:
+    {
+        "name": "Paris, Île-de-France, France métropolitaine,
+            France" - full place name
+        "lat": "48.8588897" - latitude
+        "lon": "2.3200410217200766" - longitude
+    }
+    """
+
     serializer_class: Type[Serializer] = GetCoordinatesByPlaceNameSerializer
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         try:
             geolocator = Nominatim(user_agent="geoapiExercises")
             location = geolocator.geocode(serializer.data["place_name"])
@@ -531,16 +616,30 @@ class GetCoordinatesByPlaceName(GenericAPIView):
                 }
             )
         except AttributeError:
-            return Response(NOTHING_FOUND_FOR_USER_REQUEST_ERROR, HTTP_404_NOT_FOUND)
+            raise _404(detail=NOTHING_FOUND_FOR_USER_REQUEST_ERROR)
 
 
 class GetPlaceNameByCoordinates(GenericAPIView):
+    """
+    This endpoint allows the user to get the
+    name of a point on the map by coordinates
+    Example request:
+    {
+        "lat": "48.8588897" - latitude
+        "lon": "2.3200410217200766" - longitude
+    }Response:
+    {
+    "name": "3, Rue Casimir Périer, Quartier des Invalides,
+            Paris 7e Arrondissement, Faubourg Saint-Germain, Paris,
+            Île-de-France, France métropolitaine, 75007, France" (PARIS)
+    }
+    """
+
     serializer_class: Type[Serializer] = GetPlaceNameByCoordinatesSerializer
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         try:
             geolocator = Nominatim(user_agent="geoapiExercises")
             location = geolocator.reverse(
@@ -552,4 +651,4 @@ class GetPlaceNameByCoordinates(GenericAPIView):
                 }
             )
         except AttributeError:
-            return Response(NOTHING_FOUND_FOR_USER_REQUEST_ERROR, HTTP_404_NOT_FOUND)
+            raise _404(detail=NOTHING_FOUND_FOR_USER_REQUEST_ERROR)
