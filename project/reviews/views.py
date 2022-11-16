@@ -1,6 +1,6 @@
 from typing import Type
 
-from config.yasg import skip_param
+from config.yasg import skip_param_query
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
     method_decorator,
@@ -26,7 +26,7 @@ class ReviewCreate(CreateAPIView):
     queryset: QuerySet[Review] = Review.get_all()
 
 
-@method_decorator(swagger_auto_schema(manual_parameters=[skip_param]), name="get")
+@method_decorator(swagger_auto_schema(manual_parameters=[skip_param_query]), name="get")
 class UserReviewsList(ListAPIView):
     serializer_class: Type[Serializer] = ReviewListSerializer
     queryset: QuerySet[Review] = Review.get_all()

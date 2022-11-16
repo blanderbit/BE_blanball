@@ -69,13 +69,6 @@ class Gender(models.TextChoices):
     WOMAN: str = "Woman"
 
 
-class Role(models.TextChoices):
-    """role choices"""
-
-    USER: str = "User"
-    ADMIN: str = "Admin"
-
-
 def validate_birthday(value: date) -> None:
     if timezone.now().date() - value > timezone.timedelta(days=29200):
         raise ValidationError(MAX_AGE_VALUE_ERROR, HTTP_400_BAD_REQUEST)
@@ -174,7 +167,8 @@ class Profile(models.Model):
                     secret_key=settings.MINIO_SECRET_KEY,
                     secure=False,
                 )
-                new_image_name: str = f"users/{urlsafe_base64_encode(smart_bytes(self.id))}_{timezone.now().date()}"
+                new_image_name: str = f"users/{urlsafe_base64_encode(smart_bytes(self.id))}\
+                    _{timezone.now().date()}.jpeg"
                 client.copy_object(
                     settings.MINIO_MEDIA_FILES_BUCKET,
                     new_image_name,
@@ -197,6 +191,12 @@ class Profile(models.Model):
 
 class User(AbstractBaseUser):
     """basic user model"""
+
+    class Role(models.TextChoices):
+        """role choices"""
+
+        USER: str = "User"
+        ADMIN: str = "Admin"
 
     email: str = models.EmailField(max_length=255, unique=True, db_index=True)
     phone: str = PhoneNumberField(unique=True)
