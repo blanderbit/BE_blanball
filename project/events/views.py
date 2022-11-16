@@ -8,7 +8,7 @@ from config.yasg import (
     skip_param_query,
     event_type_query,
     event_status_query,
-    gender_query,
+    event_gender_query,
     event_duration_query,
     event_need_ball_query,
     event_relevant_searh_query,
@@ -361,7 +361,7 @@ class RemoveUserFromEvent(GenericAPIView):
             point_query,
             event_type_query,
             event_status_query,
-            gender_query,
+            event_gender_query,
             event_duration_query,
             event_need_ball_query,
             event_searh_query,
@@ -402,18 +402,18 @@ class EventsList(ListAPIView):
 
 @method_decorator(
     swagger_auto_schema(
-        manual_parameters=[
-            skip_param_query, 
-            event_relevant_searh_query
-        ]
-    ), name="get")
+        manual_parameters=[skip_param_query, event_relevant_searh_query]
+    ),
+    name="get",
+)
 class EventsRelevantList(ListAPIView):
     """
-    This endpoint allows you to get the 5 
+    This endpoint allows you to get the 5
     most relevant events for the entered search term.
-    Endpoint supports searching with typos and grammatical 
+    Endpoint supports searching with typos and grammatical
     errors, as well as searching by the content of letters
     """
+
     filter_backends = [RankedFuzzySearchFilter]
     serializer_class: Type[Serializer] = EventListSerializer
     queryset: QuerySet[Event] = Event.get_all()
@@ -426,11 +426,12 @@ class EventsRelevantList(ListAPIView):
 
 class UserEventsRelevantList(EventsRelevantList):
     """
-    This endpoint allows you to get the 5 
+    This endpoint allows you to get the 5
     most relevant events for the entered search term.
-    Endpoint supports searching with typos and grammatical 
+    Endpoint supports searching with typos and grammatical
     errors, as well as searching by the content of letters
     """
+
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Event]:
         return self.queryset.filter(author_id=self.request.user.id)
