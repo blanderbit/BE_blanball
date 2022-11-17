@@ -13,6 +13,7 @@ from config.yasg import (
     event_need_ball_query,
     event_relevant_searh_query,
     event_searh_query,
+    distance_query,
 )
 from django.db.models import Count, Q
 from django.db.models.query import QuerySet
@@ -30,7 +31,6 @@ from events.constants.notification_types import (
 from events.constants.response_error import (
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,
     EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,
-    EVENT_NOT_FOUND_ERROR,
     NO_IN_EVENT_FANS_LIST_ERROR,
     NO_IN_EVENT_MEMBERS_LIST_ERROR,
     NOTHING_FOUND_FOR_USER_REQUEST_ERROR,
@@ -80,6 +80,8 @@ from events.services import (
     send_notification_to_subscribe_event_user,
     skip_objects_from_response_by_id,
     validate_user_before_join_to_event,
+    add_dist_filter_to_view,
+    send_message_to_event_author_after_leave_user_from_event,
 )
 from geopy.geocoders import Nominatim
 from notifications.tasks import *
@@ -110,7 +112,6 @@ from rest_framework.status import (
     HTTP_404_NOT_FOUND,
 )
 from rest_framework_gis.filters import (
-    DistanceToPointFilter,
     DistanceToPointOrderingFilter,
 )
 
@@ -308,25 +309,8 @@ class LeaveFromEvent(GenericAPIView):
         event: Event = Event.get_all().get(id=serializer.data["event_id"])
         if user.current_rooms.filter(id=serializer.data["event_id"]).exists():
             user.current_rooms.remove(event)
-            send_to_user(
-                user=event.author,
-                message_type=LEAVE_USER_FROM_THE_EVENT_NOTIFICATION_TYPE,
-                data={
-                    "recipient": {
-                        "id": event.author.id,
-                        "name": event.author.profile.name,
-                        "last_name": event.author.profile.last_name,
-                    },
-                    "event": {
-                        "id": event.id,
-                        "name": event.name,  # +++++++++++++++++++++++++++++
-                    },
-                    "sender": {
-                        "id": user.id,
-                        "name": user.profile.name,
-                        "last_name": user.profile.last_name,
-                    },
-                },
+            send_message_to_event_author_after_leave_user_from_event(
+                event=event, user=user
             )
             return Response(DISCONNECT_FROM_EVENT_SUCCESS, status=HTTP_200_OK)
         return Response(NO_IN_EVENT_MEMBERS_LIST_ERROR, status=HTTP_400_BAD_REQUEST)
@@ -365,6 +349,7 @@ class RemoveUserFromEvent(GenericAPIView):
             event_duration_query,
             event_need_ball_query,
             event_searh_query,
+            distance_query,
         ]
     ),
     name="get",
@@ -394,8 +379,10 @@ class EventsList(ListAPIView):
         DistanceToPointOrderingFilter,
     ]
     distance_ordering_filter_field: str = "coordinates"
+    distance_filter_convert_meters = True
 
     @skip_objects_from_response_by_id
+    @add_dist_filter_to_view
     def get_queryset(self) -> QuerySet[Event]:
         return self.queryset.filter(~Q(black_list__in=[self.request.user.id]))
 

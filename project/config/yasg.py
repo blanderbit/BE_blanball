@@ -146,3 +146,17 @@ users_ordering = openapi.Parameter(
         will be in reverse order.",
     type=openapi.TYPE_STRING,
 )
+distance_query = openapi.Parameter(
+    "dist",
+    openapi.IN_QUERY,
+    description="This option allows the user to filter \
+    the list of events or the list of users by a radius \
+    specified in meters. \nThis parameter cannot work \
+    independently, it depends on the point parameter, \
+    because it is the point that is considered \
+    to be the starting point from which the \
+    radius is calculated.\
+    \n!!! If you enter a value with a minus sign, the \
+    parameter will be simply ignored !!!",
+    type=openapi.TYPE_INTEGER,
+)

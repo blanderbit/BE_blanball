@@ -2,6 +2,11 @@ import re
 from collections import OrderedDict
 from typing import Any, List, Union
 
+from django.core.validators import (
+    MaxValueValidator,
+    MinValueValidator,
+)
+
 from authentication.constants.code_types import (
     ACCOUNT_DELETE_CODE_TYPE,
     EMAIL_CHANGE_CODE_TYPE,
@@ -26,6 +31,38 @@ from rest_framework import serializers
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
+
+
+class PlaceSerializer(serializers.Serializer):
+    place_name: str = serializers.CharField(max_length=255)
+    lat: float = serializers.FloatField(
+        validators=[
+            MinValueValidator(-90),
+            MaxValueValidator(90),
+        ]
+    )
+    lon: float = serializers.FloatField(
+        validators=[
+            MinValueValidator(-180),
+            MaxValueValidator(180),
+        ]
+    )
+
+    class Meta:
+        fields = [
+            "place_name",
+            "lon",
+            "lat",
+        ]
+
+
+class UserPublicProfilePlaceSerializer(serializers.Serializer):
+    place_name: str = serializers.CharField(max_length=255)
+
+    class Meta:
+        fields = [
+            "place_name",
+        ]
 
 
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
@@ -66,17 +103,24 @@ class EventUsersSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+    place = UserPublicProfilePlaceSerializer()
+
     class Meta:
         model: Profile = Profile
-        fields: Union[str, list[str]] = "__all__"
+        exclude: Union[str, list[str]] = [
+            "coordinates",
+        ]
 
 
 class CreateUpdateProfileSerializer(serializers.ModelSerializer):
+    place = PlaceSerializer()
+
     class Meta:
         model: Profile = Profile
         exclude: Union[str, list[str]] = [
             "created_at",
             "age",
+            "coordinates",
         ]
 
 

@@ -11,7 +11,6 @@ from authentication.constants.code_types import (
 from authentication.constants.errors import (
     ALREADY_VERIFIED_ERROR,
     NO_PERMISSIONS_ERROR,
-    NO_SUCH_IMAGE_ERROR,
     THIS_EMAIL_ALREADY_IN_USE_ERROR,
     WRONG_PASSWORD_ERROR,
 )
@@ -210,6 +209,7 @@ class UpdateProfile(GenericAPIView):
     serializer_class: Type[Serializer] = UpdateProfileSerializer
     queryset: QuerySet[User] = User.get_all()
 
+    @transaction.atomic
     def patch(self, request: Request) -> Response:
         user: User = self.queryset.get(id=self.request.user.id)
         serializer = self.serializer_class(user, data=request.data)

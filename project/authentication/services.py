@@ -28,6 +28,13 @@ from django.template.loader import (
 )
 from django.utils import timezone
 from rest_framework.serializers import Serializer
+from django.utils.encoding import smart_bytes
+from django.utils.http import (
+    urlsafe_base64_decode,
+    urlsafe_base64_encode,
+)
+from minio import Minio
+from minio.commonconfig import REPLACE, CopySource
 
 from .tasks import Util
 

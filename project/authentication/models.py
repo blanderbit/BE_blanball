@@ -1,6 +1,6 @@
 import os
 from datetime import date, datetime
-from typing import Any, Optional, final
+from typing import Any, Optional, final, Union
 
 from authentication.constants.errors import (
     MAX_AGE_VALUE_ERROR,
@@ -44,6 +44,10 @@ from rest_framework_simplejwt.tokens import (
     AccessToken,
     RefreshToken,
 )
+from django.contrib.gis.db.models import (
+    PointField,
+)
+from django.contrib.gis.geos import Point
 
 
 class UserManager(BaseUserManager):
@@ -147,6 +151,8 @@ class Profile(models.Model):
     working_leg: Optional[str] = models.CharField(
         choices=Leg.choices, max_length=255, null=True
     )
+    place: dict[str, Union[str, float]] = models.JSONField()
+    coordinates: Point = PointField(null=True, srid=4326)
 
     @final
     def __repr__(self) -> str:
@@ -158,6 +164,8 @@ class Profile(models.Model):
 
     @final
     def save(self, *args: Any, **kwargs: Any) -> None:
+        if self.place != None:
+            self.coordinates = Point(self.place["lon"], self.place["lat"])
         super(Profile, self).save(*args, **kwargs)
         try:
             if self.avatar != None:
