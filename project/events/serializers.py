@@ -30,33 +30,11 @@ from rest_framework import serializers
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
-
-
-class EventPlaceSerializer(serializers.Serializer):
-    place_name: str = serializers.CharField(max_length=255)
-    lat: float = serializers.FloatField(
-        validators=[
-            MinValueValidator(-90),
-            MaxValueValidator(90),
-        ]
-    )
-    lon: float = serializers.FloatField(
-        validators=[
-            MinValueValidator(-180),
-            MaxValueValidator(180),
-        ]
-    )
-
-    class Meta:
-        fields = [
-            "place_name",
-            "lon",
-            "lat",
-        ]
+from authentication.serializers import PlaceSerializer
 
 
 class CreateEventSerializer(serializers.ModelSerializer):
-    place = EventPlaceSerializer()
+    place = PlaceSerializer()
 
     class Meta:
         model: Event = Event
@@ -71,7 +49,7 @@ class CreateEventSerializer(serializers.ModelSerializer):
 
 
 class UpdateEventSerializer(serializers.ModelSerializer):
-    place = EventPlaceSerializer()
+    place = PlaceSerializer()
 
     class Meta:
         model: Event = Event
@@ -115,7 +93,7 @@ class PopularEventsListSerializer(serializers.ModelSerializer):
 
 
 class EventListSerializer(serializers.ModelSerializer):
-    place = EventPlaceSerializer()
+    place = PlaceSerializer()
 
     class Meta:
         model: Event = Event

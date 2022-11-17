@@ -23,13 +23,13 @@ from events.constants.notification_types import (
     RESPONSE_TO_THE_INVITE_TO_EVENT_NOTIFICATION_TYPE,
     RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_NOTIFICATION_TYPE,
     USER_REMOVE_FROM_EVENT_NOTIFICATION_TYPE,
+    LEAVE_USER_FROM_THE_EVENT_NOTIFICATION_TYPE,
 )
 from events.constants.response_error import (
     ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR,
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,
     ALREADY_SENT_REQUEST_TO_PARTICIPATE_ERROR,
     EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,
-    EVENT_NOT_FOUND_ERROR,
     GET_PLANNED_EVENTS_ERROR,
 )
 from events.models import (
@@ -49,6 +49,9 @@ from rest_framework.serializers import (
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
+from rest_framework_gis.filters import (
+    DistanceToPointFilter,
+)
 
 bulk = TypeVar(Optional[Generator[list[dict[str, int]], None, None]])
 
@@ -64,6 +67,42 @@ def bulk_delete_events(
                 yield {"success": event_id}
         except Event.DoesNotExist:
             pass
+
+
+
+
+def send_message_after_bulk_accept_or_decline(
+    *, object: Union[RequestToParticipation, InviteToEvent], 
+    message_type: str, response: bool
+) -> None:
+    if isinstance(object, RequestToParticipation):
+        message_obejct_name: str = "request"
+    if isinstance(object, InviteToEvent):
+        message_obejct_name: str = "invite"
+    send_to_user(
+        user=object.sender,
+        message_type=message_type,
+        data={
+            "recipient": {
+                "id": object.sender.id,
+                "name": object.sender.profile.name,
+                "last_name": object.sender.profile.last_name,
+            },
+            "event": {
+                "id": object.event.id,
+                "name": object.event.name,
+            },
+            message_obejct_name: {
+                "id": object.id,
+                "response": response,
+            },
+            "sender": {
+                "id": object.recipient.id,
+                "name": object.recipient.profile.name,
+                "last_name": object.recipient.profile.last_name,
+            },
+        },
+    )
 
 
 def bulk_accept_or_decline_invites_to_events(
@@ -82,31 +121,10 @@ def bulk_accept_or_decline_invites_to_events(
                         invite.recipient.current_rooms.add(invite.event)
                     else:
                         invite.status = invite.Status.DECLINED
-
                     invite.save()
-                    send_to_user(
-                        user=invite.sender,
-                        message_type=RESPONSE_TO_THE_INVITE_TO_EVENT_NOTIFICATION_TYPE,
-                        data={
-                            "recipient": {
-                                "id": invite.sender.id,
-                                "name": invite.sender.profile.name,
-                                "last_name": invite.sender.profile.last_name,
-                            },
-                            "event": {
-                                "id": invite.event.id,
-                                "name": invite.event.name,
-                            },
-                            "invite": {
-                                "id": invite.id,
-                                "response": data["type"],
-                            },
-                            "sender": {
-                                "id": invite.recipient.id,
-                                "name": invite.recipient.profile.name,
-                                "last_name": invite.recipient.profile.last_name,
-                            },
-                        },
+                    send_message_after_bulk_accept_or_decline(
+                        object=invite, message_type=RESPONSE_TO_THE_INVITE_TO_EVENT_NOTIFICATION_TYPE,
+                        response=data["type"]
                     )
                     yield {"success": invite_id}
 
@@ -136,32 +154,11 @@ def bulk_accpet_or_decline_requests_to_participation(
                 else:
                     request_to_p.status = request_to_p.Status.DECLINED
                 request_to_p.save()
-                send_to_user(
-                    user=request_to_p.sender,
-                    message_type=RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_NOTIFICATION_TYPE,
-                    data={
-                        "recipient": {
-                            "id": request_to_p.sender.id,
-                            "name": request_to_p.sender.profile.name,
-                            "last_name": request_to_p.sender.profile.last_name,
-                        },
-                        "event": {
-                            "id": request_to_p.event.id,
-                            "name": request_to_p.event.name,
-                        },
-                        "request": {
-                            "id": request_to_p.id,
-                            "response": data["type"],
-                        },
-                        "sender": {
-                            "id": request_to_p.recipient.id,
-                            "name": request_to_p.recipient.profile.name,
-                            "last_name": request_to_p.recipient.profile.last_name,
-                        },
-                    },
+                send_message_after_bulk_accept_or_decline(
+                    object=request_to_p, message_type=RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_NOTIFICATION_TYPE,
+                    response=data["type"]
                 )
                 yield {"success": request_id}
-
         except RequestToParticipation.DoesNotExist:
             pass
 
@@ -355,3 +352,46 @@ def skip_objects_from_response_by_id(
             return func(self, *args, **kwargs)
 
     return wrap
+
+
+def add_dist_filter_to_view(
+    func: Callable[[..., ...], QuerySet[QuerySet[Union[User, Event]]]]
+) -> Callable[[..., ...], QuerySet[QuerySet[Union[User, Event]]]]:
+    def wrap(self) -> QuerySet[Union[User, Event]]:
+        try:
+            distance: int = self.request.query_params["dist"]
+            if distance < 0:
+                distance = None
+            if distance != None:
+                self.filter_backends.append(DistanceToPointFilter)
+                self.distance_filter_field = "coordinates"
+                return func(self)
+        except:
+            return func(self)
+
+    return wrap
+
+
+def send_message_to_event_author_after_leave_user_from_event(
+    *, event: Event, user: User
+) -> None:
+    send_to_user(
+        user=event.author,
+        message_type=LEAVE_USER_FROM_THE_EVENT_NOTIFICATION_TYPE,
+        data={
+            "recipient": {
+                "id": event.author.id,
+                "name": event.author.profile.name,
+                "last_name": event.author.profile.last_name,
+            },
+            "event": {
+                "id": event.id,
+                "name": event.name,
+            },
+            "sender": {
+                "id": user.id,
+                "name": user.profile.name,
+                "last_name": user.profile.last_name,
+            },
+        },
+    )
