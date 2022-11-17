@@ -19,18 +19,47 @@ from reviews.serializers import (
     CreateReviewSerializer,
     ReviewListSerializer,
 )
+from reviews.services import (
+    hide_user_reviews,
+)
 
 
 class ReviewCreate(CreateAPIView):
+    """
+    This endpoint gives you the ability
+    to set up a review for another user.
+    Based on each new review, the recipient's
+    rating will be recalculated. The rating is
+    calculated using the arithmetic mean formula.
+    """
+
     serializer_class: Type[Serializer] = CreateReviewSerializer
     queryset: QuerySet[Review] = Review.get_all()
 
 
 @method_decorator(swagger_auto_schema(manual_parameters=[skip_param_query]), name="get")
-class UserReviewsList(ListAPIView):
+class MyReviewsList(ListAPIView):
+    """
+    This endpoint allows the user to
+    get a list of reviews left to him.
+    """
+
     serializer_class: Type[Serializer] = ReviewListSerializer
     queryset: QuerySet[Review] = Review.get_all()
 
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Review]:
-        return self.queryset.filter(user=self.request.user.id)
+        return self.queryset.filter(user_id=self.request.user.id)
+
+
+class UserReviewsList(MyReviewsList):
+    """
+    This endpoint makes it possible to
+    get a list of reviews of any user,
+    if access to them is open.
+    """
+
+    @hide_user_reviews
+    @skip_objects_from_response_by_id
+    def get_queryset(self) -> QuerySet[Review]:
+        return self.queryset.filter(user_id=self.kwargs["pk"])

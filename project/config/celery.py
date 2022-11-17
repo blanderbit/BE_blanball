@@ -23,4 +23,8 @@ app.conf.beat_schedule = {
         "task": "authentication.tasks.check_user_age",
         "schedule": crontab(minute=0, hour=0),
     },
+    "delete_expire_notifications": {
+        "task": "notifications.tasks.delete_expire_notifications",
+        "schedule": crontab(minute=0, hour=0),
+    },
 }

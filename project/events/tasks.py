@@ -42,3 +42,4 @@ def check_event_start_time() -> None:
         ) * 1440 + event.duration <= 0:
             event.status = event.Status.FINISHED
             event.save()
+
