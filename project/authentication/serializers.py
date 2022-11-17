@@ -83,11 +83,13 @@ class CreateUpdateProfileSerializer(serializers.ModelSerializer):
 class UserConfigurationSerializer(serializers.Serializer):
     email: bool = serializers.BooleanField()
     phone: bool = serializers.BooleanField()
+    show_reviews: bool = serializers.BooleanField()
 
     class Meta:
         fields: Union[str, list[str]] = [
             "email",
             "phone",
+            "show_reviews",
         ]
 
 
@@ -107,7 +109,7 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
         self, attrs: OrderedDict
     ) -> Union[serializers.ValidationError, OrderedDict]:
         conf: str = attrs.get("configuration")
-        keys: list[str] = ["email", "phone"]
+        keys: list[str] = ["email", "phone", "show_reviews"]
         planned_events = attrs.get("get_planned_events")
         string: str = re.findall(r"\D", planned_events)[0]
         if string not in ["d", "m", "y"]:
