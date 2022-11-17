@@ -46,6 +46,7 @@ class CreateReviewSerializer(ModelSerializer):
                     "id": review.user.id,
                     "name": review.user.profile.name,
                     "last_name": review.user.profile.last_name,
+                    "avatar": review.user.profile.avatar,
                 },
                 "review": {
                     "id": review.id,
@@ -54,6 +55,7 @@ class CreateReviewSerializer(ModelSerializer):
                     "id": review.author.id,
                     "name": review.author.profile.name,
                     "last_name": review.author.profile.last_name,
+                    "avatar": review.author.profile.avatar,
                 },
             },
         )

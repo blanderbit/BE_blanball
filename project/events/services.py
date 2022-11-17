@@ -87,6 +87,7 @@ def send_message_after_bulk_accept_or_decline(
                 "id": object.sender.id,
                 "name": object.sender.profile.name,
                 "last_name": object.sender.profile.last_name,
+                "avatar": object.sender.profile.avatar,
             },
             "event": {
                 "id": object.event.id,
@@ -100,6 +101,7 @@ def send_message_after_bulk_accept_or_decline(
                 "id": object.recipient.id,
                 "name": object.recipient.profile.name,
                 "last_name": object.recipient.profile.last_name,
+                "avatar": object.recipient.profile.avatar,
             },
         },
     )
@@ -244,6 +246,7 @@ def send_notification_to_event_author(*, event: Event, request_user: User) -> No
                 "id": event.author.id,
                 "name": event.author.profile.name,
                 "last_name": event.author.profile.last_name,
+                "avatar": event.author.profile.avatar,
             },
             "event": {
                 "id": event.id,
@@ -253,6 +256,7 @@ def send_notification_to_event_author(*, event: Event, request_user: User) -> No
                 "id": request_user.id,
                 "name": request_user.profile.name,
                 "last_name": request_user.profile.last_name,
+                "avatar": request_user.profile.avatar,
             },
         },
     )
@@ -385,6 +389,7 @@ def send_message_to_event_author_after_leave_user_from_event(
                 "id": event.author.id,
                 "name": event.author.profile.name,
                 "last_name": event.author.profile.last_name,
+                "avatar": event.author.profile.avatar,
             },
             "event": {
                 "id": event.id,
@@ -394,6 +399,7 @@ def send_message_to_event_author_after_leave_user_from_event(
                 "id": user.id,
                 "name": user.profile.name,
                 "last_name": user.profile.last_name,
+                "avatar": user.profile.avatar,
             },
         },
     )
