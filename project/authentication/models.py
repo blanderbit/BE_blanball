@@ -1,6 +1,6 @@
 import os
 from datetime import date, datetime
-from typing import Any, Optional, final
+from typing import Any, Optional, final, Union
 
 from authentication.constants.errors import (
     MAX_AGE_VALUE_ERROR,
@@ -44,6 +44,10 @@ from rest_framework_simplejwt.tokens import (
     AccessToken,
     RefreshToken,
 )
+from django.contrib.gis.db.models import (
+    PointField,
+)
+from django.contrib.gis.geos import Point
 
 
 class UserManager(BaseUserManager):
@@ -69,13 +73,6 @@ class Gender(models.TextChoices):
     WOMAN: str = "Woman"
 
 
-class Role(models.TextChoices):
-    """role choices"""
-
-    USER: str = "User"
-    ADMIN: str = "Admin"
-
-
 def validate_birthday(value: date) -> None:
     if timezone.now().date() - value > timezone.timedelta(days=29200):
         raise ValidationError(MAX_AGE_VALUE_ERROR, HTTP_400_BAD_REQUEST)
@@ -85,7 +82,7 @@ def validate_birthday(value: date) -> None:
 
 @final
 def configuration_dict() -> dict[str, bool]:
-    return {"email": True, "phone": True}
+    return {"email": True, "phone": True, "show_reviews": True}
 
 
 def image_file_name(instance: "Profile", filename: str) -> str:
@@ -154,6 +151,8 @@ class Profile(models.Model):
     working_leg: Optional[str] = models.CharField(
         choices=Leg.choices, max_length=255, null=True
     )
+    place: dict[str, Union[str, float]] = models.JSONField()
+    coordinates: Point = PointField(null=True, srid=4326)
 
     @final
     def __repr__(self) -> str:
@@ -165,6 +164,8 @@ class Profile(models.Model):
 
     @final
     def save(self, *args: Any, **kwargs: Any) -> None:
+        if self.place != None:
+            self.coordinates = Point(self.place["lon"], self.place["lat"])
         super(Profile, self).save(*args, **kwargs)
         try:
             if self.avatar != None:
@@ -174,7 +175,8 @@ class Profile(models.Model):
                     secret_key=settings.MINIO_SECRET_KEY,
                     secure=False,
                 )
-                new_image_name: str = f"users/{urlsafe_base64_encode(smart_bytes(self.id))}_{timezone.now().date()}"
+                new_image_name: str = f"users/{urlsafe_base64_encode(smart_bytes(self.id))}\
+                    _{timezone.now().date()}.jpeg"
                 client.copy_object(
                     settings.MINIO_MEDIA_FILES_BUCKET,
                     new_image_name,
@@ -197,6 +199,12 @@ class Profile(models.Model):
 
 class User(AbstractBaseUser):
     """basic user model"""
+
+    class Role(models.TextChoices):
+        """role choices"""
+
+        USER: str = "User"
+        ADMIN: str = "Admin"
 
     email: str = models.EmailField(max_length=255, unique=True, db_index=True)
     phone: str = PhoneNumberField(unique=True)

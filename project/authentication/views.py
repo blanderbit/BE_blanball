@@ -11,7 +11,6 @@ from authentication.constants.code_types import (
 from authentication.constants.errors import (
     ALREADY_VERIFIED_ERROR,
     NO_PERMISSIONS_ERROR,
-    NO_SUCH_IMAGE_ERROR,
     THIS_EMAIL_ALREADY_IN_USE_ERROR,
     WRONG_PASSWORD_ERROR,
 )
@@ -68,7 +67,14 @@ from authentication.services import (
     send_email_template,
 )
 from config.exceptions import _404
-from config.yasg import skip_param
+from config.yasg import (
+    skip_param_query,
+    users_relevant_searh_query,
+    users_profile__position_query,
+    users_profile__gender_query,
+    users_is_online_query,
+    users_ordering,
+)
 from django.conf import settings
 from django.db import transaction
 from django.db.models.query import QuerySet
@@ -105,9 +111,24 @@ from rest_framework.status import (
 
 class RegisterUser(GenericAPIView):
     """
-    This class allows the user to register in the application.
-    If the user entered the correct data,
-    he will receive 2 tokens [Access and Refresh] otherwise there will be an error.
+    This endpoint allows any user to register on the site.
+    The email and phone number fields are required
+    and must be unique!
+    The birthday field has some restrictions: the date of
+    birth must not be less than 6 years ago and not
+    more than 80 years ago.
+
+    List of required fields: "email", "phone", "password",
+    "re_password", "name", "last_name", "gender"
+
+    List of optional fields:  "birthday", "height",
+    "weight", "position", "about_me", "working_leg",
+    "avatar"
+
+    position field options: "GK", "LB", "RB", "CB",
+    "LWB", "RWB", "CDM", "CM", "CAM", "RM", "LM", "RF",
+    "CF", "LF", "ST"
+    working_leg options: "Left", "Right"
     """
 
     serializer_class: Type[Serializer] = RegisterSerializer
@@ -139,15 +160,8 @@ class RegisterUser(GenericAPIView):
 
 class LoginUser(GenericAPIView):
     """
-    This class gives the user the  ability to log in to the site.
-    If the user entered the correct data, пe will receive 2 tokens
-    [Access and Refresh] otherwise there will be an error.
-
-    Example request:
-    {
-        "email": "user@example.com",
-        "password": "stringst"
-    }
+    This endpoint allows a previously
+    registered user to log in to the system.
     """
 
     serializer_class: Type[Serializer] = LoginSerializer
@@ -195,6 +209,7 @@ class UpdateProfile(GenericAPIView):
     serializer_class: Type[Serializer] = UpdateProfileSerializer
     queryset: QuerySet[User] = User.get_all()
 
+    @transaction.atomic
     def patch(self, request: Request) -> Response:
         user: User = self.queryset.get(id=self.request.user.id)
         serializer = self.serializer_class(user, data=request.data)
@@ -230,15 +245,22 @@ class UserProfile(GenericAPIView):
             raise _404(object=User)
 
 
-@method_decorator(swagger_auto_schema(manual_parameters=[skip_param]), name="get")
+@method_decorator(
+    swagger_auto_schema(
+        manual_parameters=[
+            skip_param_query,
+            users_profile__position_query,
+            users_profile__gender_query,
+            users_is_online_query,
+            users_ordering,
+        ]
+    ),
+    name="get",
+)
 class UsersList(ListAPIView):
     """
     This class makes it possible to
     get a list of all users of the application.
-
-    The list can also be filtered by such parameters as (ordering, search filter).
-    Possible filter options are specified in the
-    ordering_fields and search_fields parameters, respectively.
     """
 
     serializer_class: Type[Serializer] = UsersListSerializer
@@ -261,14 +283,16 @@ class UsersList(ListAPIView):
         return self.queryset.filter(role="User")
 
 
-@method_decorator(swagger_auto_schema(manual_parameters=[skip_param]), name="get")
+@method_decorator(
+    swagger_auto_schema(
+        manual_parameters=[skip_param_query, users_relevant_searh_query]
+    ),
+    name="get",
+)
 class UsersRelevantList(ListAPIView):
     """
     This class makes it possible to get the 5 most
     relevant users for a search query.
-
-    The fields for which you can make a request are indicated in search_fields
-
     """
 
     filter_backends = [

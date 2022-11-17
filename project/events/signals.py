@@ -1,4 +1,3 @@
-from gettext import install
 from typing import Any, Union
 
 from authentication.models import User

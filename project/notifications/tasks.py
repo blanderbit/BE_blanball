@@ -12,6 +12,7 @@ from notifications.constants.notification_types import (
     ALL_USER_NOTIFICATIONS_DELETED_NOTIFICATION_TYPE,
 )
 from notifications.models import Notification
+from django.utils import timezone
 
 
 @app.task(
@@ -96,3 +97,10 @@ def delete_all_user_notifications(*, request_user_id: int) -> None:
             )
         except User.DoesNotExist:
             pass
+
+
+@app.task
+def delete_expire_notifications():
+    Notification.objects.filter(
+        time_created__lte=timezone.now() - timezone.timedelta(days=85)
+    )
