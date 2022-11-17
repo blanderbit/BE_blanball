@@ -1,6 +1,6 @@
 from typing import Type
 
-from config.yasg import skip_param_query
+from config.openapi import skip_param_query
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
     method_decorator,
