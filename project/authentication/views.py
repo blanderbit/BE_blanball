@@ -67,13 +67,9 @@ from authentication.services import (
     send_email_template,
 )
 from config.exceptions import _404
-from config.yasg import (
-    skip_param_query,
-    users_relevant_searh_query,
-    users_profile__position_query,
-    users_profile__gender_query,
-    users_is_online_query,
-    users_ordering,
+from authentication.openapi import (
+    users_relevant_list_query_params,
+    users_list_query_params,
 )
 from django.conf import settings
 from django.db import transaction
@@ -246,15 +242,7 @@ class UserProfile(GenericAPIView):
 
 
 @method_decorator(
-    swagger_auto_schema(
-        manual_parameters=[
-            skip_param_query,
-            users_profile__position_query,
-            users_profile__gender_query,
-            users_is_online_query,
-            users_ordering,
-        ]
-    ),
+    swagger_auto_schema(manual_parameters=users_list_query_params),
     name="get",
 )
 class UsersList(ListAPIView):
@@ -284,9 +272,7 @@ class UsersList(ListAPIView):
 
 
 @method_decorator(
-    swagger_auto_schema(
-        manual_parameters=[skip_param_query, users_relevant_searh_query]
-    ),
+    swagger_auto_schema(manual_parameters=users_relevant_list_query_params),
     name="get",
 )
 class UsersRelevantList(ListAPIView):

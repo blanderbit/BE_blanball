@@ -69,11 +69,11 @@ def bulk_delete_events(
             pass
 
 
-
-
 def send_message_after_bulk_accept_or_decline(
-    *, object: Union[RequestToParticipation, InviteToEvent], 
-    message_type: str, response: bool
+    *,
+    object: Union[RequestToParticipation, InviteToEvent],
+    message_type: str,
+    response: bool,
 ) -> None:
     if isinstance(object, RequestToParticipation):
         message_obejct_name: str = "request"
@@ -123,8 +123,9 @@ def bulk_accept_or_decline_invites_to_events(
                         invite.status = invite.Status.DECLINED
                     invite.save()
                     send_message_after_bulk_accept_or_decline(
-                        object=invite, message_type=RESPONSE_TO_THE_INVITE_TO_EVENT_NOTIFICATION_TYPE,
-                        response=data["type"]
+                        object=invite,
+                        message_type=RESPONSE_TO_THE_INVITE_TO_EVENT_NOTIFICATION_TYPE,
+                        response=data["type"],
                     )
                     yield {"success": invite_id}
 
@@ -155,8 +156,9 @@ def bulk_accpet_or_decline_requests_to_participation(
                     request_to_p.status = request_to_p.Status.DECLINED
                 request_to_p.save()
                 send_message_after_bulk_accept_or_decline(
-                    object=request_to_p, message_type=RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_NOTIFICATION_TYPE,
-                    response=data["type"]
+                    object=request_to_p,
+                    message_type=RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_NOTIFICATION_TYPE,
+                    response=data["type"],
                 )
                 yield {"success": request_id}
         except RequestToParticipation.DoesNotExist:
