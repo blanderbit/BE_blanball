@@ -3,18 +3,11 @@ from authentication.filters import (
     RankedFuzzySearchFilter,
 )
 from config.exceptions import _404
-from config.yasg import (
-    point_query,
-    skip_param_query,
-    event_type_query,
-    event_status_query,
-    event_gender_query,
-    event_duration_query,
-    event_need_ball_query,
-    event_relevant_searh_query,
-    event_searh_query,
-    distance_query,
+from events.openapi import (
+    events_list_query_params,
+    events_relevant_list_query_params,
 )
+from config.openapi import skip_param_query
 from django.db.models import Count, Q
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
@@ -26,7 +19,6 @@ from django_filters.rest_framework import (
 from drf_yasg.utils import swagger_auto_schema
 from events.constants.notification_types import (
     EVENT_UPDATE_NOTIFICATION_TYPE,
-    LEAVE_USER_FROM_THE_EVENT_NOTIFICATION_TYPE,
 )
 from events.constants.response_error import (
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,
@@ -339,19 +331,7 @@ class RemoveUserFromEvent(GenericAPIView):
 
 
 @method_decorator(
-    swagger_auto_schema(
-        manual_parameters=[
-            skip_param_query,
-            point_query,
-            event_type_query,
-            event_status_query,
-            event_gender_query,
-            event_duration_query,
-            event_need_ball_query,
-            event_searh_query,
-            distance_query,
-        ]
-    ),
+    swagger_auto_schema(manual_parameters=events_list_query_params),
     name="get",
 )
 class EventsList(ListAPIView):
@@ -388,9 +368,7 @@ class EventsList(ListAPIView):
 
 
 @method_decorator(
-    swagger_auto_schema(
-        manual_parameters=[skip_param_query, event_relevant_searh_query]
-    ),
+    swagger_auto_schema(manual_parameters=events_relevant_list_query_params),
     name="get",
 )
 class EventsRelevantList(ListAPIView):
@@ -424,7 +402,10 @@ class UserEventsRelevantList(EventsRelevantList):
         return self.queryset.filter(author_id=self.request.user.id)
 
 
-@method_decorator(swagger_auto_schema(manual_parameters=[skip_param_query]), name="get")
+@method_decorator(
+    swagger_auto_schema(manual_parameters=[skip_param_query]),
+    name="get",
+)
 class InvitesToEventList(ListAPIView):
     """
     This endpoint allows the user to
