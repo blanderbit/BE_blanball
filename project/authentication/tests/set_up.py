@@ -34,6 +34,11 @@ class SetUpAauthenticationViews(APITestCase):
             "password": "string11",
             "re_password": "string11",
             "profile": {
+                "place": {
+                    "place_name": "string",
+                    "lat": 90,
+                    "lon": 180
+                },
                 "name": "string",
                 "last_name": "string",
                 "gender": "Man",
@@ -50,6 +55,11 @@ class SetUpAauthenticationViews(APITestCase):
             "password": "string12121",
             "re_password": "string11",
             "profile": {
+                "place": {
+                    "place_name": "string",
+                    "lat": 90,
+                    "lon": 180
+                },
                 "name": "string",
                 "last_name": "string",
                 "gender": "Man",
@@ -66,6 +76,11 @@ class SetUpAauthenticationViews(APITestCase):
             "password": "string11",
             "re_password": "string11",
             "profile": {
+                "place": {
+                    "place_name": "string",
+                    "lat": 90,
+                    "lon": 180
+                },
                 "name": "string",
                 "last_name": "string",
                 "gender": "Man",

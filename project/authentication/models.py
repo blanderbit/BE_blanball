@@ -151,7 +151,7 @@ class Profile(models.Model):
     working_leg: Optional[str] = models.CharField(
         choices=Leg.choices, max_length=255, null=True
     )
-    place: dict[str, Union[str, float]] = models.JSONField()
+    place: dict[str, Union[str, float]] = models.JSONField(null=True)
     coordinates: Point = PointField(null=True, srid=4326)
 
     @final

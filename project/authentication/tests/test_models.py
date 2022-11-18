@@ -14,7 +14,8 @@ class TestAuthenticationModels(SetUpAuthenticationModels):
         self.assertEqual(self.user.profile_id, self.profile.id)
 
     def test_user_configuration(self) -> None:
-        self.assertEqual(self.user.configuration, {"email": True, "phone": True})
+        self.assertEqual(self.user.configuration, {"email": True, "phone": True, 
+            "show_reviews": True})
 
     def test_check_user_defalut_fields(self) -> None:
         self.assertEqual(self.user.get_planned_events, "1m")

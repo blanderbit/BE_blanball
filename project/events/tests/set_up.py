@@ -8,7 +8,11 @@ class SetUpEventsViews(APITestCase):
         self.event_create_data = {
             "name": "string",
             "description": "string",
-            "place": "string",
+            "place": {
+                "place_name": "string",
+                "lat": 90,
+                "lon": 180
+            },
             "gender": "Man",
             "date_and_time": "2022-9-30T10:44:32.275Z",
             "contact_number": "+380683861202",
@@ -27,7 +31,11 @@ class SetUpEventsViews(APITestCase):
         self.event_create_withount_phone_data = {
             "name": "string",
             "description": "string",
-            "place": "string",
+            "place": {
+                "place_name": "string",
+                "lat": 90,
+                "lon": 180
+            },
             "gender": "Man",
             "date_and_time": "2022-9-30T10:44:32.275Z",
             "need_ball": True,
@@ -45,7 +53,11 @@ class SetUpEventsViews(APITestCase):
         self.event_update_data = {
             "name": "updated",
             "description": "string",
-            "place": "string",
+            "place": {
+                "place_name": "string",
+                "lat": 90,
+                "lon": 180
+            },
             "gender": "Man",
             "date_and_time": "2022-9-30T10:44:32.275Z",
             "contact_number": "+380683861202",
@@ -68,6 +80,11 @@ class SetUpEventsViews(APITestCase):
             "password": "string11",
             "re_password": "string11",
             "profile": {
+                "place": {
+                    "place_name": "string",
+                    "lat": 90,
+                    "lon": 180
+                },
                 "name": "string",
                 "last_name": "string",
                 "gender": "Man",
@@ -85,6 +102,11 @@ class SetUpEventsViews(APITestCase):
             "password": "string11",
             "re_password": "string11",
             "profile": {
+                "place": {
+                    "place_name": "string",
+                    "lat": 90,
+                    "lon": 180
+                },
                 "name": "string",
                 "last_name": "string",
                 "gender": "Man",
