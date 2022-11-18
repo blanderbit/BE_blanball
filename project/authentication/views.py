@@ -172,22 +172,22 @@ class LoginUser(GenericAPIView):
 
 
 class UserOwnerProfile(GenericAPIView):
-    """
-    This class allows an authorized user to
-    get detailed information about their profile,
-    as well as send a request to delete it
-    """
-
     serializer_class = UserSerializer
 
     def get(self, request: Request) -> Response:
-        """get detail information about profile"""
+        """
+        This endpoint allows an authorized user to
+        get detailed information about their profile,
+        """
         user: User = User.get_all().get(id=self.request.user.id)
         serializer = self.serializer_class(user)
         return Response(serializer.data, status=HTTP_200_OK)
 
     def delete(self, request: Request) -> Response:
-        """submitting an account deletion request"""
+        """
+        This endpoint allows the user to send a 
+        request to delete their account.
+        """
         code_create(
             email=request.user.email,
             type=ACCOUNT_DELETE_CODE_TYPE,
@@ -217,8 +217,6 @@ class UserProfile(GenericAPIView):
     """
     This class makes it possible to
     get information about any user of the application
-
-
     !! It is important that the profile information may differ,
     because information about the phone number and mail may be hidden !!
     """
@@ -294,8 +292,9 @@ class UsersRelevantList(ListAPIView):
 
 class RequestPasswordReset(GenericAPIView):
     """
-    This class allows an unauthorized user to request a password reset.
-    After submitting the application, a confirmation code will be sent
+    This class allows an unauthorized user to 
+    request a password reset. \nAfter submitting the 
+    application, a confirmation code will be sent
     to the email specified by the user.
     """
 
@@ -305,7 +304,6 @@ class RequestPasswordReset(GenericAPIView):
     ]
 
     def post(self, request: Request) -> Response:
-        """send request to reset user password by email"""
         email: str = request.data.get("email", "")
         try:
             User.get_all().get(email=email)
