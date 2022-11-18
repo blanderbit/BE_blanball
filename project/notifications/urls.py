@@ -11,7 +11,6 @@ from notifications.views import (
     DeleteNotifcations,
     GetCurrentVersion,
     GetMaintenance,
-    NotificationsList,
     ReadAllUserNotifications,
     ReadNotifications,
     UserNotificaitonsCount,
@@ -19,11 +18,6 @@ from notifications.views import (
 )
 
 urlpatterns: list[Union[URLResolver, URLPattern]] = [
-    path(
-        "admin/notifications/list",
-        NotificationsList.as_view(),
-        name="notifications-list",
-    ),
     path(
         "client/my/notifications/list",
         UserNotificationsList.as_view(),
