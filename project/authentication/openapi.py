@@ -1,6 +1,10 @@
 from drf_yasg import openapi
 
-from config.openapi import skip_param_query
+from config.openapi import (
+    skip_param_query,
+    distance_query,
+    point_query,
+)
 
 users_relevant_searh_query = openapi.Parameter(
     "search",
@@ -47,6 +51,8 @@ users_ordering = openapi.Parameter(
 
 users_list_query_params: list[openapi.Parameter] = [
     skip_param_query,
+    distance_query,
+    point_query,
     users_profile__position_query,
     users_profile__gender_query,
     users_is_online_query,

@@ -6,7 +6,7 @@ from decouple import config
 if environ.get("GITHUB_WORKFLOW"):
     DATABASES: dict[str, Any] = {
         "default": {
-            "ENGINE": "django.db.backends.postgresql_psycopg2",
+            "ENGINE": config("DB_ENGINE", cast=str),
             "NAME": "postgres_test",
             "USER": "postgres_test",
             "PASSWORD": "postgres_test",
