@@ -51,5 +51,4 @@ if not environ.get("GITHUB_WORKFLOW"):
     MINIO_BUCKET_CHECK_ON_SAVE: bool = True
     MINIO_ACCESS_KEY: str = config("MINIO_ROOT_USER", cast=str)
     MINIO_SECRET_KEY: str = config("MINIO_ROOT_PASSWORD", cast=str)
-    MINIO_PUBLIC_BUCKETS: list[str] = []
-    MINIO_PUBLIC_BUCKETS.append(MINIO_MEDIA_FILES_BUCKET)
+    MINIO_PUBLIC_BUCKETS: list[str] = [MINIO_MEDIA_FILES_BUCKET]

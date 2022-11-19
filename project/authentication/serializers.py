@@ -85,7 +85,7 @@ class EventUsersProfileSerializer(DynamicFieldsModelSerializer):
             "id",
             "name",
             "last_name",
-            "avatar",
+            "avatar_url",
             "position",
             "working_leg",
         ]
@@ -107,8 +107,21 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model: Profile = Profile
-        exclude: Union[str, list[str]] = [
-            "coordinates",
+        fields: Union[str, list[str]] = [
+            "id",
+            "name",
+            "last_name",
+            "gender",
+            "birthday",
+            "avatar_url",
+            "age",
+            "place",
+            "height",
+            "weight",
+            "position",
+            "created_at",
+            "about_me",
+            "working_leg"
         ]
 
 
@@ -277,7 +290,7 @@ class ProfileListSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "last_name",
-            "avatar",
+            "avatar_url",
             "position",
             "gender",
             "age",
