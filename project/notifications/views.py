@@ -67,6 +67,7 @@ class UserNotificationsList(ListAPIView):
     ordering_fields: list[str] = [
         "id",
     ]
+    queryset: QuerySet[Notification] = Notification.get_all()
 
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Notification]:
