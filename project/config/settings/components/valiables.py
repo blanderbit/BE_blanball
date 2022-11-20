@@ -1,4 +1,4 @@
-from os import path, getenv
+from os import getenv, path
 
 import django
 from decouple import Csv, config

@@ -1,10 +1,9 @@
-from drf_yasg import openapi
-
 from config.openapi import (
-    skip_param_query,
     distance_query,
     point_query,
+    skip_param_query,
 )
+from drf_yasg import openapi
 
 users_relevant_searh_query = openapi.Parameter(
     "search",

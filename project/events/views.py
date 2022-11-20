@@ -1,12 +1,9 @@
 from typing import Any, Type, final
+
 from authentication.filters import (
     RankedFuzzySearchFilter,
 )
 from config.exceptions import _404
-from events.openapi import (
-    events_list_query_params,
-    events_relevant_list_query_params,
-)
 from config.openapi import skip_param_query
 from django.db.models import Count, Q
 from django.db.models.query import QuerySet
@@ -43,6 +40,10 @@ from events.models import (
     InviteToEvent,
     RequestToParticipation,
 )
+from events.openapi import (
+    events_list_query_params,
+    events_relevant_list_query_params,
+)
 from events.serializers import (
     BulkAcceptOrDeclineRequestToParticipationSerializer,
     CreateEventSerializer,
@@ -60,6 +61,7 @@ from events.serializers import (
     UpdateEventSerializer,
 )
 from events.services import (
+    add_dist_filter_to_view,
     bulk_accept_or_decline_invites_to_events,
     bulk_accpet_or_decline_requests_to_participation,
     bulk_delete_events,
@@ -68,12 +70,11 @@ from events.services import (
     not_in_black_list,
     only_author,
     remove_user_from_event,
+    send_message_to_event_author_after_leave_user_from_event,
     send_notification_to_event_author,
     send_notification_to_subscribe_event_user,
     skip_objects_from_response_by_id,
     validate_user_before_join_to_event,
-    add_dist_filter_to_view,
-    send_message_to_event_author_after_leave_user_from_event,
 )
 from geopy.geocoders import Nominatim
 from notifications.tasks import *

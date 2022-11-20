@@ -2,11 +2,6 @@ import re
 from collections import OrderedDict
 from typing import Any, List, Union
 
-from django.core.validators import (
-    MaxValueValidator,
-    MinValueValidator,
-)
-
 from authentication.constants.code_types import (
     ACCOUNT_DELETE_CODE_TYPE,
     EMAIL_CHANGE_CODE_TYPE,
@@ -27,6 +22,10 @@ from authentication.validators import (
     CodeValidator,
 )
 from django.contrib import auth
+from django.core.validators import (
+    MaxValueValidator,
+    MinValueValidator,
+)
 from rest_framework import serializers
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
@@ -121,7 +120,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             "position",
             "created_at",
             "about_me",
-            "working_leg"
+            "working_leg",
         ]
 
 

@@ -19,11 +19,11 @@ from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.utils import timezone
 from events.constants.notification_types import (
+    LEAVE_USER_FROM_THE_EVENT_NOTIFICATION_TYPE,
     NEW_USER_ON_THE_EVENT_NOTIFICATION_TYPE,
     RESPONSE_TO_THE_INVITE_TO_EVENT_NOTIFICATION_TYPE,
     RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_NOTIFICATION_TYPE,
     USER_REMOVE_FROM_EVENT_NOTIFICATION_TYPE,
-    LEAVE_USER_FROM_THE_EVENT_NOTIFICATION_TYPE,
 )
 from events.constants.response_error import (
     ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR,

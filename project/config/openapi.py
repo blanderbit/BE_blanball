@@ -1,6 +1,5 @@
 from drf_yasg import openapi
 
-
 skip_param_query = openapi.Parameter(
     "skipids",
     openapi.IN_QUERY,
