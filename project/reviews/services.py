@@ -1,11 +1,11 @@
-from authentication.models import User
-from typing import Callable, Any
-from django.db.models import QuerySet
+from typing import Any, Callable
 
-from reviews.models import Review
+from authentication.models import User
+from django.db.models import QuerySet
 from rest_framework.exceptions import (
     PermissionDenied,
 )
+from reviews.models import Review
 
 
 def hide_user_reviews(func: Callable[[], QuerySet[Review]]):

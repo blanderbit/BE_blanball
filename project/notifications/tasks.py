@@ -6,13 +6,13 @@ from authentication.models import User
 from channels.layers import get_channel_layer
 from config.celery import app
 from django.db.models import QuerySet
+from django.utils import timezone
 from notifications.constants.notification_types import (
-    CHANGE_MAINTENANCE_NOTIFICATION_TYPE,
-    ALL_USER_NOTIFICATIONS_READED_NOTIFICATION_TYPE,
     ALL_USER_NOTIFICATIONS_DELETED_NOTIFICATION_TYPE,
+    ALL_USER_NOTIFICATIONS_READED_NOTIFICATION_TYPE,
+    CHANGE_MAINTENANCE_NOTIFICATION_TYPE,
 )
 from notifications.models import Notification
-from django.utils import timezone
 
 
 @app.task(

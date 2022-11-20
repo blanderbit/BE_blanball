@@ -1,4 +1,4 @@
-from os import path
+from os import getenv, path
 
 import django
 from decouple import Csv, config
@@ -45,3 +45,8 @@ CODE_EXPIRE_MINUTES_TIME: int = config("CODE_EXPIRE_MINUTES_TIME", cast=int)
 ALGORITHM: str = config("ALGORITHM", cast=str)
 
 DEBUG: bool = config("DEBUG", cast=bool)
+
+if DEBUG == False:
+    MINIO_IMAGE_HOST: str = getenv("MINIO_IMAGE_HOST_PROD")
+else:
+    MINIO_IMAGE_HOST: str = getenv("MINIO_IMAGE_HOST")

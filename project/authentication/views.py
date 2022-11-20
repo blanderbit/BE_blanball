@@ -44,6 +44,10 @@ from authentication.models import (
     Profile,
     User,
 )
+from authentication.openapi import (
+    users_list_query_params,
+    users_relevant_list_query_params,
+)
 from authentication.permisions import (
     IsNotAuthenticated,
 )
@@ -67,10 +71,6 @@ from authentication.services import (
     send_email_template,
 )
 from config.exceptions import _404
-from authentication.openapi import (
-    users_relevant_list_query_params,
-    users_list_query_params,
-)
 from django.conf import settings
 from django.db import transaction
 from django.db.models.query import QuerySet
@@ -185,7 +185,7 @@ class UserOwnerProfile(GenericAPIView):
 
     def delete(self, request: Request) -> Response:
         """
-        This endpoint allows the user to send a 
+        This endpoint allows the user to send a
         request to delete their account.
         """
         code_create(
@@ -292,8 +292,8 @@ class UsersRelevantList(ListAPIView):
 
 class RequestPasswordReset(GenericAPIView):
     """
-    This class allows an unauthorized user to 
-    request a password reset. \nAfter submitting the 
+    This class allows an unauthorized user to
+    request a password reset. \nAfter submitting the
     application, a confirmation code will be sent
     to the email specified by the user.
     """

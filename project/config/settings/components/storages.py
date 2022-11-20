@@ -6,7 +6,7 @@ from decouple import config
 if environ.get("GITHUB_WORKFLOW"):
     DATABASES: dict[str, Any] = {
         "default": {
-            "ENGINE": "django.db.backends.postgresql_psycopg2",
+            "ENGINE": config("DB_ENGINE", cast=str),
             "NAME": "postgres_test",
             "USER": "postgres_test",
             "PASSWORD": "postgres_test",
@@ -51,5 +51,4 @@ if not environ.get("GITHUB_WORKFLOW"):
     MINIO_BUCKET_CHECK_ON_SAVE: bool = True
     MINIO_ACCESS_KEY: str = config("MINIO_ROOT_USER", cast=str)
     MINIO_SECRET_KEY: str = config("MINIO_ROOT_PASSWORD", cast=str)
-    MINIO_PUBLIC_BUCKETS: list[str] = []
-    MINIO_PUBLIC_BUCKETS.append(MINIO_MEDIA_FILES_BUCKET)
+    MINIO_PUBLIC_BUCKETS: list[str] = [MINIO_MEDIA_FILES_BUCKET]

@@ -216,7 +216,7 @@ class InviteToEventManager(models.Manager):
                         "id": invite_user.id,
                         "name": invite_user.profile.name,
                         "last_name": invite_user.profile.last_name,
-                        "avatar": str(invite_user.profile.avatar),
+                        "avatar": invite_user.profile.avatar_url,
                     },
                     "event": {"id": event.id, "name": event.name},
                     "invite": {
@@ -226,7 +226,7 @@ class InviteToEventManager(models.Manager):
                         "id": request_user.id,
                         "name": request_user.profile.name,
                         "last_name": request_user.profile.last_name,
-                        "avatar": str(request_user.profile.avatar),
+                        "avatar": request_user.profile.avatar_url,
                     },
                 },
             )

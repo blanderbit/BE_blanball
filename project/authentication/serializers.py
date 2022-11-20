@@ -2,11 +2,6 @@ import re
 from collections import OrderedDict
 from typing import Any, List, Union
 
-from django.core.validators import (
-    MaxValueValidator,
-    MinValueValidator,
-)
-
 from authentication.constants.code_types import (
     ACCOUNT_DELETE_CODE_TYPE,
     EMAIL_CHANGE_CODE_TYPE,
@@ -27,6 +22,10 @@ from authentication.validators import (
     CodeValidator,
 )
 from django.contrib import auth
+from django.core.validators import (
+    MaxValueValidator,
+    MinValueValidator,
+)
 from rest_framework import serializers
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
@@ -85,7 +84,7 @@ class EventUsersProfileSerializer(DynamicFieldsModelSerializer):
             "id",
             "name",
             "last_name",
-            "avatar",
+            "avatar_url",
             "position",
             "working_leg",
         ]
@@ -107,8 +106,21 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model: Profile = Profile
-        exclude: Union[str, list[str]] = [
-            "coordinates",
+        fields: Union[str, list[str]] = [
+            "id",
+            "name",
+            "last_name",
+            "gender",
+            "birthday",
+            "avatar_url",
+            "age",
+            "place",
+            "height",
+            "weight",
+            "position",
+            "created_at",
+            "about_me",
+            "working_leg",
         ]
 
 
@@ -277,7 +289,7 @@ class ProfileListSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "last_name",
-            "avatar",
+            "avatar_url",
             "position",
             "gender",
             "age",

@@ -6,8 +6,8 @@ from django.urls.resolvers import (
     URLResolver,
 )
 from reviews.views import (
-    ReviewCreate,
     MyReviewsList,
+    ReviewCreate,
     UserReviewsList,
 )
 

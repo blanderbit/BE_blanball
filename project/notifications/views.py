@@ -51,15 +51,15 @@ from rest_framework.status import (
 from rest_framework.views import APIView
 
 
-
 @method_decorator(swagger_auto_schema(manual_parameters=[skip_param_query]), name="get")
 class UserNotificationsList(ListAPIView):
     """
-    This endpoint allows the user to get a 
-    complete list of his notifications, as 
+    This endpoint allows the user to get a
+    complete list of his notifications, as
     well as sort them by newest.
     Allowed fields for sorting: 'id', '-id'
     """
+
     serializer_class: Type[Serializer] = NotificationSerializer
     filter_backends = [
         OrderingFilter,
@@ -67,6 +67,7 @@ class UserNotificationsList(ListAPIView):
     ordering_fields: list[str] = [
         "id",
     ]
+
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Notification]:
         return self.queryset.filter(user_id=self.request.user.id)
@@ -74,15 +75,16 @@ class UserNotificationsList(ListAPIView):
 
 class UserNotificaitonsCount(GenericAPIView):
     """
-    This endpoint allows the user to get the 
-    total number of his notifications, as well 
+    This endpoint allows the user to get the
+    total number of his notifications, as well
     as the number of unread notifications.
 
-    all_notifications_count - Number of all 
+    all_notifications_count - Number of all
         notifications
-    not_read_notifications_count - Number of 
+    not_read_notifications_count - Number of
         unread notifications
     """
+
     queryset: QuerySet[Notification] = Notification.get_all().filter()
     serializer_class: Type[Serializer] = UserNotificationsCount
 
@@ -102,7 +104,7 @@ class UserNotificaitonsCount(GenericAPIView):
 
 class ReadNotifications(GenericAPIView):
     """
-    This endpoint allows the user to 
+    This endpoint allows the user to
     read a certain number of notifications by ID.
     Example:
     {
@@ -110,10 +112,11 @@ class ReadNotifications(GenericAPIView):
             1, 2, 3, 4, 5
         ]
     }
-    If the user who sent the request has unread 
-    notifications under identifiers: 1,2,3,4,5 
+    If the user who sent the request has unread
+    notifications under identifiers: 1,2,3,4,5
     then they will be read.
     """
+
     serializer_class: Type[Serializer] = ReadOrDeleteNotificationsSerializer
     queryset: QuerySet[Notification] = Notification.get_all()
 
@@ -132,7 +135,7 @@ class ReadNotifications(GenericAPIView):
 
 class DeleteNotifcations(GenericAPIView):
     """
-    This endpoint allows the user to 
+    This endpoint allows the user to
     delete a certain number of notifications by ID.
     Example:
     {
@@ -140,10 +143,11 @@ class DeleteNotifcations(GenericAPIView):
             1, 2, 3, 4, 5
         ]
     }
-    If the user who sent the request has  
-    notifications under identifiers: 1,2,3,4,5 
+    If the user who sent the request has
+    notifications under identifiers: 1,2,3,4,5
     then they will be read.
     """
+
     serializer_class: Type[Serializer] = ReadOrDeleteNotificationsSerializer
     queryset: QuerySet[Notification] = Notification.get_all()
 
@@ -162,11 +166,12 @@ class DeleteNotifcations(GenericAPIView):
 
 class ChangeMaintenance(GenericAPIView):
     """
-    This endpoint allows you to change the 
+    This endpoint allows you to change the
     current state of technical work in the application.
-    \nIf technical work is true then the client side of the 
+    \nIf technical work is true then the client side of the
     application will be blocked
     """
+
     serializer_class: Type[Serializer] = ChangeMaintenanceSerializer
 
     def post(self, request: Request) -> Response:
@@ -183,12 +188,13 @@ class ChangeMaintenance(GenericAPIView):
 
 class GetMaintenance(APIView):
     """
-    This endpoint allows the user to get the 
-    current state of the technical work 
+    This endpoint allows the user to get the
+    current state of the technical work
     of the application.
-    If technical work is true then the 
+    If technical work is true then the
     client side of the application will be blocked
     """
+
     key: str = "isMaintenance"
     permission_classes = [AllowAny]
 
@@ -203,17 +209,19 @@ class GetMaintenance(APIView):
 
 class GetCurrentVersion(GetMaintenance):
     """
-    This endpoint allows any user to get 
+    This endpoint allows any user to get
     the current version of the application.
     """
+
     key: str = "version"
 
 
 class DeleteAllUserNotifications(APIView):
     """
-    This endpoint allows the user to 
+    This endpoint allows the user to
     delete all his notifications at once.
     """
+
     queryset: QuerySet[Notification] = Notification.get_all()
 
     def delete(self, request: Request) -> Response:
@@ -223,9 +231,10 @@ class DeleteAllUserNotifications(APIView):
 
 class ReadAllUserNotifications(APIView):
     """
-    This endpoint allows the user to 
+    This endpoint allows the user to
     read all his notifications at once.
     """
+
     queryset: QuerySet[Notification] = Notification.get_all()
 
     def get(self, request: Request) -> Response:

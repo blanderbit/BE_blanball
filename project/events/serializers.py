@@ -4,6 +4,7 @@ from typing import Any, Union
 from authentication.models import User
 from authentication.serializers import (
     EventUsersSerializer,
+    PlaceSerializer,
 )
 from config.exceptions import _404
 from django.core.validators import (
@@ -30,7 +31,6 @@ from rest_framework import serializers
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
-from authentication.serializers import PlaceSerializer
 
 
 class CreateEventSerializer(serializers.ModelSerializer):

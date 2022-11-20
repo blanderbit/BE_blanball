@@ -1,10 +1,9 @@
-from drf_yasg import openapi
-
 from config.openapi import (
-    skip_param_query,
-    point_query,
     distance_query,
+    point_query,
+    skip_param_query,
 )
+from drf_yasg import openapi
 
 event_type_query = openapi.Parameter(
     "type",

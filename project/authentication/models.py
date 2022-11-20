@@ -1,6 +1,6 @@
 import os
 from datetime import date, datetime
-from typing import Any, Optional, final, Union
+from typing import Any, Optional, Union, final
 
 from authentication.constants.errors import (
     MAX_AGE_VALUE_ERROR,
@@ -11,6 +11,10 @@ from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
 )
+from django.contrib.gis.db.models import (
+    PointField,
+)
+from django.contrib.gis.geos import Point
 from django.core.files.uploadedfile import (
     TemporaryUploadedFile,
 )
@@ -44,10 +48,6 @@ from rest_framework_simplejwt.tokens import (
     AccessToken,
     RefreshToken,
 )
-from django.contrib.gis.db.models import (
-    PointField,
-)
-from django.contrib.gis.geos import Point
 
 
 class UserManager(BaseUserManager):
@@ -151,8 +151,10 @@ class Profile(models.Model):
     working_leg: Optional[str] = models.CharField(
         choices=Leg.choices, max_length=255, null=True
     )
-    place: dict[str, Union[str, float]] = models.JSONField(null=True)
-    coordinates: Point = PointField(null=True, srid=4326)
+    place: dict[Optional[str], Optional[Union[str, float]]] = models.JSONField(
+        null=True
+    )
+    coordinates: Optional[Point] = PointField(null=True, srid=4326)
 
     @final
     def __repr__(self) -> str:
@@ -176,7 +178,7 @@ class Profile(models.Model):
                     secure=False,
                 )
                 new_image_name: str = f"users/{urlsafe_base64_encode(smart_bytes(self.id))}\
-                    _{timezone.now().date()}.jpeg"
+_{timezone.now().date()}.jpg"
                 client.copy_object(
                     settings.MINIO_MEDIA_FILES_BUCKET,
                     new_image_name,
@@ -190,6 +192,12 @@ class Profile(models.Model):
                 self.avatar.name = new_image_name
         except ValueError:
             pass
+
+    @property
+    def avatar_url(self) -> Optional[str]:
+        if self.avatar:
+            return self.avatar.url.replace("minio:9000", settings.MINIO_IMAGE_HOST)
+        return None
 
     class Meta:
         db_table: str = "profile"

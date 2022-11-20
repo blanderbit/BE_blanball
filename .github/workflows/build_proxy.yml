@@ -1,4 +1,11 @@
-on: [push,workflow_dispatch]
+name: build_proxy
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+  workflow_dispatch:
 
 env:
   PROXY_DOCKERFILE_PATH: nginx/Dockerfile
@@ -7,7 +14,6 @@ env:
 
 jobs:
   build_proxy:
-    if: contains(fromJson('["push"]'), github.event_name) && github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main' || contains(fromJson('["workflow_dispatch"]'), github.event_name)
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
@@ -31,4 +37,4 @@ jobs:
     - name: Push images (PROXY)
       run: |
         docker push ${{ env.PROXY_COMMIT_IMAGE }}
-        docker push ${{ env.PROXY_LATEST_IMAGE }}        
+        docker push ${{ env.PROXY_LATEST_IMAGE }}

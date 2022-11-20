@@ -19,9 +19,7 @@ from reviews.serializers import (
     CreateReviewSerializer,
     ReviewListSerializer,
 )
-from reviews.services import (
-    hide_user_reviews,
-)
+from reviews.services import hide_user_reviews
 
 
 class ReviewCreate(CreateAPIView):
