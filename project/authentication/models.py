@@ -205,6 +205,7 @@ _{timezone.now().date()}.jpg"
         verbose_name_plural: str = "profiles"
 
 
+
 class User(AbstractBaseUser):
     """basic user model"""
 
