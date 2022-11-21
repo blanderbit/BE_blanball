@@ -370,7 +370,7 @@ def add_dist_filter_to_view(
                 distance = None
             if distance != None:
                 self.filter_backends.append(DistanceToPointFilter)
-                self.distance_filter_field = "coordinates"
+                self.distance_filter_field = self.distance_ordering_filter_field
                 return func(self)
         except:
             return func(self)

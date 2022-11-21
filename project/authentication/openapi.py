@@ -47,6 +47,20 @@ users_ordering = openapi.Parameter(
         will be in reverse order.",
     type=openapi.TYPE_STRING,
 )
+users_profile_age_min_query = openapi.Parameter(
+    "profile__age_min",
+    openapi.IN_QUERY,
+    description="This parameter allows the user to filter \
+    the list of users by specifying a minimum age value.",
+    type=openapi.TYPE_STRING,
+)
+users_profile_age_max_query = openapi.Parameter(
+    "profile__age_max",
+    openapi.IN_QUERY,
+    description="This parameter allows the user to filter \
+    the list of users by specifying a maximum age value.",
+    type=openapi.TYPE_STRING,
+)
 
 users_list_query_params: list[openapi.Parameter] = [
     skip_param_query,
@@ -56,6 +70,8 @@ users_list_query_params: list[openapi.Parameter] = [
     users_profile__gender_query,
     users_is_online_query,
     users_ordering,
+    users_profile_age_min_query,
+    users_profile_age_max_query,
 ]
 users_relevant_list_query_params: list[openapi.Parameter] = [
     skip_param_query,

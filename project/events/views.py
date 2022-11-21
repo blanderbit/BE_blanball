@@ -102,7 +102,6 @@ from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
-    HTTP_404_NOT_FOUND,
 )
 from rest_framework_gis.filters import (
     DistanceToPointOrderingFilter,
@@ -360,7 +359,7 @@ class EventsList(ListAPIView):
         DistanceToPointOrderingFilter,
     ]
     distance_ordering_filter_field: str = "coordinates"
-    distance_filter_convert_meters = True
+    distance_filter_convert_meters: bool = True
 
     @skip_objects_from_response_by_id
     @add_dist_filter_to_view
