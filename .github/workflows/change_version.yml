@@ -3,7 +3,7 @@ name: change_version
 on:
   push:
     branches:
-      - 'version__/**'
+      - 'version__**'
 
 jobs:
   change_version:
