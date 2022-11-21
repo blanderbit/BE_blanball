@@ -103,6 +103,12 @@ from rest_framework.status import (
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
 )
+from rest_framework_gis.filters import (
+    DistanceToPointOrderingFilter,
+)
+from events.services import (
+    add_dist_filter_to_view,
+)
 
 
 class RegisterUser(GenericAPIView):
@@ -172,7 +178,7 @@ class LoginUser(GenericAPIView):
 
 
 class UserOwnerProfile(GenericAPIView):
-    serializer_class = UserSerializer
+    serializer_class: Type[Serializer] = UserSerializer
 
     def get(self, request: Request) -> Response:
         """
@@ -250,10 +256,12 @@ class UsersList(ListAPIView):
     """
 
     serializer_class: Type[Serializer] = UsersListSerializer
+    queryset: QuerySet[User] = User.get_all()
     filter_backends = [
         DjangoFilterBackend,
         SearchFilter,
         OrderingFilter,
+        DistanceToPointOrderingFilter,
     ]
     filterset_class = UserAgeRangeFilter
     ordering_fields: list[str] = ["id", "profile__age", "raiting"]
@@ -262,9 +270,11 @@ class UsersList(ListAPIView):
         "profile__gender",
         "profile__last_name",
     ]
-    queryset: QuerySet[User] = User.get_all()
+    distance_ordering_filter_field: str = "profile__coordinates"
+    distance_filter_convert_meters: bool = True
 
     @skip_objects_from_response_by_id
+    @add_dist_filter_to_view
     def get_queryset(self) -> QuerySet[User]:
         return self.queryset.filter(role="User")
 
