@@ -1,4 +1,5 @@
 import random
+import copy
 import string
 from datetime import date
 from typing import Any
@@ -28,8 +29,8 @@ from django.template.loader import (
 )
 from django.utils import timezone
 from rest_framework.serializers import Serializer
-
 from .tasks import Util
+from authentication.tasks import update_user_messages_after_change_avatar
 
 
 def count_age(*, profile: Profile, data: dict[str, Any]) -> Profile:
@@ -106,8 +107,12 @@ def profile_update(*, user: User, serializer: Serializer) -> None:
     profile: Profile = Profile.objects.filter(id=user.profile_id)
     profile.update(**serializer.validated_data["profile"])
     count_age(profile=profile[0], data=serializer.validated_data["profile"].items())
+    if serializer.validated_data["profile"].get("avatar") != None:
+        update_user_messages_after_change_avatar(profile=profile[0])
+    result: dict[str, Any] = copy.deepcopy(serializer.validated_data)
     serializer.validated_data.pop("profile")
     serializer.save()
+    return result
 
 
 def reset_password(*, data: dict[str, Any]) -> None:

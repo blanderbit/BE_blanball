@@ -126,7 +126,7 @@ class Profile(models.Model):
         null=True, validators=[validate_birthday]
     )
     avatar: Optional[ImageFieldFile] = models.ImageField(
-        null=True, upload_to=image_file_name, validators=[validate_image]
+        null=True, upload_to=image_file_name, validators=[validate_image], default=None
     )
     age: Optional[int] = models.PositiveSmallIntegerField(null=True)
     height: Optional[int] = models.PositiveSmallIntegerField(
@@ -203,7 +203,6 @@ _{timezone.now().date()}.jpg"
         db_table: str = "profile"
         verbose_name: str = "profile"
         verbose_name_plural: str = "profiles"
-
 
 
 class User(AbstractBaseUser):

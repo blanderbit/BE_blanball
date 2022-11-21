@@ -10,6 +10,8 @@ from django.core.mail import EmailMessage
 from django.utils import timezone
 
 from .models import Code, Profile
+from notifications.models import Notification
+from django.db.models import Q
 
 
 class EmailThread(threading.Thread):
@@ -52,3 +54,16 @@ def check_user_age() -> None:
         if rdelta.months == 0 and rdelta.days == 0:
             user_profile.age += 1
             user_profile.save()
+
+
+@app.task
+def update_user_messages_after_change_avatar(*, profile: Profile) -> None:
+    for notification in Notification.get_all().filter(
+        Q(data__recipient__id=profile.id) | Q(data__sender__id=profile.id)
+    ):
+        if profile.id == notification.data["recipient"]["id"]:
+            notification.data["recipient"]["avatar"] = profile.avatar_url
+            notification.save()
+        elif profile.id == notification.data["sender"]["id"]:
+            notification.data["sender"]["avatar"] = profile.avatar_url
+            notification.save()

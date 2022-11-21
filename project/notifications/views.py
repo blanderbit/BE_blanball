@@ -86,7 +86,7 @@ class UserNotificaitonsCount(GenericAPIView):
         unread notifications
     """
 
-    queryset: QuerySet[Notification] = Notification.get_all().filter()
+    queryset: QuerySet[Notification] = Notification.get_all()
     serializer_class: Type[Serializer] = UserNotificationsCount
 
     def get(self, request: Request) -> Response:

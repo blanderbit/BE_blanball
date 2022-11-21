@@ -166,14 +166,13 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
     ) -> Union[serializers.ValidationError, OrderedDict]:
         conf: str = attrs.get("configuration")
         keys: list[str] = ["email", "phone", "show_reviews"]
-        planned_events = attrs.get("get_planned_events")
-        string: str = re.findall(r"\D", planned_events)[0]
-        if string not in ["d", "m", "y"]:
-            raise serializers.ValidationError(
-                GET_PLANNED_EVENTS_ERROR, HTTP_400_BAD_REQUEST
-            )
-
         try:
+            planned_events = attrs.get("get_planned_events")
+            string: str = re.findall(r"\D", planned_events)[0]
+            if string not in ["d", "m", "y"]:
+                raise serializers.ValidationError(
+                    GET_PLANNED_EVENTS_ERROR, HTTP_400_BAD_REQUEST
+                )
             if sorted(conf) != sorted(keys):
                 raise serializers.ValidationError(
                     CONFIGURATION_IS_REQUIRED_ERROR, HTTP_400_BAD_REQUEST
