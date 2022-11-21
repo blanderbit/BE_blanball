@@ -212,11 +212,11 @@ class UpdateProfile(GenericAPIView):
     queryset: QuerySet[User] = User.get_all()
 
     @transaction.atomic
-    def patch(self, request: Request) -> Response:
+    def put(self, request: Request) -> Response:
         user: User = self.queryset.get(id=self.request.user.id)
         serializer = self.serializer_class(user, data=request.data)
-        profile_update(user=user, serializer=serializer)
-        return Response(serializer.data, status=HTTP_200_OK)
+        result: dict[str, Any] = profile_update(user=user, serializer=serializer)
+        return Response(result, status=HTTP_200_OK)
 
 
 class UserProfile(GenericAPIView):
