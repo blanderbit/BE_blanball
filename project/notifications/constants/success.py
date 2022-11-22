@@ -1,9 +1,9 @@
-MAINTENANCE_UPDATED_SUCCESS: dict[str, str] = {"success": "Maintenance updated success"}
+MAINTENANCE_UPDATED_SUCCESS: dict[str, str] = {"success": "maintenance_updated"}
 
 NOTIFICATIONS_DELETED_SUCCESS: dict[str, str] = {
-    "success": "All your notifications deleted"
+    "success": "all_notifications_deleted"
 }
 
 NOTIFICATIONS_READED_SUCCESS: dict[str, str] = {
-    "success": "All your notifications was readed"
+    "success": "all_notifications_readed"
 }

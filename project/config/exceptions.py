@@ -12,17 +12,11 @@ from rest_framework.status import (
 class _404(APIException):
 
     status_code: int = HTTP_404_NOT_FOUND
-    default_detail: str = "{object_name} not found."
+    default_detail: str = "{object_name}_not_found"
 
     def __init__(self, *, object=None, detail: Optional[Union[dict[str, str]]] = None):
         if object is None and detail is None:
             raise Exception("detail or object must be set")
         if detail is None:
-            detail = force_str(self.default_detail).format(object_name=object.__name__)
+            detail = force_str(self.default_detail).format(object_name=object.__name__.lower())
         super().__init__(detail)
-
-
-@final
-class _403(APIException):
-    status_code: int = HTTP_403_FORBIDDEN
-    default_detail: str = "You cannot take this action."

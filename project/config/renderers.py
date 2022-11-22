@@ -10,6 +10,19 @@ class CustomRenderer(JSONRenderer):
             "data": data,
             "message": None,
         }
+        try:
+            for i in response['data'].get('errors'):
+                attr = i.get('attr')
+                if attr == None:
+                    if i['code'] == 'permission_denied':
+                        i['detail'] = i['code']
+                    else:
+                        i['detail'] = i['detail'].replace(' ', '_').lower()
+                else:
+                    i['detail'] = f'{attr}_' + i['code'] 
+                del i['attr'], i['code']
+        except TypeError:
+            pass
 
         if not str(status_code).startswith("2"):
             response["status"] = "error"

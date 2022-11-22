@@ -1,3 +1,3 @@
 REVIEW_CREATE_ERROR: dict[str, str] = {
-    "error": "You cant leave a review about yourself"
+    "error": "cant_leave_review_about_yourself"
 }

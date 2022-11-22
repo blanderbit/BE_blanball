@@ -26,7 +26,8 @@ class UserNotificationsCount(serializers.Serializer):
 
     class Meta:
         fields: Union[str, list[str]] = [
-            "all_notifications_count" "not_read_notifications_count",
+            "all_notifications_count",
+            "not_read_notifications_count",
         ]
 
 

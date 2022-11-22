@@ -14,7 +14,6 @@ from authentication.constants.errors import (
     CONFIGURATION_IS_REQUIRED_ERROR,
     GET_PLANNED_EVENTS_ERROR,
     INVALID_CREDENTIALS_ERROR,
-    NO_SUCH_USER_ERROR,
     PASSWORDS_DO_NOT_MATCH_ERROR,
 )
 from authentication.models import Profile, User
@@ -30,6 +29,7 @@ from rest_framework import serializers
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
+from config.exceptions import _404
 
 
 class PlaceSerializer(serializers.Serializer):
@@ -391,4 +391,4 @@ class CheckUserActiveSerializer(serializers.Serializer):
             User.get_all().get(id=user_id)
             return super().validate(attrs)
         except User.DoesNotExist:
-            raise serializers.ValidationError(NO_SUCH_USER_ERROR, HTTP_400_BAD_REQUEST)
+            raise _404(object=User)
