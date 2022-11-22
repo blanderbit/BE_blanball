@@ -41,6 +41,7 @@ MIDDLEWARE: list[str] = [
     "corsheaders.middleware.CorsPostCsrfMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "events.middlewares.RequestMiddleware",
 ]
@@ -114,7 +115,6 @@ SIMPLE_JWT: dict[str, Any] = {
         days=config("REFRESH_TOKEN_LIFETIME", cast=int)
     ),
 }
-
 
 CORS_ALLOWED_ORIGINS: list[str] = [
     "http://localhost:5173",
