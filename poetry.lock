@@ -625,6 +625,25 @@ python-jose = ["python-jose (==3.3.0)"]
 test = ["cryptography", "pytest", "pytest-cov", "pytest-django", "pytest-xdist", "tox"]
 
 [[package]]
+name = "drf-standardized-errors"
+version = "0.12.3"
+description = "Standardize your API error responses."
+category = "main"
+optional = false
+python-versions = ">=3.8"
+
+[package.dependencies]
+django = ">=3.2"
+djangorestframework = ">=3.12"
+
+[package.extras]
+dev = ["pre-commit"]
+doc = ["myst-parser", "sphinx (!=5.2.0.post0)", "sphinx-autobuild", "sphinx-rtd-theme"]
+openapi = ["drf-spectacular", "inflection"]
+release = ["flit", "keyring", "tbump"]
+test = ["tox", "tox-gh-actions"]
+
+[[package]]
 name = "drf-yasg"
 version = "1.21.3"
 description = "Automated generation of real Swagger/OpenAPI 2.0 schemas from Django Rest Framework code."
@@ -1435,7 +1454,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "3.10.7"
-content-hash = "d38570d0b349b78b8b701e5dcdda024fb795388e0e4cdd4622e19bae41897283"
+content-hash = "18c83f0dedac89d7ecae7d330453d85b05c02bdf47b91c4f27acb6dc66d40994"
 
 [metadata.files]
 aioredis = [
@@ -1726,6 +1745,10 @@ djangorestframework-gis = [
 djangorestframework-simplejwt = [
     {file = "djangorestframework_simplejwt-5.2.0-py3-none-any.whl", hash = "sha256:bcc4cb74dcb637ca1e17eed35276bd618ab19491f8c53e65dee6271177c355e8"},
     {file = "djangorestframework_simplejwt-5.2.0.tar.gz", hash = "sha256:a60b09afb27d91ad1d7ac904cc632bd52cecead8f389f0fa1532ceb0fb757a74"},
+]
+drf-standardized-errors = [
+    {file = "drf-standardized-errors-0.12.3.tar.gz", hash = "sha256:8dade786622d2dd53efe4fbadbb313f582e270227ed64080268960604c571e76"},
+    {file = "drf_standardized_errors-0.12.3-py3-none-any.whl", hash = "sha256:7ad7e3dc01daed616ec726f2ec2ba7896fdbeeffa1f14e85d3a89a3caa049f36"},
 ]
 drf-yasg = [
     {file = "drf-yasg-1.21.3.tar.gz", hash = "sha256:b2eebb438fa641503a08dac791be24183ea26dbcfe371a9824ea91f6e3a988aa"},

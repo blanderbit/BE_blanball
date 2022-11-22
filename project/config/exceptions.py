@@ -20,9 +20,3 @@ class _404(APIException):
         if detail is None:
             detail = force_str(self.default_detail).format(object_name=object.__name__.lower())
         super().__init__(detail)
-
-
-@final
-class _403(APIException):
-    status_code: int = HTTP_403_FORBIDDEN
-    default_detail: str = "You cannot take this action."

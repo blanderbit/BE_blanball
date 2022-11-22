@@ -34,7 +34,7 @@ LANGUAGE_CODE: str = config("LANGUAGE_CODE", cast=str)
 TIME_ZONE: str = config("TIME_ZONE", cast=str)
 USE_I18N: bool = config("USE_I18N", cast=bool)
 USE_TZ: bool = config("USE_TZ", cast=bool)
-USE_L10N = True
+USE_L10N: bool = True
 
 DEFAULT_AUTO_FIELD: str = "django.db.models.BigAutoField"
 
@@ -52,9 +52,3 @@ if DEBUG == False:
     MINIO_IMAGE_HOST: str = getenv("MINIO_IMAGE_HOST_PROD")
 else:
     MINIO_IMAGE_HOST: str = getenv("MINIO_IMAGE_HOST")
-
-LANGUAGES = (
-    ('en-us', _('English')),
-)
-
-LOCALE_PATHS: list[str] = [path.join(settings._BASE_DIR, 'locale')]

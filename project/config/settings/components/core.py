@@ -18,6 +18,7 @@ INSTALLED_APPS: list[str] = [
     "django.contrib.staticfiles",
     # Other libs apps:
     "corsheaders",
+    "drf_standardized_errors",
     "rest_framework_swagger",
     "rest_framework",
     "rest_framework_gis",
@@ -46,7 +47,7 @@ MIDDLEWARE: list[str] = [
     "corsheaders.middleware.CorsPostCsrfMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.locale.LocaleMiddleware",
+    'django.middleware.locale.LocaleMiddleware',
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "events.middlewares.RequestMiddleware",
 ]
@@ -108,8 +109,10 @@ REST_FRAMEWORK: dict[str, Any] = {
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_RENDERER_CLASSES": ("config.renderers.CustomRenderer",),
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
+    "EXCEPTION_HANDLER": "drf_standardized_errors.handler.exception_handler",
     "DEFAULT_PAGINATION_CLASS": "config.pagination.CustomPagination",
 }
+DRF_STANDARDIZED_ERRORS = {"ENABLE_IN_DEBUG_FOR_UNHANDLED_EXCEPTIONS": True}
 
 SIMPLE_JWT: dict[str, Any] = {
     "AUTH_HEADER_TYPES": (config("AUTH_HEADER_TYPES", cast=str)),
