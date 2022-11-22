@@ -23,7 +23,7 @@ class Review(models.Model):
         ]
     )
     user: User = models.ForeignKey(
-        User, on_delete=models.PROTECT, related_name="reviews"
+        User, on_delete=models.CASCADE, related_name="reviews"
     )
 
     @final

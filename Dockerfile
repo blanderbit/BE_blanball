@@ -33,6 +33,8 @@ WORKDIR $APP_PATH
 COPY ./poetry.lock ./pyproject.toml $APP_PATH/
 
 
+RUN apt-get update && apt-get install -y gettext
+
 RUN apt-get update && apt-get upgrade -y \
   && apt-get install --no-install-recommends -y \
   && groupadd -g "${GID}" -r deploy \

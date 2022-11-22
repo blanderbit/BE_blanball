@@ -605,17 +605,6 @@ python-versions = "*"
 djangorestframework = "*"
 
 [[package]]
-name = "djangorestframework-gis-distance"
-version = "1.0.0"
-description = "UNKNOWN"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-djangorestframework-gis = "*"
-
-[[package]]
 name = "djangorestframework-simplejwt"
 version = "5.2.0"
 description = "A minimal JSON Web Token authentication plugin for Django REST Framework"
@@ -1144,6 +1133,14 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "python-gettext"
+version = "4.1"
+description = "Python Gettext po to mo file compiler."
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "pytz"
 version = "2022.2.1"
 description = "World timezone definitions, modern and historical"
@@ -1438,7 +1435,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "3.10.7"
-content-hash = "0143f9391969e4e1cfb4435654177d04c4bd287221e27e6ad4363a994a614a09"
+content-hash = "d38570d0b349b78b8b701e5dcdda024fb795388e0e4cdd4622e19bae41897283"
 
 [metadata.files]
 aioredis = [
@@ -1725,9 +1722,6 @@ djangorestframework = [
 djangorestframework-gis = [
     {file = "djangorestframework-gis-1.0.tar.gz", hash = "sha256:921c5adbc9a7c0502c905957a6695b67f55d7bf6582e1ab837888b55a1fce5a6"},
     {file = "djangorestframework_gis-1.0-py2.py3-none-any.whl", hash = "sha256:bb715f05a111c02b9acc4021b17566e40c0b90dd833c583bac3d67f92be9667d"},
-]
-djangorestframework-gis-distance = [
-    {file = "djangorestframework-gis-distance-1.0.0.tar.gz", hash = "sha256:e2c9f643b02d0c43407cbb2b4a6f5f140a30fe61d1baa407deddfefa30926798"},
 ]
 djangorestframework-simplejwt = [
     {file = "djangorestframework_simplejwt-5.2.0-py3-none-any.whl", hash = "sha256:bcc4cb74dcb637ca1e17eed35276bd618ab19491f8c53e65dee6271177c355e8"},
@@ -2194,6 +2188,10 @@ python-dateutil = [
 python-decouple = [
     {file = "python-decouple-3.6.tar.gz", hash = "sha256:2838cdf77a5cf127d7e8b339ce14c25bceb3af3e674e039d4901ba16359968c7"},
     {file = "python_decouple-3.6-py3-none-any.whl", hash = "sha256:6cf502dc963a5c642ea5ead069847df3d916a6420cad5599185de6bab11d8c2e"},
+]
+python-gettext = [
+    {file = "python-gettext-4.1.tar.gz", hash = "sha256:bd06f141d585db3258390e2381678cb0efde586a36bf3ab6aee5ced7dc8d6ffb"},
+    {file = "python_gettext-4.1-py2.py3-none-any.whl", hash = "sha256:3438a24961dc5fa4feb441655da3d1070b1db3fd40ee7092a0cb06b0e6d03f16"},
 ]
 pytz = [
     {file = "pytz-2022.2.1-py2.py3-none-any.whl", hash = "sha256:220f481bdafa09c3955dfbdddb7b57780e9a94f5127e35456a48589b9e0c0197"},
