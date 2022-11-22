@@ -1,5 +1,7 @@
 MAINTENANCE_CAN_NOT_UPDATE_ERROR: dict[str, str] = {
-    "error": "Can not update maintenance"
+    "error": "cant_update_maintenance"
 }
 
-CONFIG_FILE_ERROR: dict[str, str] = {"error": "Config file is not available now"}
+MAINTENANCE_CAN_NOT_GET_ERROR: dict[str, str] = {
+    "error": "cant_get_maintenance"
+}

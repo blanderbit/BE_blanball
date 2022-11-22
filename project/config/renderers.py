@@ -10,6 +10,7 @@ class CustomRenderer(JSONRenderer):
             "data": data,
             "message": None,
         }
+        print(response["message"])
 
         if not str(status_code).startswith("2"):
             response["status"] = "error"

@@ -14,7 +14,6 @@ from django.core.validators import (
 from events.constants.response_error import (
     ALREADY_IN_EVENT_FANS_LIST_ERROR,
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,
-    EVENT_NOT_FOUND_ERROR,
     EVENT_TIME_EXPIRED_ERROR,
     NO_EVENT_PLACE_ERROR,
     NO_IN_EVENT_MEMBERS_LIST_ERROR,

@@ -11,7 +11,7 @@ from events.services import (
     skip_objects_from_response_by_id,
 )
 from notifications.constants.errors import (
-    CONFIG_FILE_ERROR,
+    MAINTENANCE_CAN_NOT_GET_ERROR,
     MAINTENANCE_CAN_NOT_UPDATE_ERROR,
 )
 from notifications.constants.success import (
@@ -205,7 +205,7 @@ class GetMaintenance(APIView):
                 data = f.read()
             return Response({self.key: json.loads(data)[self.key]}, status=HTTP_200_OK)
         except:
-            return Response(CONFIG_FILE_ERROR, status=HTTP_400_BAD_REQUEST)
+            return Response(MAINTENANCE_CAN_NOT_GET_ERROR, status=HTTP_400_BAD_REQUEST)
 
 
 class GetCurrentVersion(GetMaintenance):

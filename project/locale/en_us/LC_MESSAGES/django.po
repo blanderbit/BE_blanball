@@ -20,3 +20,6 @@ msgstr ""
 #: config/settings/components/valiables.py:61
 msgid "English"
 msgstr ""
+
+msgid "The phone number entered is not valid."
+msgstr "fff"

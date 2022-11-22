@@ -3,6 +3,7 @@ from os import getenv, path
 import django
 from decouple import Csv, config
 from django.utils.encoding import smart_str
+from django.utils.translation import gettext_lazy as _
 
 django.utils.encoding.smart_text = smart_str
 
@@ -52,13 +53,8 @@ if DEBUG == False:
 else:
     MINIO_IMAGE_HOST: str = getenv("MINIO_IMAGE_HOST")
 
-
-
-from django.utils.translation import gettext_lazy as _
-
-
 LANGUAGES = (
     ('en-us', _('English')),
 )
 
-LOCALE_PATHS = [path.join(settings._BASE_DIR, 'locale')]
+LOCALE_PATHS: list[str] = [path.join(settings._BASE_DIR, 'locale')]
