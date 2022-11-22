@@ -20,9 +20,10 @@ class CustomRenderer(JSONRenderer):
                         i['detail'] = i['detail'].replace(' ', '_').lower()
                 else:
                     i['detail'] = f'{attr}_' + i['code'] 
-                del i['attr'], i['code']
         except TypeError:
             pass
+        finally:
+            del i['attr'], i['code']
 
         if not str(status_code).startswith("2"):
             response["status"] = "error"
