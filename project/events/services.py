@@ -222,9 +222,7 @@ def validate_user_before_join_to_event(*, user: User, event: Event) -> None:
     if user.current_rooms.filter(id=event.id).exists():
         raise ValidationError(ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, HTTP_400_BAD_REQUEST)
     if user.current_views_rooms.filter(id=event.id).exists():
-        raise ValidationError(
-            NO_IN_EVENT_FANS_LIST_ERROR, HTTP_400_BAD_REQUEST
-        )
+        raise ValidationError(NO_IN_EVENT_FANS_LIST_ERROR, HTTP_400_BAD_REQUEST)
     if event.author.id == user.id:
         raise ValidationError(EVENT_AUTHOR_CAN_NOT_JOIN_ERROR, HTTP_400_BAD_REQUEST)
     if user in event.black_list.all():

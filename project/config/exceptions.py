@@ -18,5 +18,7 @@ class _404(APIException):
         if object is None and detail is None:
             raise Exception("detail or object must be set")
         if detail is None:
-            detail = force_str(self.default_detail).format(object_name=object.__name__.lower())
+            detail = force_str(self.default_detail).format(
+                object_name=object.__name__.lower()
+            )
         super().__init__(detail)

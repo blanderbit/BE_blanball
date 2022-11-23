@@ -1,5 +1,3 @@
-
-
 CHANGE_PASSWORD_SUCCESS: dict[str, str] = {"succes": "password_change"}
 REGISTER_SUCCESS_TITLE: str = "Thank you for registering with BlanBall"
 REGISTER_SUCCESS_TEXT: str = (

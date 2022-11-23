@@ -125,7 +125,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class CreateUpdateProfileSerializer(serializers.ModelSerializer):
-    place = PlaceSerializer()
+    place = PlaceSerializer(required=False, allow_null=True)
 
     class Meta:
         model: Profile = Profile
