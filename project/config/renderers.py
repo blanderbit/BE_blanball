@@ -11,22 +11,23 @@ class CustomRenderer(JSONRenderer):
             "message": None,
         }
         try:
-            for i in response['data'].get('errors'):
-                attr = i.get('attr')
+            for i in response["data"].get("errors"):
+                attr = i.get("attr")
                 if attr == None:
-                    if i['code'] == 'permission_denied':
-                        i['detail'] = i['code']
+                    if i["code"] == "permission_denied":
+                        i["detail"] = i["code"]
                     else:
-                        i['detail'] = i['detail'].replace(' ', '_').lower()
+                        i["detail"] = i["detail"].replace(" ", "_").lower()
                 else:
-                    i['detail'] = f'{attr}_' + i['code'] 
+                    if isinstance(i["code"], str):
+                        i["detail"] = f"{attr}_" + i["code"]
+                del i["attr"], i["code"]
         except TypeError:
             pass
-        finally:
-            del i['attr'], i['code']
 
         if not str(status_code).startswith("2"):
             response["status"] = "error"
+            del response["data"]["type"]
             response["data"] = None
             try:
                 response["message"] = data["detail"]
