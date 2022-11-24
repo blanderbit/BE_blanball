@@ -5,7 +5,6 @@ from typing import Any
 from decouple import Csv, config
 from django.conf import settings
 
-
 INSTALLED_APPS: list[str] = [
     "django.contrib.auth",
     "django.contrib.contenttypes",

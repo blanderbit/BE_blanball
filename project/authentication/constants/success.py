@@ -42,3 +42,5 @@ EMAIL_VERIFY_SUCCESS_BODY_TITLE: str = "Verification was successful!"
 EMAIL_VERIFY_SUCCESS_TEXT: str = "You received this message because your account has been verified in the BlanBall application."
 EMAIL_VERIFY_SUCCESS_TITLE: str = "Your account has been verified!"
 BLANBALL: str = "BlanBall"
+
+RESET_PASSWORD_CODE_IS_VALID_SUCCESS: dict[str, str] = {"success": "code_is_valid"}

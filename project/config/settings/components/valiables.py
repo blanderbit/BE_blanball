@@ -3,7 +3,9 @@ from os import getenv, path
 import django
 from decouple import Csv, config
 from django.utils.encoding import smart_str
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import (
+    gettext_lazy as _,
+)
 
 django.utils.encoding.smart_text = smart_str
 

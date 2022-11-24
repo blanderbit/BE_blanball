@@ -30,6 +30,7 @@ from authentication.constants.success import (
     REGISTER_SUCCESS_BODY_TITLE,
     REGISTER_SUCCESS_TEXT,
     REGISTER_SUCCESS_TITLE,
+    RESET_PASSWORD_CODE_IS_VALID_SUCCESS,
     SENT_CODE_TO_EMAIL_SUCCESS,
     TEMPLATE_SUCCESS_BODY_TITLE,
     TEMPLATE_SUCCESS_TEXT,
@@ -62,6 +63,7 @@ from authentication.serializers import (
     UpdateProfileSerializer,
     UserSerializer,
     UsersListSerializer,
+    ValidateResetPasswordCodeSerializer,
 )
 from authentication.services import (
     code_create,
@@ -82,6 +84,7 @@ from django_filters.rest_framework import (
 )
 from drf_yasg.utils import swagger_auto_schema
 from events.services import (
+    add_dist_filter_to_view,
     skip_objects_from_response_by_id,
 )
 from rest_framework.filters import (
@@ -105,9 +108,6 @@ from rest_framework.status import (
 )
 from rest_framework_gis.filters import (
     DistanceToPointOrderingFilter,
-)
-from events.services import (
-    add_dist_filter_to_view,
 )
 
 
@@ -366,6 +366,25 @@ class ResetPassword(GenericAPIView):
             raise _404(object=User)
 
 
+class ValidateResetPasswordCode(GenericAPIView):
+    """
+    Validate reset password code
+
+    This endpoint allows the user to check the password reset code for
+    validity before using it
+    """
+
+    serializer_class: Type[Serializer] = ValidateResetPasswordCodeSerializer
+    permission_classes = [
+        IsNotAuthenticated,
+    ]
+
+    def post(self, request: Request) -> Response:
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(RESET_PASSWORD_CODE_IS_VALID_SUCCESS, HTTP_200_OK)
+
+
 class RequestChangePassword(GenericAPIView):
     """
     Request change password
@@ -461,10 +480,10 @@ class CheckCode(GenericAPIView):
     """
     Сode confirmations
 
-    This endpoint allows the user to: 
-    confirm changing the password, phone number, 
-    email, account verification, as well as deleting 
-    the account using the previously received code 
+    This endpoint allows the user to:
+    confirm changing the password, phone number,
+    email, account verification, as well as deleting
+    the account using the previously received code
     that comes to the mail
     """
 

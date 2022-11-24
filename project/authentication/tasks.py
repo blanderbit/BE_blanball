@@ -7,11 +7,11 @@ from authentication.constants.success import (
 from config.celery import app
 from dateutil.relativedelta import relativedelta
 from django.core.mail import EmailMessage
+from django.db.models import Q
 from django.utils import timezone
+from notifications.models import Notification
 
 from .models import Code, Profile
-from notifications.models import Notification
-from django.db.models import Q
 
 
 class EmailThread(threading.Thread):
@@ -56,7 +56,10 @@ def check_user_age() -> None:
             user_profile.save()
 
 
-@app.task
+@app.task(
+    ignore_result=True,
+    default_retry_delay=5,
+)
 def update_user_messages_after_change_avatar(*, profile: Profile) -> None:
     for notification in Notification.get_all().filter(
         Q(data__recipient__id=profile.id) | Q(data__sender__id=profile.id)

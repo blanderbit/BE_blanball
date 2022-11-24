@@ -3,12 +3,10 @@ from typing import Any, Union
 
 from authentication.models import User
 from authentication.serializers import (
-    EventUsersSerializer,
     EventAuthorSerializer,
+    EventUsersSerializer,
 )
-from cities.serializers import (
-    PlaceSerializer,
-)
+from cities.serializers import PlaceSerializer
 from config.exceptions import _404
 from events.constants.response_error import (
     ALREADY_IN_EVENT_FANS_LIST_ERROR,

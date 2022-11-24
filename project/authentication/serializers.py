@@ -20,15 +20,13 @@ from authentication.models import Profile, User
 from authentication.validators import (
     CodeValidator,
 )
+from cities.serializers import PlaceSerializer
+from config.exceptions import _404
 from django.contrib import auth
-from cities.serializers import (
-    PlaceSerializer,
-)
 from rest_framework import serializers
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
-from config.exceptions import _404
 
 
 class UserPublicProfilePlaceSerializer(serializers.Serializer):
@@ -64,6 +62,7 @@ class EventUsersProfileSerializer(serializers.ModelSerializer):
             "working_leg",
         ]
 
+
 class EventAuthorProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model: Profile = Profile
@@ -73,6 +72,7 @@ class EventAuthorProfileSerializer(serializers.ModelSerializer):
             "last_name",
             "avatar_url",
         ]
+
 
 class EventAuthorSerializer(serializers.ModelSerializer):
     profile = EventAuthorProfileSerializer()
@@ -339,6 +339,18 @@ class ResetPasswordSerializer(serializers.Serializer):
         fields: Union[str, list[str]] = [
             "verify_code",
             "new_password",
+        ]
+
+
+class ValidateResetPasswordCodeSerializer(serializers.Serializer):
+    verify_code: str = serializers.CharField(
+        min_length=5, max_length=5, write_only=True
+    )
+
+    class Meta:
+        validators = [CodeValidator(token_type=PASSWORD_RESET_CODE_TYPE)]
+        fields: Union[str, list[str]] = [
+            "verify_code",
         ]
 
 

@@ -1,14 +1,14 @@
 from typing import Union
 
-from django.urls import path
-from django.urls.resolvers import (
-    URLPattern,
-    URLResolver,
-)
 from cities.views import (
     GetCoordinatesByPlaceName,
     GetPlaceNameByCoordinates,
     UkraineAreasList,
+)
+from django.urls import path
+from django.urls.resolvers import (
+    URLPattern,
+    URLResolver,
 )
 
 urlpatterns: list[Union[URLResolver, URLPattern]] = [
