@@ -54,6 +54,8 @@ from rest_framework.views import APIView
 @method_decorator(swagger_auto_schema(manual_parameters=[skip_param_query]), name="get")
 class UserNotificationsList(ListAPIView):
     """
+    List of user notifications
+
     This endpoint allows the user to get a
     complete list of his notifications, as
     well as sort them by newest.
@@ -76,6 +78,8 @@ class UserNotificationsList(ListAPIView):
 
 class UserNotificaitonsCount(GenericAPIView):
     """
+    User notifications count
+
     This endpoint allows the user to get the
     total number of his notifications, as well
     as the number of unread notifications.
@@ -105,6 +109,8 @@ class UserNotificaitonsCount(GenericAPIView):
 
 class ReadNotifications(GenericAPIView):
     """
+    Read notifications
+
     This endpoint allows the user to
     read a certain number of notifications by ID.
     Example:
@@ -136,6 +142,8 @@ class ReadNotifications(GenericAPIView):
 
 class DeleteNotifcations(GenericAPIView):
     """
+    Delete notifications
+
     This endpoint allows the user to
     delete a certain number of notifications by ID.
     Example:
@@ -167,6 +175,8 @@ class DeleteNotifcations(GenericAPIView):
 
 class ChangeMaintenance(GenericAPIView):
     """
+    Change maintenance
+
     This endpoint allows you to change the
     current state of technical work in the application.
     \nIf technical work is true then the client side of the
@@ -189,6 +199,8 @@ class ChangeMaintenance(GenericAPIView):
 
 class GetMaintenance(APIView):
     """
+    Get maintenance
+
     This endpoint allows the user to get the
     current state of the technical work
     of the application.
@@ -210,6 +222,8 @@ class GetMaintenance(APIView):
 
 class GetCurrentVersion(GetMaintenance):
     """
+    Get current version
+
     This endpoint allows any user to get
     the current version of the application.
     """
@@ -219,6 +233,8 @@ class GetCurrentVersion(GetMaintenance):
 
 class DeleteAllUserNotifications(APIView):
     """
+    Delete all notifications
+
     This endpoint allows the user to
     delete all his notifications at once.
     """
@@ -232,6 +248,8 @@ class DeleteAllUserNotifications(APIView):
 
 class ReadAllUserNotifications(APIView):
     """
+    Read all notifcations
+
     This endpoint allows the user to
     read all his notifications at once.
     """

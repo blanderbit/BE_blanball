@@ -23,6 +23,8 @@ from django.conf import settings
 
 class GetCoordinatesByPlaceName(GenericAPIView):
     """
+    Get coordinates by place name
+
     This endpoint makes it possible to get
     the exact coordinates of a place by name
     Example request:
@@ -58,6 +60,8 @@ class GetCoordinatesByPlaceName(GenericAPIView):
 
 class GetPlaceNameByCoordinates(GenericAPIView):
     """
+    Get place name by coordinates
+
     This endpoint allows the user to get the
     name of a point on the map by coordinates
     Example request:
@@ -92,6 +96,13 @@ class GetPlaceNameByCoordinates(GenericAPIView):
 
 
 class UkraineAreasList(APIView):
+    """
+    List of Ukraine areas
+
+
+    This endpoint allows the user to get 
+    a list of regions of Ukraine
+    """
     def get(self, request: Request) -> Response:
         client = NovaPoshtaApi(api_key=settings.NOVAPOSHTA_API_KEY)
         return Response(client.address.get_areas().json())

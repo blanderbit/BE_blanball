@@ -4,6 +4,7 @@ from typing import Any, Union
 from authentication.models import User
 from authentication.serializers import (
     EventUsersSerializer,
+    EventAuthorSerializer,
 )
 from cities.serializers import (
     PlaceSerializer,
@@ -65,13 +66,14 @@ class UpdateEventSerializer(serializers.ModelSerializer):
 
 
 class EventSerializer(serializers.ModelSerializer):
-    author = EventUsersSerializer()
+    author = EventAuthorSerializer()
     current_users = EventUsersSerializer(many=True)
 
     class Meta:
         model: Event = Event
         exclude: Union[str, list[str]] = [
             "black_list",
+            "current_fans",
         ]
 
 
@@ -91,12 +93,13 @@ class PopularEventsListSerializer(serializers.ModelSerializer):
 
 class EventListSerializer(serializers.ModelSerializer):
     place = PlaceSerializer()
+    author = EventAuthorSerializer()
 
     class Meta:
         model: Event = Event
         fields: Union[str, list[str]] = [
-            "author",
             "id",
+            "author",
             "name",
             "place",
             "amount_members",
