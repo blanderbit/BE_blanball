@@ -39,6 +39,9 @@ flake8 = "^5.0.4"
 black = "^22.10.0"
 geopy = "^2.2.0"
 djangorestframework-gis = "^1.0"
+python-gettext = "^4.1"
+drf-standardized-errors = "^0.12.3"
+novaposhta-api-client = {git = "https://github.com/semolex/novaposhta-api-client"}
 
 [tool.poetry.dev-dependencies]
 

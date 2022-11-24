@@ -89,7 +89,7 @@ jobs:
 
     - name: Pull latest image (API)
       run: |
-        docker pull ${LATEST_IMAGE} --ignore-pull-failures || true
+        docker pull ${{ env.LATEST_IMAGE }} --ignore-pull-failures || true
     - name: Build image (API)
       working-directory: .
       run: |

@@ -3,18 +3,14 @@ from typing import Any, Union
 
 from authentication.models import User
 from authentication.serializers import (
+    EventAuthorSerializer,
     EventUsersSerializer,
-    PlaceSerializer,
 )
+from cities.serializers import PlaceSerializer
 from config.exceptions import _404
-from django.core.validators import (
-    MaxValueValidator,
-    MinValueValidator,
-)
 from events.constants.response_error import (
     ALREADY_IN_EVENT_FANS_LIST_ERROR,
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,
-    EVENT_NOT_FOUND_ERROR,
     EVENT_TIME_EXPIRED_ERROR,
     NO_EVENT_PLACE_ERROR,
     NO_IN_EVENT_MEMBERS_LIST_ERROR,
@@ -68,13 +64,14 @@ class UpdateEventSerializer(serializers.ModelSerializer):
 
 
 class EventSerializer(serializers.ModelSerializer):
-    author = EventUsersSerializer()
+    author = EventAuthorSerializer()
     current_users = EventUsersSerializer(many=True)
 
     class Meta:
         model: Event = Event
         exclude: Union[str, list[str]] = [
             "black_list",
+            "current_fans",
         ]
 
 
@@ -94,12 +91,13 @@ class PopularEventsListSerializer(serializers.ModelSerializer):
 
 class EventListSerializer(serializers.ModelSerializer):
     place = PlaceSerializer()
+    author = EventAuthorSerializer()
 
     class Meta:
         model: Event = Event
         fields: Union[str, list[str]] = [
-            "author",
             "id",
+            "author",
             "name",
             "place",
             "amount_members",
@@ -133,7 +131,12 @@ class InvitesToEventListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model: InviteToEvent = InviteToEvent
-        fields: Union[str, list[str]] = ["id", "time_created", "event", "sender"]
+        fields: Union[str, list[str]] = [
+            "id",
+            "time_created",
+            "event",
+            "sender",
+        ]
 
 
 class DeleteEventsSerializer(serializers.Serializer):
@@ -251,34 +254,4 @@ class BulkAcceptOrDeclineRequestToParticipationSerializer(serializers.Serializer
         fields: Union[str, list[str]] = [
             "ids",
             "type",
-        ]
-
-
-class GetCoordinatesByPlaceNameSerializer(serializers.Serializer):
-    place_name: bool = serializers.CharField(max_length=255)
-
-    class Meta:
-        fields: Union[str, list[str]] = [
-            "place_name",
-        ]
-
-
-class GetPlaceNameByCoordinatesSerializer(serializers.Serializer):
-    lat: float = serializers.FloatField(
-        validators=[
-            MinValueValidator(-90),
-            MaxValueValidator(90),
-        ]
-    )
-    lon: float = serializers.FloatField(
-        validators=[
-            MinValueValidator(-180),
-            MaxValueValidator(180),
-        ]
-    )
-
-    class Meta:
-        fields: Union[str, list[str]] = [
-            "lat",
-            "lon",
         ]

@@ -11,7 +11,7 @@ from events.services import (
     skip_objects_from_response_by_id,
 )
 from notifications.constants.errors import (
-    CONFIG_FILE_ERROR,
+    MAINTENANCE_CAN_NOT_GET_ERROR,
     MAINTENANCE_CAN_NOT_UPDATE_ERROR,
 )
 from notifications.constants.success import (
@@ -54,6 +54,8 @@ from rest_framework.views import APIView
 @method_decorator(swagger_auto_schema(manual_parameters=[skip_param_query]), name="get")
 class UserNotificationsList(ListAPIView):
     """
+    List of user notifications
+
     This endpoint allows the user to get a
     complete list of his notifications, as
     well as sort them by newest.
@@ -76,6 +78,8 @@ class UserNotificationsList(ListAPIView):
 
 class UserNotificaitonsCount(GenericAPIView):
     """
+    User notifications count
+
     This endpoint allows the user to get the
     total number of his notifications, as well
     as the number of unread notifications.
@@ -86,7 +90,7 @@ class UserNotificaitonsCount(GenericAPIView):
         unread notifications
     """
 
-    queryset: QuerySet[Notification] = Notification.get_all().filter()
+    queryset: QuerySet[Notification] = Notification.get_all()
     serializer_class: Type[Serializer] = UserNotificationsCount
 
     def get(self, request: Request) -> Response:
@@ -105,6 +109,8 @@ class UserNotificaitonsCount(GenericAPIView):
 
 class ReadNotifications(GenericAPIView):
     """
+    Read notifications
+
     This endpoint allows the user to
     read a certain number of notifications by ID.
     Example:
@@ -136,6 +142,8 @@ class ReadNotifications(GenericAPIView):
 
 class DeleteNotifcations(GenericAPIView):
     """
+    Delete notifications
+
     This endpoint allows the user to
     delete a certain number of notifications by ID.
     Example:
@@ -167,6 +175,8 @@ class DeleteNotifcations(GenericAPIView):
 
 class ChangeMaintenance(GenericAPIView):
     """
+    Change maintenance
+
     This endpoint allows you to change the
     current state of technical work in the application.
     \nIf technical work is true then the client side of the
@@ -189,6 +199,8 @@ class ChangeMaintenance(GenericAPIView):
 
 class GetMaintenance(APIView):
     """
+    Get maintenance
+
     This endpoint allows the user to get the
     current state of the technical work
     of the application.
@@ -205,11 +217,13 @@ class GetMaintenance(APIView):
                 data = f.read()
             return Response({self.key: json.loads(data)[self.key]}, status=HTTP_200_OK)
         except:
-            return Response(CONFIG_FILE_ERROR, status=HTTP_400_BAD_REQUEST)
+            return Response(MAINTENANCE_CAN_NOT_GET_ERROR, status=HTTP_400_BAD_REQUEST)
 
 
 class GetCurrentVersion(GetMaintenance):
     """
+    Get current version
+
     This endpoint allows any user to get
     the current version of the application.
     """
@@ -219,6 +233,8 @@ class GetCurrentVersion(GetMaintenance):
 
 class DeleteAllUserNotifications(APIView):
     """
+    Delete all notifications
+
     This endpoint allows the user to
     delete all his notifications at once.
     """
@@ -232,6 +248,8 @@ class DeleteAllUserNotifications(APIView):
 
 class ReadAllUserNotifications(APIView):
     """
+    Read all notifcations
+
     This endpoint allows the user to
     read all his notifications at once.
     """

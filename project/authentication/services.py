@@ -1,3 +1,4 @@
+import copy
 import random
 import string
 from datetime import date
@@ -22,18 +23,14 @@ from authentication.models import (
     Profile,
     User,
 )
+from authentication.tasks import (
+    update_user_messages_after_change_avatar,
+)
 from django.conf import settings
 from django.template.loader import (
     render_to_string,
 )
 from django.utils import timezone
-from django.utils.encoding import smart_bytes
-from django.utils.http import (
-    urlsafe_base64_decode,
-    urlsafe_base64_encode,
-)
-from minio import Minio
-from minio.commonconfig import REPLACE, CopySource
 from rest_framework.serializers import Serializer
 
 from .tasks import Util
@@ -113,8 +110,12 @@ def profile_update(*, user: User, serializer: Serializer) -> None:
     profile: Profile = Profile.objects.filter(id=user.profile_id)
     profile.update(**serializer.validated_data["profile"])
     count_age(profile=profile[0], data=serializer.validated_data["profile"].items())
+    if serializer.validated_data["profile"].get("avatar") != None:
+        update_user_messages_after_change_avatar.delay(profile=profile[0])
+    result: dict[str, Any] = copy.deepcopy(serializer.validated_data)
     serializer.validated_data.pop("profile")
     serializer.save()
+    return result
 
 
 def reset_password(*, data: dict[str, Any]) -> None:

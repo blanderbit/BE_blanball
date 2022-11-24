@@ -13,6 +13,7 @@ INSTALLED_APPS: list[str] = [
     "django.contrib.staticfiles",
     # Other libs apps:
     "corsheaders",
+    "drf_standardized_errors",
     "rest_framework_swagger",
     "rest_framework",
     "rest_framework_gis",
@@ -27,6 +28,7 @@ INSTALLED_APPS: list[str] = [
     "authentication.apps.AuthenticationConfig",
     "notifications.apps.NotificationsConfig",
     "reviews.apps.ReviewsConfig",
+    "cities.apps.CitiesConfig",
 ]
 
 if not os.environ.get("GITHUB_WORKFLOW"):
@@ -102,6 +104,7 @@ REST_FRAMEWORK: dict[str, Any] = {
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_RENDERER_CLASSES": ("config.renderers.CustomRenderer",),
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
+    "EXCEPTION_HANDLER": "drf_standardized_errors.handler.exception_handler",
     "DEFAULT_PAGINATION_CLASS": "config.pagination.CustomPagination",
 }
 
@@ -114,7 +117,6 @@ SIMPLE_JWT: dict[str, Any] = {
         days=config("REFRESH_TOKEN_LIFETIME", cast=int)
     ),
 }
-
 
 CORS_ALLOWED_ORIGINS: list[str] = [
     "http://localhost:5173",

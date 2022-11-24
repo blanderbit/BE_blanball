@@ -605,17 +605,6 @@ python-versions = "*"
 djangorestframework = "*"
 
 [[package]]
-name = "djangorestframework-gis-distance"
-version = "1.0.0"
-description = "UNKNOWN"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-djangorestframework-gis = "*"
-
-[[package]]
 name = "djangorestframework-simplejwt"
 version = "5.2.0"
 description = "A minimal JSON Web Token authentication plugin for Django REST Framework"
@@ -634,6 +623,25 @@ doc = ["Sphinx (>=1.6.5,<2)", "sphinx-rtd-theme (>=0.1.9)"]
 lint = ["flake8", "isort", "pep8"]
 python-jose = ["python-jose (==3.3.0)"]
 test = ["cryptography", "pytest", "pytest-cov", "pytest-django", "pytest-xdist", "tox"]
+
+[[package]]
+name = "drf-standardized-errors"
+version = "0.12.3"
+description = "Standardize your API error responses."
+category = "main"
+optional = false
+python-versions = ">=3.8"
+
+[package.dependencies]
+django = ">=3.2"
+djangorestframework = ">=3.12"
+
+[package.extras]
+dev = ["pre-commit"]
+doc = ["myst-parser", "sphinx (!=5.2.0.post0)", "sphinx-autobuild", "sphinx-rtd-theme"]
+openapi = ["drf-spectacular", "inflection"]
+release = ["flit", "keyring", "tbump"]
+test = ["tox", "tox-gh-actions"]
 
 [[package]]
 name = "drf-yasg"
@@ -890,6 +898,24 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "novaposhta-api-client"
+version = "0.0.9"
+description = ""
+category = "main"
+optional = false
+python-versions = "*"
+develop = false
+
+[package.dependencies]
+requests = "*"
+
+[package.source]
+type = "git"
+url = "https://github.com/semolex/novaposhta-api-client"
+reference = "HEAD"
+resolved_reference = "8dd77ed29e6bb0ef3c7b931f79e33e3d99f55117"
+
+[[package]]
 name = "numpy"
 version = "1.23.3"
 description = "NumPy is the fundamental package for array computing with Python."
@@ -1139,6 +1165,14 @@ six = ">=1.5"
 name = "python-decouple"
 version = "3.6"
 description = "Strict separation of settings from code."
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
+name = "python-gettext"
+version = "4.1"
+description = "Python Gettext po to mo file compiler."
 category = "main"
 optional = false
 python-versions = "*"
@@ -1438,7 +1472,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "3.10.7"
-content-hash = "0143f9391969e4e1cfb4435654177d04c4bd287221e27e6ad4363a994a614a09"
+content-hash = "e1326702ad0546f3ce53ab2dc36469117f87d56cb75782bbe34bbee296798905"
 
 [metadata.files]
 aioredis = [
@@ -1726,12 +1760,13 @@ djangorestframework-gis = [
     {file = "djangorestframework-gis-1.0.tar.gz", hash = "sha256:921c5adbc9a7c0502c905957a6695b67f55d7bf6582e1ab837888b55a1fce5a6"},
     {file = "djangorestframework_gis-1.0-py2.py3-none-any.whl", hash = "sha256:bb715f05a111c02b9acc4021b17566e40c0b90dd833c583bac3d67f92be9667d"},
 ]
-djangorestframework-gis-distance = [
-    {file = "djangorestframework-gis-distance-1.0.0.tar.gz", hash = "sha256:e2c9f643b02d0c43407cbb2b4a6f5f140a30fe61d1baa407deddfefa30926798"},
-]
 djangorestframework-simplejwt = [
     {file = "djangorestframework_simplejwt-5.2.0-py3-none-any.whl", hash = "sha256:bcc4cb74dcb637ca1e17eed35276bd618ab19491f8c53e65dee6271177c355e8"},
     {file = "djangorestframework_simplejwt-5.2.0.tar.gz", hash = "sha256:a60b09afb27d91ad1d7ac904cc632bd52cecead8f389f0fa1532ceb0fb757a74"},
+]
+drf-standardized-errors = [
+    {file = "drf-standardized-errors-0.12.3.tar.gz", hash = "sha256:8dade786622d2dd53efe4fbadbb313f582e270227ed64080268960604c571e76"},
+    {file = "drf_standardized_errors-0.12.3-py3-none-any.whl", hash = "sha256:7ad7e3dc01daed616ec726f2ec2ba7896fdbeeffa1f14e85d3a89a3caa049f36"},
 ]
 drf-yasg = [
     {file = "drf-yasg-1.21.3.tar.gz", hash = "sha256:b2eebb438fa641503a08dac791be24183ea26dbcfe371a9824ea91f6e3a988aa"},
@@ -1964,6 +1999,7 @@ mypy-extensions = [
     {file = "mypy_extensions-0.4.3-py2.py3-none-any.whl", hash = "sha256:090fedd75945a69ae91ce1303b5824f428daf5a028d2f6ab8a299250a846f15d"},
     {file = "mypy_extensions-0.4.3.tar.gz", hash = "sha256:2d82818f5bb3e369420cb3c4060a7970edba416647068eb4c5343488a6c604a8"},
 ]
+novaposhta-api-client = []
 numpy = [
     {file = "numpy-1.23.3-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:c9f707b5bb73bf277d812ded9896f9512a43edff72712f31667d0a8c2f8e71ee"},
     {file = "numpy-1.23.3-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:ffcf105ecdd9396e05a8e58e81faaaf34d3f9875f137c7372450baa5d77c9a54"},
@@ -2194,6 +2230,10 @@ python-dateutil = [
 python-decouple = [
     {file = "python-decouple-3.6.tar.gz", hash = "sha256:2838cdf77a5cf127d7e8b339ce14c25bceb3af3e674e039d4901ba16359968c7"},
     {file = "python_decouple-3.6-py3-none-any.whl", hash = "sha256:6cf502dc963a5c642ea5ead069847df3d916a6420cad5599185de6bab11d8c2e"},
+]
+python-gettext = [
+    {file = "python-gettext-4.1.tar.gz", hash = "sha256:bd06f141d585db3258390e2381678cb0efde586a36bf3ab6aee5ced7dc8d6ffb"},
+    {file = "python_gettext-4.1-py2.py3-none-any.whl", hash = "sha256:3438a24961dc5fa4feb441655da3d1070b1db3fd40ee7092a0cb06b0e6d03f16"},
 ]
 pytz = [
     {file = "pytz-2022.2.1-py2.py3-none-any.whl", hash = "sha256:220f481bdafa09c3955dfbdddb7b57780e9a94f5127e35456a48589b9e0c0197"},

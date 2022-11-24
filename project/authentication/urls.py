@@ -15,6 +15,7 @@ from authentication.views import (
     UserProfile,
     UsersList,
     UsersRelevantList,
+    ValidateResetPasswordCode,
 )
 from django.urls import path
 from django.urls.resolvers import (
@@ -42,6 +43,11 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
         "client/password/reset-complete",
         ResetPassword.as_view(),
         name="complete-reset-password",
+    ),
+    path(
+        "client/validate/reset-password/code",
+        ValidateResetPasswordCode.as_view(),
+        name="validate-reset-password-code",
     ),
     path(
         "client/request-change/password",

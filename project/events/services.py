@@ -26,11 +26,11 @@ from events.constants.notification_types import (
     USER_REMOVE_FROM_EVENT_NOTIFICATION_TYPE,
 )
 from events.constants.response_error import (
-    ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR,
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,
     ALREADY_SENT_REQUEST_TO_PARTICIPATE_ERROR,
     EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,
     GET_PLANNED_EVENTS_ERROR,
+    NO_IN_EVENT_FANS_LIST_ERROR,
 )
 from events.models import (
     Event,
@@ -222,9 +222,7 @@ def validate_user_before_join_to_event(*, user: User, event: Event) -> None:
     if user.current_rooms.filter(id=event.id).exists():
         raise ValidationError(ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, HTTP_400_BAD_REQUEST)
     if user.current_views_rooms.filter(id=event.id).exists():
-        raise ValidationError(
-            ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR, HTTP_400_BAD_REQUEST
-        )
+        raise ValidationError(NO_IN_EVENT_FANS_LIST_ERROR, HTTP_400_BAD_REQUEST)
     if event.author.id == user.id:
         raise ValidationError(EVENT_AUTHOR_CAN_NOT_JOIN_ERROR, HTTP_400_BAD_REQUEST)
     if user in event.black_list.all():
@@ -370,7 +368,7 @@ def add_dist_filter_to_view(
                 distance = None
             if distance != None:
                 self.filter_backends.append(DistanceToPointFilter)
-                self.distance_filter_field = "coordinates"
+                self.distance_filter_field = self.distance_ordering_filter_field
                 return func(self)
         except:
             return func(self)

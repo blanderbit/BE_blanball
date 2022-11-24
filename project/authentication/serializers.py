@@ -14,45 +14,19 @@ from authentication.constants.errors import (
     CONFIGURATION_IS_REQUIRED_ERROR,
     GET_PLANNED_EVENTS_ERROR,
     INVALID_CREDENTIALS_ERROR,
-    NO_SUCH_USER_ERROR,
     PASSWORDS_DO_NOT_MATCH_ERROR,
 )
 from authentication.models import Profile, User
 from authentication.validators import (
     CodeValidator,
 )
+from cities.serializers import PlaceSerializer
+from config.exceptions import _404
 from django.contrib import auth
-from django.core.validators import (
-    MaxValueValidator,
-    MinValueValidator,
-)
 from rest_framework import serializers
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
-
-
-class PlaceSerializer(serializers.Serializer):
-    place_name: str = serializers.CharField(max_length=255)
-    lat: float = serializers.FloatField(
-        validators=[
-            MinValueValidator(-90),
-            MaxValueValidator(90),
-        ]
-    )
-    lon: float = serializers.FloatField(
-        validators=[
-            MinValueValidator(-180),
-            MaxValueValidator(180),
-        ]
-    )
-
-    class Meta:
-        fields = [
-            "place_name",
-            "lon",
-            "lat",
-        ]
 
 
 class UserPublicProfilePlaceSerializer(serializers.Serializer):
@@ -77,7 +51,19 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
                 self.fields.pop(field_name)
 
 
-class EventUsersProfileSerializer(DynamicFieldsModelSerializer):
+class EventUsersProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model: Profile = Profile
+        fields: Union[str, list[str]] = [
+            "name",
+            "last_name",
+            "avatar_url",
+            "position",
+            "working_leg",
+        ]
+
+
+class EventAuthorProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model: Profile = Profile
         fields: Union[str, list[str]] = [
@@ -85,8 +71,17 @@ class EventUsersProfileSerializer(DynamicFieldsModelSerializer):
             "name",
             "last_name",
             "avatar_url",
-            "position",
-            "working_leg",
+        ]
+
+
+class EventAuthorSerializer(serializers.ModelSerializer):
+    profile = EventAuthorProfileSerializer()
+
+    class Meta:
+        model: User = User
+        fields: Union[str, list[str]] = [
+            "id",
+            "profile",
         ]
 
 
@@ -125,7 +120,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class CreateUpdateProfileSerializer(serializers.ModelSerializer):
-    place = PlaceSerializer()
+    place = PlaceSerializer(required=False, allow_null=True)
 
     class Meta:
         model: Profile = Profile
@@ -156,9 +151,9 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model: User = User
         fields: Union[str, list[str]] = [
+            "get_planned_events",
             "configuration",
             "profile",
-            "get_planned_events",
         ]
 
     def validate(
@@ -166,14 +161,13 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
     ) -> Union[serializers.ValidationError, OrderedDict]:
         conf: str = attrs.get("configuration")
         keys: list[str] = ["email", "phone", "show_reviews"]
-        planned_events = attrs.get("get_planned_events")
-        string: str = re.findall(r"\D", planned_events)[0]
-        if string not in ["d", "m", "y"]:
-            raise serializers.ValidationError(
-                GET_PLANNED_EVENTS_ERROR, HTTP_400_BAD_REQUEST
-            )
-
         try:
+            planned_events = attrs.get("get_planned_events")
+            string: str = re.findall(r"\D", planned_events)[0]
+            if string not in ["d", "m", "y"]:
+                raise serializers.ValidationError(
+                    GET_PLANNED_EVENTS_ERROR, HTTP_400_BAD_REQUEST
+                )
             if sorted(conf) != sorted(keys):
                 raise serializers.ValidationError(
                     CONFIGURATION_IS_REQUIRED_ERROR, HTTP_400_BAD_REQUEST
@@ -188,7 +182,6 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    """a class that serializes user registration"""
 
     password: str = serializers.CharField(max_length=68, min_length=8, write_only=True)
     re_password: str = serializers.CharField(
@@ -209,7 +202,6 @@ class RegisterSerializer(serializers.ModelSerializer):
     def validate(
         self, attrs: OrderedDict
     ) -> Union[serializers.ValidationError, OrderedDict]:
-        """data validation function"""
         password: str = attrs.get("password", "")
         re_password: str = attrs.get("re_password", "")
 
@@ -221,12 +213,10 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data: dict[str, Any]) -> User:
         validated_data.pop("re_password")
-        """creating a user with previously validated data"""
         return User.objects.create_user(**validated_data)
 
 
 class LoginSerializer(serializers.ModelSerializer):
-    """class that serializes user login"""
 
     email: str = serializers.EmailField(min_length=3, max_length=255)
     password: str = serializers.CharField(min_length=8, max_length=68, write_only=True)
@@ -234,7 +224,6 @@ class LoginSerializer(serializers.ModelSerializer):
     tokens = serializers.SerializerMethodField()
 
     def get_tokens(self, obj) -> dict[str, str]:
-        """function that issues jwt tokens for an authorized user"""
         user: User = User.get_all().get(email=obj["email"])
         return {"refresh": user.tokens()["refresh"], "access": user.tokens()["access"]}
 
@@ -263,7 +252,6 @@ class LoginSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(DynamicFieldsModelSerializer):
-    """user pricate and public profile serializer"""
 
     profile: Profile = ProfileSerializer()
 
@@ -277,8 +265,8 @@ class UserSerializer(DynamicFieldsModelSerializer):
             "is_verified",
             "is_online",
             "raiting",
-            "profile",
             "configuration",
+            "profile",
         ]
 
 
@@ -303,10 +291,10 @@ class UsersListSerializer(serializers.ModelSerializer):
         model: User = User
         fields: Union[str, list[str]] = [
             "id",
-            "profile",
             "raiting",
             "role",
             "is_online",
+            "profile",
         ]
 
 
@@ -354,6 +342,18 @@ class ResetPasswordSerializer(serializers.Serializer):
         ]
 
 
+class ValidateResetPasswordCodeSerializer(serializers.Serializer):
+    verify_code: str = serializers.CharField(
+        min_length=5, max_length=5, write_only=True
+    )
+
+    class Meta:
+        validators = [CodeValidator(token_type=PASSWORD_RESET_CODE_TYPE)]
+        fields: Union[str, list[str]] = [
+            "verify_code",
+        ]
+
+
 class CheckCodeSerializer(serializers.Serializer):
     verify_code: str = serializers.CharField(
         min_length=5, max_length=5, write_only=True
@@ -392,4 +392,4 @@ class CheckUserActiveSerializer(serializers.Serializer):
             User.get_all().get(id=user_id)
             return super().validate(attrs)
         except User.DoesNotExist:
-            raise serializers.ValidationError(NO_SUCH_USER_ERROR, HTTP_400_BAD_REQUEST)
+            raise _404(object=User)

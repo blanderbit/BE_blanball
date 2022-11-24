@@ -24,6 +24,8 @@ from reviews.services import hide_user_reviews
 
 class ReviewCreate(CreateAPIView):
     """
+    Create review
+
     This endpoint gives you the ability
     to set up a review for another user.
     Based on each new review, the recipient's
@@ -38,6 +40,8 @@ class ReviewCreate(CreateAPIView):
 @method_decorator(swagger_auto_schema(manual_parameters=[skip_param_query]), name="get")
 class MyReviewsList(ListAPIView):
     """
+    List of my reviews
+
     This endpoint allows the user to
     get a list of reviews left to him.
     """
@@ -52,6 +56,8 @@ class MyReviewsList(ListAPIView):
 
 class UserReviewsList(MyReviewsList):
     """
+    List of user reviews
+
     This endpoint makes it possible to
     get a list of reviews of any user,
     if access to them is open.

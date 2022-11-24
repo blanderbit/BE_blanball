@@ -1,58 +1,24 @@
 ALREADY_SENT_REQUEST_TO_PARTICIPATE_ERROR: dict[str, str] = {
-    "error": "You have already sent a request to participate"
+    "error": "already_sent_request_to_participate"
 }
 
-EVENT_NOT_FOUND_ERROR: dict[str, str] = {"error": "Event not found"}
 EVENT_AUTHOR_CAN_NOT_JOIN_ERROR: dict[str, str] = {
-    "error": "Author can`t join to his event"
+    "error": "author_cant_enter_his_event"
 }
-EVENT_TIME_EXPIRED_ERROR: dict[str, str] = {"error": "Event time expired"}
-BAD_EVENT_TIME_CREATE_ERROR: dict[str, str] = {
-    "error": "The time of the event must differ from the minimum by an hour"
-}
-ALREADY_IN_EVENT_MEMBERS_LIST_ERROR: dict[str, str] = {
-    "error": "Already in the event members list"
-}
-ALREADY_IN_EVENT_FANS_LIST_ERROR: dict[str, str] = {
-    "error": "Already in the event fans list"
-}
-NO_IN_EVENT_MEMBERS_LIST_ERROR: dict[str, str] = {"error": "Not in event members list"}
-NO_IN_EVENT_FANS_LIST_ERROR: dict[str, str] = {"error": "Not in event fans list"}
-PASSWORD_CHANGE_ERROR: dict[str, str] = {"error": "Password not change"}
-NO_EVENT_PLACE_ERROR: dict[str, str] = {"error": "No place"}
-
-ALREADY_IN_EVENT_LIKE_SPECTATOR_ERROR: dict[str, str] = {
-    "error": "You cannot join the event as a player because you are already a member of the event as a spectator"
-}
-
+EVENT_TIME_EXPIRED_ERROR: dict[str, str] = {"error": "event_time_expired"}
+BAD_EVENT_TIME_CREATE_ERROR: dict[str, str] = {"error": "bad_event_date_time"}
+ALREADY_IN_EVENT_MEMBERS_LIST_ERROR: dict[str, str] = {"error": "already_like_member"}
+ALREADY_IN_EVENT_FANS_LIST_ERROR: dict[str, str] = {"error": "already_like_fan"}
+NO_IN_EVENT_MEMBERS_LIST_ERROR: dict[str, str] = {"error": "not_in_event_members_list"}
+NO_IN_EVENT_FANS_LIST_ERROR: dict[str, str] = {"error": "not_in_event_fans_list"}
+NO_EVENT_PLACE_ERROR: dict[str, str] = {"error": "no_place"}
 AUTHOR_CAN_NOT_INVITE_ERROR: dict[str, str] = {
-    "error": "The author cannot be invited to his event"
+    "error": "author_cannot_be_invited_to_his_event"
 }
-
-GET_PLANNED_EVENTS_ERROR: dict[str, str] = {
-    "error": "The user has hidden the list of his scheduled events"
-}
-
-
-EVENT_TEMPLATE_NOT_FOUND_ERROR: dict[str, str] = {"error": "Event template not found"}
-
+GET_PLANNED_EVENTS_ERROR: dict[str, str] = {"error": "hidden_planned_events"}
 USER_CAN_NOT_INVITE_TO_THIS_EVENT_ERROR: dict[str, str] = {
-    "error": "You cannot invite users to this event"
+    "error": "no_permissions_to_invite"
 }
-
-THIS_USER_CAN_NOT_BE_INVITED: dict[str, str] = {
-    "error": "This user cannot be invited to this event"
-}
-
-
-NO_PRICE_DESK_ERROR: dict[str, str] = {
-    "error": "If the price is greater than 0 you must provide a description of what it is for"
-}
-SENT_INVATION_ERROR: dict[str, str] = {
-    "error": "You cannot invite yourself to the event"
-}
-
-
-NOTHING_FOUND_FOR_USER_REQUEST_ERROR: dict[str, str] = {
-    "error": "Nothing found for your request"
-}
+THIS_USER_CAN_NOT_BE_INVITED: dict[str, str] = {"error": "this_user_cannot_be_invited"}
+NO_PRICE_DESK_ERROR: dict[str, str] = {"error": "price_description_required"}
+SENT_INVATION_ERROR: dict[str, str] = {"error": "cant_invite_yourself"}

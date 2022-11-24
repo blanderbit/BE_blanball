@@ -3,6 +3,9 @@ from os import getenv, path
 import django
 from decouple import Csv, config
 from django.utils.encoding import smart_str
+from django.utils.translation import (
+    gettext_lazy as _,
+)
 
 django.utils.encoding.smart_text = smart_str
 
@@ -33,6 +36,7 @@ LANGUAGE_CODE: str = config("LANGUAGE_CODE", cast=str)
 TIME_ZONE: str = config("TIME_ZONE", cast=str)
 USE_I18N: bool = config("USE_I18N", cast=bool)
 USE_TZ: bool = config("USE_TZ", cast=bool)
+USE_L10N: bool = True
 
 DEFAULT_AUTO_FIELD: str = "django.db.models.BigAutoField"
 
@@ -50,3 +54,5 @@ if DEBUG == False:
     MINIO_IMAGE_HOST: str = getenv("MINIO_IMAGE_HOST_PROD")
 else:
     MINIO_IMAGE_HOST: str = getenv("MINIO_IMAGE_HOST")
+
+NOVAPOSHTA_API_KEY: str = config("NOVAPOSHTA_API_KEY", cast=str)
