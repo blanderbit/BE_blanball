@@ -53,9 +53,9 @@ from events.serializers import (
     InviteUserToEventSerializer,
     JoinOrRemoveRoomSerializer,
     PopularEventsListSerializer,
+    RemoveUserFromEventSerializer,
     RequestToParticipationSerializer,
     UpdateEventSerializer,
-    RemoveUserFromEventSerializer,
 )
 from events.services import (
     add_dist_filter_to_view,
@@ -163,7 +163,7 @@ class InviteUserToEvent(GenericAPIView):
 
 class GetEvent(RetrieveModelMixin, GenericAPIView):
     """
-    Get event 
+    Get event
 
     This endpoint allows the user, with the exception
     of those blacklisted for this event,
@@ -190,7 +190,7 @@ class UpdateEvent(GenericAPIView):
     queryset: QuerySet[Event] = Event.get_all()
 
     @only_author(Event)
-    def patch(self, request: Request, pk: int) -> Response:
+    def put(self, request: Request, pk: int) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         event: Event = self.queryset.filter(id=pk)
@@ -484,10 +484,10 @@ class UserParticipantEventsList(EventsList):
     """
     List of the user participation history
 
-    This endpoint allows the user to get information 
+    This endpoint allows the user to get information
     about his history of participation in events.
     """
-    
+
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Event]:
         return self.queryset.filter(current_users__in=[self.request.user.id])

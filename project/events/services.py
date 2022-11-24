@@ -26,11 +26,11 @@ from events.constants.notification_types import (
     USER_REMOVE_FROM_EVENT_NOTIFICATION_TYPE,
 )
 from events.constants.response_error import (
-    NO_IN_EVENT_FANS_LIST_ERROR,
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,
     ALREADY_SENT_REQUEST_TO_PARTICIPATE_ERROR,
     EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,
     GET_PLANNED_EVENTS_ERROR,
+    NO_IN_EVENT_FANS_LIST_ERROR,
 )
 from events.models import (
     Event,

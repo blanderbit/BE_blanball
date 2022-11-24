@@ -1,24 +1,22 @@
-import requests
-
 from typing import Type
 
+import requests
+from cities.constants.errors import (
+    NOTHING_FOUND_FOR_USER_REQUEST_ERROR,
+)
 from cities.serializers import (
     GetCoordinatesByPlaceNameSerializer,
     GetPlaceNameByCoordinatesSerializer,
 )
-from cities.constants.errors import (
-    NOTHING_FOUND_FOR_USER_REQUEST_ERROR,
-)
 from config.exceptions import _404
-
+from django.conf import settings
 from geopy.geocoders import Nominatim
+from novaposhta import NovaPoshtaApi
+from rest_framework.generics import GenericAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.generics import GenericAPIView
-from rest_framework.views import APIView
 from rest_framework.serializers import Serializer
-from novaposhta import NovaPoshtaApi
-from django.conf import settings
+from rest_framework.views import APIView
 
 
 class GetCoordinatesByPlaceName(GenericAPIView):
@@ -100,9 +98,10 @@ class UkraineAreasList(APIView):
     List of Ukraine areas
 
 
-    This endpoint allows the user to get 
+    This endpoint allows the user to get
     a list of regions of Ukraine
     """
+
     def get(self, request: Request) -> Response:
         client = NovaPoshtaApi(api_key=settings.NOVAPOSHTA_API_KEY)
         return Response(client.address.get_areas().json())
