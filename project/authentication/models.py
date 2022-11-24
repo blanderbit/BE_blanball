@@ -279,3 +279,17 @@ class Code(models.Model):
         db_table: str = "code"
         verbose_name: str = "code"
         verbose_name_plural: str = "codes"
+
+
+# import requests
+
+# url = "https://api.dmsolutions.com.ua:2661/Token"
+
+# payload='username=shapranov.nik@gmail.com&password=Djoncarton1921_&grant_type=password'
+# headers = {
+#   'Content-Type': 'application/x-www-form-urlencoded'
+# }
+
+# response = requests.request("POST", url, headers=headers, data=payload)
+
+# print(response.text)

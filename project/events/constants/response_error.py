@@ -22,6 +22,3 @@ USER_CAN_NOT_INVITE_TO_THIS_EVENT_ERROR: dict[str, str] = {
 THIS_USER_CAN_NOT_BE_INVITED: dict[str, str] = {"error": "this_user_cannot_be_invited"}
 NO_PRICE_DESK_ERROR: dict[str, str] = {"error": "price_description_required"}
 SENT_INVATION_ERROR: dict[str, str] = {"error": "cant_invite_yourself"}
-NOTHING_FOUND_FOR_USER_REQUEST_ERROR: dict[str, str] = {
-    "error": "nothing_found_for_request"
-}

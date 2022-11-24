@@ -5,11 +5,6 @@ from typing import Any
 from decouple import Csv, config
 from django.conf import settings
 
-from django.forms import Field
-
-Field.default_error_messages = {
-    "required": "fdfdfd",
-}
 
 INSTALLED_APPS: list[str] = [
     "django.contrib.auth",
@@ -34,6 +29,7 @@ INSTALLED_APPS: list[str] = [
     "authentication.apps.AuthenticationConfig",
     "notifications.apps.NotificationsConfig",
     "reviews.apps.ReviewsConfig",
+    "cities.apps.CitiesConfig",
 ]
 
 if not os.environ.get("GITHUB_WORKFLOW"):

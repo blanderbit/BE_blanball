@@ -22,7 +22,6 @@ from events.constants.response_error import (
     EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,
     NO_IN_EVENT_FANS_LIST_ERROR,
     NO_IN_EVENT_MEMBERS_LIST_ERROR,
-    NOTHING_FOUND_FOR_USER_REQUEST_ERROR,
 )
 from events.constants.response_success import (
     APPLICATION_FOR_PARTICIPATION_SUCCESS,
@@ -50,15 +49,13 @@ from events.serializers import (
     DeleteEventsSerializer,
     EventListSerializer,
     EventSerializer,
-    GetCoordinatesByPlaceNameSerializer,
-    GetPlaceNameByCoordinatesSerializer,
     InvitesToEventListSerializer,
     InviteUserToEventSerializer,
     JoinOrRemoveRoomSerializer,
     PopularEventsListSerializer,
-    RemoveUserFromEventSerializer,
     RequestToParticipationSerializer,
     UpdateEventSerializer,
+    RemoveUserFromEventSerializer,
 )
 from events.services import (
     add_dist_filter_to_view,
@@ -76,7 +73,6 @@ from events.services import (
     skip_objects_from_response_by_id,
     validate_user_before_join_to_event,
 )
-from geopy.geocoders import Nominatim
 from notifications.tasks import *
 from rest_framework.exceptions import (
     PermissionDenied,
@@ -110,6 +106,8 @@ from rest_framework_gis.filters import (
 
 class CreateEvent(GenericAPIView):
     """
+    Event create
+
     This endpoint allows the user to create an event.
     The user can also specify the ID of other users in
     the current_users field to send them invitations.
@@ -143,6 +141,8 @@ class CreateEvent(GenericAPIView):
 
 class InviteUserToEvent(GenericAPIView):
     """
+    Invite user to event
+
     This endpoint allows the author of the event
     and the user who is a participant in the event
     to send invitations to participate in this event
@@ -163,6 +163,8 @@ class InviteUserToEvent(GenericAPIView):
 
 class GetEvent(RetrieveModelMixin, GenericAPIView):
     """
+    Get event 
+
     This endpoint allows the user, with the exception
     of those blacklisted for this event,
     get detailed information about any event.
@@ -178,6 +180,8 @@ class GetEvent(RetrieveModelMixin, GenericAPIView):
 
 class UpdateEvent(GenericAPIView):
     """
+    Update event
+
     This endpoint allows the event author
     to change any data on the event
     """
@@ -199,6 +203,8 @@ class UpdateEvent(GenericAPIView):
 
 class DeleteEvents(GenericAPIView):
     """
+    Delete event
+
     This endpoint allows the user to delete
     their events.If the user deletes the event,
     it can no longer be restored.
@@ -220,6 +226,8 @@ class DeleteEvents(GenericAPIView):
 
 class JoinToEvent(GenericAPIView):
     """
+    Join the event as a member
+
     This endpoint allows a user who is not the
     author of this event and is not  already on the
     participants or viewers list to enter the event as a participant.
@@ -245,6 +253,8 @@ class JoinToEvent(GenericAPIView):
 
 class FanJoinToEvent(GenericAPIView):
     """
+    Join the event as a spectator
+
     This endpoint allows a user who is not the
     author of this event and is not  already on the
     participants or viewers list to enter the event as a viewer.
@@ -269,6 +279,8 @@ class FanJoinToEvent(GenericAPIView):
 
 class FanLeaveFromEvent(GenericAPIView):
     """
+    Leave the event as a spectator
+
     This endpoint allows the user who is
     at the event as a spectator to leave it
     """
@@ -288,6 +300,8 @@ class FanLeaveFromEvent(GenericAPIView):
 
 class LeaveFromEvent(GenericAPIView):
     """
+    Leave the event as a member
+
     This endpoint allows the user who is
     at the event as a participant to leave it
     """
@@ -310,6 +324,8 @@ class LeaveFromEvent(GenericAPIView):
 
 class RemoveUserFromEvent(GenericAPIView):
     """
+    Exclude a user from an event
+
     This endpoint allows the event author to
     remove (kick) the user from the event for
     one reason or another.
@@ -336,6 +352,8 @@ class RemoveUserFromEvent(GenericAPIView):
 )
 class EventsList(ListAPIView):
     """
+    List of events
+
     This endpoint allows the user to receive,
     filter and sort the complete list of site events.
     """
@@ -373,6 +391,8 @@ class EventsList(ListAPIView):
 )
 class EventsRelevantList(ListAPIView):
     """
+    Relevant events search
+
     This endpoint allows you to get the 5
     most relevant events for the entered search term.
     Endpoint supports searching with typos and grammatical
@@ -391,6 +411,8 @@ class EventsRelevantList(ListAPIView):
 
 class UserEventsRelevantList(EventsRelevantList):
     """
+    Relevant my events search
+
     This endpoint allows you to get the 5
     most relevant events for the entered search term.
     Endpoint supports searching with typos and grammatical
@@ -408,6 +430,8 @@ class UserEventsRelevantList(EventsRelevantList):
 )
 class InvitesToEventList(ListAPIView):
     """
+    List of my invitations to events
+
     This endpoint allows the user to
     view all of his event invitations.
     """
@@ -424,6 +448,8 @@ class InvitesToEventList(ListAPIView):
 
 class BulkAcceptOrDeclineInvitesToEvent(GenericAPIView):
     """
+    Accepting/declining invitations to participate in an event
+
     This endpoint gives the user the ability to
     accept or decline requests to participate in events.
     """
@@ -444,6 +470,8 @@ class BulkAcceptOrDeclineInvitesToEvent(GenericAPIView):
 
 class UserEventsList(EventsList):
     """
+    List of my events
+
     This endpoint allows the user to get, filter,
     sort the list of events on which he is the author
     """
@@ -453,6 +481,13 @@ class UserEventsList(EventsList):
 
 
 class UserParticipantEventsList(EventsList):
+    """
+    List of the user participation history
+
+    This endpoint allows the user to get information 
+    about his history of participation in events.
+    """
+    
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Event]:
         return self.queryset.filter(current_users__in=[self.request.user.id])
@@ -460,6 +495,8 @@ class UserParticipantEventsList(EventsList):
 
 class PopularEvents(EventsList):
     """
+    List of the most popular events
+
     This endpoint allows the user to get the first 10
     scheduled events. Sorting occurs by the number of
     active users at the event
@@ -478,6 +515,8 @@ class PopularEvents(EventsList):
 
 class UserPlannedEventsList(EventsList):
     """
+    List of user planned events
+
     This endpoint makes it possible to get
     a list of other user's scheduled events.
     Scheduled events are displayed depending
@@ -507,6 +546,8 @@ class UserPlannedEventsList(EventsList):
 @method_decorator(swagger_auto_schema(manual_parameters=[skip_param_query]), name="get")
 class RequestToParticipationsList(ListAPIView):
     """
+    List of requests for participation in the event
+
     This endpoint allows all users to view
     applications for participation in a
     particular private event
@@ -533,6 +574,8 @@ class RequestToParticipationsList(ListAPIView):
 
 class BulkAcceptOrDeclineRequestToParticipation(GenericAPIView):
     """
+    Accepting/declining requests to participate in an event
+
     This endpoint allows the author of a private
     event to accept or reject applications for
     participation in his event.
@@ -550,73 +593,3 @@ class BulkAcceptOrDeclineRequestToParticipation(GenericAPIView):
             data=serializer.validated_data, request_user=request.user
         )
         return Response(data, status=HTTP_200_OK)
-
-
-class GetCoordinatesByPlaceName(GenericAPIView):
-    """
-    This endpoint makes it possible to get
-    the exact coordinates of a place by name
-    Example request:
-    {
-        "place_name": "Paris"
-    }Response:
-    {
-        "name": "Paris, Île-de-France, France métropolitaine,
-            France" - full place name
-        "lat": "48.8588897" - latitude
-        "lon": "2.3200410217200766" - longitude
-    }
-    """
-
-    serializer_class: Type[Serializer] = GetCoordinatesByPlaceNameSerializer
-
-    def post(self, request: Request) -> Response:
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        try:
-            geolocator = Nominatim(user_agent="geoapiExercises")
-            location = geolocator.geocode(serializer.data["place_name"])
-            return Response(
-                {
-                    "name": location.raw["display_name"],
-                    "lat": location.raw["lat"],
-                    "lon": location.raw["lon"],
-                }
-            )
-        except AttributeError:
-            raise _404(detail=NOTHING_FOUND_FOR_USER_REQUEST_ERROR)
-
-
-class GetPlaceNameByCoordinates(GenericAPIView):
-    """
-    This endpoint allows the user to get the
-    name of a point on the map by coordinates
-    Example request:
-    {
-        "lat": "48.8588897" - latitude
-        "lon": "2.3200410217200766" - longitude
-    }Response:
-    {
-    "name": "3, Rue Casimir Périer, Quartier des Invalides,
-            Paris 7e Arrondissement, Faubourg Saint-Germain, Paris,
-            Île-de-France, France métropolitaine, 75007, France" (PARIS)
-    }
-    """
-
-    serializer_class: Type[Serializer] = GetPlaceNameByCoordinatesSerializer
-
-    def post(self, request: Request) -> Response:
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        try:
-            geolocator = Nominatim(user_agent="geoapiExercises")
-            location = geolocator.reverse(
-                str(serializer.data["lat"]) + "," + str(serializer.data["lon"])
-            )
-            return Response(
-                {
-                    "name": location.raw["display_name"],
-                }
-            )
-        except AttributeError:
-            raise _404(detail=NOTHING_FOUND_FOR_USER_REQUEST_ERROR)

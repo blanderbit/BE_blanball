@@ -898,6 +898,24 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "novaposhta-api-client"
+version = "0.0.9"
+description = ""
+category = "main"
+optional = false
+python-versions = "*"
+develop = false
+
+[package.dependencies]
+requests = "*"
+
+[package.source]
+type = "git"
+url = "https://github.com/semolex/novaposhta-api-client"
+reference = "HEAD"
+resolved_reference = "8dd77ed29e6bb0ef3c7b931f79e33e3d99f55117"
+
+[[package]]
 name = "numpy"
 version = "1.23.3"
 description = "NumPy is the fundamental package for array computing with Python."
@@ -1454,7 +1472,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "3.10.7"
-content-hash = "18c83f0dedac89d7ecae7d330453d85b05c02bdf47b91c4f27acb6dc66d40994"
+content-hash = "e1326702ad0546f3ce53ab2dc36469117f87d56cb75782bbe34bbee296798905"
 
 [metadata.files]
 aioredis = [
@@ -1981,6 +1999,7 @@ mypy-extensions = [
     {file = "mypy_extensions-0.4.3-py2.py3-none-any.whl", hash = "sha256:090fedd75945a69ae91ce1303b5824f428daf5a028d2f6ab8a299250a846f15d"},
     {file = "mypy_extensions-0.4.3.tar.gz", hash = "sha256:2d82818f5bb3e369420cb3c4060a7970edba416647068eb4c5343488a6c604a8"},
 ]
+novaposhta-api-client = []
 numpy = [
     {file = "numpy-1.23.3-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:c9f707b5bb73bf277d812ded9896f9512a43edff72712f31667d0a8c2f8e71ee"},
     {file = "numpy-1.23.3-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:ffcf105ecdd9396e05a8e58e81faaaf34d3f9875f137c7372450baa5d77c9a54"},
