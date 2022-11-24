@@ -22,7 +22,7 @@ class CustomRenderer(JSONRenderer):
                     if isinstance(i["code"], str):
                         i["detail"] = f"{attr}_" + i["code"]
                 del i["attr"], i["code"]
-        except TypeError:
+        except (TypeError, AttributeError):
             pass
 
         if not str(status_code).startswith("2"):

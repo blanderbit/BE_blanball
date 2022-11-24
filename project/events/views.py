@@ -22,7 +22,6 @@ from events.constants.response_error import (
     EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,
     NO_IN_EVENT_FANS_LIST_ERROR,
     NO_IN_EVENT_MEMBERS_LIST_ERROR,
-    NOTHING_FOUND_FOR_USER_REQUEST_ERROR,
 )
 from events.constants.response_success import (
     APPLICATION_FOR_PARTICIPATION_SUCCESS,
@@ -50,8 +49,6 @@ from events.serializers import (
     DeleteEventsSerializer,
     EventListSerializer,
     EventSerializer,
-    GetCoordinatesByPlaceNameSerializer,
-    GetPlaceNameByCoordinatesSerializer,
     InvitesToEventListSerializer,
     InviteUserToEventSerializer,
     JoinOrRemoveRoomSerializer,
@@ -76,7 +73,6 @@ from events.services import (
     skip_objects_from_response_by_id,
     validate_user_before_join_to_event,
 )
-from geopy.geocoders import Nominatim
 from notifications.tasks import *
 from rest_framework.exceptions import (
     PermissionDenied,
@@ -550,73 +546,3 @@ class BulkAcceptOrDeclineRequestToParticipation(GenericAPIView):
             data=serializer.validated_data, request_user=request.user
         )
         return Response(data, status=HTTP_200_OK)
-
-
-class GetCoordinatesByPlaceName(GenericAPIView):
-    """
-    This endpoint makes it possible to get
-    the exact coordinates of a place by name
-    Example request:
-    {
-        "place_name": "Paris"
-    }Response:
-    {
-        "name": "Paris, Île-de-France, France métropolitaine,
-            France" - full place name
-        "lat": "48.8588897" - latitude
-        "lon": "2.3200410217200766" - longitude
-    }
-    """
-
-    serializer_class: Type[Serializer] = GetCoordinatesByPlaceNameSerializer
-
-    def post(self, request: Request) -> Response:
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        try:
-            geolocator = Nominatim(user_agent="geoapiExercises")
-            location = geolocator.geocode(serializer.data["place_name"])
-            return Response(
-                {
-                    "name": location.raw["display_name"],
-                    "lat": location.raw["lat"],
-                    "lon": location.raw["lon"],
-                }
-            )
-        except AttributeError:
-            raise _404(detail=NOTHING_FOUND_FOR_USER_REQUEST_ERROR)
-
-
-class GetPlaceNameByCoordinates(GenericAPIView):
-    """
-    This endpoint allows the user to get the
-    name of a point on the map by coordinates
-    Example request:
-    {
-        "lat": "48.8588897" - latitude
-        "lon": "2.3200410217200766" - longitude
-    }Response:
-    {
-    "name": "3, Rue Casimir Périer, Quartier des Invalides,
-            Paris 7e Arrondissement, Faubourg Saint-Germain, Paris,
-            Île-de-France, France métropolitaine, 75007, France" (PARIS)
-    }
-    """
-
-    serializer_class: Type[Serializer] = GetPlaceNameByCoordinatesSerializer
-
-    def post(self, request: Request) -> Response:
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        try:
-            geolocator = Nominatim(user_agent="geoapiExercises")
-            location = geolocator.reverse(
-                str(serializer.data["lat"]) + "," + str(serializer.data["lon"])
-            )
-            return Response(
-                {
-                    "name": location.raw["display_name"],
-                }
-            )
-        except AttributeError:
-            raise _404(detail=NOTHING_FOUND_FOR_USER_REQUEST_ERROR)

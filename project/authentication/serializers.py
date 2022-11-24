@@ -21,38 +21,14 @@ from authentication.validators import (
     CodeValidator,
 )
 from django.contrib import auth
-from django.core.validators import (
-    MaxValueValidator,
-    MinValueValidator,
+from cities.serializers import (
+    PlaceSerializer,
 )
 from rest_framework import serializers
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
 from config.exceptions import _404
-
-
-class PlaceSerializer(serializers.Serializer):
-    place_name: str = serializers.CharField(max_length=255)
-    lat: float = serializers.FloatField(
-        validators=[
-            MinValueValidator(-90),
-            MaxValueValidator(90),
-        ]
-    )
-    lon: float = serializers.FloatField(
-        validators=[
-            MinValueValidator(-180),
-            MaxValueValidator(180),
-        ]
-    )
-
-    class Meta:
-        fields = [
-            "place_name",
-            "lon",
-            "lat",
-        ]
 
 
 class UserPublicProfilePlaceSerializer(serializers.Serializer):

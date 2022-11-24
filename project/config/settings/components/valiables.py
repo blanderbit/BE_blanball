@@ -52,3 +52,5 @@ if DEBUG == False:
     MINIO_IMAGE_HOST: str = getenv("MINIO_IMAGE_HOST_PROD")
 else:
     MINIO_IMAGE_HOST: str = getenv("MINIO_IMAGE_HOST")
+
+NOVAPOSHTA_API_KEY: str = config("NOVAPOSHTA_API_KEY", cast=str)

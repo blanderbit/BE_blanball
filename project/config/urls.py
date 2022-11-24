@@ -16,6 +16,7 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     ),
     path("api/v1/notifications/", include("notifications.urls"), name="notifications"),
     path("api/v1/reviews/", include("reviews.urls"), name="reviews"),
+    path("api/v1/cities/", include("cities.urls"), name="cities"),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
