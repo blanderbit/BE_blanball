@@ -11,6 +11,7 @@ from authentication.views import (
     RequetChangeEmail,
     ResetPassword,
     UpdateProfile,
+    UpdateProfileImage,
     UserOwnerProfile,
     UserProfile,
     UsersList,
@@ -70,5 +71,10 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
         "client/request-verify/email",
         RequestEmailVerify.as_view(),
         name="request-email-verify",
+    ),
+    path(
+        "client/update/my/profile/avatar",
+        UpdateProfileImage.as_view(),
+        name="update-profile-image",
     ),
 ]

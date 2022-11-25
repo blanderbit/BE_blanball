@@ -60,13 +60,15 @@ def check_user_age() -> None:
     ignore_result=True,
     default_retry_delay=5,
 )
-def update_user_messages_after_change_avatar(*, profile: Profile) -> None:
+def update_user_messages_after_change_avatar(*, profile_id: int) -> None:
+    profile: Profile = Profile.objects.get(id=profile_id)
     for notification in Notification.get_all().filter(
-        Q(data__recipient__id=profile.id) | Q(data__sender__id=profile.id)
+        Q(data__recipient__id=profile_id) | Q(data__sender__id=profile_id)
     ):
-        if profile.id == notification.data["recipient"]["id"]:
-            notification.data["recipient"]["avatar"] = profile.avatar_url
-            notification.save()
-        elif profile.id == notification.data["sender"]["id"]:
-            notification.data["sender"]["avatar"] = profile.avatar_url
-            notification.save()
+        if profile.avatar_url != notification.data["recipient"]["avatar"]:
+            if profile.id == notification.data["recipient"]["id"]:
+                notification.data["recipient"]["avatar"] = profile.avatar_url
+                notification.save()
+            elif profile.id == notification.data["sender"]["id"]:
+                notification.data["sender"]["avatar"] = profile.avatar_url
+                notification.save()
