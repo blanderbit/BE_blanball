@@ -5,7 +5,6 @@ from typing import Any, Optional, Union, final
 from authentication.constants.errors import (
     MAX_AGE_VALUE_ERROR,
     MIN_AGE_VALUE_ERROR,
-    AVATAR_MAX_SIZE_ERROR,
 )
 from django.conf import settings
 from django.contrib.auth.models import (
@@ -23,12 +22,19 @@ from django.core.validators import (
     MaxValueValidator,
     MinValueValidator,
 )
-from django.db import models, transaction
+from django.db import models
 from django.db.models.fields.files import (
     ImageFieldFile,
 )
 from django.db.models.query import QuerySet
 from django.utils import timezone
+from django.utils.encoding import smart_bytes
+from django.utils.http import (
+    urlsafe_base64_decode,
+    urlsafe_base64_encode,
+)
+from minio import Minio
+from minio.commonconfig import REPLACE, CopySource
 from phonenumber_field.modelfields import (
     PhoneNumberField,
 )
@@ -86,7 +92,7 @@ def image_file_name(instance: "Profile", filename: str) -> str:
 def validate_image(image: TemporaryUploadedFile) -> str:
     megabyte_limit: float = 1.0
     if image.size > megabyte_limit * 1024 * 1024:
-        raise ValidationError(AVATAR_MAX_SIZE_ERROR, HTTP_400_BAD_REQUEST)
+        raise ValidationError("Max file size is %sMB" % str(megabyte_limit))
 
 
 class Profile(models.Model):
@@ -159,16 +165,33 @@ class Profile(models.Model):
         return self.name
 
     @final
-    @transaction.atomic
     def save(self, *args: Any, **kwargs: Any) -> None:
         if self.place != None:
             self.coordinates = Point(self.place["lon"], self.place["lat"])
         super(Profile, self).save(*args, **kwargs)
-        from authentication.services import (
-            update_user_profile_avatar,
-        )
-
-        update_user_profile_avatar(avatar=self.avatar, profile_id=self.id)
+        try:
+            if self.avatar != None:
+                client: Minio = Minio(
+                    settings.MINIO_ENDPOINT,
+                    access_key=settings.MINIO_ACCESS_KEY,
+                    secret_key=settings.MINIO_SECRET_KEY,
+                    secure=False,
+                )
+                new_image_name: str = f"users/{urlsafe_base64_encode(smart_bytes(self.id))}\
+_{timezone.now().date()}.jpg"
+                client.copy_object(
+                    settings.MINIO_MEDIA_FILES_BUCKET,
+                    new_image_name,
+                    CopySource(settings.MINIO_MEDIA_FILES_BUCKET, self.avatar.name),
+                    metadata_directive=REPLACE,
+                )
+                if self.avatar.name != new_image_name:
+                    client.remove_object(
+                        settings.MINIO_MEDIA_FILES_BUCKET, self.avatar.name
+                    )
+                self.avatar.name = new_image_name
+        except ValueError:
+            pass
 
     @property
     def avatar_url(self) -> Optional[str]:
@@ -256,3 +279,17 @@ class Code(models.Model):
         db_table: str = "code"
         verbose_name: str = "code"
         verbose_name_plural: str = "codes"
+
+
+# import requests
+
+# url = "https://api.dmsolutions.com.ua:2661/Token"
+
+# payload='username=shapranov.nik@gmail.com&password=Djoncarton1921_&grant_type=password'
+# headers = {
+#   'Content-Type': 'application/x-www-form-urlencoded'
+# }
+
+# response = requests.request("POST", url, headers=headers, data=payload)
+
+# print(response.text)

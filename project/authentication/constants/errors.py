@@ -17,5 +17,3 @@ BAD_CODE_ERROR: dict[str, str] = {"error": "bad_verify_code"}
 CODE_EXPIRED_ERROR: str = {"error": "verify_code_expired"}
 
 THIS_EMAIL_ALREADY_IN_USE_ERROR: dict[str, str] = {"error": "email_already_in_use"}
-
-AVATAR_MAX_SIZE_ERROR: dict[str, str] = {"error": "avatar_max_size_1mb"}
