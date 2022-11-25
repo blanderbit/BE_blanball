@@ -31,13 +31,6 @@ from django.template.loader import (
     render_to_string,
 )
 from django.utils import timezone
-from django.utils.encoding import smart_bytes
-from django.utils.http import (
-    urlsafe_base64_decode,
-    urlsafe_base64_encode,
-)
-from minio import Minio
-from minio.commonconfig import REPLACE, CopySource
 from rest_framework.serializers import Serializer
 
 from .tasks import Util
@@ -112,45 +105,17 @@ def code_create(*, email: str, type: str, dop_info: str) -> None:
     Util.send_email.delay(data={"email_body": template, "to_email": email})
 
 
-def update_user_profile_avatar(*, avatar, profile_id: int) -> None:
-    try:
-        new_image_name: str = f"users/{urlsafe_base64_encode(smart_bytes(profile_id))}\
-_{timezone.now().date()}.jpg"
-        if avatar != None:
-            client: Minio = Minio(
-                settings.MINIO_ENDPOINT,
-                access_key=settings.MINIO_ACCESS_KEY,
-                secret_key=settings.MINIO_SECRET_KEY,
-                secure=False,
-            )
-            client.copy_object(
-                settings.MINIO_MEDIA_FILES_BUCKET,
-                new_image_name,
-                CopySource(settings.MINIO_MEDIA_FILES_BUCKET, avatar.name),
-                metadata_directive=REPLACE,
-            )
-            if avatar.name != new_image_name:
-                client.remove_object(settings.MINIO_MEDIA_FILES_BUCKET, avatar.name)
-            avatar.name = new_image_name
-    except ValueError:
-        pass
-
-
-def profile_update(*, profile_id: int, serializer: Serializer) -> dict[str, Any]:
-    profile: Profile = Profile.objects.filter(id=profile_id)
+def profile_update(*, user: User, serializer: Serializer) -> None:
+    serializer.is_valid(raise_exception=True)
+    profile: Profile = Profile.objects.filter(id=user.profile_id)
     profile.update(**serializer.validated_data["profile"])
     count_age(profile=profile[0], data=serializer.validated_data["profile"].items())
+    if serializer.validated_data["profile"].get("avatar") != None:
+        update_user_messages_after_change_avatar.delay(profile=profile[0])
     result: dict[str, Any] = copy.deepcopy(serializer.validated_data)
     serializer.validated_data.pop("profile")
     serializer.save()
     return result
-
-
-def update_profile_avatar(*, profile_id: int, data: dict[str, Any]) -> None:
-    profile: Profile = Profile.objects.get(id=profile_id)
-    profile.avatar = data.get("avatar")
-    profile.save()
-    update_user_messages_after_change_avatar.delay(profile_id=profile_id)
 
 
 def reset_password(*, data: dict[str, Any]) -> None:
