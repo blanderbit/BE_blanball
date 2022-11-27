@@ -173,7 +173,7 @@ class TestEventsViews(SetUpEventsViews):
         get_event = self.client.get(
             reverse("get-event", kwargs={"pk": Event.objects.first().id})
         )
-        response = self.client.patch(
+        response = self.client.put(
             reverse("update-event", kwargs={"pk": Event.objects.first().id}),
             self.event_update_data,
         )
@@ -190,7 +190,7 @@ class TestEventsViews(SetUpEventsViews):
     def test_no_author_update_event(self) -> None:
         self.create_events(1)
         self.register_second_user()
-        response = self.client.patch(
+        response = self.client.put(
             reverse("update-event", kwargs={"pk": Event.objects.first().id}),
             self.event_update_data,
         )
