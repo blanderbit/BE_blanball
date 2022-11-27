@@ -2,10 +2,11 @@ import os
 from datetime import date, datetime
 from typing import Any, Optional, Union, final
 
+import pandas
 from authentication.constants.errors import (
+    AVATAR_MAX_SIZE_ERROR,
     MAX_AGE_VALUE_ERROR,
     MIN_AGE_VALUE_ERROR,
-    AVATAR_MAX_SIZE_ERROR,
 )
 from django.conf import settings
 from django.contrib.auth.models import (
@@ -29,6 +30,13 @@ from django.db.models.fields.files import (
 )
 from django.db.models.query import QuerySet
 from django.utils import timezone
+from django.utils.encoding import smart_bytes
+from django.utils.http import (
+    urlsafe_base64_decode,
+    urlsafe_base64_encode,
+)
+from minio import Minio
+from minio.commonconfig import REPLACE, CopySource
 from phonenumber_field.modelfields import (
     PhoneNumberField,
 )
@@ -171,6 +179,15 @@ class Profile(models.Model):
         update_user_profile_avatar(avatar=self.avatar, profile_id=self.id)
 
     @property
+    @final
+    def new_image_name(self) -> str:
+        d = timezone.now()
+        d.strftime("%Y-%m-%d %H:%M:%S")
+        datetime = timezone.localtime(d).strftime("%Y-%m-%d %H:%M")
+        pandas.to_datetime(datetime).round("1min").to_pydatetime()
+        return f"users/{urlsafe_base64_encode(smart_bytes(self.id))}_{datetime}.jpg"
+
+    @property
     def avatar_url(self) -> Optional[str]:
         if self.avatar:
             return self.avatar.url.replace("minio:9000", settings.MINIO_IMAGE_HOST)
@@ -183,11 +200,7 @@ class Profile(models.Model):
 
 
 class User(AbstractBaseUser):
-    """basic user model"""
-
     class Role(models.TextChoices):
-        """role choices"""
-
         USER: str = "User"
         ADMIN: str = "Admin"
 

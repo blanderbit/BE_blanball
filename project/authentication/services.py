@@ -24,6 +24,7 @@ from authentication.models import (
     User,
 )
 from authentication.tasks import (
+    delete_old_user_profile_avatar_after_update,
     update_user_messages_after_change_avatar,
 )
 from django.conf import settings
@@ -31,11 +32,6 @@ from django.template.loader import (
     render_to_string,
 )
 from django.utils import timezone
-from django.utils.encoding import smart_bytes
-from django.utils.http import (
-    urlsafe_base64_decode,
-    urlsafe_base64_encode,
-)
 from minio import Minio
 from minio.commonconfig import REPLACE, CopySource
 from rest_framework.serializers import Serializer
@@ -114,8 +110,7 @@ def code_create(*, email: str, type: str, dop_info: str) -> None:
 
 def update_user_profile_avatar(*, avatar, profile_id: int) -> None:
     try:
-        new_image_name: str = f"users/{urlsafe_base64_encode(smart_bytes(profile_id))}\
-_{timezone.now().date()}.jpg"
+        profile: Profile = Profile.objects.get(id=profile_id)
         if avatar != None:
             client: Minio = Minio(
                 settings.MINIO_ENDPOINT,
@@ -125,13 +120,13 @@ _{timezone.now().date()}.jpg"
             )
             client.copy_object(
                 settings.MINIO_MEDIA_FILES_BUCKET,
-                new_image_name,
+                profile.new_image_name,
                 CopySource(settings.MINIO_MEDIA_FILES_BUCKET, avatar.name),
                 metadata_directive=REPLACE,
             )
-            if avatar.name != new_image_name:
+            if avatar.name != profile.new_image_name:
                 client.remove_object(settings.MINIO_MEDIA_FILES_BUCKET, avatar.name)
-            avatar.name = new_image_name
+            avatar.name = profile.new_image_name
     except ValueError:
         pass
 
@@ -146,11 +141,13 @@ def profile_update(*, profile_id: int, serializer: Serializer) -> dict[str, Any]
     return result
 
 
-def update_profile_avatar(*, profile_id: int, data: dict[str, Any]) -> None:
-    profile: Profile = Profile.objects.get(id=profile_id)
+def update_profile_avatar(*, profile: Profile, data: dict[str, Any]) -> None:
+    delete_old_user_profile_avatar_after_update.delay(profile_id=profile.id)
     profile.avatar = data.get("avatar")
+    if data.get("avatar") != None:
+        profile.avatar.name: str = profile.new_image_name.replace("users/", "")
     profile.save()
-    update_user_messages_after_change_avatar.delay(profile_id=profile_id)
+    update_user_messages_after_change_avatar.delay(profile_id=profile.id)
 
 
 def reset_password(*, data: dict[str, Any]) -> None:

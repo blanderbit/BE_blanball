@@ -253,9 +253,7 @@ class UpdateProfileImage(GenericAPIView):
         user: User = self.queryset.get(id=self.request.user.id)
         serializer = self.serializer_class(user, data=request.data)
         serializer.is_valid(raise_exception=True)
-        update_profile_avatar(
-            profile_id=user.profile.id, data=serializer.validated_data
-        )
+        update_profile_avatar(profile=user.profile, data=serializer.validated_data)
         return Response(PROFILE_AVATAR_UPDATED_SUCCESS, status=HTTP_200_OK)
 
 
