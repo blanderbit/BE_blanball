@@ -119,7 +119,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         ]
 
 
-class CreateUpdateProfileSerializer(serializers.ModelSerializer):
+class CreateProfileSerializer(serializers.ModelSerializer):
     place = PlaceSerializer(required=False, allow_null=True)
 
     class Meta:
@@ -128,6 +128,19 @@ class CreateUpdateProfileSerializer(serializers.ModelSerializer):
             "created_at",
             "age",
             "coordinates",
+        ]
+
+
+class UpdateProfileSerializer(serializers.ModelSerializer):
+    place = PlaceSerializer(required=False, allow_null=True)
+
+    class Meta:
+        model: Profile = Profile
+        exclude: Union[str, list[str]] = [
+            "created_at",
+            "age",
+            "coordinates",
+            "avatar",
         ]
 
 
@@ -144,8 +157,8 @@ class UserConfigurationSerializer(serializers.Serializer):
         ]
 
 
-class UpdateProfileSerializer(serializers.ModelSerializer):
-    profile = CreateUpdateProfileSerializer()
+class UpdateUserProfileSerializer(serializers.ModelSerializer):
+    profile = UpdateProfileSerializer()
     configuration = UserConfigurationSerializer()
 
     class Meta:
@@ -181,13 +194,21 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 
+class UpdateUserProfileImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model: Profile = Profile
+        fields: Union[str, list[str]] = [
+            "avatar",
+        ]
+
+
 class RegisterSerializer(serializers.ModelSerializer):
 
     password: str = serializers.CharField(max_length=68, min_length=8, write_only=True)
     re_password: str = serializers.CharField(
         max_length=68, min_length=8, write_only=True
     )
-    profile: Profile = CreateUpdateProfileSerializer()
+    profile: Profile = CreateProfileSerializer()
 
     class Meta:
         model: User = User

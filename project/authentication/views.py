@@ -27,6 +27,7 @@ from authentication.constants.success import (
     EMAIL_VERIFY_SUCCESS_TEXT,
     EMAIL_VERIFY_SUCCESS_TITLE,
     PASSWORD_RESET_SUCCESS,
+    PROFILE_AVATAR_UPDATED_SUCCESS,
     REGISTER_SUCCESS_BODY_TITLE,
     REGISTER_SUCCESS_TEXT,
     REGISTER_SUCCESS_TITLE,
@@ -60,7 +61,8 @@ from authentication.serializers import (
     RequestChangePasswordSerializer,
     RequestChangePhoneSerializer,
     ResetPasswordSerializer,
-    UpdateProfileSerializer,
+    UpdateUserProfileImageSerializer,
+    UpdateUserProfileSerializer,
     UserSerializer,
     UsersListSerializer,
     ValidateResetPasswordCodeSerializer,
@@ -71,6 +73,7 @@ from authentication.services import (
     profile_update,
     reset_password,
     send_email_template,
+    update_profile_avatar,
 )
 from config.exceptions import _404
 from django.conf import settings
@@ -95,6 +98,7 @@ from rest_framework.generics import (
     GenericAPIView,
     ListAPIView,
 )
+from rest_framework.parsers import MultiPartParser
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import (
@@ -219,15 +223,38 @@ class UpdateProfile(GenericAPIView):
     user to change their profile information.
     """
 
-    serializer_class: Type[Serializer] = UpdateProfileSerializer
+    serializer_class: Type[Serializer] = UpdateUserProfileSerializer
     queryset: QuerySet[User] = User.get_all()
 
     @transaction.atomic
     def put(self, request: Request) -> Response:
         user: User = self.queryset.get(id=self.request.user.id)
         serializer = self.serializer_class(user, data=request.data)
-        result: dict[str, Any] = profile_update(user=user, serializer=serializer)
+        serializer.is_valid(raise_exception=True)
+        result: dict[str, Any] = profile_update(
+            profile_id=user.profile_id, serializer=serializer
+        )
         return Response(result, status=HTTP_200_OK)
+
+
+class UpdateProfileImage(GenericAPIView):
+    """
+    Update profile avatar
+
+    This endpoint allows the user to change
+    their profile avatar to any other
+    """
+
+    parser_classes = [MultiPartParser]
+    serializer_class: Type[Serializer] = UpdateUserProfileImageSerializer
+    queryset: QuerySet[User] = User.get_all()
+
+    def put(self, request: Request) -> Response:
+        user: User = self.queryset.get(id=self.request.user.id)
+        serializer = self.serializer_class(user, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        update_profile_avatar(profile=user.profile, data=serializer.validated_data)
+        return Response(PROFILE_AVATAR_UPDATED_SUCCESS, status=HTTP_200_OK)
 
 
 class UserProfile(GenericAPIView):
@@ -244,7 +271,7 @@ class UserProfile(GenericAPIView):
     queryset: QuerySet[User] = User.get_all()
 
     def get(self, request: Request, pk: int) -> Response:
-        fields: list = ["configuration"]
+        fields: list[str] = ["configuration"]
         try:
             user: User = self.queryset.get(id=pk)
             for item in user.configuration.items():

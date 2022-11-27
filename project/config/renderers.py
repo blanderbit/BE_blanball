@@ -27,7 +27,6 @@ class CustomRenderer(JSONRenderer):
 
         if not str(status_code).startswith("2"):
             response["status"] = "error"
-            del response["data"]["type"]
             response["data"] = None
             try:
                 response["message"] = data["detail"]
