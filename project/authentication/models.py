@@ -123,7 +123,9 @@ class Profile(models.Model):
 
     name: str = models.CharField(max_length=255)
     last_name: str = models.CharField(max_length=255)
-    gender: str = models.CharField(choices=Gender.choices, max_length=10)
+    gender: Optional[str] = models.CharField(choices=Gender.choices, max_length=10,
+        null=True
+    )
     birthday: Optional[date] = models.DateField(
         null=True, validators=[validate_birthday]
     )
@@ -184,7 +186,6 @@ class Profile(models.Model):
         d = timezone.now()
         d.strftime("%Y-%m-%d %H:%M:%S")
         datetime = timezone.localtime(d).strftime("%Y-%m-%d %H:%M")
-        pandas.to_datetime(datetime).round("1min").to_pydatetime()
         return f"users/{urlsafe_base64_encode(smart_bytes(self.id))}_{datetime}.jpg"
 
     @property

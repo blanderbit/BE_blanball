@@ -82,8 +82,11 @@ def update_user_messages_after_change_avatar(*, profile_id: int) -> None:
                 notification.save()
 
 
-@app.task
-def delete_old_user_profile_avatar_after_update(*, profile_id: int) -> None:
+@app.task(
+    ignore_result=True,
+    default_retry_delay=5,
+)
+def delete_old_user_profile_avatar(*, profile_id: int) -> None:
     client: Minio = Minio(
         settings.MINIO_ENDPOINT,
         access_key=settings.MINIO_ACCESS_KEY,
