@@ -20,7 +20,8 @@ class CustomRenderer(JSONRenderer):
                         i["detail"] = i["detail"].replace(" ", "_").lower()
                 else:
                     if isinstance(i["code"], str):
-                        i["detail"] = f"{attr}_" + i["code"]
+                        if i["code"] != "error":
+                            i["detail"] = f"{attr}_" + i["code"]
                 del i["attr"], i["code"]
         except (TypeError, AttributeError):
             pass
