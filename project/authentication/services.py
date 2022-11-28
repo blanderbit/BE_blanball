@@ -24,7 +24,7 @@ from authentication.models import (
     User,
 )
 from authentication.tasks import (
-    delete_old_user_profile_avatar_after_update,
+    delete_old_user_profile_avatar,
     update_user_messages_after_change_avatar,
 )
 from django.conf import settings
@@ -142,7 +142,7 @@ def profile_update(*, profile_id: int, serializer: Serializer) -> dict[str, Any]
 
 
 def update_profile_avatar(*, profile: Profile, data: dict[str, Any]) -> None:
-    delete_old_user_profile_avatar_after_update.delay(profile_id=profile.id)
+    delete_old_user_profile_avatar.delay(profile_id=profile.id)
     profile.avatar = data.get("avatar")
     if data.get("avatar") != None:
         profile.avatar.name: str = profile.new_image_name.replace("users/", "")

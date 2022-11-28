@@ -44,12 +44,17 @@ class GetCoordinatesByPlaceName(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         try:
             geolocator = Nominatim(user_agent="geoapiExercises")
-            location = geolocator.geocode(serializer.data["place_name"])
+            location = geolocator.geocode(serializer.data["place_name"], country_codes="ua")
+            location = geolocator.reverse(
+                str(location.raw["lat"]) + "," + str(location.raw["lon"])
+            )
             return Response(
                 {
-                    "name": location.raw["display_name"],
-                    "lat": location.raw["lat"],
-                    "lon": location.raw["lon"],
+                    "data": location.raw["address"],
+                    "coordinates": {
+                        "lat": location.raw["lat"],
+                        "lon": location.raw["lon"],
+                    }
                 }
             )
         except AttributeError:
@@ -84,11 +89,15 @@ class GetPlaceNameByCoordinates(GenericAPIView):
             location = geolocator.reverse(
                 str(serializer.data["lat"]) + "," + str(serializer.data["lon"])
             )
-            return Response(
-                {
-                    "name": location.raw["display_name"],
-                }
-            )
+            ff = geolocator.geocode(location.raw["display_name"], country_codes="ua")
+            if ff != None:
+                return Response(
+                    {
+                        "data": location.raw['address']
+                    }
+                )
+            else: 
+                raise _404(detail=NOTHING_FOUND_FOR_USER_REQUEST_ERROR)
         except AttributeError:
             raise _404(detail=NOTHING_FOUND_FOR_USER_REQUEST_ERROR)
 
