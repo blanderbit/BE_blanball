@@ -10,7 +10,6 @@ from authentication.constants.code_types import (
     EMAIL_VERIFY_CODE_TYPE,
     PASSWORD_CHANGE_CODE_TYPE,
     PASSWORD_RESET_CODE_TYPE,
-    PHONE_CHANGE_CODE_TYPE,
 )
 from authentication.constants.success import (
     EMAIL_MESSAGE_TEMPLATE_TITLE,
@@ -66,9 +65,7 @@ def send_email_template(*, user: User, body_title: str, title: str, text: str) -
 
 
 def check_code_type(*, code: Code) -> str:
-    if code.type == PHONE_CHANGE_CODE_TYPE:
-        title = EMAIL_MESSAGE_TEMPLATE_TITLE.format(type="Change", key="phone number")
-    elif code.type == EMAIL_CHANGE_CODE_TYPE:
+    if code.type == EMAIL_CHANGE_CODE_TYPE:
         title = EMAIL_MESSAGE_TEMPLATE_TITLE.format(type="Change", key="email address")
     elif code.type == ACCOUNT_DELETE_CODE_TYPE:
         title = EMAIL_MESSAGE_TEMPLATE_TITLE.format(type="Removal", key="account")

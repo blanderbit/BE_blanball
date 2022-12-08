@@ -5,7 +5,6 @@ from authentication.views import (
     LoginUser,
     RegisterUser,
     RequestChangePassword,
-    RequestChangePhone,
     RequestEmailVerify,
     RequestPasswordReset,
     RequetChangeEmail,
@@ -61,11 +60,6 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
         "client/request-change/email",
         RequetChangeEmail.as_view(),
         name="request-change-email",
-    ),
-    path(
-        "client/request-change/phone",
-        RequestChangePhone.as_view(),
-        name="request-change-phone",
     ),
     path(
         "client/request-verify/email",
