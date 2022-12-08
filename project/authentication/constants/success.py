@@ -10,7 +10,6 @@ PASS_UPDATE_SUCCESS_TEXT: str = (
     "You received this message because your password has been changed in BlanBall."
 )
 
-CHANGE_PHONE_SUCCESS: dict[str, str] = {"succes": "phone_change"}
 CHANGE_EMAIL_SUCCESS: dict[str, str] = {"succes": "email_change"}
 
 
