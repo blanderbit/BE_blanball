@@ -53,39 +53,6 @@ class TestAuthenticationViews(SetUpAauthenticationViews):
         response = self.client.post(reverse("register"), self.user_register_bad_data)
         self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
 
-    def test_check_change_phone(self) -> None:
-        self.auth()
-        self.client.post(
-            reverse("request-change-phone"), self.request_change_phone_data
-        )
-        response = self.client.post(
-            reverse("check-code"), {"verify_code": Code.objects.first().verify_code}
-        )
-        self.assertEqual(
-            User.objects.first().phone, self.request_change_phone_data["phone"]
-        )
-        self.assertEqual(response.status_code, HTTP_200_OK)
-
-    def test_change_phone_with_same_data(self) -> None:
-        self.auth()
-        response = self.client.post(
-            reverse("request-change-phone"), {"phone": self.user_register_data["phone"]}
-        )
-        self.assertEqual(Code.objects.count(), 0)
-        self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
-
-    def test_check_code_after_expire(self) -> None:
-        self.auth()
-        with freeze_time("2022-9-28-14:00"):
-            self.client.post(
-                reverse("request-change-phone"), self.request_change_phone_data
-            )
-        with freeze_time("2022-9-28-14:06"):
-            response = self.client.post(
-                reverse("check-code"), {"verify_code": Code.objects.first().verify_code}
-            )
-        self.assertEqual(User.objects.first().phone, self.user_register_data["phone"])
-        self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
 
     def test_change_email(self) -> None:
         self.auth()
@@ -120,7 +87,7 @@ class TestAuthenticationViews(SetUpAauthenticationViews):
     def test_change_email_with_same_data(self) -> None:
         self.auth()
         response = self.client.post(
-            reverse("request-change-phone"), {"email": self.user_register_data["email"]}
+            reverse("request-change-email"), {"email": self.user_register_data["email"]}
         )
         self.assertEqual(Code.objects.count(), 0)
         self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
