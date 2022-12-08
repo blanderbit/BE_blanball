@@ -100,10 +100,7 @@ services:
     networks:
       - app-network
     ports:
-      - 49280:49280
-    depends_on:
-      db:
-        condition: service_started
+      - 49280:${PGADMIN_LISTEN_PORT}
 
   db_backup:
     container_name: db_backup
