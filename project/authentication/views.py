@@ -6,7 +6,6 @@ from authentication.constants.code_types import (
     EMAIL_VERIFY_CODE_TYPE,
     PASSWORD_CHANGE_CODE_TYPE,
     PASSWORD_RESET_CODE_TYPE,
-    PHONE_CHANGE_CODE_TYPE,
 )
 from authentication.constants.errors import (
     ALREADY_VERIFIED_ERROR,
@@ -22,7 +21,6 @@ from authentication.constants.success import (
     ACTIVATION_SUCCESS,
     CHANGE_EMAIL_SUCCESS,
     CHANGE_PASSWORD_SUCCESS,
-    CHANGE_PHONE_SUCCESS,
     EMAIL_VERIFY_SUCCESS_BODY_TITLE,
     EMAIL_VERIFY_SUCCESS_TEXT,
     EMAIL_VERIFY_SUCCESS_TITLE,
@@ -59,7 +57,6 @@ from authentication.serializers import (
     LoginSerializer,
     RegisterSerializer,
     RequestChangePasswordSerializer,
-    RequestChangePhoneSerializer,
     ResetPasswordSerializer,
     UpdateUserProfileImageSerializer,
     UpdateUserProfileSerializer,
@@ -481,26 +478,6 @@ class RequetChangeEmail(GenericAPIView):
         return Response(THIS_EMAIL_ALREADY_IN_USE_ERROR, status=HTTP_400_BAD_REQUEST)
 
 
-class RequestChangePhone(GenericAPIView):
-    """
-    Request change phone
-
-    This class allows an authorized user to request a phone change.
-    After submitting the application, a confirmation code will be sent.
-    to the email address provided by the user.
-    """
-
-    serializer_class: Type[Serializer] = RequestChangePhoneSerializer
-
-    def post(self, request: Request) -> Response:
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        code_create(
-            email=request.user.email,
-            type=PHONE_CHANGE_CODE_TYPE,
-            dop_info=serializer.validated_data["phone"],
-        )
-        return Response(SENT_CODE_TO_EMAIL_SUCCESS, status=HTTP_200_OK)
 
 
 class CheckCode(GenericAPIView):
@@ -539,11 +516,6 @@ class CheckCode(GenericAPIView):
             self.user.set_password(self.code.dop_info)
             self.success(key="password")
             return Response(CHANGE_PASSWORD_SUCCESS, status=HTTP_200_OK)
-
-        elif self.code.type == PHONE_CHANGE_CODE_TYPE:
-            self.user.phone = self.code.dop_info
-            self.success(key="phone number")
-            return Response(CHANGE_PHONE_SUCCESS, status=HTTP_200_OK)
 
         elif self.code.type == EMAIL_CHANGE_CODE_TYPE:
             self.user.email = self.code.dop_info
