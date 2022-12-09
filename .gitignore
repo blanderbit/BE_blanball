@@ -98,3 +98,4 @@ qa.txt
 .mypy_cache/
 
 drf-yasg/
+.vscode/
