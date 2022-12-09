@@ -93,7 +93,7 @@ services:
     container_name: pgadmin
     env_file: 
       - stack.env
-    image: dpage/pgadmin4
+    image: dpage/pgadmin4:latest
     restart: always
     volumes:
       - pgadmin-data:/usr/src/blanball/storage/pgadmin/data
