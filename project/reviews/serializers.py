@@ -18,6 +18,9 @@ from reviews.constants.notification_types import (
 )
 from reviews.models import Review
 
+from authentication.serializers import (
+    ReviewAuthorSerializer,
+)
 
 class CreateReviewSerializer(ModelSerializer):
     class Meta:
@@ -68,6 +71,8 @@ class CreateReviewSerializer(ModelSerializer):
 
 
 class ReviewListSerializer(ModelSerializer):
+    author = ReviewAuthorSerializer()
+
     class Meta:
         model: Review = Review
         exclude: Union[str, list[str]] = [

@@ -36,6 +36,24 @@ class UserPublicProfilePlaceSerializer(serializers.Serializer):
             "place_name",
         ]
 
+class ReviewAuthorProfileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model: User = Profile
+        fields: Union[str, list[str]] = [
+            "name",
+            "last_name",
+        ]
+
+class ReviewAuthorSerializer(serializers.ModelSerializer):
+    profile = ReviewAuthorProfileSerializer()
+
+    class Meta:
+        model: User = User
+        fields: Union[str, list[str]] = [
+            "profile"
+        ]
+
 
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs) -> None:
