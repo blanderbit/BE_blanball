@@ -103,6 +103,7 @@ class EventListSerializer(serializers.ModelSerializer):
             "amount_members",
             "status",
             "gender",
+            "description",
             "price",
             "type",
             "need_ball",
