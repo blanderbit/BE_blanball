@@ -1,23 +1,23 @@
 from typing import Type
 
-import requests
-from cities.constants.errors import (
-    NOTHING_FOUND_FOR_USER_REQUEST_ERROR,
-)
 from cities.serializers import (
     GetCoordinatesByPlaceNameSerializer,
     GetPlaceNameByCoordinatesSerializer,
 )
-from config.exceptions import _404
+from cities.services import (
+    get_place_name_by_coordinates,
+    get_coordinates_by_place_name,
+)
 from django.conf import settings
-from geopy.geocoders import Nominatim
 from novaposhta import NovaPoshtaApi
 from rest_framework.generics import GenericAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
-
+from rest_framework.status import (
+    HTTP_200_OK,
+)
 
 class GetCoordinatesByPlaceName(GenericAPIView):
     """
@@ -42,23 +42,10 @@ class GetCoordinatesByPlaceName(GenericAPIView):
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        try:
-            geolocator = Nominatim(user_agent="geoapiExercises")
-            location = geolocator.geocode(serializer.data["place_name"], country_codes="ua")
-            location = geolocator.reverse(
-                str(location.raw["lat"]) + "," + str(location.raw["lon"])
-            )
-            return Response(
-                {
-                    "data": location.raw["address"],
-                    "coordinates": {
-                        "lat": location.raw["lat"],
-                        "lon": location.raw["lon"],
-                    }
-                }
-            )
-        except AttributeError:
-            raise _404(detail=NOTHING_FOUND_FOR_USER_REQUEST_ERROR)
+        coordinates = get_coordinates_by_place_name(
+            place_name=serializer.data["place_name"]
+        )
+        return Response(coordinates, HTTP_200_OK)
 
 
 class GetPlaceNameByCoordinates(GenericAPIView):
@@ -84,22 +71,8 @@ class GetPlaceNameByCoordinates(GenericAPIView):
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        try:
-            geolocator = Nominatim(user_agent="geoapiExercises")
-            location = geolocator.reverse(
-                str(serializer.data["lat"]) + "," + str(serializer.data["lon"])
-            )
-            ff = geolocator.geocode(location.raw["display_name"], country_codes="ua")
-            if ff != None:
-                return Response(
-                    {
-                        "data": location.raw['address']
-                    }
-                )
-            else: 
-                raise _404(detail=NOTHING_FOUND_FOR_USER_REQUEST_ERROR)
-        except AttributeError:
-            raise _404(detail=NOTHING_FOUND_FOR_USER_REQUEST_ERROR)
+        place = get_place_name_by_coordinates(data=serializer.data)
+        return Response(place, HTTP_200_OK)
 
 
 class UkraineAreasList(APIView):
