@@ -38,14 +38,14 @@ jobs:
         sudo apt-get install -y gdal-bin libgdal-dev 
         sudo apt-get install -y python3-gdal 
         sudo apt-get install -y binutils libproj-dev
-    - uses: actions/setup-python@v3
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-        cache: 'poetry'
     - name: Install poetry
       run: |
         pip install --upgrade pip
         pip install poetry==${{ env.POETRY_VERSION }}
+    - uses: actions/setup-python@v3
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'poetry'
       env:
         PATH: /root/.poetry/bin:/opt/venv/bin:${PATH}
     - name: Install deps
