@@ -1,0 +1,14 @@
+EN
+- Fixed bugs with notifications
+- Updated update notification that comes after responding to an event invitation
+- Added an update to a new notification that comes after a response to a request to participate in an event
+- The logic of the InviteToEvent and RequestToParticipation models has been redesigned, they are no longer deleted after the response
+- Fixed bug with temporary notifications
+- Changed docker-compose configuration
+RU
+- Исправлены баги с нотификациями
+- Обновлена update нотификация которая отправляется после ответа на приглашение на событие
+- Добавлена новая update нотификация которая отправляется после ответа на запрос на участие в событии
+- Переработана логика моделей InviteToEvent и RequestToParticipation, они больше не удаляются после ответа 
+- Исправлен баг с временными нотификациями
+- Изменена конфигурация docker-compose

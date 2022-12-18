@@ -1,0 +1,12 @@
+EN
+- Added new endpoint to change profile picture
+- Fixed bugs with updating the user profile picture
+- Added a function that deletes the user's old picture when he uploads a new one
+- Fixed bug with incorrect backend time zone
+- Added deleting a picture from the storage after deleting a user profile
+RU
+- Добавлен новый ендпоинт для смены картинки в профиле
+- Исправлены баги с обновлением картинки пользователя в профиле
+- Добавлена функция которая удаляет старую картинку пользователя когда он загружает новую
+- Исправлен баг с не правельным временным поясом бекенда
+- Добавлено удаление картинки со сторейджа после удаления профиля пользователя

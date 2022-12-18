@@ -1,0 +1,16 @@
+EN
+- Changed access for endpoints for getting the current version and getting the current state of those works. Now all site users have access to these endpoints
+- Added endpoint to delete all notifications at once
+- Added endpoint for reading all notifications at once
+- Sending a message to a socket now works in the background
+- Added auto code formatter according to pep8 standards
+- Fixed a bug where a user who is on the blacklist of an event could view requests to participate in this event
+- Fixed bug with launching workflows in github actions
+RU
+- Изменен доступ для ендпоинтов получения текущей версии и получения текущего состояния тех работ. Теперь доступ к этим ендпоинтам имеют все пользователи сайта
+- Добавлен ендпоинт для удаления всех нотиификаций сразу
+- Добавлен ендпоинт для чтения всех нотификаций сразу
+- Отправка сообщения в сокет теперь работает в фоне
+- Добавлен авто форматер кода по стандартам pep8
+- Исправлен баг при котором пользователь который находится в черном списке события мог просмотреть запросы на участие в этом событии
+- Исправлен баг с запуском workflows в гитхаб екшинах

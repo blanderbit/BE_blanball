@@ -1,0 +1,18 @@
+EN
+- Changed the root project settings file
+- Settings have been split into different functional blocks
+    - Vaults
+    - Project Core
+    - smtp
+    - Turn
+    - Variables
+- The root directory of the project was renamed from the project folder to the config folder
+RU
+- Изменен корневой файл настроек проекта
+- Настройки были разбиты на разные функциональные блоки
+    - Хранилища
+    - Кор проекта
+    - Смтп
+    - Очередь
+    - Переменные
+- Был переимнован корневой каталог проекта из папки project в папку config
