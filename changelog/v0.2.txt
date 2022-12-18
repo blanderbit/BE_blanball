@@ -1,0 +1,8 @@
+EN
+- Fixed bug with relevant search
+- Updated pagination
+- Added display of user activity status
+RU
+- Исправлен баг с релевантным поиском
+- Обновлена пагинация
+- Добавлено отображение статуса активности пользователя

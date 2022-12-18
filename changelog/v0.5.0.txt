@@ -1,0 +1,16 @@
+EN
+- Fixed issues with migrations and disabling the database
+- Changed the format of the response to requests
+- Added event_name field in all notifications
+- Fixed bugs with status codes
+- Notification about maintenance changes is no longer stored in the database
+- Changed notifications for confirmation, rejection of a request for participation and an invite to an event
+- Added messages to the socket for updating notifications after confirming or rejecting an invite to an event
+RU
+- Исправлены проблемы с миграциями и отключением базы данных
+- Изменен формат ответа на запросы
+- Добавлено поле ivent_name во всех нотификациях
+- Исправлены ошибки со статус кодами
+- Нотификация про изменения maintenance больше не хранится в базе данных
+- Изменены нотификации подтвереджения, отклонения запроса на участие и инвайта на ивент
+- Добавлены месседжи в сокет для для обновления нотификаций полсе подтверждения или отклонения инвайта на ивент

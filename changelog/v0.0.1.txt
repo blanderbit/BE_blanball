@@ -1,0 +1,32 @@
+EN
+- Updated list of all users
+- Fixed a bug with calculating and updating the user's age
+- Now the event has 2 privacy statuses: open access and closed
+- If access is open, then users can enter the event as a participant automatically
+- If closed, then the author will receive a request for participation, which he can either reject or accept
+- Fixed bug with notification texts
+- Added templates for sending messages to the mail
+- Added Relevant Search function. Relevant search returns the 5 most relevant records from the database for your query
+- Added the ability to change / view the configuration
+- Added the ability to get the current version
+- Added the ability to check the user for activity
+- Added the ability to enter the event as a spectator
+- Spectators receive notifications in the same way as event players
+- Fixed a bug with connecting and disconnecting from a socket
+- Work was carried out to improve and optimize the code
+RU
+- Обновлен список всех пользователей
+- Исправлен баг  с подсчетом и обновлением возраста пользователя
+- Теперь событие имеет 2 статуса приватности : открытый доступ и закрытый
+- Если доступ открытый то пользователи могут зайти на событие как участник автоматически
+- Если закрытый , то автору придет запрос на участие, который он может либо отклонить либо принять
+- Исправлен баг с текстами нотификаций
+- Добавлены шаблоны для отправки сообщений на почту
+- Добавлена функция релевантного поиска. Релевантный поиск выдает 5 самых подходящих записей из базы данных по вашему запросу
+- Добавлена возможность сменить / просмотреть конфигурацию
+- Добавлена возможность получить текущую версию
+- Добавлена возможность проверить пользователя на активность
+- Добавлена возможность зайти на событие как зритель
+- Зрители так же получают нотификации как и игроки события
+- Исправлен баг с подключением и отключением от сокета
+- Были проведены работы по улучшению и оптимизации кода
