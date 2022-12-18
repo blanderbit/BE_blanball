@@ -35,11 +35,8 @@ from rest_framework.status import (
 
 
 class Event(models.Model):
-    """footbal Event model"""
 
     class Type(models.TextChoices):
-        """Event  type choices"""
-
         FOOTBALL: str = "Football"
         FUTSAL: str = "Futsal"
 

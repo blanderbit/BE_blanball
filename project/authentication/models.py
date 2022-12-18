@@ -32,11 +32,8 @@ from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.utils.encoding import smart_bytes
 from django.utils.http import (
-    urlsafe_base64_decode,
     urlsafe_base64_encode,
 )
-from minio import Minio
-from minio.commonconfig import REPLACE, CopySource
 from phonenumber_field.modelfields import (
     PhoneNumberField,
 )
@@ -53,8 +50,6 @@ from rest_framework_simplejwt.tokens import (
 
 
 class UserManager(BaseUserManager):
-    """user manager"""
-
     @final
     def create_user(
         self, email: str, phone: str, password: None = None, *agrs: Any, **kwargs: Any
@@ -69,8 +64,6 @@ class UserManager(BaseUserManager):
 
 
 class Gender(models.TextChoices):
-    """gender choices"""
-
     MAN: str = "Man"
     WOMAN: str = "Woman"
 
