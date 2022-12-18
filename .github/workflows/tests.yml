@@ -1,14 +1,7 @@
-name: Run tests
-
-on: 
-  push:
-    branches:
-      - develop
-      - main
-  workflow_dispatch:
+name: tests
 
 jobs:
-  run_tests:
+  tests:
     runs-on: ubuntu-latest
     env:
       ENV_FILE: ${{ secrets.ENV_FILE }}
@@ -42,7 +35,7 @@ jobs:
         sudo apt-get install -y gdal-bin libgdal-dev 
         sudo apt-get install -y python3-gdal 
         sudo apt-get install -y binutils libproj-dev
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v3
       with:
         python-version: ${{ env.PYTHON_VERSION }}
         cache: 'poetry'
