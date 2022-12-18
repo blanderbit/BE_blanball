@@ -8,4 +8,3 @@ changelog
 changelog
 .gitignore
 postgres-data
-nginx
