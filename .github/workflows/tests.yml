@@ -42,12 +42,12 @@ jobs:
       run: |
         pip install --upgrade pip
         pip install poetry==${{ env.POETRY_VERSION }}
-    - name: Install deps
+    - name: Cache deps
       uses: actions/setup-python@v3
       with:
         python-version: ${{ env.PYTHON_VERSION }}
         cache: 'poetry'
-      run: poetry install
+    - run: poetry install
     - name: Run tests
       run: |
         echo $ENV_FILE | base64 --decode > .env
