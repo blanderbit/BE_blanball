@@ -9,7 +9,7 @@ on:
 
 jobs:
   run_tests:
-    uses: blanderbit/BE_blanball/.github/workflows/tests.yml@v${{ github.ref_name }}
+    uses: blanderbit/BE_blanball/.github/workflows/tests.yml@${{ github.ref_name }}
   deploy:
     runs-on: ubuntu-latest
     needs: run_tests
