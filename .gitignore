@@ -30,7 +30,7 @@ Temporary Items
 __pycache__/
 *.py[cod]
 
-# C extensions
+# C extensionss
 *.so
 
 # Distribution / packaging
@@ -97,5 +97,4 @@ postgres-data/
 qa.txt
 .mypy_cache/
 
-drf-yasg/
 .vscode/

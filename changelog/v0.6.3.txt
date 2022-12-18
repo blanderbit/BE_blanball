@@ -1,5 +1,5 @@
 EN
-- Added auto version update when creating a new vteka
+- Added auto version update when creating a new branch
 - Added new filters profile__age_min, profile__age_max,
 date_and_time_after, date_and_time_before
 - Added license for the project
@@ -9,7 +9,7 @@ date_and_time_after, date_and_time_before
 - Added a new endpoint for getting a list of regions of Ukraine
 - Updated swagger documentation
 RU
-- Добавлено авто обновление версии при создании новой втеки
+- Добавлено авто обновление версии при создании новой вeтки
 - Добавлены новые фильтры profile__age_min,profile__age_max,
 date_and_time_after, date_and_time_before
 - Добавлена лицензия для проекта
