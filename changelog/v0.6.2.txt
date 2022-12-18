@@ -1,0 +1,16 @@
+EN
+- Refactored documentation in the swagger for the block of events, authentication and reviews
+- Added pictures of users in the notification
+- Done a small code review: notifications, events
+- Fully documented notifications in swagger
+- Backend tests resumed
+- Fixed bugs with sending images to the socket
+- Fixed bug with image host display
+RU
+- Отрефакторено документация в сваггере для блока ивентов, аунетификации и отзывов
+- Добавлены картинки пользователей в нотификации
+- Проделано не большое код ревью: нотификаций, ивентов
+- Полностью задокументированы нотификации в сваггере
+- Возобновлена работа тестов бекенда
+- Исправлены баги с отправкой картинок в сокет
+- Исправлен баг с отображением хоста картинок 

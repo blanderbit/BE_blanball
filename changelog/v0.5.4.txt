@@ -1,0 +1,14 @@
+EN
+- Ftp server changed to minio storage
+- Added changing the name of the pictures when they are saved
+- Added validation for image size
+- Added the ability to remove list items by id in all project lists
+- Removed endpoint for getting a list of admins
+- Added auto-formatter for project imports
+RU
+- Ftp server изменен на minio storage
+- Добавлено изменение названия картинок при их сохранении
+- Добавлена валидация для размера картинок 
+- Добавлена возможность убрать элементы списка по айди во всех списках проекта
+- Убран ендпоинт получения списка админов 
+- Добавлен автоформатер импортов для проекта

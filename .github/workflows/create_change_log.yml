@@ -20,6 +20,7 @@ jobs:
         git config --local user.name "GitHub Action"
         git commit -am "auto create change log for ${{ github.event.release.name }}"
         git tag ${{ steps.semantic_release_info.outputs.git_tag }}
+        git add changelog/${{ github.event.release.name }}.txt
     - name: Push changes
       uses: ad-m/github-push-action@v0.6.0
       with:

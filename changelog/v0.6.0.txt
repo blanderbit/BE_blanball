@@ -1,0 +1,22 @@
+EN
+- Optimized most of the database queries
+- Added a new optional field "working leg" to the user profile
+- Fixed a bug with changing the profile
+- All PUT methods change to PATCH
+- Added a method that returns the coordinates of a place by the entered name
+- Added a method that returns the name of the place by the entered coordinates
+- Fixed a bug with updating the profile, changing the configuration format in updating the profile
+- In reviews, the email field has been replaced with the author field
+- Fixed bug with saving pictures in 2 instances
+- Changed the place field in the event and added event filtering by coordinates
+RU
+- Оптимизирована большая часть запросов к базе данных
+- Добавлено новое не обязательное поле  “working leg” в профиль пользователя
+- Испралвен баг с изменением профиля
+- Все методы PUT измены на PATCH
+- Добавлен метод который возвращает координаты места по введенному названию
+- Добавлен метод который возвращает название  места по введенным  координатам
+- Исправлен баг с обновлением профиля, измене формат конфигурации в обновлении профиля
+- В отзывах поле email заменено на поле author 
+- Исправлен баг с сохранением картинок в 2 екземплярах
+- Изменено поле place в событии и добавлена фильтрация событий по координатам

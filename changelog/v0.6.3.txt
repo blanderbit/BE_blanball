@@ -1,0 +1,20 @@
+EN
+- Added auto version update when creating a new vteka
+- Added new filters profile__age_min, profile__age_max,
+date_and_time_after, date_and_time_before
+- Added license for the project
+- Added common response format
+- Fixed a bug with the fact that the user's place of residence field was mandatory
+- Added new endpoint for password reset code validation
+- Added a new endpoint for getting a list of regions of Ukraine
+- Updated swagger documentation
+RU
+- Добавлено авто обновление версии при создании новой втеки
+- Добавлены новые фильтры profile__age_min,profile__age_max,
+date_and_time_after, date_and_time_before
+- Добавлена лицензия для проекта
+- Добавлен общий формат ответов
+- Исправлен баг с тем что поле место жительства пользователя было обязательным к заполнению 
+- Добавлен новый ендпоинт для валидации кода сброса пароля
+- Добавлен новый ендпоинт для получения списка областей Украины
+- Обновлена документация сваггера

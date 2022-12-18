@@ -1,0 +1,16 @@
+EN
+- Changed behavior when changing the maintenance parameter
+- Added a new websocket channel general/ which will receive messages for all authorized and non-authorized users
+- Fixed bug with project auto testing
+- Added notification that is sent after the end of the event
+- Added notification that is sent after the last user enters the event
+- Added cleaning of the database after the event has been completed, requests to participate in this event and invitations to this event are deleted
+- Now when the event is over, all notifications associated with them are marked with the flags finished
+RU
+- Изменено поведение при изменении параметра maintenance
+- Добавлен новый вебсокет канал general/ в который будут приходит сообщения для всех пользователей авторизованных и не - авторизованных
+- Исправлен баг с авто тестированием проекта
+- Добавлена нотификация которая отправляется после окончания события
+- Добавлена нотификация которая отправляется после того как на событие заходит последний пользователь
+- Добавлено очищение базы данных после того как событие было закончено, удаляются запросы на участие в этом событии и приглашения на это события
+- Теперь когда событие закончилось все связанные  с ними нотификации помечаются флагов finished
