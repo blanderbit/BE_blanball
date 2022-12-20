@@ -178,7 +178,7 @@ class Profile(models.Model):
     def new_image_name(self) -> str:
         d = timezone.now()
         d.strftime("%Y-%m-%d %H:%M:%S")
-        datetime = timezone.localtime(d).strftime("%Y-%m-%d %H:%M")
+        datetime = timezone.localtime(d).strftime("%Y-%m-%d")
         return f"users/{urlsafe_base64_encode(smart_bytes(self.id))}_{datetime}.jpg"
 
     @property
