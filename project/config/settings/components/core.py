@@ -79,7 +79,7 @@ TEMPLATES: list[dict[str, Any]] = [
 ]
 
 SWAGGER_SETTINGS: dict[str, Any] = {
-    "SHOW_REQUEST_HEADERS": config("SHOW_REQUEST_HEADERS", cast=bool),
+    "SHOW_REQUEST_HEADERS": True,
     "HIDE_HOSTNAME": True,
     "SECURITY_DEFINITIONS": {
         "Bearer": {"type": "apiKey", "name": "Authorization", "in": "Header"}
