@@ -32,9 +32,9 @@ from django.template.loader import (
 )
 from django.utils import timezone
 from minio import Minio
+from minio.error import S3Error
 from minio.commonconfig import REPLACE, CopySource
 from rest_framework.serializers import Serializer
-
 from .tasks import Util
 
 
@@ -124,7 +124,7 @@ def update_user_profile_avatar(*, avatar, profile_id: int) -> None:
             if avatar.name != profile.new_image_name:
                 client.remove_object(settings.MINIO_MEDIA_FILES_BUCKET, avatar.name)
             avatar.name = profile.new_image_name
-    except ValueError:
+    except (ValueError, S3Error):
         pass
 
 
