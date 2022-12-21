@@ -117,14 +117,14 @@ def update_user_profile_avatar(*, avatar, profile_id: int) -> None:
             )
             client.copy_object(
                 settings.MINIO_MEDIA_FILES_BUCKET,
-                profile.new_image_name,
+                profile.avatar.name,
                 CopySource(settings.MINIO_MEDIA_FILES_BUCKET, avatar.name),
                 metadata_directive=REPLACE,
             )
-            if avatar.name != profile.new_image_name:
+            if avatar.name != profile.avatar.name:
                 client.remove_object(settings.MINIO_MEDIA_FILES_BUCKET, avatar.name)
-            avatar.name = profile.new_image_name
-    except (ValueError, S3Error):
+            avatar.name = profile.avatar.name
+    except (ValueError):
         pass
 
 
