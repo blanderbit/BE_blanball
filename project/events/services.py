@@ -364,7 +364,7 @@ def add_dist_filter_to_view(
     def wrap(self) -> QuerySet[Union[User, Event]]:
         try:
             distance: int = self.request.query_params["dist"]
-            if distance < 0:
+            if int(distance) < 0:
                 distance = None
             if distance != None:
                 self.filter_backends.append(DistanceToPointFilter)
@@ -372,7 +372,6 @@ def add_dist_filter_to_view(
                 return func(self)
         except:
             return func(self)
-
     return wrap
 
 
