@@ -132,8 +132,7 @@ class ReadNotifications(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         return Response(
             bulk_read_notifications(
-                data=serializer.validated_data["ids"],
-                queryset=self.queryset,
+                ids=serializer.validated_data["ids"],
                 user=request.user,
             ),
             status=HTTP_200_OK,
@@ -165,8 +164,7 @@ class DeleteNotifcations(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         return Response(
             bulk_delete_notifications(
-                data=serializer.validated_data["ids"],
-                queryset=self.queryset,
+                ids=serializer.validated_data["ids"],
                 user=request.user,
             ),
             status=HTTP_200_OK,
