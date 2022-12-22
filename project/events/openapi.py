@@ -5,38 +5,40 @@ from config.openapi import (
 )
 from drf_yasg import openapi
 
+from events.models import Event
+from authentication.models import Gender
+
 events_type_query = openapi.Parameter(
     "type",
     openapi.IN_QUERY,
     description="This option allows you to filter the list of \
-        events by type by selection.\
-        \nPossible options: Football, Futsal",
+        events by type by selection.",
     type=openapi.TYPE_STRING,
+    enum=[k for k, _ in Event.Type.choices],
 )
 events_gender_query = openapi.Parameter(
     "gender",
     openapi.IN_QUERY,
     description="This option allows you to filter the list of \
-        events by gender by selection.\
-        \nPossible options: Man, Woman",
+        events by gender by selection.",
     type=openapi.TYPE_STRING,
+    enum=[k for k, _ in Gender.choices],
 )
 events_status_query = openapi.Parameter(
     "status",
     openapi.IN_QUERY,
     description="This option allows you to filter the list of \
-        events by status by selection.\
-        \nPossible options: Planned, Active, Finished",
+        events by status by selection.",
     type=openapi.TYPE_STRING,
+    enum=[k for k, _ in Event.Status.choices],
 )
 events_duration_query = openapi.Parameter(
     "duration",
     openapi.IN_QUERY,
     description="This option allows you to filter the list of \
-        events by duration by selection.\
-        \nPossible options: 10, 20, 30, 40, 50, 60, 70, 80, 90 \
-        100, 110, 120, 130, 140, 150, 160, 170, 180",
+        events by duration by selection.",
     type=openapi.TYPE_INTEGER,
+    enum=[k for k, _ in Event.Duration.choices],
 )
 events_need_ball_query = openapi.Parameter(
     "need_ball",

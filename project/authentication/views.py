@@ -73,7 +73,6 @@ from authentication.services import (
     update_profile_avatar,
 )
 from config.exceptions import _404
-from django.conf import settings
 from django.db import transaction
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
