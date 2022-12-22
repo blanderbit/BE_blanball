@@ -145,6 +145,7 @@ class CreateProfileSerializer(serializers.ModelSerializer):
             "created_at",
             "age",
             "coordinates",
+            "avatar",
         ]
 
 

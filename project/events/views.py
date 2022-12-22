@@ -493,7 +493,7 @@ class UserParticipantEventsList(EventsList):
         return self.queryset.filter(current_users__in=[self.request.user.id])
 
 
-class PopularEvents(EventsList):
+class PopularEvents(ListAPIView):
     """
     List of the most popular events
 
