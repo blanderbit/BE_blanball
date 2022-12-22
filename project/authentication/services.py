@@ -32,7 +32,6 @@ from django.template.loader import (
 )
 from django.utils import timezone
 from minio import Minio
-from minio.error import S3Error
 from minio.commonconfig import REPLACE, CopySource
 from rest_framework.serializers import Serializer
 from .tasks import Util
