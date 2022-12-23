@@ -1,13 +1,13 @@
 from typing import Union
 
-from rest_framework import serializers
+from authentication.serializers import (
+    ReviewAuthorSerializer,
+)
 from bugs.models import Bug
-from authentication.serializers import ReviewAuthorSerializer
-
+from rest_framework import serializers
 
 
 class CreateBugSerializer(serializers.ModelSerializer):
-
     class Meta:
         model: Bug = Bug
         fields: Union[str, list[str]] = [
@@ -15,6 +15,7 @@ class CreateBugSerializer(serializers.ModelSerializer):
             "description",
             "image",
         ]
+
 
 class BugsListSerializer(serializers.ModelSerializer):
 
@@ -24,18 +25,17 @@ class BugsListSerializer(serializers.ModelSerializer):
         model: Bug = Bug
         fields: Union[str, list[str]] = "__all__"
 
-class MyBugsListSerializer(serializers.ModelSerializer):
 
+class MyBugsListSerializer(serializers.ModelSerializer):
     class Meta:
         model: Bug = Bug
-        exclude: list[str] = [
-            "author"
-        ]
+        exclude: list[str] = ["author"]
+
 
 class BulkDeleteBugsSerializer(serializers.Serializer):
     ids: list[int] = serializers.ListField(child=serializers.IntegerField(min_value=0))
 
     class Meta:
-        fields: Union[str, list[str]] =  [
+        fields: Union[str, list[str]] = [
             "ids",
         ]

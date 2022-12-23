@@ -74,9 +74,7 @@ def send_message_after_bulk_method(message_type: str) -> ...:
 
 
 @send_message_after_bulk_method(NOTIFICATIONS_BULK_DELETE_NOTIFICATION_TYPE)
-def bulk_delete_notifications(
-    *, ids: dict[str, int], user: User
-) -> bulk:
+def bulk_delete_notifications(*, ids: dict[str, int], user: User) -> bulk:
     for notification in ids:
         try:
             notify = Notification.objects.get(id=notification)
@@ -88,9 +86,7 @@ def bulk_delete_notifications(
 
 
 @send_message_after_bulk_method(NOTIFICATIONS_BULK_READ_NOTIFICATION_TYPE)
-def bulk_read_notifications(
-    *, ids: dict[str, int], user: User
-) -> bulk:
+def bulk_read_notifications(*, ids: dict[str, int], user: User) -> bulk:
     for notification in ids:
         try:
             notify = Notification.objects.get(id=notification)

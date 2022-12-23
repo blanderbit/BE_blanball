@@ -1,25 +1,26 @@
-from typing import Optional
 from os import path
+from typing import Optional
 
+from authentication.models import (
+    User,
+    validate_image,
+)
 from django.db import models
 from django.db.models.fields.files import (
     ImageFieldFile,
 )
-from authentication.models import (
-    validate_image, 
-    User
-)
+
 
 def bug_image_name(instance: "Bug", filename: str) -> str:
-    time_created: str = instance.time_created.strftime('%Y-%m-%d-%H-%M')
-    filename: str = f'author_{instance.author.id}_{time_created}'
+    time_created: str = instance.time_created.strftime("%Y-%m-%d-%H-%M")
+    filename: str = f"author_{instance.author.id}_{time_created}"
     return path.join("bugs", filename)
 
 
 class Bug(models.Model):
     class Type(models.TextChoices):
-        CLOSED: str = 'Closed'
-        OPEN: str = 'Open'
+        CLOSED: str = "Closed"
+        OPEN: str = "Open"
 
     author: User = models.ForeignKey(User, on_delete=models.CASCADE)
     title: str = models.CharField(max_length=255)

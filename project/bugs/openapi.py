@@ -1,10 +1,8 @@
-from config.openapi import (
-    skip_param_query,
-)
-from drf_yasg import openapi
 from bugs.models import Bug
+from config.openapi import skip_param_query
+from drf_yasg import openapi
 
-bugs_type_query= openapi.Parameter(
+bugs_type_query = openapi.Parameter(
     "type",
     openapi.IN_QUERY,
     description="This option allows you to filter the list of \

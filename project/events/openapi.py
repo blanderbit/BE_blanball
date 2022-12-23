@@ -1,12 +1,11 @@
+from authentication.models import Gender
 from config.openapi import (
     distance_query,
     point_query,
     skip_param_query,
 )
 from drf_yasg import openapi
-
 from events.models import Event
-from authentication.models import Gender
 
 events_type_query = openapi.Parameter(
     "type",

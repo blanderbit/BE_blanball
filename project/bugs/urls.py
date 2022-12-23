@@ -1,13 +1,11 @@
 from typing import Union
 
-from bugs.views import  (
-    CreateBug,
+from bugs.views import (
     BugsList,
-    MyBugs,
     BulkDeleteBugs,
+    CreateBug,
+    MyBugs,
 )
-
-
 from django.urls import path
 from django.urls.resolvers import (
     URLPattern,

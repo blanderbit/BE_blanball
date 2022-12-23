@@ -34,6 +34,7 @@ from django.utils import timezone
 from minio import Minio
 from minio.commonconfig import REPLACE, CopySource
 from rest_framework.serializers import Serializer
+
 from .tasks import Util
 
 
@@ -95,9 +96,10 @@ def code_create(*, email: str, type: str, dop_info: str) -> None:
     user: User = User.get_all().get(email=email)
     context: dict = {
         "title": check_code_type(code=code),
-        "code": list(code.verify_code),
+        "code": code.verify_code,
         "name": user.profile.name,
         "surname": user.profile.last_name,
+        "email": user.email,
     }
     template: str = render_to_string("email_code.html", context)
     print(verify_code)

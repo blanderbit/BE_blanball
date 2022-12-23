@@ -116,8 +116,8 @@ class Profile(models.Model):
 
     name: str = models.CharField(max_length=255)
     last_name: str = models.CharField(max_length=255)
-    gender: Optional[str] = models.CharField(choices=Gender.choices, max_length=10,
-        null=True
+    gender: Optional[str] = models.CharField(
+        choices=Gender.choices, max_length=10, null=True
     )
     birthday: Optional[date] = models.DateField(
         null=True, validators=[validate_birthday]
@@ -176,7 +176,7 @@ class Profile(models.Model):
     @property
     @final
     def new_image_name(self) -> str:
-        datetime = timezone.localtime(timezone.now()).strftime('%Y-%m-%d-%H-%M')
+        datetime = timezone.localtime(timezone.now()).strftime("%Y-%m-%d-%H-%M")
         return f"users/{urlsafe_base64_encode(smart_bytes(self.id))}_{datetime}.jpg"
 
     @property

@@ -2,6 +2,9 @@ from collections import OrderedDict
 from typing import Any, Union
 
 from authentication.models import User
+from authentication.serializers import (
+    ReviewAuthorSerializer,
+)
 from notifications.tasks import send_to_user
 from rest_framework.serializers import (
     ModelSerializer,
@@ -18,9 +21,6 @@ from reviews.constants.notification_types import (
 )
 from reviews.models import Review
 
-from authentication.serializers import (
-    ReviewAuthorSerializer,
-)
 
 class CreateReviewSerializer(ModelSerializer):
     class Meta:

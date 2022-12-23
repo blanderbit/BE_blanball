@@ -5,8 +5,8 @@ from cities.serializers import (
     GetPlaceNameByCoordinatesSerializer,
 )
 from cities.services import (
-    get_place_name_by_coordinates,
     get_coordinates_by_place_name,
+    get_place_name_by_coordinates,
 )
 from django.conf import settings
 from novaposhta import NovaPoshtaApi
@@ -14,10 +14,9 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
+from rest_framework.status import HTTP_200_OK
 from rest_framework.views import APIView
-from rest_framework.status import (
-    HTTP_200_OK,
-)
+
 
 class GetCoordinatesByPlaceName(GenericAPIView):
     """

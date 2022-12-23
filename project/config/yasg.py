@@ -4,6 +4,7 @@ from django.urls import path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
+from config.openapi import CustomOpenAPISchemaGenerator
 
 
 def get_current_version_for_swagger():
@@ -16,10 +17,13 @@ schema_view = get_schema_view(
     openapi.Info(
         title="Blanball",
         default_version=get_current_version_for_swagger(),
-        license=openapi.License(name="Attribution-NonCommercial-ShareAlike 4.0 International"),
+        license=openapi.License(
+            name="Attribution-NonCommercial-ShareAlike 4.0 International"
+        ),
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
+    generator_class=CustomOpenAPISchemaGenerator,
 )
 
 urlpatterns = [

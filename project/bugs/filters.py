@@ -1,9 +1,9 @@
 from typing import Union
 
+from bugs.models import Bug
 from django_filters import (
     rest_framework as filters,
 )
-from bugs.models import Bug
 
 
 class BugFilter(filters.FilterSet):
@@ -11,6 +11,4 @@ class BugFilter(filters.FilterSet):
 
     class Meta:
         model: Bug = Bug
-        fields: Union[str, list[str]] = [
-            "type"
-        ]
+        fields: Union[str, list[str]] = ["type"]

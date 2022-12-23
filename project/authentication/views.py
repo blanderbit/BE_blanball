@@ -477,8 +477,6 @@ class RequetChangeEmail(GenericAPIView):
         return Response(THIS_EMAIL_ALREADY_IN_USE_ERROR, status=HTTP_400_BAD_REQUEST)
 
 
-
-
 class CheckCode(GenericAPIView):
     """
     Сode confirmations

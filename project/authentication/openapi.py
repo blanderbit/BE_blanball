@@ -1,14 +1,10 @@
+from authentication.models import Gender, Profile
 from config.openapi import (
     distance_query,
     point_query,
     skip_param_query,
 )
 from drf_yasg import openapi
-
-from authentication.models import (
-    Gender,
-    Profile
-)
 
 users_relevant_searh_query = openapi.Parameter(
     "search",
