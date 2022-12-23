@@ -35,7 +35,6 @@ from rest_framework.status import (
 
 
 class Event(models.Model):
-
     class Type(models.TextChoices):
         FOOTBALL: str = "Football"
         FUTSAL: str = "Futsal"

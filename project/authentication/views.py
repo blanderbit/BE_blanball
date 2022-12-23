@@ -73,7 +73,6 @@ from authentication.services import (
     update_profile_avatar,
 )
 from config.exceptions import _404
-from django.conf import settings
 from django.db import transaction
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
@@ -476,8 +475,6 @@ class RequetChangeEmail(GenericAPIView):
             )
             return Response(SENT_CODE_TO_EMAIL_SUCCESS, status=HTTP_200_OK)
         return Response(THIS_EMAIL_ALREADY_IN_USE_ERROR, status=HTTP_400_BAD_REQUEST)
-
-
 
 
 class CheckCode(GenericAPIView):

@@ -10,7 +10,6 @@ from typing import (
 from asgiref.sync import async_to_sync
 from authentication.models import User
 from channels.layers import get_channel_layer
-from django.db.models.query import QuerySet
 from notifications.constants.notification_types import (
     CHANGE_MAINTENANCE_NOTIFICATION_TYPE,
     NOTIFICATIONS_BULK_DELETE_NOTIFICATION_TYPE,
@@ -75,12 +74,10 @@ def send_message_after_bulk_method(message_type: str) -> ...:
 
 
 @send_message_after_bulk_method(NOTIFICATIONS_BULK_DELETE_NOTIFICATION_TYPE)
-def bulk_delete_notifications(
-    *, data: dict[str, Any], queryset: QuerySet[Notification], user: User
-) -> bulk:
-    for notification in data:
+def bulk_delete_notifications(*, ids: dict[str, int], user: User) -> bulk:
+    for notification in ids:
         try:
-            notify = queryset.get(id=notification)
+            notify = Notification.objects.get(id=notification)
             if notify.user == user:
                 notify.delete()
                 yield notification
@@ -89,12 +86,10 @@ def bulk_delete_notifications(
 
 
 @send_message_after_bulk_method(NOTIFICATIONS_BULK_READ_NOTIFICATION_TYPE)
-def bulk_read_notifications(
-    *, data: dict[str, Any], queryset: QuerySet[Notification], user: User
-) -> bulk:
-    for notification in data:
+def bulk_read_notifications(*, ids: dict[str, int], user: User) -> bulk:
+    for notification in ids:
         try:
-            notify = queryset.get(id=notification)
+            notify = Notification.objects.get(id=notification)
             if notify.type != "Read" and notify.user == user:
                 notify.type = "Read"
                 notify.save()

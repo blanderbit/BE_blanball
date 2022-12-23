@@ -372,6 +372,7 @@ def add_dist_filter_to_view(
                 return func(self)
         except:
             return func(self)
+
     return wrap
 
 

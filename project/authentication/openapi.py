@@ -1,3 +1,4 @@
+from authentication.models import Gender, Profile
 from config.openapi import (
     distance_query,
     point_query,
@@ -17,18 +18,17 @@ users_profile__position_query = openapi.Parameter(
     "profile__position",
     openapi.IN_QUERY,
     description="This option allows you to filter the list of \
-        users by position by selection.\
-        \nPossible options: GK, LB, RB, CB, LWB, RWB, \
-        CDM, CM, CAM, RM, LM, RF, CF, LF, ST",
+        users by position by selection.",
     type=openapi.TYPE_STRING,
+    enum=[k for k, _ in Profile.Position.choices],
 )
 users_profile__gender_query = openapi.Parameter(
     "profile__gender",
     openapi.IN_QUERY,
     description="This option allows you to filter the list of \
-        users by gender by selection.\
-        \nPossible options: Man, Woman",
+        users by gender by selection.",
     type=openapi.TYPE_STRING,
+    enum=[k for k, _ in Gender.choices],
 )
 users_is_online_query = openapi.Parameter(
     "is_online",

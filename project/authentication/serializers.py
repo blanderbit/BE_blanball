@@ -36,8 +36,8 @@ class UserPublicProfilePlaceSerializer(serializers.Serializer):
             "place_name",
         ]
 
-class ReviewAuthorProfileSerializer(serializers.ModelSerializer):
 
+class ReviewAuthorProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model: User = Profile
         fields: Union[str, list[str]] = [
@@ -45,14 +45,13 @@ class ReviewAuthorProfileSerializer(serializers.ModelSerializer):
             "last_name",
         ]
 
+
 class ReviewAuthorSerializer(serializers.ModelSerializer):
     profile = ReviewAuthorProfileSerializer()
 
     class Meta:
         model: User = User
-        fields: Union[str, list[str]] = [
-            "profile"
-        ]
+        fields: Union[str, list[str]] = ["id", "profile"]
 
 
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):

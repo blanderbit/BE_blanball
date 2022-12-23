@@ -53,7 +53,6 @@ class TestAuthenticationViews(SetUpAauthenticationViews):
         response = self.client.post(reverse("register"), self.user_register_bad_data)
         self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
 
-
     def test_change_email(self) -> None:
         self.auth()
         self.client.post(

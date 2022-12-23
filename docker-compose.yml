@@ -98,7 +98,7 @@ services:
     networks:
       - app-network
     ports:
-      - 49280:${PGADMIN_LISTEN_PORT}
+      - 49280:49299
 
 networks:
   app-network:

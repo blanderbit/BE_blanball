@@ -29,6 +29,7 @@ INSTALLED_APPS: list[str] = [
     "notifications.apps.NotificationsConfig",
     "reviews.apps.ReviewsConfig",
     "cities.apps.CitiesConfig",
+    "bugs.apps.BugsConfig",
 ]
 
 if not os.environ.get("GITHUB_WORKFLOW"):
