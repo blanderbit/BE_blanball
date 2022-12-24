@@ -16,7 +16,7 @@ jobs:
       POETRY_VERSION: 1.2.0
     services:
       db:
-        image: postgis/postgis:latest
+        image: postgis/postgis:latest 
         env:
           POSTGRES_USER: postgres_test
           POSTGRES_PASSWORD: postgres_test
@@ -34,7 +34,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Set up Python ${{ env.PYTHON_VERSION }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ env.PYTHON_VERSION }}
     - name: Install GDAL for geo django
@@ -46,12 +46,17 @@ jobs:
       run: |
         pip install --upgrade pip
         pip install poetry==${{ env.POETRY_VERSION }}
-      env:
-        PATH: /root/.poetry/bin:/opt/venv/bin:${PATH}
+    - name: Configure poetry
+      run: |
+        python -m poetry config virtualenvs.in-project true
+
+    - name: Cache the virtualenv
+      uses: actions/cache@v2
+      with:
+        path: ./.venv
+        key: ${{ runner.os }}-venv-${{ hashFiles('**/poetry.lock') }}
     - name: Install deps
       run: |
-        cd project
-        poetry run pip install -U pip 
         poetry install
     - name: Run tests
       run: |
@@ -100,7 +105,7 @@ jobs:
     - name: Push images (API)
       run: |
         docker push ${{ env.COMMIT_IMAGE }}
-        docker push ${{ env.LATEST_IMAGE }}        
+        docker push ${{ env.LATEST_IMAGE }}
     - name: Trigger deploy in portainer
       run: |
         curl -X POST ${{ env.WEBHOOK }}

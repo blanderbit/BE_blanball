@@ -63,8 +63,9 @@ class CreateReviewSerializer(ModelSerializer):
             },
         )
         user: User = User.get_all().get(email=validated_data["user"])
+        stars = 0
         for item in user.reviews.all():
-            stars = item.stars
+            stars += item.stars
         user.raiting = stars / user.reviews.count()
         user.save()
         return review
