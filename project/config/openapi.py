@@ -7,7 +7,12 @@ skip_param_query = openapi.Parameter(
     description="EN - This parameter makes it possible to delete \
         entries from the beginning of the list by id. \
         \nQuery example: '1, 2, 3, 4, 5' - 5 entries will be \
-        removed from the top of the list",
+        removed from the top of the list \
+    \n \
+    \n RU - Этот параметр позволяет удалить \
+        записи с начала списка по id. \
+        \nПример запроса: '1, 2, 3, 4, 5' - 5 записей будут \
+        удалено из начала списка",
     type=openapi.TYPE_STRING,
 )
 point_query = openapi.Parameter(
@@ -15,7 +20,11 @@ point_query = openapi.Parameter(
     openapi.IN_QUERY,
     description="EN - This option allows you to sort \
         the list in descending order, starting from \
-        the entered coordinate value (longitude, latitude).",
+        the entered coordinate value (longitude, latitude). \
+    \n \
+    \n RU - Эта опция позволяет вам сортировать \
+        список в порядке убывания, начиная с \
+        введенного значение координат (долгота, широта). ",
     type=openapi.TYPE_STRING,
 )
 distance_query = openapi.Parameter(
@@ -29,7 +38,17 @@ distance_query = openapi.Parameter(
     to be the starting point from which the \
     radius is calculated.\
     \n!!! If you enter a value with a minus sign, the \
-    parameter will be simply ignored !!!",
+    parameter will be simply ignored !!! \
+    \n \
+    \n RU - Эта опция позволяет пользователю фильтровать \
+    список событий или список пользователей по радиусу \
+    указывается в метрах. \nЭтот параметр  \
+    зависит от параметра point, \
+    потому что point считается \
+    отправной точкой, из которой \
+    вычисляется радиус.\
+    \n!!! Если ввести значение со знаком минус, \
+    параметр будет просто проигнорирован!!!",
     type=openapi.TYPE_INTEGER,
 )
 
