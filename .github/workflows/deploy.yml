@@ -28,7 +28,7 @@ jobs:
         ports:
           - 5432:5432
       redis:
-        image: redis:7.0.4-alpine
+        image: redis:latest
         ports:
           - 6379:6379
     steps:
@@ -42,22 +42,22 @@ jobs:
         sudo apt-get install -y gdal-bin libgdal-dev 
         sudo apt-get install -y python3-gdal 
         sudo apt-get install -y binutils libproj-dev
-    - name: Install poetry
-      run: |
-        pip install --upgrade pip
-        pip install poetry==${{ env.POETRY_VERSION }}
-    - name: Configure poetry
-      run: |
-        python -m poetry config virtualenvs.in-project true
-
-    - name: Cache the virtualenv
+    - name: Cache poetry virtualenv
       uses: actions/cache@v2
+      id: cache
       with:
-        path: ./.venv
-        key: ${{ runner.os }}-venv-${{ hashFiles('**/poetry.lock') }}
-    - name: Install deps
+        path: ${{ env.pythonLocation }}
+        key: ${{ runner.os }}-python-${{ env.pythonLocation }}-${{ hashFiles('poetry.lock') }}
+    - name: Install poetry
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
-        poetry install
+        python -m pip install --upgrade pip
+        python -m pip install poetry
+    - name: Set poetry config
+      run: python -m poetry config virtualenvs.create false
+    - name: Install dependencies
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: python -m poetry install
     - name: Run tests
       run: |
         echo $ENV_FILE | base64 --decode > .env
