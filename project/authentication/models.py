@@ -203,7 +203,7 @@ class User(AbstractBaseUser):
     get_planned_events: str = models.CharField(max_length=10, default="1m")
     role: str = models.CharField(choices=Role.choices, max_length=10, null=True)
     updated_at: str = models.DateTimeField(auto_now=True)
-    raiting: float = models.FloatField(null=True)
+    raiting: Optional[float] = models.FloatField(null=True)
     profile: Profile = models.ForeignKey(
         Profile, on_delete=models.CASCADE, null=True, related_name="user"
     )

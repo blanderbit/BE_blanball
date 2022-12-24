@@ -10,80 +10,114 @@ from events.models import Event
 events_type_query = openapi.Parameter(
     "type",
     openapi.IN_QUERY,
-    description="This option allows you to filter the list of \
-        events by type by selection.",
+    description="EN - This option allows you to filter the list of \
+    events by type by selection.\
+    \n \
+    \n RU - Эта опция позволяет фильтровать список \
+    событий по выбору типа.",
     type=openapi.TYPE_STRING,
     enum=[k for k, _ in Event.Type.choices],
 )
 events_gender_query = openapi.Parameter(
     "gender",
     openapi.IN_QUERY,
-    description="This option allows you to filter the list of \
-        events by gender by selection.",
+    description="EN - This option allows you to filter the list of \
+    events by gender by selection.\
+    events by type by selection.\
+    \n \
+    \n RU - Эта опция позволяет фильтровать список \
+    событий по выбору гендера.",
     type=openapi.TYPE_STRING,
     enum=[k for k, _ in Gender.choices],
 )
 events_status_query = openapi.Parameter(
     "status",
     openapi.IN_QUERY,
-    description="This option allows you to filter the list of \
-        events by status by selection.",
+    description="EN - This option allows you to filter the list of \
+        events by status by selection. \
+    \n \
+    \n RU - Эта опция позволяет фильтровать список \
+    событий по выбору статуса.",
     type=openapi.TYPE_STRING,
     enum=[k for k, _ in Event.Status.choices],
 )
 events_duration_query = openapi.Parameter(
     "duration",
     openapi.IN_QUERY,
-    description="This option allows you to filter the list of \
-        events by duration by selection.",
+    description="EN - This option allows you to filter the list of \
+        events by duration by selection.\
+    \n \
+    \n RU - Эта опция позволяет фильтровать список \
+    событий по выбору длительности.",
     type=openapi.TYPE_INTEGER,
     enum=[k for k, _ in Event.Duration.choices],
 )
 events_need_ball_query = openapi.Parameter(
     "need_ball",
     openapi.IN_QUERY,
-    description="This option allows you to filter the list of \
-        events by need_ball by selection.",
+    description="EN - This option allows you to filter the list of \
+        events by need_ball by selection.\
+    \n \
+    \n RU - Эта опция позволяет фильтровать список \
+    событий по выбору нужен ли мяч.",
     type=openapi.TYPE_BOOLEAN,
 )
 events_relevant_searh_query = openapi.Parameter(
     "search",
     openapi.IN_QUERY,
-    description="This option allows you to filter the list of \
+    description="EN - This option allows you to filter the list of \
         events to get the most relevant entries for your query. \
-        \nRecords are filtered by the field 'name'",
+        \nRecords are filtered by the field 'name' \
+        \n \
+        \n RU - Эта опция позволяет фильтровать список \
+        события, чтобы получить наиболее релевантные записи для вашего запроса. \
+        \nЗаписи фильтруются по полю 'name'",
     type=openapi.TYPE_STRING,
 )
 events_searh_query = openapi.Parameter(
     "search",
     openapi.IN_QUERY,
-    description="This option allows you to filter \
+    description="EN - This option allows you to filter \
         the list of events by fields such as:\
-        \n'id,'name','price','amount_members'",
+        \n'id,'name','price','amount_members' \
+    \n \
+    \n RU - Эта опция позволяет фильтровать \
+    список событий по полям типа:\
+    \n'id,'name','price','amount_members'",
     type=openapi.TYPE_STRING,
 )
 events_ordering_query = openapi.Parameter(
     "ordering",
     openapi.IN_QUERY,
-    description="This option allows you to sort the list of \
+    description="EN - This option allows you to sort the list of \
         events by fields such as: id, -id\
         \nIf you add a minus before the field name, then sorting \
-        will be in reverse order.",
+        will be in reverse order. \
+        \n \
+        \n RU - Эта опция позволяет вам сортировать список \
+        события по полям, таким как: id, -id\
+        \nЕсли добавить минус перед именем поля, то сортировка \
+        будет в обратном порядке.",
     type=openapi.TYPE_STRING,
 )
 event_date_and_time_before_query = openapi.Parameter(
     "date_and_time_before",
     openapi.IN_QUERY,
-    description="This option allows the user \
+    description="EN - This option allows the user \
         to filter the list of events by limiting it to \
         the maximum date.\
-        \ndate format = yyyy-mm-dd",
+        \ndate format = yyyy-mm-dd \
+    \n \
+    \nRU - Эта опция позволяет пользователю \
+        отфильтровать список событий, ограничив его \
+        максимальной дата.\
+        \nформат даты = гггг-мм-дд",
     type=openapi.TYPE_STRING,
 )
 event_date_and_time_after_query = openapi.Parameter(
     "date_and_time_after",
     openapi.IN_QUERY,
-    description="This option allows the user \
+    description="EN - This option allows the user \
         to filter the list of events by limiting it to \
         the minimum date.\
         \ndate format = yyyy-mm-dd",
