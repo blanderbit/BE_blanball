@@ -7,21 +7,6 @@ on:
       - main
 
 jobs:
-  health_check_server:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Server healthcheck
-      run: |
-        if ${{ github.ref_name }} = develop; then
-          echo "SERVER_RESPONSE=$(curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL_TEST }})" >> $GITHUB_ENV
-        else
-          echo "SERVER_RESPONSE=$(curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL_PROD }})" >> $GITHUB_ENV
-        fi
-    - name: Stop deploy
-      uses: saulmaldonado/skip-workflow@v1
-      with:
-        fail-fast: 'true'
-
   run_tests:
     runs-on: ubuntu-latest
     env:
@@ -122,4 +107,9 @@ jobs:
         docker push ${{ env.LATEST_IMAGE }}
     - name: Trigger deploy in portainer
       run: |
-        curl -X POST ${{ env.WEBHOOK }}
+        echo "PORTAINER_STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST ${{ env.WEBHOOK }})" >> $GITHUB_ENV
+    - name: Stop deploy
+      if: startsWith(${{ env.PORTAINER_STATUS_CODE }}, 4) || startsWith(${{ env.PORTAINER_STATUS_CODE }}, 5)
+      uses: saulmaldonado/skip-workflow@v1
+      with:
+        fail-fast: 'true'
