@@ -5,9 +5,23 @@ on:
     branches:
       - develop
       - main
-  workflow_dispatch:
 
 jobs:
+  health_check_server:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Server healthcheck
+      run: |
+        if ${{ github.ref_name }} = develop; then
+          echo "SERVER_RESPONSE=$(curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL_TEST }})" >> $GITHUB_ENV
+        else
+          echo "SERVER_RESPONSE=$(curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL_PROD }})" >> $GITHUB_ENV
+        fi
+    - name: Stop deploy
+      uses: mstachniuk/ci-skip@v1
+      with:
+        fail-fast: true
+
   run_tests:
     runs-on: ubuntu-latest
     env:
@@ -70,7 +84,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Set env vars (TEST)
-      if: contains(fromJson('["push"]'), github.event_name) && github.ref == 'refs/heads/develop' || contains(fromJson('["workflow_dispatch"]'), github.event_name)
+      if: github.ref == 'refs/heads/develop'
       run: |
         echo "API_DOCKERFILE_PATH=Dockerfile" >> $GITHUB_ENV
         echo "WEBHOOK=${{ secrets.PORTAINER_WEBHOOK_URL_TEST }}" >> $GITHUB_ENV
