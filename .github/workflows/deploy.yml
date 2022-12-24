@@ -18,9 +18,9 @@ jobs:
           echo "SERVER_RESPONSE=$(curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL_PROD }})" >> $GITHUB_ENV
         fi
     - name: Stop deploy
-      uses: mstachniuk/ci-skip@v1
+      uses: saulmaldonado/skip-workflow@v1
       with:
-        fail-fast: true
+        fail-fast: 'true'
 
   run_tests:
     runs-on: ubuntu-latest
