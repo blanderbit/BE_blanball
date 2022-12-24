@@ -13,7 +13,7 @@ jobs:
     - name: Server healthcheck
       run: |
         if ${{ github.ref_name }} = develop; then
-          echo "SERVER_RESPONSE=$(curl -X POST http://178.151.201.167:9000/api/stacks/webhooks/7dafe961-2a78-4ea2-aeb7-86a989f618d3)" >> $GITHUB_ENV
+          echo "SERVER_RESPONSE=$(curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL_TEST }})" >> $GITHUB_ENV
         else
           echo "SERVER_RESPONSE=$(curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL_PROD }})" >> $GITHUB_ENV
         fi
