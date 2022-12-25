@@ -120,7 +120,12 @@ event_date_and_time_after_query = openapi.Parameter(
     description="EN - This option allows the user \
         to filter the list of events by limiting it to \
         the minimum date.\
-        \ndate format = yyyy-mm-dd",
+        \ndate format = yyyy-mm-dd\
+    \n \
+    \nRU - Эта опция позволяет пользователю \
+        чтобы отфильтровать список событий, ограничив его до \
+        минимальная дата.\
+        \nформат даты = гггг-мм-дд",
     type=openapi.TYPE_STRING,
 )
 
