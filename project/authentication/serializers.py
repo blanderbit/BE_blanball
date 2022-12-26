@@ -349,7 +349,6 @@ class UsersListDetailSerializer(serializers.ModelSerializer):
         model: User = User
         exclude: Union[str, list[str]] = [
             "password",
-            "coordinates"
         ]
 
 
