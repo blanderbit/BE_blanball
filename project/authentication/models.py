@@ -2,7 +2,6 @@ import os
 from datetime import date, datetime
 from typing import Any, Optional, Union, final
 
-import pandas
 from authentication.constants.errors import (
     AVATAR_MAX_SIZE_ERROR,
     MAX_AGE_VALUE_ERROR,

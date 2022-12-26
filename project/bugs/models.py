@@ -1,5 +1,5 @@
 from os import path
-from typing import Optional
+from typing import Optional, final
 
 from authentication.models import (
     User,
@@ -9,24 +9,53 @@ from django.db import models
 from django.db.models.fields.files import (
     ImageFieldFile,
 )
+from django.utils import timezone
+from django.conf import settings
 
 
-def bug_image_name(instance: "Bug", filename: str) -> str:
-    time_created: str = instance.time_created.strftime("%Y-%m-%d-%H-%M")
-    filename: str = f"author_{instance.author.id}_{time_created}"
+def bug_image_name(instance: "BugImage", filename: str) -> str:
+    print(instance.id)
+    datetime = timezone.now().strftime("%Y-%m-%d-%H-%M")
+    filename: str = f"{datetime}"
     return path.join("bugs", filename)
+
+class BugImage(models.Model):
+    image: Optional[ImageFieldFile] = models.ImageField(
+        null=True, upload_to=bug_image_name, validators=[validate_image], default=None
+    )
+
+    @property
+    def image_url(self) -> Optional[str]:
+        if self.image:
+            return self.image.url.replace("minio:9000", settings.MINIO_IMAGE_HOST)
+        return None
+
+    @final
+    def __repr__(self) -> str:
+        return "<BugImage %s>" % self.id
+
+    @final
+    def __str__(self) -> str:
+        return self.image
 
 
 class Bug(models.Model):
     class Type(models.TextChoices):
         CLOSED: str = "Closed"
+        CONSIDERATION: str = "Consideration"
         OPEN: str = "Open"
 
     author: User = models.ForeignKey(User, on_delete=models.CASCADE)
     title: str = models.CharField(max_length=255)
     description: Optional[str] = models.TextField(blank=True, null=True)
     time_created = models.DateTimeField(auto_now_add=True)
-    image: Optional[ImageFieldFile] = models.ImageField(
-        null=True, upload_to=bug_image_name, validators=[validate_image], default=None
-    )
-    type: str = models.CharField(choices=Type.choices, max_length=10, default=Type.OPEN)
+    images: Optional[BugImage] = models.ManyToManyField(BugImage, blank=True)
+    type: str = models.CharField(choices=Type.choices, max_length=15, default=Type.OPEN)
+
+    @final
+    def __repr__(self) -> str:
+        return "<Bug %s>" % self.id
+
+    @final
+    def __str__(self) -> str:
+        return self.title

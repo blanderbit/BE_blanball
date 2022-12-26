@@ -107,9 +107,11 @@ jobs:
         docker push ${{ env.LATEST_IMAGE }}
     - name: Trigger deploy in portainer
       run: |
-        echo "PORTAINER_STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST ${{ env.WEBHOOK }})" >> $GITHUB_ENV
+        curl ${{ env.WEBHOOK }}) --silent --insecure --request POST --output output.txt --write-out %{http_code} 
+        > http.response.code 2> error.messages
     - name: Stop deploy
-      if: ${{ env.PORTAINER_STATUS_CODE != 204}}
+      if: $(cat http.response.code) != 204
+      run: echo $(cat output.txt)
       uses: saulmaldonado/skip-workflow@v1
       with:
         fail-fast: 'true'

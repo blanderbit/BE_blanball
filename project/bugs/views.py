@@ -12,7 +12,10 @@ from bugs.serializers import (
     CreateBugSerializer,
     MyBugsListSerializer,
 )
-from bugs.services import bulk_delete_bugs
+from bugs.services import (
+    bulk_delete_bugs,
+    create_bug,
+)
 from django.db.models import QuerySet
 from django.utils.decorators import (
     method_decorator,
@@ -31,8 +34,12 @@ from rest_framework.filters import (
 from rest_framework.generics import (
     GenericAPIView,
     ListAPIView,
+    ListCreateAPIView,
 )
-from rest_framework.parsers import MultiPartParser
+from rest_framework.parsers import (
+    MultiPartParser,
+    FormParser
+)
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
@@ -43,7 +50,8 @@ from rest_framework.status import (
 )
 
 
-class CreateBug(GenericAPIView):
+
+class CreateBug(ListCreateAPIView):
     """
     Create bug
 
@@ -53,13 +61,15 @@ class CreateBug(GenericAPIView):
     """
 
     serializer_class: Type[Serializer] = CreateBugSerializer
-    parser_classes = [MultiPartParser]
+    parser_classes = (MultiPartParser, FormParser,)
     queryset: QuerySet[Bug] = Bug.objects.all()
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        Bug.objects.create(author=request.user, **serializer.validated_data)
+        create_bug(validated_data=serializer.validated_data, 
+            request_user=request.user
+        )
         return Response(BUG_REPORT_CREATED_SUCCESS, HTTP_201_CREATED)
 
 
