@@ -109,9 +109,9 @@ jobs:
       run: |
         curl ${{ env.WEBHOOK }}) --silent --insecure --request POST --output output.txt --write-out %{http_code} 
         > http.response.code 2> error.messages
+        echo "ERROR_MESSAGE=$(cat output.txt)" >> $GITHUB_ENV
     - name: Stop deploy
       if: $(cat http.response.code) != 204
-      run: echo $(cat output.txt)
       uses: saulmaldonado/skip-workflow@v1
       with:
         fail-fast: 'true'
