@@ -63,6 +63,7 @@ from authentication.serializers import (
     UserSerializer,
     UsersListSerializer,
     ValidateResetPasswordCodeSerializer,
+    UsersListDetailSerializer,
 )
 from authentication.services import (
     code_create,
@@ -316,6 +317,8 @@ class UsersList(ListAPIView):
     def get_queryset(self) -> QuerySet[User]:
         return self.queryset.filter(role="User")
 
+class UsersDetailList(UsersList):
+    serializer_class: Type[Serializer] = UsersListDetailSerializer
 
 @method_decorator(
     swagger_auto_schema(manual_parameters=users_relevant_list_query_params),

@@ -109,7 +109,7 @@ jobs:
       run: |
         echo "PORTAINER_STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST ${{ env.WEBHOOK }})" >> $GITHUB_ENV
     - name: Stop deploy
-      if: startsWith(${{ env.PORTAINER_STATUS_CODE }}, 4) || startsWith(${{ env.PORTAINER_STATUS_CODE }}, 5)
+      if: ${{ env.PORTAINER_STATUS_CODE != 204}}
       uses: saulmaldonado/skip-workflow@v1
       with:
         fail-fast: 'true'

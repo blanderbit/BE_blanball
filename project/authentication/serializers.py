@@ -337,6 +337,22 @@ class UsersListSerializer(serializers.ModelSerializer):
         ]
 
 
+class ProfileListDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model: Profile = Profile
+        fields: Union[str, list[str]] = "__all__"
+
+class UsersListDetailSerializer(serializers.ModelSerializer):
+    profile = ProfileListDetailSerializer()
+
+    class Meta:
+        model: User = User
+        exclude: Union[str, list[str]] = [
+            "password",
+            "coordinates"
+        ]
+
+
 class EmailSerializer(serializers.Serializer):
     email: str = serializers.EmailField(min_length=3, max_length=255)
 

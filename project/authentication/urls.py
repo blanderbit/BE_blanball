@@ -16,6 +16,7 @@ from authentication.views import (
     UsersList,
     UsersRelevantList,
     ValidateResetPasswordCode,
+    UsersDetailList,
 )
 from django.urls import path
 from django.urls.resolvers import (
@@ -27,6 +28,7 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     path("client/register", RegisterUser.as_view(), name="register"),
     path("client/login", LoginUser.as_view(), name="login"),
     path("client/users/list", UsersList.as_view(), name="users-list"),
+    path("admin/users/list/detail", UsersDetailList.as_view(), name="users-list-detail"),
     path(
         "client/users/relevant/list",
         UsersRelevantList.as_view(),
