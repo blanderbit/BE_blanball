@@ -280,6 +280,8 @@ class UserProfile(GenericAPIView):
             return Response(serializer.data, status=HTTP_200_OK)
         except User.DoesNotExist:
             raise _404(object=User)
+        except KeyError:
+            return Response(serializer.data, status=HTTP_200_OK)
 
 
 @method_decorator(
