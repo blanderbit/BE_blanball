@@ -61,7 +61,6 @@ class CreateBug(ListCreateAPIView):
     """
 
     serializer_class: Type[Serializer] = CreateBugSerializer
-    parser_classes = (MultiPartParser, FormParser,)
     queryset: QuerySet[Bug] = Bug.objects.all()
 
     def post(self, request: Request) -> Response:
