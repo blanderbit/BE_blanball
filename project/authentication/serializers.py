@@ -353,6 +353,7 @@ class ProfileListDetailSerializer(serializers.ModelSerializer):
             "created_at",
             "about_me",
             "working_leg",
+            "avatar_url",
             "place",
         ]
 
