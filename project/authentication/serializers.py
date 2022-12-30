@@ -340,7 +340,22 @@ class UsersListSerializer(serializers.ModelSerializer):
 class ProfileListDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model: Profile = Profile
-        fields: Union[str, list[str]] = "__all__"
+        fields: Union[str, list[str]] = [
+            "id",
+            "name",
+            "last_name",
+            "gender",
+            "birthday",
+            "age",
+            "height",
+            "weight",
+            "position",
+            "created_at",
+            "about_me",
+            "working_leg",
+            "place",
+        ]
+
 
 class UsersListDetailSerializer(serializers.ModelSerializer):
     profile = ProfileListDetailSerializer()

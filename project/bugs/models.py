@@ -5,12 +5,12 @@ from authentication.models import (
     User,
     validate_image,
 )
+from django.conf import settings
 from django.db import models
 from django.db.models.fields.files import (
     ImageFieldFile,
 )
 from django.utils import timezone
-from django.conf import settings
 
 
 def bug_image_name(instance: "BugImage", filename: str) -> str:
@@ -18,6 +18,7 @@ def bug_image_name(instance: "BugImage", filename: str) -> str:
     datetime = timezone.now().strftime("%Y-%m-%d-%H-%M")
     filename: str = f"{datetime}"
     return path.join("bugs", filename)
+
 
 class BugImage(models.Model):
     image: Optional[ImageFieldFile] = models.ImageField(

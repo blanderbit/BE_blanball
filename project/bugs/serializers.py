@@ -3,18 +3,14 @@ from typing import Union
 from authentication.serializers import (
     ReviewAuthorSerializer,
 )
-from bugs.models import (
-    Bug,
-    BugImage,
-)
+from bugs.models import Bug, BugImage
 from rest_framework import serializers
 
 
 class CreateBugSerializer(serializers.ModelSerializer):
 
-    images = serializers.ListField(
-        child=serializers.ImageField(), required=False
-    )
+    images = serializers.ListField(child=serializers.ImageField(), required=False)
+
     class Meta:
         model: Bug = Bug
         fields: Union[str, list[str]] = [
@@ -23,13 +19,11 @@ class CreateBugSerializer(serializers.ModelSerializer):
             "images",
         ]
 
-class BugsListImagesNameSerializer(serializers.ModelSerializer):
 
+class BugsListImagesNameSerializer(serializers.ModelSerializer):
     class Meta:
         model: BugImage = BugImage
-        fields: Union[str, list[str]] = [
-            "image_url"
-        ]
+        fields: Union[str, list[str]] = ["image_url"]
 
 
 class BugsListSerializer(serializers.ModelSerializer):

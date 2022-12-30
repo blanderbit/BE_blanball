@@ -1,5 +1,7 @@
 from drf_yasg import openapi
-from drf_yasg.generators import OpenAPISchemaGenerator
+from drf_yasg.generators import (
+    OpenAPISchemaGenerator,
+)
 
 skip_param_query = openapi.Parameter(
     "skipids",

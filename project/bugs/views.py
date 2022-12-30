@@ -37,8 +37,8 @@ from rest_framework.generics import (
     ListCreateAPIView,
 )
 from rest_framework.parsers import (
+    FormParser,
     MultiPartParser,
-    FormParser
 )
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -48,7 +48,6 @@ from rest_framework.status import (
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
 )
-
 
 
 class CreateBug(ListCreateAPIView):
@@ -66,9 +65,7 @@ class CreateBug(ListCreateAPIView):
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        create_bug(validated_data=serializer.validated_data, 
-            request_user=request.user
-        )
+        create_bug(validated_data=serializer.validated_data, request_user=request.user)
         return Response(BUG_REPORT_CREATED_SUCCESS, HTTP_201_CREATED)
 
 
@@ -121,8 +118,19 @@ class MyBugs(BugsList):
 
 class BulkDeleteBugs(GenericAPIView):
     """
-    Bulk delete bugs
+    Delete bugs
 
+    This endpoint allows the user to
+    delete a certain number of bugs by ID.
+    Example:
+    {
+        "ids": [
+            1, 2, 3, 4, 5
+        ]
+    }
+    If the user who sent the request has
+    bugs under identifiers: 1,2,3,4,5
+    then they will be read.
     """
 
     serializer_class: Type[Serializer] = BulkDeleteBugsSerializer

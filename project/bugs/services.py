@@ -1,9 +1,7 @@
 from typing import Any
 
 from authentication.models import User
-from bugs.models import (
-    BugImage, Bug
-)
+from bugs.models import Bug, BugImage
 
 
 def bulk_delete_bugs(*, ids: dict[str, int], user: User):
@@ -24,9 +22,7 @@ def create_bug(validated_data: dict[str, Any], request_user: User) -> None:
 
         images_list = []
         for image in images:
-            images_list.append(
-                BugImage(image=image)
-            )
+            images_list.append(BugImage(image=image))
         if images_list:
             bug: Bug = Bug.objects.create(author=request_user, **validated_data)
             bug.images.set(BugImage.objects.bulk_create(images_list))

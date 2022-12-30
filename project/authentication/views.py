@@ -49,6 +49,7 @@ from authentication.openapi import (
     users_relevant_list_query_params,
 )
 from authentication.permisions import (
+    AllowAny,
     IsNotAuthenticated,
 )
 from authentication.serializers import (
@@ -61,9 +62,9 @@ from authentication.serializers import (
     UpdateUserProfileImageSerializer,
     UpdateUserProfileSerializer,
     UserSerializer,
+    UsersListDetailSerializer,
     UsersListSerializer,
     ValidateResetPasswordCodeSerializer,
-    UsersListDetailSerializer,
 )
 from authentication.services import (
     code_create,
@@ -319,8 +320,20 @@ class UsersList(ListAPIView):
     def get_queryset(self) -> QuerySet[User]:
         return self.queryset.filter(role="User")
 
+
 class UsersDetailList(UsersList):
+    """
+    List of users for admins
+
+    This class makes it possible to
+    get a list of all users of the application.
+    """
+
+    permission_classes = [
+        AllowAny,
+    ]
     serializer_class: Type[Serializer] = UsersListDetailSerializer
+
 
 @method_decorator(
     swagger_auto_schema(manual_parameters=users_relevant_list_query_params),
