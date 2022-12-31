@@ -16,6 +16,7 @@ from authentication.views import (
     UsersDetailList,
     UsersList,
     UsersRelevantList,
+    ValidatePhoneByUnique,
     ValidateResetPasswordCode,
 )
 from django.urls import path
@@ -52,6 +53,11 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
         "client/validate/reset-password/code",
         ValidateResetPasswordCode.as_view(),
         name="validate-reset-password-code",
+    ),
+    path(
+        "client/validate/phone",
+        ValidatePhoneByUnique.as_view(),
+        name="validate-phone-by-unique",
     ),
     path(
         "client/request-change/password",

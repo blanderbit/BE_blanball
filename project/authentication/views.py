@@ -25,6 +25,7 @@ from authentication.constants.success import (
     EMAIL_VERIFY_SUCCESS_TEXT,
     EMAIL_VERIFY_SUCCESS_TITLE,
     PASSWORD_RESET_SUCCESS,
+    PHONE_IS_VALID_SUCCESS,
     PROFILE_AVATAR_UPDATED_SUCCESS,
     REGISTER_SUCCESS_BODY_TITLE,
     REGISTER_SUCCESS_TEXT,
@@ -64,6 +65,7 @@ from authentication.serializers import (
     UserSerializer,
     UsersListDetailSerializer,
     UsersListSerializer,
+    ValidatePhoneByUniqueSerializer,
     ValidateResetPasswordCodeSerializer,
 )
 from authentication.services import (
@@ -424,6 +426,25 @@ class ValidateResetPasswordCode(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response(RESET_PASSWORD_CODE_IS_VALID_SUCCESS, HTTP_200_OK)
+
+
+class ValidatePhoneByUnique(GenericAPIView):
+    """
+    Validate phone by unique
+
+    This endpoint allows the user to validate
+    the phone number for uniqueness
+    """
+
+    serializer_class: Type[Serializer] = ValidatePhoneByUniqueSerializer
+    permission_classes = [
+        IsNotAuthenticated,
+    ]
+
+    def post(self, request: Request) -> Response:
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(PHONE_IS_VALID_SUCCESS, HTTP_200_OK)
 
 
 class RequestChangePassword(GenericAPIView):

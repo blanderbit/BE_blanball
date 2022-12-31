@@ -43,4 +43,5 @@ EMAIL_VERIFY_SUCCESS_TITLE: str = "Your account has been verified!"
 BLANBALL: str = "BlanBall"
 
 RESET_PASSWORD_CODE_IS_VALID_SUCCESS: dict[str, str] = {"success": "code_is_valid"}
+PHONE_IS_VALID_SUCCESS: dict[str, str] = {"success": "phone_is_valid"}
 PROFILE_AVATAR_UPDATED_SUCCESS: dict[str, str] = {"success": "profile_avatar_updated"}
