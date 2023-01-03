@@ -10,11 +10,11 @@ from django.db import models
 from django.db.models.fields.files import (
     ImageFieldFile,
 )
+from django.db.models.query import QuerySet
 from django.utils import timezone
 
 
 def bug_image_name(instance: "BugImage", filename: str) -> str:
-    print(instance.id)
     datetime = timezone.now().strftime("%Y-%m-%d-%H-%M")
     filename: str = f"{datetime}"
     return path.join("bugs", filename)
@@ -38,6 +38,11 @@ class BugImage(models.Model):
     @final
     def __str__(self) -> str:
         return self.image
+    
+    class Meta:
+        db_table: str = "bug_image"
+        verbose_name: str = "bug_image"
+        verbose_name_plural: str = "bug_images"
 
 
 class Bug(models.Model):
@@ -54,9 +59,19 @@ class Bug(models.Model):
     type: str = models.CharField(choices=Type.choices, max_length=15, default=Type.OPEN)
 
     @final
+    @staticmethod
+    def get_all() -> QuerySet["Bug"]:
+        return Bug.objects.prefetch_related("images").select_related("author").order_by("-id")
+
+    @final
     def __repr__(self) -> str:
         return "<Bug %s>" % self.id
 
     @final
     def __str__(self) -> str:
         return self.title
+
+    class Meta:
+        db_table: str = "bug"
+        verbose_name: str = "bug"
+        verbose_name_plural: str = "bugs"

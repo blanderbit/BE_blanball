@@ -102,7 +102,6 @@ def code_create(*, email: str, type: str, dop_info: str) -> None:
         "email": user.email,
     }
     template: str = render_to_string("email_code.html", context)
-    print(verify_code)
     Util.send_email.delay(data={"email_body": template, "to_email": email})
 
 

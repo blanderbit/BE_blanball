@@ -33,6 +33,10 @@ from events.constants.response_success import (
 )
 from events.filters import (
     EventDateTimeRangeFilter,
+    EVENTS_LIST_ORDERING_FIELDS,
+    EVENTS_LIST_SEARCH_FIELDS,
+    EVENTS_RELEVANT_LIST_SEARCH_FIELDS,
+    EVENTS_LIST_DISTANCE_ORDERING_FIELD,
 )
 from events.models import (
     Event,
@@ -359,15 +363,8 @@ class EventsList(ListAPIView):
     """
 
     serializer_class: Type[Serializer] = EventListSerializer
-    search_fields: list[str] = [
-        "id",
-        "name",
-        "price",
-        "amount_members",
-    ]
-    ordering_fields: list[str] = [
-        "id",
-    ]
+    search_fields = EVENTS_LIST_SEARCH_FIELDS
+    ordering_fields = EVENTS_LIST_ORDERING_FIELDS
     filterset_class = EventDateTimeRangeFilter
     queryset: QuerySet[Event] = Event.get_all()
     filter_backends = [
@@ -376,7 +373,7 @@ class EventsList(ListAPIView):
         SearchFilter,
         DistanceToPointOrderingFilter,
     ]
-    distance_ordering_filter_field: str = "coordinates"
+    distance_ordering_filter_field: str = EVENTS_LIST_DISTANCE_ORDERING_FIELD
     distance_filter_convert_meters: bool = True
 
     @skip_objects_from_response_by_id
@@ -402,7 +399,7 @@ class EventsRelevantList(ListAPIView):
     filter_backends = [RankedFuzzySearchFilter]
     serializer_class: Type[Serializer] = EventListSerializer
     queryset: QuerySet[Event] = Event.get_all()
-    search_fields: list[str] = ["name"]
+    search_fields: list[str] = EVENTS_RELEVANT_LIST_SEARCH_FIELDS
 
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Event]:

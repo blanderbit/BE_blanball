@@ -6,6 +6,12 @@ from config.openapi import (
 )
 from drf_yasg import openapi
 from events.models import Event
+from events.filters import (
+    EVENTS_LIST_ORDERING_FIELDS,
+    EVENTS_LIST_SEARCH_FIELDS,
+    EVENTS_RELEVANT_LIST_SEARCH_FIELDS,
+)
+from config.openapi import concat_search_fields
 
 events_type_query = openapi.Parameter(
     "type",
@@ -65,39 +71,38 @@ events_need_ball_query = openapi.Parameter(
 events_relevant_searh_query = openapi.Parameter(
     "search",
     openapi.IN_QUERY,
-    description="EN - This option allows you to filter the list of \
+    description=f"EN - This option allows you to filter the list of \
         events to get the most relevant entries for your query. \
-        \nRecords are filtered by the field 'name' \
+        \nRecords are filtered by the fields: \
+        {concat_search_fields(EVENTS_RELEVANT_LIST_SEARCH_FIELDS)} \
         \n \
         \n RU - Эта опция позволяет фильтровать список \
         события, чтобы получить наиболее релевантные записи для вашего запроса. \
-        \nЗаписи фильтруются по полю 'name'",
+        \nЗаписи фильтруются по полям: \
+        {concat_search_fields(EVENTS_RELEVANT_LIST_SEARCH_FIELDS)}",
     type=openapi.TYPE_STRING,
 )
 events_searh_query = openapi.Parameter(
     "search",
     openapi.IN_QUERY,
-    description="EN - This option allows you to filter \
+    description=f"EN - This option allows you to filter \
         the list of events by fields such as:\
-        \n'id,'name','price','amount_members' \
+        \n{concat_search_fields(EVENTS_LIST_SEARCH_FIELDS)}\
     \n \
     \n RU - Эта опция позволяет фильтровать \
-    список событий по полям типа:\
-    \n'id,'name','price','amount_members'",
+    список событий по полям:\
+    \n{concat_search_fields(EVENTS_LIST_SEARCH_FIELDS)}",
     type=openapi.TYPE_STRING,
 )
 events_ordering_query = openapi.Parameter(
     "ordering",
     openapi.IN_QUERY,
     description="EN - This option allows you to sort the list of \
-        events by fields such as: id, -id\
-        \nIf you add a minus before the field name, then sorting \
-        will be in reverse order. \
+        events\
         \n \
         \n RU - Эта опция позволяет вам сортировать список \
-        события по полям, таким как: id, -id\
-        \nЕсли добавить минус перед именем поля, то сортировка \
-        будет в обратном порядке.",
+        событий",
+    enum=[k for k in EVENTS_LIST_ORDERING_FIELDS],
     type=openapi.TYPE_STRING,
 )
 event_date_and_time_before_query = openapi.Parameter(
@@ -124,7 +129,7 @@ event_date_and_time_after_query = openapi.Parameter(
     \n \
     \nRU - Эта опция позволяет пользователю \
         чтобы отфильтровать список событий, ограничив его до \
-        минимальная дата.\
+        минимальная датe.\
         \nформат даты = гггг-мм-дд",
     type=openapi.TYPE_STRING,
 )

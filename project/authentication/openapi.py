@@ -5,17 +5,41 @@ from config.openapi import (
     skip_param_query,
 )
 from drf_yasg import openapi
+from authentication.filters import (
+    USERS_LIST_ORDERING_FIELDS,
+    USERS_LIST_SEARCH_FIELDS,
+    USERS_RELEVANT_LIST_SEARCH_FIELDS,
+)
+from config.openapi import concat_search_fields
+
+users_searh_query = openapi.Parameter(
+    "search",
+    openapi.IN_QUERY,
+    description=f"EN - This option allows you to filter the list of \
+        users\
+        \nRecords are filtered by the fields: \
+        {concat_search_fields(USERS_LIST_SEARCH_FIELDS)}\
+    \n \
+    \n RU - Эта опция позволяет фильтровать список \
+        пользователей \
+        \nЗаписи фильтруются по полям: \
+        {concat_search_fields(USERS_LIST_SEARCH_FIELDS)}",
+    type=openapi.TYPE_STRING,
+)
+
 
 users_relevant_searh_query = openapi.Parameter(
     "search",
     openapi.IN_QUERY,
-    description="EN - This option allows you to filter the list of \
-        events to get the most relevant entries for your query. \
-        \nRecords are filtered by the field 'profile__name', 'profile__last_name\
+    description=f"EN - This option allows you to filter the list of \
+        users to get the most relevant entries for your query. \
+        \nRecords are filtered by the fields: \
+        {concat_search_fields(USERS_RELEVANT_LIST_SEARCH_FIELDS)}\
     \n \
     \n RU - Эта опция позволяет фильтровать список \
         события, чтобы получить наиболее релевантные записи для вашего запроса. \
-        \nЗаписи фильтруются по полям 'profile__name', 'profile__last_name",
+        \nЗаписи фильтруются по полям: \
+        {concat_search_fields(USERS_RELEVANT_LIST_SEARCH_FIELDS)}",
     type=openapi.TYPE_STRING,
 )
 users_profile__position_query = openapi.Parameter(
@@ -54,17 +78,12 @@ users_ordering = openapi.Parameter(
     "ordering",
     openapi.IN_QUERY,
     description="EN - This option allows you to sort the list of \
-        users by fields such as: id, profile__age, raiting, \
-        -id, -profile__age, -raiting. \
-        \nIf you add a minus before the field name, then sorting \
-        will be in reverse order.\
+        users \
     \n \
     \n RU - Эта опция позволяет вам сортировать список \
-        пользователей по таким полям как: id, profile__age, raiting, \
-        -id, -профиль__возраст, -рейтинг. \
-        \nЕсли добавить минус перед именем поля, то сортировка \
-        будет в обратном порядке.",
+        пользователей",
     type=openapi.TYPE_STRING,
+    enum=[k for k in USERS_LIST_ORDERING_FIELDS],
 )
 users_profile_age_min_query = openapi.Parameter(
     "profile__age_min",
@@ -97,6 +116,7 @@ users_list_query_params: list[openapi.Parameter] = [
     users_ordering,
     users_profile_age_min_query,
     users_profile_age_max_query,
+    users_searh_query,
 ]
 users_relevant_list_query_params: list[openapi.Parameter] = [
     skip_param_query,

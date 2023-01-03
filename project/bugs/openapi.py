@@ -2,6 +2,12 @@ from bugs.models import Bug
 from config.openapi import skip_param_query
 from drf_yasg import openapi
 
+from bugs.filters import (
+    BUGS_LIST_ORDERING_FIELDS,
+    BUGS_LIST_SEARCH_FIELDS,
+)
+from config.openapi import concat_search_fields
+
 bugs_type_query = openapi.Parameter(
     "type",
     openapi.IN_QUERY,
@@ -16,27 +22,44 @@ bugs_type_query = openapi.Parameter(
 bugs_searh_query = openapi.Parameter(
     "search",
     openapi.IN_QUERY,
-    description="EN - This option allows you to filter \
+    description=f"EN - This option allows you to filter \
         the list of bugs by fields such as:\
-        \n'title' \
+    \n{concat_search_fields(BUGS_LIST_SEARCH_FIELDS)}\
     \n \
     \n RU - Эта опция позволяет фильтровать \
-        список багов по полям типа:\
-        \n'title'",
+        список багов по таким полям как полям:\
+    \n{concat_search_fields(BUGS_LIST_SEARCH_FIELDS)}",
     type=openapi.TYPE_STRING,
 )
 bugs_ordering_query = openapi.Parameter(
     "ordering",
     openapi.IN_QUERY,
     description="EN - This option allows you to sort the list of \
-        bugs by fields such as: id, -id\
-        \nIf you add a minus before the field name, then sorting \
-        will be in reverse order. \
+        bugs\
     \n \
     \n RU - Эта опция позволяет вам сортировать список \
-        ошибки по полям типа: id, -id\
-        \nЕсли добавить минус перед именем поля, то сортировка \
-        будет в обратном порядке.",
+        ошибок",
+    enum=[k for k in BUGS_LIST_ORDERING_FIELDS],
+    type=openapi.TYPE_STRING,
+)
+bugs_profile_time_created_min_query = openapi.Parameter(
+    "time_created_min",
+    openapi.IN_QUERY,
+    description="EN - This parameter allows the user to filter \
+        the list of users by specifying a minimum time created value.\
+    \n \
+    \nRU - Этот параметр позволяет пользователю фильтровать \
+        список пользователей, указав минимальное значение даты создания.",
+    type=openapi.TYPE_STRING,
+)
+users_profile_time_created_max_query = openapi.Parameter(
+    "time_created_max",
+    openapi.IN_QUERY,
+    description="EN - This parameter allows the user to filter \
+        the list of bugs by specifying a maximum time created value. \
+    \n \
+    \nRU - Этот параметр позволяет пользователю фильтровать \
+        список багов, указав максимальное значение даты создания.",
     type=openapi.TYPE_STRING,
 )
 
@@ -45,4 +68,5 @@ bugs_list_query_params: list[openapi.Parameter] = [
     bugs_searh_query,
     bugs_type_query,
     bugs_ordering_query,
+    bugs_profile_time_created_min_query,
 ]

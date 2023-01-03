@@ -19,6 +19,33 @@ from rest_framework.filters import SearchFilter
 from rest_framework.request import Request
 
 
+USERS_LIST_ORDERING_FIELDS: list[str] = [
+    "id", 
+    "profile__age", 
+    "raiting",
+    "-id",
+    "-profile__age", 
+    "-raiting",
+]
+USERS_LIST_SEARCH_FIELDS: list[str] = [
+    "profile__name",
+    "profile__gender",
+    "profile__last_name",
+]
+USERS_LIST_CHOICE_FILTER_FIELDS: list[str] = [
+    "profile__age", 
+    "profile__position", 
+    "profile__gender", 
+    "is_online"
+]
+
+USERS_LIST_DISTANCE_ORDERING_FIELD: str = "profile__coordinates"
+
+USERS_RELEVANT_LIST_SEARCH_FIELDS: list[str] = [
+    "profile__name", 
+    "profile__last_name"
+]
+
 class MySearchFilter(SearchFilter):
     def get_search_terms(self, request: Request) -> str:
         params: str = " ".join(request.query_params.getlist(self.search_param))
@@ -73,4 +100,4 @@ class UserAgeRangeFilter(filters.FilterSet):
 
     class Meta:
         model: User = User
-        fields = ["profile__age", "profile__position", "profile__gender", "is_online"]
+        fields = USERS_LIST_CHOICE_FILTER_FIELDS

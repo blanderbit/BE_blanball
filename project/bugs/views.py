@@ -3,7 +3,11 @@ from typing import Type
 from bugs.constants.success import (
     BUG_REPORT_CREATED_SUCCESS,
 )
-from bugs.filters import BugFilter
+from bugs.filters import (
+    BugFilter,
+    BUGS_LIST_SEARCH_FIELDS,
+    BUGS_LIST_ORDERING_FIELDS,
+)
 from bugs.models import Bug
 from bugs.openapi import bugs_list_query_params
 from bugs.serializers import (
@@ -34,11 +38,6 @@ from rest_framework.filters import (
 from rest_framework.generics import (
     GenericAPIView,
     ListAPIView,
-    ListCreateAPIView,
-)
-from rest_framework.parsers import (
-    FormParser,
-    MultiPartParser,
 )
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -50,7 +49,7 @@ from rest_framework.status import (
 )
 
 
-class CreateBug(ListCreateAPIView):
+class CreateBug(GenericAPIView):
     """
     Create bug
 
@@ -60,7 +59,7 @@ class CreateBug(ListCreateAPIView):
     """
 
     serializer_class: Type[Serializer] = CreateBugSerializer
-    queryset: QuerySet[Bug] = Bug.objects.all()
+    queryset: QuerySet[Bug] = Bug.get_all()
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
@@ -83,17 +82,15 @@ class BugsList(ListAPIView):
     """
 
     serializer_class: Type[Serializer] = BugsListSerializer
-    queryset: QuerySet[Bug] = Bug.objects.all().order_by("-id")
+    queryset: QuerySet[Bug] = Bug.get_all()
     filterset_class = BugFilter
     filter_backends = [
         DjangoFilterBackend,
         OrderingFilter,
         SearchFilter,
     ]
-    ordering_fields: list[str] = [
-        "id",
-    ]
-    search_fields: list[str] = ["title"]
+    ordering_fields = BUGS_LIST_ORDERING_FIELDS
+    search_fields = BUGS_LIST_SEARCH_FIELDS
 
     @skip_objects_from_response_by_id
     def get_queryset(self):
@@ -140,3 +137,9 @@ class BulkDeleteBugs(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         data = bulk_delete_bugs(ids=serializer.validated_data["ids"], user=request.user)
         return Response(data, HTTP_200_OK)
+
+
+class ChangeBugType(GenericAPIView):
+    
+    def put(self, request: Request) -> Response:
+        pass
