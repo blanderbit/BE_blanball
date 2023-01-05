@@ -35,7 +35,7 @@ from minio import Minio
 from minio.commonconfig import REPLACE, CopySource
 from rest_framework.serializers import Serializer
 
-from .tasks import Util
+from authentication.tasks import Util
 
 
 def count_age(*, profile: Profile, data: dict[str, Any]) -> Profile:

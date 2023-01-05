@@ -3,8 +3,9 @@ from drf_yasg.generators import (
     OpenAPISchemaGenerator,
 )
 
+
 def concat_search_fields(search_fields: list[str]) -> str:
-    return ', '.join(search_fields)
+    return ", ".join(search_fields)
 
 
 skip_param_query = openapi.Parameter(

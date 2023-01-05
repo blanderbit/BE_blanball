@@ -37,12 +37,12 @@ from authentication.constants.success import (
     TEMPLATE_SUCCESS_TITLE,
 )
 from authentication.filters import (
-    RankedFuzzySearchFilter,
-    UserAgeRangeFilter,
+    USERS_LIST_DISTANCE_ORDERING_FIELD,
     USERS_LIST_ORDERING_FIELDS,
     USERS_LIST_SEARCH_FIELDS,
-    USERS_LIST_DISTANCE_ORDERING_FIELD,
     USERS_RELEVANT_LIST_SEARCH_FIELDS,
+    RankedFuzzySearchFilter,
+    UserAgeRangeFilter,
 )
 from authentication.models import (
     Code,
@@ -302,6 +302,7 @@ class UsersList(ListAPIView):
     This class makes it possible to
     get a list of all users of the application.
     """
+
     serializer_class: Type[Serializer] = UsersListSerializer
     queryset: QuerySet[User] = User.get_all()
     filter_backends = [
@@ -364,7 +365,7 @@ class RequestPasswordReset(GenericAPIView):
     Request password reset
 
     This class allows an unauthorized user to
-    request a password reset. \nAfter submitting the
+    request a password reset. After submitting the
     application, a confirmation code will be sent
     to the email specified by the user.
     """

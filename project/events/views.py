@@ -3,6 +3,9 @@ from typing import Any, Type, final
 from authentication.filters import (
     RankedFuzzySearchFilter,
 )
+from authentication.models import (
+    User
+)
 from config.exceptions import _404
 from config.openapi import skip_param_query
 from django.db.models import Count, Q
@@ -32,11 +35,11 @@ from events.constants.response_success import (
     USER_REMOVED_FROM_EVENT_SUCCESS,
 )
 from events.filters import (
-    EventDateTimeRangeFilter,
+    EVENTS_LIST_DISTANCE_ORDERING_FIELD,
     EVENTS_LIST_ORDERING_FIELDS,
     EVENTS_LIST_SEARCH_FIELDS,
     EVENTS_RELEVANT_LIST_SEARCH_FIELDS,
-    EVENTS_LIST_DISTANCE_ORDERING_FIELD,
+    EventDateTimeRangeFilter,
 )
 from events.models import (
     Event,
@@ -77,7 +80,6 @@ from events.services import (
     skip_objects_from_response_by_id,
     validate_user_before_join_to_event,
 )
-from notifications.tasks import *
 from rest_framework.exceptions import (
     PermissionDenied,
 )

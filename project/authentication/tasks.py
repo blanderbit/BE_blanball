@@ -4,7 +4,10 @@ from typing import Any, final
 from authentication.constants.success import (
     BLANBALL,
 )
-from authentication.models import Profile
+from authentication.models import (
+    Profile,
+    Code,
+)
 from config.celery import app
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -18,8 +21,6 @@ from django.utils.http import (
 from minio import Minio
 from minio.deleteobjects import DeleteObject
 from notifications.models import Notification
-
-from .models import Code, Profile
 
 
 class EmailThread(threading.Thread):

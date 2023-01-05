@@ -38,7 +38,7 @@ class BugImage(models.Model):
     @final
     def __str__(self) -> str:
         return self.image
-    
+
     class Meta:
         db_table: str = "bug_image"
         verbose_name: str = "bug_image"
@@ -61,7 +61,11 @@ class Bug(models.Model):
     @final
     @staticmethod
     def get_all() -> QuerySet["Bug"]:
-        return Bug.objects.prefetch_related("images").select_related("author").order_by("-id")
+        return (
+            Bug.objects.prefetch_related("images")
+            .select_related("author")
+            .order_by("-id")
+        )
 
     @final
     def __repr__(self) -> str:

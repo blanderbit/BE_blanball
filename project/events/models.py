@@ -199,8 +199,8 @@ class InviteToEventManager(models.Manager):
             raise ValidationError(THIS_USER_CAN_NOT_BE_INVITED, HTTP_403_FORBIDDEN)
 
         if (
-            request_user.id == event.author.id
-            or request_user in event.current_users.all()
+            request_user.id == event.author.id or
+            request_user in event.current_users.all()
         ):
             invite = self.model(recipient=invite_user, event=event, sender=request_user)
             invite.save()

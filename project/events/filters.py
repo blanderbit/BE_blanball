@@ -19,6 +19,7 @@ EVENTS_RELEVANT_LIST_SEARCH_FIELDS: list[str] = [
 ]
 EVENTS_LIST_DISTANCE_ORDERING_FIELD: str = "coordinates"
 
+
 class EventDateTimeRangeFilter(filters.FilterSet):
     date_and_time = filters.DateFromToRangeFilter()
 

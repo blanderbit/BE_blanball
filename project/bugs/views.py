@@ -4,9 +4,9 @@ from bugs.constants.success import (
     BUG_REPORT_CREATED_SUCCESS,
 )
 from bugs.filters import (
-    BugFilter,
-    BUGS_LIST_SEARCH_FIELDS,
     BUGS_LIST_ORDERING_FIELDS,
+    BUGS_LIST_SEARCH_FIELDS,
+    BugFilter,
 )
 from bugs.models import Bug
 from bugs.openapi import bugs_list_query_params
@@ -140,6 +140,10 @@ class BulkDeleteBugs(GenericAPIView):
 
 
 class ChangeBugType(GenericAPIView):
-    
+    """
+    Change bug type
+
+    """
+
     def put(self, request: Request) -> Response:
         pass

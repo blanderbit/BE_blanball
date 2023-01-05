@@ -1,6 +1,7 @@
-from os import getenv, path
-
 import django
+
+from os import getenv, path
+from django.conf import settings
 from decouple import Csv, config
 from django.utils.encoding import smart_str
 from django.utils.translation import (
@@ -9,7 +10,6 @@ from django.utils.translation import (
 
 django.utils.encoding.smart_text = smart_str
 
-from django.conf import settings
 
 ################################################################
 

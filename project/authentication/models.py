@@ -147,7 +147,7 @@ class Profile(models.Model):
     working_leg: Optional[str] = models.CharField(
         choices=Leg.choices, max_length=255, null=True
     )
-    place: dict[Optional[str], Optional[Union[str, float]]] = models.JSONField(
+    place: Optional[dict[str, Union[str, float]]] = models.JSONField(
         null=True
     )
     coordinates: Optional[Point] = PointField(null=True, srid=4326)

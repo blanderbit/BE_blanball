@@ -1,16 +1,16 @@
-from authentication.models import Gender, Profile
-from config.openapi import (
-    distance_query,
-    point_query,
-    skip_param_query,
-)
-from drf_yasg import openapi
 from authentication.filters import (
     USERS_LIST_ORDERING_FIELDS,
     USERS_LIST_SEARCH_FIELDS,
     USERS_RELEVANT_LIST_SEARCH_FIELDS,
 )
-from config.openapi import concat_search_fields
+from authentication.models import Gender, Profile
+from config.openapi import (
+    concat_search_fields,
+    distance_query,
+    point_query,
+    skip_param_query,
+)
+from drf_yasg import openapi
 
 users_searh_query = openapi.Parameter(
     "search",

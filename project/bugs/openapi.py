@@ -1,12 +1,13 @@
-from bugs.models import Bug
-from config.openapi import skip_param_query
-from drf_yasg import openapi
-
 from bugs.filters import (
     BUGS_LIST_ORDERING_FIELDS,
     BUGS_LIST_SEARCH_FIELDS,
 )
-from config.openapi import concat_search_fields
+from bugs.models import Bug
+from config.openapi import (
+    concat_search_fields,
+    skip_param_query,
+)
+from drf_yasg import openapi
 
 bugs_type_query = openapi.Parameter(
     "type",
