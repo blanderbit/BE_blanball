@@ -3,6 +3,7 @@ from typing import Union
 from bugs.views import (
     BugsList,
     BulkDeleteBugs,
+    ChangeBugType,
     CreateBug,
     MyBugs,
 )
@@ -17,4 +18,5 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     path("client/bugs/list", BugsList.as_view(), name="bugs-list"),
     path("client/my/bugs/list", MyBugs.as_view(), name="my-bugs-list"),
     path("client/delete/bugs", BulkDeleteBugs.as_view(), name="delete-bugs"),
+    path("client/change/bug/type", ChangeBugType.as_view(), name="change-bug-type"),
 ]

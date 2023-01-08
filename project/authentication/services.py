@@ -35,7 +35,7 @@ from minio import Minio
 from minio.commonconfig import REPLACE, CopySource
 from rest_framework.serializers import Serializer
 
-from .tasks import Util
+from authentication.tasks import Util
 
 
 def count_age(*, profile: Profile, data: dict[str, Any]) -> Profile:
@@ -102,7 +102,6 @@ def code_create(*, email: str, type: str, dop_info: str) -> None:
         "email": user.email,
     }
     template: str = render_to_string("email_code.html", context)
-    print(verify_code)
     Util.send_email.delay(data={"email_body": template, "to_email": email})
 
 

@@ -8,8 +8,6 @@ from django.db.models.query import QuerySet
 
 class Notification(models.Model):
     class Type(models.TextChoices):
-        """gender choices"""
-
         UNREAD: str = "Unread"
         READ: str = "Read"
 

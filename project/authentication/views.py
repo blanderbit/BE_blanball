@@ -37,6 +37,10 @@ from authentication.constants.success import (
     TEMPLATE_SUCCESS_TITLE,
 )
 from authentication.filters import (
+    USERS_LIST_DISTANCE_ORDERING_FIELD,
+    USERS_LIST_ORDERING_FIELDS,
+    USERS_LIST_SEARCH_FIELDS,
+    USERS_RELEVANT_LIST_SEARCH_FIELDS,
     RankedFuzzySearchFilter,
     UserAgeRangeFilter,
 )
@@ -308,13 +312,9 @@ class UsersList(ListAPIView):
         DistanceToPointOrderingFilter,
     ]
     filterset_class = UserAgeRangeFilter
-    ordering_fields: list[str] = ["id", "profile__age", "raiting"]
-    search_fields: list[str] = [
-        "profile__name",
-        "profile__gender",
-        "profile__last_name",
-    ]
-    distance_ordering_filter_field: str = "profile__coordinates"
+    ordering_fields = USERS_LIST_ORDERING_FIELDS
+    search_fields = USERS_LIST_SEARCH_FIELDS
+    distance_ordering_filter_field = USERS_LIST_DISTANCE_ORDERING_FIELD
     distance_filter_convert_meters: bool = True
 
     @skip_objects_from_response_by_id
@@ -354,7 +354,7 @@ class UsersRelevantList(ListAPIView):
     ]
     serializer_class: Type[Serializer] = UsersListSerializer
     queryset: QuerySet[User] = User.get_all()
-    search_fields: list[str] = ["profile__name", "profile__last_name"]
+    search_fields = USERS_RELEVANT_LIST_SEARCH_FIELDS
 
     def get_queryset(self) -> QuerySet[User]:
         return UsersList.get_queryset(self)
@@ -365,7 +365,7 @@ class RequestPasswordReset(GenericAPIView):
     Request password reset
 
     This class allows an unauthorized user to
-    request a password reset. \nAfter submitting the
+    request a password reset. After submitting the
     application, a confirmation code will be sent
     to the email specified by the user.
     """
