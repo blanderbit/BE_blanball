@@ -1,5 +1,5 @@
 # ==============================================================================
-# events.py file which includes all controllers responsible for working
+# events_list.py file which includes all controllers responsible for working
 # with events lists, search, filtering, sorting, selection and relevant search
 # ==============================================================================
 

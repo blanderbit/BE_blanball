@@ -1,3 +1,8 @@
+# ==============================================================================
+# events_list.py file which includes all controllers responsible for working with 
+# requests for participation in the event and invitations to events
+# ==============================================================================
+
 from typing import Any, Type, final
 
 from authentication.models import User
