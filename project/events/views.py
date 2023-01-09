@@ -3,9 +3,7 @@ from typing import Any, Type, final
 from authentication.filters import (
     RankedFuzzySearchFilter,
 )
-from authentication.models import (
-    User
-)
+from authentication.models import User
 from config.exceptions import _404
 from config.openapi import skip_param_query
 from django.db.models import Count, Q

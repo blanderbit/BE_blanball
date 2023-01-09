@@ -1,8 +1,8 @@
-import django
-
 from os import getenv, path
-from django.conf import settings
+
+import django
 from decouple import Csv, config
+from django.conf import settings
 from django.utils.encoding import smart_str
 from django.utils.translation import (
     gettext_lazy as _,

@@ -1,5 +1,4 @@
 import pandas
-
 from config.celery import app
 from django.db.models import Q
 from django.utils import timezone
@@ -25,21 +24,21 @@ def check_event_start_time() -> None:
         event_start_time_delta = event.date_and_time - rounded_current_datetime
         event_minutes_to_start = event_start_time_delta.total_seconds() / 60
 
-        #1 day
-        if event_minutes_to_start == 24*60:
+        # 1 day
+        if event_minutes_to_start == 24 * 60:
             send_notification_to_subscribe_event_user(
                 event=event,
                 message_type=EVENT_TIME_NOTIFICATION_TYPE,
                 start_time=str(event.date_and_time),
-                time_to_start=24*60,
+                time_to_start=24 * 60,
             )
-        #2 hours
-        elif event_minutes_to_start == 2*60:
+        # 2 hours
+        elif event_minutes_to_start == 2 * 60:
             send_notification_to_subscribe_event_user(
                 event=event,
                 message_type=EVENT_TIME_NOTIFICATION_TYPE,
                 start_time=str(event.date_and_time),
-                time_to_start=2*60,
+                time_to_start=2 * 60,
             )
         elif event_minutes_to_start == 10:
             send_notification_to_subscribe_event_user(
