@@ -1,6 +1,6 @@
 # ==============================================================================
 # users_list.py file which includes all controllers responsible for working 
-# with user lists, search, filtering, sorting, selection and relevant search
+# with users lists, search, filtering, sorting, selection and relevant search
 # ==============================================================================
 from typing import Any, Type
 from authentication.filters import (

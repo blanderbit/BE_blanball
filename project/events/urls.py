@@ -19,7 +19,7 @@ from events.views import (
     InviteUserToEvent,
     JoinToEvent,
     LeaveFromEvent,
-    PopularEvents,
+    PopularEventsList,
     RemoveUserFromEvent,
     RequestToParticipationsList,
     UpdateEvent,
@@ -80,7 +80,7 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     ),
     path(
         "client/popular/events/list",
-        PopularEvents.as_view(),
+        PopularEventsList.as_view(),
         name="popular-events-list",
     ),
     path(
