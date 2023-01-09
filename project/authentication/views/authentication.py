@@ -1,3 +1,8 @@
+# ==============================================================================
+# authentication.py file which includes all controllers responsible for
+# registration, authorization, verification, password change, etc.
+# ==============================================================================
+
 from typing import Any, Type
 
 from authentication.constants.code_types import (
@@ -26,7 +31,6 @@ from authentication.constants.success import (
     EMAIL_VERIFY_SUCCESS_TITLE,
     PASSWORD_RESET_SUCCESS,
     PHONE_IS_VALID_SUCCESS,
-    PROFILE_AVATAR_UPDATED_SUCCESS,
     REGISTER_SUCCESS_BODY_TITLE,
     REGISTER_SUCCESS_TEXT,
     REGISTER_SUCCESS_TITLE,
@@ -36,25 +40,12 @@ from authentication.constants.success import (
     TEMPLATE_SUCCESS_TEXT,
     TEMPLATE_SUCCESS_TITLE,
 )
-from authentication.filters import (
-    USERS_LIST_DISTANCE_ORDERING_FIELD,
-    USERS_LIST_ORDERING_FIELDS,
-    USERS_LIST_SEARCH_FIELDS,
-    USERS_RELEVANT_LIST_SEARCH_FIELDS,
-    RankedFuzzySearchFilter,
-    UserAgeRangeFilter,
-)
 from authentication.models import (
     Code,
     Profile,
     User,
 )
-from authentication.openapi import (
-    users_list_query_params,
-    users_relevant_list_query_params,
-)
 from authentication.permisions import (
-    AllowAny,
     IsNotAuthenticated,
 )
 from authentication.serializers import (
@@ -64,45 +55,18 @@ from authentication.serializers import (
     RegisterSerializer,
     RequestChangePasswordSerializer,
     ResetPasswordSerializer,
-    UpdateUserProfileImageSerializer,
-    UpdateUserProfileSerializer,
-    UserSerializer,
-    UsersListDetailSerializer,
-    UsersListSerializer,
     ValidatePhoneByUniqueSerializer,
     ValidateResetPasswordCodeSerializer,
 )
 from authentication.services import (
     code_create,
     count_age,
-    profile_update,
     reset_password,
     send_email_template,
-    update_profile_avatar,
 )
 from config.exceptions import _404
 from django.db import transaction
-from django.db.models.query import QuerySet
-from django.utils.decorators import (
-    method_decorator,
-)
-from django_filters.rest_framework import (
-    DjangoFilterBackend,
-)
-from drf_yasg.utils import swagger_auto_schema
-from events.services import (
-    add_dist_filter_to_view,
-    skip_objects_from_response_by_id,
-)
-from rest_framework.filters import (
-    OrderingFilter,
-    SearchFilter,
-)
-from rest_framework.generics import (
-    GenericAPIView,
-    ListAPIView,
-)
-from rest_framework.parsers import MultiPartParser
+from rest_framework.generics import GenericAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import (
@@ -113,9 +77,6 @@ from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
-)
-from rest_framework_gis.filters import (
-    DistanceToPointOrderingFilter,
 )
 
 
@@ -187,177 +148,6 @@ class LoginUser(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data, status=HTTP_200_OK)
-
-
-class UserOwnerProfile(GenericAPIView):
-
-    serializer_class: Type[Serializer] = UserSerializer
-
-    def get(self, request: Request) -> Response:
-        """
-        User personal profile
-
-        This endpoint allows an authorized user to
-        get detailed information about their profile,
-        """
-        user: User = User.get_all().get(id=self.request.user.id)
-        serializer = self.serializer_class(user)
-        return Response(serializer.data, status=HTTP_200_OK)
-
-    def delete(self, request: Request) -> Response:
-        """
-        Request delete profile
-
-        This endpoint allows the user to send a
-        request to delete their account.
-        """
-        code_create(
-            email=request.user.email,
-            type=ACCOUNT_DELETE_CODE_TYPE,
-            dop_info=request.user.email,
-        )
-        return Response(SENT_CODE_TO_EMAIL_SUCCESS, status=HTTP_200_OK)
-
-
-class UpdateProfile(GenericAPIView):
-    """
-    Update profile
-
-    This class allows an authorized
-    user to change their profile information.
-    """
-
-    serializer_class: Type[Serializer] = UpdateUserProfileSerializer
-    queryset: QuerySet[User] = User.get_all()
-
-    @transaction.atomic
-    def put(self, request: Request) -> Response:
-        user: User = self.queryset.get(id=self.request.user.id)
-        serializer = self.serializer_class(user, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        result: dict[str, Any] = profile_update(
-            profile_id=user.profile_id, serializer=serializer
-        )
-        return Response(result, status=HTTP_200_OK)
-
-
-class UpdateProfileImage(GenericAPIView):
-    """
-    Update profile avatar
-
-    This endpoint allows the user to change
-    their profile avatar to any other
-    """
-
-    parser_classes = [MultiPartParser]
-    serializer_class: Type[Serializer] = UpdateUserProfileImageSerializer
-    queryset: QuerySet[User] = User.get_all()
-
-    def put(self, request: Request) -> Response:
-        user: User = self.queryset.get(id=self.request.user.id)
-        serializer = self.serializer_class(user, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        update_profile_avatar(profile=user.profile, data=serializer.validated_data)
-        return Response(PROFILE_AVATAR_UPDATED_SUCCESS, status=HTTP_200_OK)
-
-
-class UserProfile(GenericAPIView):
-    """
-    User profile
-
-    This class makes it possible to
-    get information about any user of the application
-    !! It is important that the profile information may differ,
-    because information about the phone number and mail may be hidden !!
-    """
-
-    serializer_class: Type[Serializer] = UserSerializer
-    queryset: QuerySet[User] = User.get_all()
-
-    def get(self, request: Request, pk: int) -> Response:
-        fields: list[str] = ["configuration"]
-        try:
-            user: User = self.queryset.get(id=pk)
-            for item in user.configuration.items():
-                if item[1] == True:
-                    serializer = self.serializer_class(user, fields=(fields))
-                elif item[1] == False:
-                    fields.append(item[0])
-                    serializer = self.serializer_class(user, fields=(fields))
-            return Response(serializer.data, status=HTTP_200_OK)
-        except User.DoesNotExist:
-            raise _404(object=User)
-        except KeyError:
-            return Response(serializer.data, status=HTTP_200_OK)
-
-
-@method_decorator(
-    swagger_auto_schema(manual_parameters=users_list_query_params),
-    name="get",
-)
-class UsersList(ListAPIView):
-    """
-    List of users
-
-    This class makes it possible to
-    get a list of all users of the application.
-    """
-
-    serializer_class: Type[Serializer] = UsersListSerializer
-    queryset: QuerySet[User] = User.get_all()
-    filter_backends = [
-        DjangoFilterBackend,
-        SearchFilter,
-        OrderingFilter,
-        DistanceToPointOrderingFilter,
-    ]
-    filterset_class = UserAgeRangeFilter
-    ordering_fields = USERS_LIST_ORDERING_FIELDS
-    search_fields = USERS_LIST_SEARCH_FIELDS
-    distance_ordering_filter_field = USERS_LIST_DISTANCE_ORDERING_FIELD
-    distance_filter_convert_meters: bool = True
-
-    @skip_objects_from_response_by_id
-    @add_dist_filter_to_view
-    def get_queryset(self) -> QuerySet[User]:
-        return self.queryset.filter(role="User")
-
-
-class UsersDetailList(UsersList):
-    """
-    List of users for admins
-
-    This class makes it possible to
-    get a list of all users of the application.
-    """
-
-    permission_classes = [
-        AllowAny,
-    ]
-    serializer_class: Type[Serializer] = UsersListDetailSerializer
-
-
-@method_decorator(
-    swagger_auto_schema(manual_parameters=users_relevant_list_query_params),
-    name="get",
-)
-class UsersRelevantList(ListAPIView):
-    """
-    Relevant user search
-
-    This class makes it possible to get the 5 most
-    relevant users for a search query.
-    """
-
-    filter_backends = [
-        RankedFuzzySearchFilter,
-    ]
-    serializer_class: Type[Serializer] = UsersListSerializer
-    queryset: QuerySet[User] = User.get_all()
-    search_fields = USERS_RELEVANT_LIST_SEARCH_FIELDS
-
-    def get_queryset(self) -> QuerySet[User]:
-        return UsersList.get_queryset(self)
 
 
 class RequestPasswordReset(GenericAPIView):
