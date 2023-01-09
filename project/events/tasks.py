@@ -16,8 +16,8 @@ from events.services import (
 def check_event_start_time() -> None:
 
     rounded_current_datetime = (
-        pandas.to_datetime(timezone.now().isoformat())
-        .round("1min")
+        pandas.to_datetime(timezone.now().replace(second=0).isoformat())
+        .round("1min", nonexistent="shift_backward")
         .to_pydatetime()
     )
     for event in Event.get_all().filter(~Q(status=Event.Status.FINISHED)):
@@ -51,8 +51,6 @@ def check_event_start_time() -> None:
         elif event_minutes_to_start == 0:
             event.status = event.Status.ACTIVE
             event.save()
-        elif (
-            (event.date_and_time - timezone.now()) / timezone.timedelta(days=1)
-        ) * 1440 + event.duration <= 0:
+        elif event_minutes_to_start + event.duration == 0:
             event.status = event.Status.FINISHED
             event.save()
