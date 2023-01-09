@@ -1,4 +1,5 @@
 from typing import Any, Type, final
+
 from django.db.models.query import QuerySet
 from events.constants.notification_types import (
     EVENT_UPDATE_NOTIFICATION_TYPE,
@@ -6,9 +7,7 @@ from events.constants.notification_types import (
 from events.constants.response_success import (
     EVENT_UPDATE_SUCCESS,
 )
-from events.models import (
-    Event,
-)
+from events.models import Event
 from events.serializers import (
     CreateEventSerializer,
     DeleteEventsSerializer,
@@ -22,21 +21,18 @@ from events.services import (
     only_author,
     send_notification_to_subscribe_event_user,
 )
-from rest_framework.generics import (
-    GenericAPIView,
-)
+from rest_framework.generics import GenericAPIView
 from rest_framework.mixins import (
     RetrieveModelMixin,
 )
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.serializers import (
-    Serializer,
-)
+from rest_framework.serializers import Serializer
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
 )
+
 
 class CreateEvent(GenericAPIView):
     """

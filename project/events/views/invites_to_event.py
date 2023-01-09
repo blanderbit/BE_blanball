@@ -34,12 +34,9 @@ from rest_framework.generics import (
 )
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.serializers import (
-    Serializer,
-)
-from rest_framework.status import (
-    HTTP_200_OK,
-)
+from rest_framework.serializers import Serializer
+from rest_framework.status import HTTP_200_OK
+
 
 class InviteUserToEvent(GenericAPIView):
     """
@@ -61,6 +58,7 @@ class InviteUserToEvent(GenericAPIView):
             request_user=request.user, invite_user=invite_user, event=event
         )
         return Response(SENT_INVATION_SUCCESS, status=HTTP_200_OK)
+
 
 @method_decorator(
     swagger_auto_schema(manual_parameters=[skip_param_query]),

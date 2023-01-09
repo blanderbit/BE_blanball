@@ -1,5 +1,5 @@
 # ==============================================================================
-# events.py file which includes all controllers responsible for working 
+# events.py file which includes all controllers responsible for working
 # with events lists, search, filtering, sorting, selection and relevant search
 # ==============================================================================
 
@@ -26,9 +26,7 @@ from events.filters import (
     EVENTS_RELEVANT_LIST_SEARCH_FIELDS,
     EventDateTimeRangeFilter,
 )
-from events.models import (
-    Event,
-)
+from events.models import Event
 from events.openapi import (
     events_list_query_params,
     events_relevant_list_query_params,
@@ -46,20 +44,15 @@ from rest_framework.filters import (
     OrderingFilter,
     SearchFilter,
 )
-from rest_framework.generics import (
-    ListAPIView,
-)
+from rest_framework.generics import ListAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.serializers import (
-    Serializer,
-)
-from rest_framework.status import (
-    HTTP_200_OK,
-)
+from rest_framework.serializers import Serializer
+from rest_framework.status import HTTP_200_OK
 from rest_framework_gis.filters import (
     DistanceToPointOrderingFilter,
 )
+
 
 @method_decorator(
     swagger_auto_schema(manual_parameters=events_list_query_params),
@@ -130,6 +123,7 @@ class UserEventsRelevantList(EventsRelevantList):
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Event]:
         return self.queryset.filter(author_id=self.request.user.id)
+
 
 class UserEventsList(EventsList):
     """

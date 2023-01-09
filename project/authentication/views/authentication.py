@@ -1,5 +1,5 @@
 # ==============================================================================
-# authentication.py file which includes all controllers responsible for 
+# authentication.py file which includes all controllers responsible for
 # registration, authorization, verification, password change, etc.
 # ==============================================================================
 
@@ -66,9 +66,7 @@ from authentication.services import (
 )
 from config.exceptions import _404
 from django.db import transaction
-from rest_framework.generics import (
-    GenericAPIView,
-)
+from rest_framework.generics import GenericAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import (
@@ -80,6 +78,7 @@ from rest_framework.status import (
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
 )
+
 
 class RegisterUser(GenericAPIView):
     """
@@ -149,6 +148,7 @@ class LoginUser(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data, status=HTTP_200_OK)
+
 
 class RequestPasswordReset(GenericAPIView):
     """

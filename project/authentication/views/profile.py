@@ -1,5 +1,5 @@
 # ==============================================================================
-# profile.py file which includes all controllers responsible for working 
+# profile.py file which includes all controllers responsible for working
 # with user profile, get profile, update profile, upload images, update
 # uploaded image
 # ==============================================================================
@@ -12,9 +12,7 @@ from authentication.constants.success import (
     PROFILE_AVATAR_UPDATED_SUCCESS,
     SENT_CODE_TO_EMAIL_SUCCESS,
 )
-from authentication.models import (
-    User,
-)
+from authentication.models import User
 from authentication.serializers import (
     UpdateUserProfileImageSerializer,
     UpdateUserProfileSerializer,
@@ -28,18 +26,12 @@ from authentication.services import (
 from config.exceptions import _404
 from django.db import transaction
 from django.db.models.query import QuerySet
-from rest_framework.generics import (
-    GenericAPIView,
-)
+from rest_framework.generics import GenericAPIView
 from rest_framework.parsers import MultiPartParser
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.serializers import (
-    Serializer,
-)
-from rest_framework.status import (
-    HTTP_200_OK,
-)
+from rest_framework.serializers import Serializer
+from rest_framework.status import HTTP_200_OK
 
 
 class UserOwnerProfile(GenericAPIView):

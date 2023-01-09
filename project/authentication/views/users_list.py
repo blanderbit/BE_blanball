@@ -1,8 +1,9 @@
 # ==============================================================================
-# users_list.py file which includes all controllers responsible for working 
+# users_list.py file which includes all controllers responsible for working
 # with users lists, search, filtering, sorting, selection and relevant search
 # ==============================================================================
 from typing import Any, Type
+
 from authentication.filters import (
     USERS_LIST_DISTANCE_ORDERING_FIELD,
     USERS_LIST_ORDERING_FIELDS,
@@ -11,9 +12,7 @@ from authentication.filters import (
     RankedFuzzySearchFilter,
     UserAgeRangeFilter,
 )
-from authentication.models import (
-    User,
-)
+from authentication.models import User
 from authentication.openapi import (
     users_list_query_params,
     users_relevant_list_query_params,
@@ -38,17 +37,11 @@ from rest_framework.filters import (
     OrderingFilter,
     SearchFilter,
 )
-from rest_framework.generics import (
-    ListAPIView,
-)
-from rest_framework.serializers import (
-    Serializer,
-)
+from rest_framework.generics import ListAPIView
+from rest_framework.permissions import AllowAny
+from rest_framework.serializers import Serializer
 from rest_framework_gis.filters import (
     DistanceToPointOrderingFilter,
-)
-from rest_framework.permissions import (
-    AllowAny,
 )
 
 

@@ -30,9 +30,7 @@ from events.services import (
 from rest_framework.exceptions import (
     PermissionDenied,
 )
-from rest_framework.generics import (
-    GenericAPIView,
-)
+from rest_framework.generics import GenericAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import (
@@ -43,7 +41,6 @@ from rest_framework.status import (
     HTTP_200_OK,
     HTTP_400_BAD_REQUEST,
 )
-
 
 
 class JoinToEvent(GenericAPIView):
