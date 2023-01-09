@@ -147,9 +147,7 @@ class Profile(models.Model):
     working_leg: Optional[str] = models.CharField(
         choices=Leg.choices, max_length=255, null=True
     )
-    place: Optional[dict[str, Union[str, float]]] = models.JSONField(
-        null=True
-    )
+    place: Optional[dict[str, Union[str, float]]] = models.JSONField(null=True)
     coordinates: Optional[Point] = PointField(null=True, srid=4326)
 
     @final
@@ -175,7 +173,7 @@ class Profile(models.Model):
     @property
     @final
     def new_image_name(self) -> str:
-        datetime = timezone.localtime(timezone.now()).strftime("%Y-%m-%d-%H-%M")
+        datetime = timezone.now().strftime("%Y-%m-%d-%H-%M")
         return f"users/{urlsafe_base64_encode(smart_bytes(self.id))}_{datetime}.jpg"
 
     @property

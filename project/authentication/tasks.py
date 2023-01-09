@@ -4,10 +4,7 @@ from typing import Any, final
 from authentication.constants.success import (
     BLANBALL,
 )
-from authentication.models import (
-    Profile,
-    Code,
-)
+from authentication.models import Code, Profile
 from config.celery import app
 from dateutil.relativedelta import relativedelta
 from django.conf import settings

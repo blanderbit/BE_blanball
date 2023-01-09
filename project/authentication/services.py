@@ -23,6 +23,7 @@ from authentication.models import (
     User,
 )
 from authentication.tasks import (
+    Util,
     delete_old_user_profile_avatar,
     update_user_messages_after_change_avatar,
 )
@@ -34,8 +35,6 @@ from django.utils import timezone
 from minio import Minio
 from minio.commonconfig import REPLACE, CopySource
 from rest_framework.serializers import Serializer
-
-from authentication.tasks import Util
 
 
 def count_age(*, profile: Profile, data: dict[str, Any]) -> Profile:

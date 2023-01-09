@@ -1,8 +1,8 @@
-import django
-
 from os import getenv, path
-from django.conf import settings
+
+import django
 from decouple import Csv, config
+from django.conf import settings
 from django.utils.encoding import smart_str
 from django.utils.translation import (
     gettext_lazy as _,
@@ -35,7 +35,7 @@ LANGUAGE_CODE: str = config("LANGUAGE_CODE", cast=str)
 
 TIME_ZONE: str = config("TIME_ZONE", cast=str)
 USE_I18N: bool = config("USE_I18N", cast=bool)
-USE_TZ: bool = config("USE_TZ", cast=bool)
+USE_TZ: bool = False
 USE_L10N: bool = True
 
 DEFAULT_AUTO_FIELD: str = "django.db.models.BigAutoField"
