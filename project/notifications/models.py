@@ -36,4 +36,4 @@ class Notification(models.Model):
         db_table: str = "notification"
         verbose_name: str = "notification"
         verbose_name_plural: str = "notifications"
-        ordering: list[str] = ['-id']
+        ordering: list[str] = ["-id"]

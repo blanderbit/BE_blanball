@@ -15,10 +15,12 @@ from bugs.serializers import (
     CreateBugSerializer,
     MyBugsListSerializer,
 )
-from config.serializers import BaseBulkDeleteSerializer
 from bugs.services import (
     bulk_delete_bugs,
     create_bug,
+)
+from config.serializers import (
+    BaseBulkDeleteSerializer,
 )
 from django.db.models import QuerySet
 from django.utils.decorators import (
@@ -47,6 +49,7 @@ from rest_framework.status import (
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
 )
+
 
 class CreateBug(GenericAPIView):
     """

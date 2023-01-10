@@ -1,10 +1,11 @@
 from typing import Union
 
 from rest_framework.serializers import (
-    Serializer,
-    ListField,
     IntegerField,
+    ListField,
+    Serializer,
 )
+
 
 class BaseBulkDeleteSerializer(Serializer):
     ids: list[int] = ListField(child=IntegerField(min_value=0))

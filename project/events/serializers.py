@@ -8,6 +8,9 @@ from authentication.serializers import (
 )
 from cities.serializers import PlaceSerializer
 from config.exceptions import _404
+from config.serializers import (
+    BaseBulkDeleteSerializer,
+)
 from events.constants.response_error import (
     ALREADY_IN_EVENT_FANS_LIST_ERROR,
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,
@@ -27,7 +30,6 @@ from rest_framework import serializers
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
-from config.serializers import BaseBulkDeleteSerializer
 
 
 class CreateEventSerializer(serializers.ModelSerializer):
@@ -139,6 +141,7 @@ class InvitesToEventListSerializer(serializers.ModelSerializer):
             "event",
             "sender",
         ]
+
 
 class JoinOrRemoveRoomSerializer(serializers.Serializer):
     event_id: int = serializers.IntegerField(min_value=0)

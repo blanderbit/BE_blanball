@@ -44,7 +44,7 @@ class Review(models.Model):
         db_table: str = "review"
         verbose_name: str = "review"
         verbose_name_plural: str = "reviews"
-        ordering: list[str] = ['-id']
+        ordering: list[str] = ["-id"]
 
 
 class EventReview(models.Model):
@@ -76,4 +76,4 @@ class EventReview(models.Model):
         db_table: str = "event_review"
         verbose_name: str = "event review"
         verbose_name_plural: str = "event reviews"
-        ordering: list[str] = ['-id']
+        ordering: list[str] = ["-id"]

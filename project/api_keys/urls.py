@@ -1,9 +1,9 @@
 from typing import Union
 
 from api_keys.views import (
-    CreateApiKey,
     ApiKeysList,
     BulkDeleteApiKeys,
+    CreateApiKey,
 )
 from django.urls import path
 from django.urls.resolvers import (

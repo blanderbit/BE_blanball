@@ -30,5 +30,5 @@ app.conf.beat_schedule = {
     "delete_expired_api_keys": {
         "task": "api_keys.tasks.delete_expired_api_keys",
         "schedule": crontab(minute=0, hour=0),
-    }
+    },
 }

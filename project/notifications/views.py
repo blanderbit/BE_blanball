@@ -2,6 +2,9 @@ import json
 from typing import Any, Type
 
 from config.openapi import skip_param_query
+from config.serializers import (
+    BaseBulkDeleteSerializer,
+)
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
     method_decorator,
@@ -25,7 +28,6 @@ from notifications.serializers import (
     NotificationSerializer,
     UserNotificationsCount,
 )
-from config.serializers import BaseBulkDeleteSerializer
 from notifications.services import (
     bulk_delete_notifications,
     bulk_read_notifications,

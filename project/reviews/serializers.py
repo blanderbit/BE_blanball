@@ -19,10 +19,7 @@ from reviews.constants.errors import (
 from reviews.constants.notification_types import (
     REVIEW_CREATE_NOTIFICATION_TYPE,
 )
-from reviews.models import (
-    Review,
-    EventReview
-)
+from reviews.models import EventReview, Review
 
 
 class CreateReviewSerializer(ModelSerializer):
@@ -83,11 +80,8 @@ class ReviewListSerializer(ModelSerializer):
             "user",
         ]
 
+
 class CreateEventReviewSerializer(ModelSerializer):
     class Meta:
         model: EventReview = EventReview
-        exclude: Union[str, list[str]] = [
-            "author",
-            "time_created"
-        ]
-    
+        exclude: Union[str, list[str]] = ["author", "time_created"]

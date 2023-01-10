@@ -1,12 +1,12 @@
+from api_keys.filters import (
+    API_KEYS_LIST_ORDERING_FIELDS,
+    API_KEYS_LIST_SEARCH_FIELDS,
+)
 from config.openapi import (
     concat_search_fields,
     skip_param_query,
 )
 from drf_yasg import openapi
-from api_keys.filters import (
-    API_KEYS_LIST_SEARCH_FIELDS,
-    API_KEYS_LIST_ORDERING_FIELDS,
-)
 
 api_keys_searh_query = openapi.Parameter(
     "search",

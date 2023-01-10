@@ -1,5 +1,8 @@
 from typing import Any, Type, final
 
+from config.serializers import (
+    BaseBulkDeleteSerializer,
+)
 from django.db.models.query import QuerySet
 from events.constants.notification_types import (
     EVENT_UPDATE_NOTIFICATION_TYPE,
@@ -13,7 +16,6 @@ from events.serializers import (
     EventSerializer,
     UpdateEventSerializer,
 )
-from config.serializers import BaseBulkDeleteSerializer
 from events.services import (
     bulk_delete_events,
     event_create,

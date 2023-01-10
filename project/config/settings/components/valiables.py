@@ -57,4 +57,4 @@ else:
 
 NOVAPOSHTA_API_KEY: str = config("NOVAPOSHTA_API_KEY", cast=str)
 
-API_KEY_MAX_LENGTH: int =  255
+API_KEY_MAX_LENGTH: int = 255
