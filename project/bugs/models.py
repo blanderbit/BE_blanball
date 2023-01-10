@@ -61,11 +61,7 @@ class Bug(models.Model):
     @final
     @staticmethod
     def get_all() -> QuerySet["Bug"]:
-        return (
-            Bug.objects.prefetch_related("images")
-            .select_related("author")
-            .order_by("-id")
-        )
+        return Bug.objects.prefetch_related("images").select_related("author")
 
     @final
     def __repr__(self) -> str:
@@ -79,3 +75,4 @@ class Bug(models.Model):
         db_table: str = "bug"
         verbose_name: str = "bug"
         verbose_name_plural: str = "bugs"
+        ordering: list[str] = ["-id"]

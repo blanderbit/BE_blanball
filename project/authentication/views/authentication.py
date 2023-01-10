@@ -45,7 +45,7 @@ from authentication.models import (
     Profile,
     User,
 )
-from authentication.permisions import (
+from authentication.permissions import (
     IsNotAuthenticated,
 )
 from authentication.serializers import (

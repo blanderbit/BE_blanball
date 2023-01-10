@@ -88,7 +88,7 @@ def validate_image(image: TemporaryUploadedFile) -> str:
     if image.size > megabyte_limit * 1024 * 1024:
         raise ValidationError(AVATAR_MAX_SIZE_ERROR, HTTP_400_BAD_REQUEST)
 
-
+@final
 class Profile(models.Model):
     class Position(models.TextChoices):
         GK: str = "GK"
@@ -188,6 +188,7 @@ class Profile(models.Model):
         verbose_name_plural: str = "profiles"
 
 
+@final
 class User(AbstractBaseUser):
     class Role(models.TextChoices):
         USER: str = "User"
@@ -221,7 +222,7 @@ class User(AbstractBaseUser):
     @final
     @staticmethod
     def get_all() -> QuerySet["User"]:
-        return User.objects.select_related("profile").order_by("-id")
+        return User.objects.select_related("profile")
 
     @final
     def tokens(self) -> dict[str, str]:
@@ -237,6 +238,7 @@ class User(AbstractBaseUser):
         db_table: str = "user"
         verbose_name: str = "user"
         verbose_name_plural: str = "users"
+        ordering: list[str] = ["-id"]
 
 
 class Code(models.Model):
@@ -245,6 +247,10 @@ class Code(models.Model):
     type: str = models.CharField(max_length=20)
     user_email: str = models.CharField(max_length=255)
     dop_info: Optional[str] = models.CharField(max_length=255, null=True)
+
+    @final
+    def get_only_expired() -> QuerySet["Code"]:
+        return Code.objects.filter(life_time__lt=timezone.now())
 
     @final
     def __repr__(self) -> str:

@@ -1,5 +1,5 @@
 # ==============================================================================
-# events_list.py file which includes all controllers responsible for working with 
+# events_list.py file which includes all controllers responsible for working with
 # requests for participation in the event and invitations to events
 # ==============================================================================
 

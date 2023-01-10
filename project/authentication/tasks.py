@@ -48,9 +48,7 @@ class Util:
 
 @app.task
 def delete_expire_codes() -> None:
-    for code in Code.objects.all():
-        if code.life_time < timezone.now():
-            code.delete()
+    Code.get_only_expired().delete()
 
 
 @app.task

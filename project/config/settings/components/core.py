@@ -30,6 +30,7 @@ INSTALLED_APPS: list[str] = [
     "reviews.apps.ReviewsConfig",
     "cities.apps.CitiesConfig",
     "bugs.apps.BugsConfig",
+    "api_keys.apps.ApiKeysConfig",
 ]
 
 if not os.environ.get("GITHUB_WORKFLOW"):
@@ -83,7 +84,8 @@ SWAGGER_SETTINGS: dict[str, Any] = {
     "SHOW_REQUEST_HEADERS": True,
     "HIDE_HOSTNAME": True,
     "SECURITY_DEFINITIONS": {
-        "Bearer": {"type": "apiKey", "name": "Authorization", "in": "Header"}
+        "User": {"type": "apiKey", "name": "Authorization", "in": "Header"},
+        "Admin": {"type": "apiKey", "name": "ApiKey", "in": "Header"}
     },
     "USE_SESSION_AUTH": config("USE_SESSION_AUTH", cast=bool),
     "JSON_EDITOR": config("JSON_EDITOR", cast=bool),

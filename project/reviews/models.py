@@ -34,7 +34,7 @@ class Review(models.Model):
     @final
     @staticmethod
     def get_all() -> QuerySet["Review"]:
-        return Review.objects.select_related("user", "author").order_by("-id")
+        return Review.objects.select_related("user", "author")
 
     @final
     def __str__(self) -> str:
@@ -44,6 +44,7 @@ class Review(models.Model):
         db_table: str = "review"
         verbose_name: str = "review"
         verbose_name_plural: str = "reviews"
+        ordering: list[str] = ["-id"]
 
 
 class EventReview(models.Model):
@@ -65,7 +66,7 @@ class EventReview(models.Model):
     @final
     @staticmethod
     def get_all() -> QuerySet["EventReview"]:
-        return EventReview.objects.select_related("user", "event").order_by("-id")
+        return EventReview.objects.select_related("user", "event")
 
     @final
     def __str__(self) -> str:
@@ -75,3 +76,4 @@ class EventReview(models.Model):
         db_table: str = "event_review"
         verbose_name: str = "event review"
         verbose_name_plural: str = "event reviews"
+        ordering: list[str] = ["-id"]

@@ -122,10 +122,8 @@ class Event(models.Model):
     @final
     @staticmethod
     def get_all() -> QuerySet["Event"]:
-        return (
-            Event.objects.select_related("author")
-            .prefetch_related("current_users", "current_fans")
-            .order_by("-id")
+        return Event.objects.select_related("author").prefetch_related(
+            "current_users", "current_fans"
         )
 
     @final
@@ -138,6 +136,7 @@ class Event(models.Model):
         db_table: str = "event"
         verbose_name: str = "event"
         verbose_name_plural: str = "events"
+        ordering: list[str] = ["-id"]
 
 
 class RequestToParticipation(models.Model):
@@ -170,12 +169,13 @@ class RequestToParticipation(models.Model):
     def get_all() -> QuerySet["RequestToParticipation"]:
         return RequestToParticipation.objects.select_related(
             "recipient", "event", "sender"
-        ).order_by("-id")
+        )
 
     class Meta:
         db_table: str = "request_to_participation"
         verbose_name: str = "request to participation"
         verbose_name_plural: str = "requests to participation"
+        ordering: list[str] = ["-id"]
 
 
 class InviteToEventManager(models.Manager):
@@ -248,11 +248,10 @@ class InviteToEvent(RequestToParticipation):
     @final
     @staticmethod
     def get_all() -> QuerySet["InviteToEvent"]:
-        return InviteToEvent.objects.select_related(
-            "recipient", "event", "sender"
-        ).order_by("-id")
+        return InviteToEvent.objects.select_related("recipient", "event", "sender")
 
     class Meta:
         db_table: str = "invite_to_event"
         verbose_name: str = "invite to event"
         verbose_name_plural: str = "invites to event"
+        ordering: list[str] = ["-id"]

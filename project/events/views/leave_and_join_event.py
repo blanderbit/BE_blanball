@@ -1,6 +1,6 @@
 # ==============================================================================
-# leave_and_join_event.py file which includes all controllers responsible 
-# for working withremoving the user from the event, sending a request to participate, 
+# leave_and_join_event.py file which includes all controllers responsible
+# for working withremoving the user from the event, sending a request to participate,
 # entering and exiting the event for the player and viewer
 # ==============================================================================
 from typing import Any, Type, final

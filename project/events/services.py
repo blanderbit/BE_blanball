@@ -347,9 +347,7 @@ def skip_objects_from_response_by_id(
                 ~Q(id__in=list(self.request.query_params["skipids"].split(",")))
             )
             return func(self, *args, **kwargs)
-        except KeyError:
-            pass
-        except ValueError:
+        except (KeyError, ValueError):
             pass
         finally:
             return func(self, *args, **kwargs)
@@ -375,7 +373,6 @@ def add_dist_filter_to_view(
     return wrap
 
 
-
 def only_for_event_members(func):
     def wrap(self, request: Request, *agrs: Any, **kwargs: Any):
         try:
@@ -386,6 +383,7 @@ def only_for_event_members(func):
                 raise PermissionDenied()
         except Event.DoesNotExist:
             return func(self, request, *agrs, **kwargs)
+
     return wrap
 
 
