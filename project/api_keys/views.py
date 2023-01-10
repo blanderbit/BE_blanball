@@ -12,6 +12,9 @@ from api_keys.serializers import (
     ApiKeysListSerializer,
     CreateApiKeySerializer,
 )
+from api_keys.permissions import (
+    ApiKeyPermission,
+)
 from api_keys.services import bulk_delete_api_keys
 from config.serializers import (
     BaseBulkDeleteSerializer,
@@ -56,6 +59,9 @@ class CreateApiKey(GenericAPIView):
 
     serializer_class: Type[Serializer] = CreateApiKeySerializer
     queryset: QuerySet[ApiKey] = ApiKey.objects.all()
+    permission_classes = [
+        ApiKeyPermission,
+    ]
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
@@ -90,6 +96,9 @@ class ApiKeysList(ListAPIView):
     ]
     search_fields = API_KEYS_LIST_SEARCH_FIELDS
     ordering_fields = API_KEYS_LIST_ORDERING_FIELDS
+    permission_classes = [
+        ApiKeyPermission,
+    ]
 
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[ApiKey]:
@@ -114,6 +123,9 @@ class BulkDeleteApiKeys(GenericAPIView):
     """
 
     serializer_class: Type[Serializer] = BaseBulkDeleteSerializer
+    permission_classes = [
+        ApiKeyPermission,
+    ]
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)

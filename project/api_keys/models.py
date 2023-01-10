@@ -34,11 +34,18 @@ class ApiKey(models.Model):
 
     @final
     def get_only_active() -> QuerySet["ApiKey"]:
-        return ApiKey.objects.filter(expire_time__gt=timezone.now())
+        return ApiKey.objects.filter(expire_time__lt=timezone.now())
 
     @final
     def get_only_expired() -> QuerySet["ApiKey"]:
         return ApiKey.objects.filter(expire_time__lt=timezone.now())
+
+    @final
+    def check_api_key_status(api_key: "ApiKey") -> bool:
+        try:
+            return api_key.expire_time > timezone.now()
+        except TypeError:
+            return True
 
     @final
     def __str__(self) -> str:
