@@ -56,3 +56,5 @@ else:
     MINIO_IMAGE_HOST: str = getenv("MINIO_IMAGE_HOST")
 
 NOVAPOSHTA_API_KEY: str = config("NOVAPOSHTA_API_KEY", cast=str)
+
+API_KEY_MAX_LENGTH: int =  255
