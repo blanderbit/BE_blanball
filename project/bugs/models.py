@@ -64,7 +64,6 @@ class Bug(models.Model):
         return (
             Bug.objects.prefetch_related("images")
             .select_related("author")
-            .order_by("-id")
         )
 
     @final
@@ -79,3 +78,4 @@ class Bug(models.Model):
         db_table: str = "bug"
         verbose_name: str = "bug"
         verbose_name_plural: str = "bugs"
+        ordering: list[str] = ['-id']

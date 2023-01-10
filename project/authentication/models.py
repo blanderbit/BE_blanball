@@ -221,7 +221,7 @@ class User(AbstractBaseUser):
     @final
     @staticmethod
     def get_all() -> QuerySet["User"]:
-        return User.objects.select_related("profile").order_by("-id")
+        return User.objects.select_related("profile")
 
     @final
     def tokens(self) -> dict[str, str]:
@@ -237,6 +237,7 @@ class User(AbstractBaseUser):
         db_table: str = "user"
         verbose_name: str = "user"
         verbose_name_plural: str = "users"
+        ordering: list[str] = ['-id']
 
 
 class Code(models.Model):

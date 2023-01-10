@@ -45,3 +45,4 @@ class ApiKey(models.Model):
         db_table: str = "api_key"
         verbose_name: str = "api key"
         verbose_name_plural: str = "api keys"
+        ordering: list[str] = ['-id']
