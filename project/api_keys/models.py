@@ -1,6 +1,7 @@
 from typing import (
     final, 
-    Any
+    Any,
+    Optional
 )
 from django.db import models
 from django.utils import timezone
@@ -18,7 +19,7 @@ class ApiKey(models.Model):
     value: str = models.CharField(
         max_length=settings.API_KEY_MAX_LENGTH, null=True, unique=True)
     created_at: datetime = models.DateTimeField(auto_now_add=True)
-    expire_time: datetime = models.DateTimeField(null=True)
+    expire_time: Optional[datetime]  = models.DateTimeField(null=True)
 
     @final
     def __repr__(self) -> str:
@@ -26,7 +27,11 @@ class ApiKey(models.Model):
 
     @final
     def get_only_active() -> QuerySet["ApiKey"]:
-        return ApiKey.objects.filter(expire_time__gte=timezone.now())
+        return ApiKey.objects.filter(expire_time__gt=timezone.now())
+
+    @final
+    def get_only_expired() -> QuerySet["ApiKey"]:
+        return ApiKey.objects.filter(expire_time__lt=timezone.now())
 
     @final
     def __str__(self) -> str:

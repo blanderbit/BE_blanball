@@ -248,6 +248,10 @@ class Code(models.Model):
     dop_info: Optional[str] = models.CharField(max_length=255, null=True)
 
     @final
+    def get_only_expired() -> QuerySet["Code"]:
+        return Code.objects.filter(life_time__lt=timezone.now())
+
+    @final
     def __repr__(self) -> str:
         return "<Code %s>" % self.id
 
