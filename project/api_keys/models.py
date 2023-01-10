@@ -1,6 +1,7 @@
 from typing import (
     final, 
-    Any
+    Any,
+    Optional
 )
 from django.db import models
 from django.utils import timezone
@@ -12,13 +13,22 @@ from django.contrib.auth.hashers import (
 from django.utils.crypto import get_random_string
 from datetime import datetime
 from django.conf import settings
+from rest_framework.serializers import (
+    ValidationError,
+)
+from rest_framework.status import (
+    HTTP_400_BAD_REQUEST,
+)
+from api_keys.constants.errors import (
+    API_KEY_BAD_EXPIRE_TIME_ERROR,
+)
 
 
 class ApiKey(models.Model):
     value: str = models.CharField(
         max_length=settings.API_KEY_MAX_LENGTH, null=True, unique=True)
     created_at: datetime = models.DateTimeField(auto_now_add=True)
-    expire_time: datetime = models.DateTimeField(null=True)
+    expire_time: Optional[datetime]  = models.DateTimeField(null=True)
 
     @final
     def __repr__(self) -> str:
@@ -26,7 +36,11 @@ class ApiKey(models.Model):
 
     @final
     def get_only_active() -> QuerySet["ApiKey"]:
-        return ApiKey.objects.filter(expire_time__gte=timezone.now())
+        return ApiKey.objects.filter(expire_time__gt=timezone.now())
+
+    @final
+    def get_only_expired() -> QuerySet["ApiKey"]:
+        return ApiKey.objects.filter(expire_time__lt=timezone.now())
 
     @final
     def __str__(self) -> str:
@@ -38,6 +52,10 @@ class ApiKey(models.Model):
 
     @final
     def save(self, *args: Any, **kwargs: Any) -> None:
+        if self.expire_time < timezone.now():
+            raise ValidationError(
+                API_KEY_BAD_EXPIRE_TIME_ERROR, HTTP_400_BAD_REQUEST
+            )
         self.value = self.make_api_key()
         super(ApiKey, self).save(*args, **kwargs)
 
