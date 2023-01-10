@@ -26,7 +26,7 @@ class Notification(models.Model):
     @final
     @staticmethod
     def get_all() -> QuerySet["Notification"]:
-        return Notification.objects.select_related("user").order_by("-id")
+        return Notification.objects.select_related("user")
 
     @final
     def __str__(self) -> str:
@@ -36,3 +36,4 @@ class Notification(models.Model):
         db_table: str = "notification"
         verbose_name: str = "notification"
         verbose_name_plural: str = "notifications"
+        ordering: list[str] = ['-id']

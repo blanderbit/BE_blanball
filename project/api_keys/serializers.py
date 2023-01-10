@@ -10,3 +10,9 @@ class CreateApiKeySerializer(serializers.ModelSerializer):
         fields: Union[str, list[str]] = [
             "expire_time",
         ]
+
+class ApiKeysListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model: ApiKey = ApiKey
+        fields: Union[str, list[str]] = '__all__'
