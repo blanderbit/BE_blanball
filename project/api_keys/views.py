@@ -91,3 +91,26 @@ class ApiKeysList(ListAPIView):
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[ApiKey]:
         return self.queryset
+
+
+class BulkDeleteApiKeys(GenericAPIView):
+    """
+    Delete api keys
+
+    This endpoint allows the "admin" user to
+    delete a certain number of api keys by ID.
+    Example:
+    {
+        "ids": [
+            1, 2, 3, 4, 5
+        ]
+    }
+    If the user who sent the request has
+    api keys under identifiers: 1,2,3,4,5
+    then they will be delete.
+    """
+
+    queryset: QuerySet[ApiKey] = ApiKey.objects.all()
+    
+    def post(self, request: Request) -> Response:
+        pass

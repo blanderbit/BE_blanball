@@ -27,6 +27,7 @@ from rest_framework import serializers
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
+from config.serializers import BaseBulkDeleteSerializer
 
 
 class CreateEventSerializer(serializers.ModelSerializer):
@@ -139,16 +140,6 @@ class InvitesToEventListSerializer(serializers.ModelSerializer):
             "sender",
         ]
 
-
-class DeleteEventsSerializer(serializers.Serializer):
-    ids: list[int] = serializers.ListField(child=serializers.IntegerField(min_value=0))
-
-    class Meta:
-        fieds: Union[str, list[str]] = [
-            "ids",
-        ]
-
-
 class JoinOrRemoveRoomSerializer(serializers.Serializer):
     event_id: int = serializers.IntegerField(min_value=0)
 
@@ -247,12 +238,10 @@ class RequestToParticipationSerializer(serializers.ModelSerializer):
         fields: Union[str, list[str]] = "__all__"
 
 
-class BulkAcceptOrDeclineRequestToParticipationSerializer(serializers.Serializer):
-    ids: list[int] = serializers.ListField(child=serializers.IntegerField(min_value=0))
+class BulkAcceptOrDeclineRequestToParticipationSerializer(BaseBulkDeleteSerializer):
     type: bool = serializers.BooleanField()
 
     class Meta:
         fields: Union[str, list[str]] = [
-            "ids",
             "type",
         ]

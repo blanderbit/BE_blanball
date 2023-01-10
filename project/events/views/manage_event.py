@@ -10,10 +10,10 @@ from events.constants.response_success import (
 from events.models import Event
 from events.serializers import (
     CreateEventSerializer,
-    DeleteEventsSerializer,
     EventSerializer,
     UpdateEventSerializer,
 )
+from config.serializers import BaseBulkDeleteSerializer
 from events.services import (
     bulk_delete_events,
     event_create,
@@ -101,7 +101,7 @@ class DeleteEvents(GenericAPIView):
     it can no longer be restored.
     """
 
-    serializer_class: Type[Serializer] = DeleteEventsSerializer
+    serializer_class: Type[Serializer] = BaseBulkDeleteSerializer
     queryset: QuerySet[Event] = Event.get_all()
 
     def post(self, request: Request) -> Response:

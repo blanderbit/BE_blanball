@@ -40,12 +40,3 @@ class MyBugsListSerializer(serializers.ModelSerializer):
     class Meta:
         model: Bug = Bug
         exclude: list[str] = ["author"]
-
-
-class BulkDeleteBugsSerializer(serializers.Serializer):
-    ids: list[int] = serializers.ListField(child=serializers.IntegerField(min_value=0))
-
-    class Meta:
-        fields: Union[str, list[str]] = [
-            "ids",
-        ]

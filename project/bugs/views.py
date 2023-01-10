@@ -12,10 +12,10 @@ from bugs.models import Bug
 from bugs.openapi import bugs_list_query_params
 from bugs.serializers import (
     BugsListSerializer,
-    BulkDeleteBugsSerializer,
     CreateBugSerializer,
     MyBugsListSerializer,
 )
+from config.serializers import BaseBulkDeleteSerializer
 from bugs.services import (
     bulk_delete_bugs,
     create_bug,
@@ -129,7 +129,7 @@ class BulkDeleteBugs(GenericAPIView):
     then they will be read.
     """
 
-    serializer_class: Type[Serializer] = BulkDeleteBugsSerializer
+    serializer_class: Type[Serializer] = BaseBulkDeleteSerializer
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)

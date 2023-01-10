@@ -31,15 +31,6 @@ class UserNotificationsCount(serializers.Serializer):
         ]
 
 
-class ReadOrDeleteNotificationsSerializer(serializers.Serializer):
-    ids: list[int] = serializers.ListField(child=serializers.IntegerField(min_value=0))
-
-    class Meta:
-        fields: Union[str, list[str]] = [
-            "ids",
-        ]
-
-
 class ChangeMaintenanceSerializer(serializers.Serializer):
     isMaintenance: bool = serializers.BooleanField()
 
