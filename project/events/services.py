@@ -373,7 +373,6 @@ def add_dist_filter_to_view(
     return wrap
 
 
-
 def only_for_event_members(func):
     def wrap(self, request: Request, *agrs: Any, **kwargs: Any):
         try:
@@ -384,6 +383,7 @@ def only_for_event_members(func):
                 raise PermissionDenied()
         except Event.DoesNotExist:
             return func(self, request, *agrs, **kwargs)
+
     return wrap
 
 

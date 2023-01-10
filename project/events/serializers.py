@@ -8,6 +8,9 @@ from authentication.serializers import (
 )
 from cities.serializers import PlaceSerializer
 from config.exceptions import _404
+from config.serializers import (
+    BaseBulkDeleteSerializer,
+)
 from events.constants.response_error import (
     ALREADY_IN_EVENT_FANS_LIST_ERROR,
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,
@@ -23,13 +26,20 @@ from events.models import (
 from events.validators import (
     EventDateTimeValidator,
 )
-from rest_framework import serializers
+from rest_framework.serializers import (
+    ModelSerializer,
+    Serializer,
+    BooleanField,
+    IntegerField,
+    ValidationError,
+    CharField,
+)
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
 
 
-class CreateEventSerializer(serializers.ModelSerializer):
+class CreateEventSerializer(ModelSerializer):
     place = PlaceSerializer()
 
     class Meta:
@@ -44,7 +54,7 @@ class CreateEventSerializer(serializers.ModelSerializer):
         ]
 
 
-class UpdateEventSerializer(serializers.ModelSerializer):
+class UpdateEventSerializer(ModelSerializer):
     place = PlaceSerializer()
 
     class Meta:
@@ -63,7 +73,7 @@ class UpdateEventSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 
-class EventSerializer(serializers.ModelSerializer):
+class EventSerializer(ModelSerializer):
     author = EventAuthorSerializer()
     current_users = EventUsersSerializer(many=True)
 
@@ -75,7 +85,7 @@ class EventSerializer(serializers.ModelSerializer):
         ]
 
 
-class PopularEventsListSerializer(serializers.ModelSerializer):
+class PopularEventsListSerializer(ModelSerializer):
     class Meta:
         model: Event = Event
         fields: Union[str, list[str]] = [
@@ -89,7 +99,7 @@ class PopularEventsListSerializer(serializers.ModelSerializer):
         ]
 
 
-class EventListSerializer(serializers.ModelSerializer):
+class EventListSerializer(ModelSerializer):
     place = PlaceSerializer()
     author = EventAuthorSerializer()
 
@@ -116,7 +126,7 @@ class EventListSerializer(serializers.ModelSerializer):
         ]
 
 
-class InInvitesEventSerializer(serializers.ModelSerializer):
+class InInvitesEventSerializer(ModelSerializer):
     class Meta:
         model: Event = Event
         fields: Union[str, list[str]] = [
@@ -126,7 +136,7 @@ class InInvitesEventSerializer(serializers.ModelSerializer):
         ]
 
 
-class InvitesToEventListSerializer(serializers.ModelSerializer):
+class InvitesToEventListSerializer(ModelSerializer):
     event = InInvitesEventSerializer()
     sender = EventUsersSerializer()
 
@@ -140,17 +150,8 @@ class InvitesToEventListSerializer(serializers.ModelSerializer):
         ]
 
 
-class DeleteEventsSerializer(serializers.Serializer):
-    ids: list[int] = serializers.ListField(child=serializers.IntegerField(min_value=0))
-
-    class Meta:
-        fieds: Union[str, list[str]] = [
-            "ids",
-        ]
-
-
-class JoinOrRemoveRoomSerializer(serializers.Serializer):
-    event_id: int = serializers.IntegerField(min_value=0)
+class JoinOrRemoveRoomSerializer(Serializer):
+    event_id: int = IntegerField(min_value=0)
 
     class Meta:
         fields: Union[str, list[str]] = [
@@ -162,11 +163,11 @@ class JoinOrRemoveRoomSerializer(serializers.Serializer):
         try:
             event: Event = Event.get_all().get(id=event_id)
             if event.status != event.Status.PLANNED:
-                raise serializers.ValidationError(
+                raise ValidationError(
                     EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST
                 )
             if event.amount_members < event.count_current_users + 1:
-                raise serializers.ValidationError(
+                raise ValidationError(
                     NO_EVENT_PLACE_ERROR, HTTP_400_BAD_REQUEST
                 )
             return super().validate(attrs)
@@ -174,9 +175,9 @@ class JoinOrRemoveRoomSerializer(serializers.Serializer):
             raise _404(object=Event)
 
 
-class InviteUserToEventSerializer(serializers.Serializer):
-    user_id: int = serializers.IntegerField(min_value=0)
-    event_id: int = serializers.IntegerField(min_value=0)
+class InviteUserToEventSerializer(Serializer):
+    user_id: int = IntegerField(min_value=0)
+    event_id: int = IntegerField(min_value=0)
 
     class Meta:
         fields: Union[str, list[str]] = [
@@ -189,15 +190,15 @@ class InviteUserToEventSerializer(serializers.Serializer):
             invite_user: User = User.get_all().get(id=attrs.get("user_id"))
             event: Event = Event.get_all().get(id=attrs.get("event_id"))
             if event.status == Event.Status.FINISHED:
-                raise serializers.ValidationError(
+                raise ValidationError(
                     EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST
                 )
             if invite_user.current_rooms.filter(id=event.id).exists():
-                raise serializers.ValidationError(
+                raise ValidationError(
                     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, HTTP_400_BAD_REQUEST
                 )
             if invite_user.current_views_rooms.filter(id=event.id).exists():
-                raise serializers.ValidationError(
+                raise ValidationError(
                     ALREADY_IN_EVENT_FANS_LIST_ERROR, HTTP_400_BAD_REQUEST
                 )
             return super().validate(attrs)
@@ -207,10 +208,10 @@ class InviteUserToEventSerializer(serializers.Serializer):
             raise _404(object=Event)
 
 
-class RemoveUserFromEventSerializer(serializers.Serializer):
-    user_id: int = serializers.IntegerField(min_value=0)
-    event_id: int = serializers.IntegerField(min_value=0)
-    reason: str = serializers.CharField(max_length=255)
+class RemoveUserFromEventSerializer(Serializer):
+    user_id: int = IntegerField(min_value=0)
+    event_id: int = IntegerField(min_value=0)
+    reason: str = CharField(max_length=255)
 
     class Meta:
         fields: Union[str, list[str]] = [
@@ -224,11 +225,11 @@ class RemoveUserFromEventSerializer(serializers.Serializer):
             removed_user: User = User.get_all().get(id=attrs.get("user_id"))
             event: Event = Event.get_all().get(id=attrs.get("event_id"))
             if event.status == event.Status.FINISHED:
-                raise serializers.ValidationError(
+                raise ValidationError(
                     EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST
                 )
             if not removed_user.current_rooms.filter(id=event.id).exists():
-                raise serializers.ValidationError(
+                raise ValidationError(
                     NO_IN_EVENT_MEMBERS_LIST_ERROR, HTTP_400_BAD_REQUEST
                 )
             return super().validate(attrs)
@@ -238,7 +239,7 @@ class RemoveUserFromEventSerializer(serializers.Serializer):
             raise _404(object=Event)
 
 
-class RequestToParticipationSerializer(serializers.ModelSerializer):
+class RequestToParticipationSerializer(ModelSerializer):
     sender = EventUsersSerializer()
     event = InInvitesEventSerializer()
 
@@ -247,12 +248,10 @@ class RequestToParticipationSerializer(serializers.ModelSerializer):
         fields: Union[str, list[str]] = "__all__"
 
 
-class BulkAcceptOrDeclineRequestToParticipationSerializer(serializers.Serializer):
-    ids: list[int] = serializers.ListField(child=serializers.IntegerField(min_value=0))
-    type: bool = serializers.BooleanField()
+class BulkAcceptOrDeclineRequestToParticipationSerializer(BaseBulkDeleteSerializer):
+    type: bool = BooleanField()
 
     class Meta:
         fields: Union[str, list[str]] = [
-            "ids",
             "type",
         ]

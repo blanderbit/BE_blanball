@@ -1,5 +1,6 @@
-from config.celery import app
 from api_keys.models import ApiKey
+from config.celery import app
+
 
 @app.task
 def delete_expired_api_keys() -> None:

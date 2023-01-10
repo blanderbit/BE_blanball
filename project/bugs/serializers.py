@@ -4,12 +4,16 @@ from authentication.serializers import (
     ReviewAuthorSerializer,
 )
 from bugs.models import Bug, BugImage
-from rest_framework import serializers
+from rest_framework.serializers import (
+    ModelSerializer,
+    ImageField,
+    ListField,
+)
 
 
-class CreateBugSerializer(serializers.ModelSerializer):
+class CreateBugSerializer(ModelSerializer):
 
-    images = serializers.ListField(child=serializers.ImageField(), required=False)
+    images = ListField(child=ImageField(), required=False)
 
     class Meta:
         model: Bug = Bug
@@ -20,13 +24,13 @@ class CreateBugSerializer(serializers.ModelSerializer):
         ]
 
 
-class BugsListImagesNameSerializer(serializers.ModelSerializer):
+class BugsListImagesNameSerializer(ModelSerializer):
     class Meta:
         model: BugImage = BugImage
         fields: Union[str, list[str]] = ["image_url"]
 
 
-class BugsListSerializer(serializers.ModelSerializer):
+class BugsListSerializer(ModelSerializer):
 
     author = ReviewAuthorSerializer()
     images = BugsListImagesNameSerializer(many=True)
@@ -36,16 +40,7 @@ class BugsListSerializer(serializers.ModelSerializer):
         fields: Union[str, list[str]] = "__all__"
 
 
-class MyBugsListSerializer(serializers.ModelSerializer):
+class MyBugsListSerializer(ModelSerializer):
     class Meta:
         model: Bug = Bug
         exclude: list[str] = ["author"]
-
-
-class BulkDeleteBugsSerializer(serializers.Serializer):
-    ids: list[int] = serializers.ListField(child=serializers.IntegerField(min_value=0))
-
-    class Meta:
-        fields: Union[str, list[str]] = [
-            "ids",
-        ]

@@ -2,6 +2,9 @@ import json
 from typing import Any, Type
 
 from config.openapi import skip_param_query
+from config.serializers import (
+    BaseBulkDeleteSerializer,
+)
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
     method_decorator,
@@ -23,7 +26,6 @@ from notifications.models import Notification
 from notifications.serializers import (
     ChangeMaintenanceSerializer,
     NotificationSerializer,
-    ReadOrDeleteNotificationsSerializer,
     UserNotificationsCount,
 )
 from notifications.services import (
@@ -124,7 +126,7 @@ class ReadNotifications(GenericAPIView):
     then they will be read.
     """
 
-    serializer_class: Type[Serializer] = ReadOrDeleteNotificationsSerializer
+    serializer_class: Type[Serializer] = BaseBulkDeleteSerializer
     queryset: QuerySet[Notification] = Notification.get_all()
 
     def post(self, request: Request) -> Response:
@@ -153,10 +155,10 @@ class DeleteNotifcations(GenericAPIView):
     }
     If the user who sent the request has
     notifications under identifiers: 1,2,3,4,5
-    then they will be read.
+    then they will be delete.
     """
 
-    serializer_class: Type[Serializer] = ReadOrDeleteNotificationsSerializer
+    serializer_class: Type[Serializer] = BaseBulkDeleteSerializer
     queryset: QuerySet[Notification] = Notification.get_all()
 
     def post(self, request: Request) -> Response:

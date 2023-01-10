@@ -237,7 +237,7 @@ class User(AbstractBaseUser):
         db_table: str = "user"
         verbose_name: str = "user"
         verbose_name_plural: str = "users"
-        ordering: list[str] = ['-id']
+        ordering: list[str] = ["-id"]
 
 
 class Code(models.Model):

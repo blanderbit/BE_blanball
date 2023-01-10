@@ -1,34 +1,32 @@
-from typing import (
-    final, 
-    Any,
-    Optional
+from datetime import datetime
+from typing import Any, Optional, final
+
+from api_keys.constants.errors import (
+    API_KEY_BAD_EXPIRE_TIME_ERROR,
+)
+from django.conf import settings
+from django.contrib.auth.hashers import (
+    check_password,
+    make_password,
 )
 from django.db import models
-from django.utils import timezone
 from django.db.models.query import QuerySet
-from django.contrib.auth.hashers import (
-    make_password,
-    check_password,
-)
+from django.utils import timezone
 from django.utils.crypto import get_random_string
-from datetime import datetime
-from django.conf import settings
 from rest_framework.serializers import (
     ValidationError,
 )
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
-from api_keys.constants.errors import (
-    API_KEY_BAD_EXPIRE_TIME_ERROR,
-)
 
 
 class ApiKey(models.Model):
     value: str = models.CharField(
-        max_length=settings.API_KEY_MAX_LENGTH, null=True, unique=True)
+        max_length=settings.API_KEY_MAX_LENGTH, null=True, unique=True
+    )
     created_at: datetime = models.DateTimeField(auto_now_add=True)
-    expire_time: Optional[datetime]  = models.DateTimeField(null=True)
+    expire_time: Optional[datetime] = models.DateTimeField(null=True)
 
     @final
     def __repr__(self) -> str:
@@ -53,9 +51,7 @@ class ApiKey(models.Model):
     @final
     def save(self, *args: Any, **kwargs: Any) -> None:
         if self.expire_time < timezone.now():
-            raise ValidationError(
-                API_KEY_BAD_EXPIRE_TIME_ERROR, HTTP_400_BAD_REQUEST
-            )
+            raise ValidationError(API_KEY_BAD_EXPIRE_TIME_ERROR, HTTP_400_BAD_REQUEST)
         self.value = self.make_api_key()
         super(ApiKey, self).save(*args, **kwargs)
 
@@ -63,4 +59,4 @@ class ApiKey(models.Model):
         db_table: str = "api_key"
         verbose_name: str = "api key"
         verbose_name_plural: str = "api keys"
-        ordering: list[str] = ['-id']
+        ordering: list[str] = ["-id"]

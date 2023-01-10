@@ -4,11 +4,15 @@ from django.core.validators import (
     MaxValueValidator,
     MinValueValidator,
 )
-from rest_framework import serializers
+from rest_framework.serializers import (
+    Serializer,
+    CharField,
+    FloatField,
+)
 
 
-class GetCoordinatesByPlaceNameSerializer(serializers.Serializer):
-    place_name: bool = serializers.CharField(max_length=255)
+class GetCoordinatesByPlaceNameSerializer(Serializer):
+    place_name: bool = CharField(max_length=255)
 
     class Meta:
         fields: Union[str, list[str]] = [
@@ -16,15 +20,15 @@ class GetCoordinatesByPlaceNameSerializer(serializers.Serializer):
         ]
 
 
-class PlaceSerializer(serializers.Serializer):
-    place_name: str = serializers.CharField(max_length=255)
-    lat: float = serializers.FloatField(
+class PlaceSerializer(Serializer):
+    place_name: str = CharField(max_length=255)
+    lat: float = FloatField(
         validators=[
             MinValueValidator(-90),
             MaxValueValidator(90),
         ]
     )
-    lon: float = serializers.FloatField(
+    lon: float = FloatField(
         validators=[
             MinValueValidator(-180),
             MaxValueValidator(180),
@@ -39,14 +43,14 @@ class PlaceSerializer(serializers.Serializer):
         ]
 
 
-class GetPlaceNameByCoordinatesSerializer(serializers.Serializer):
-    lat: float = serializers.FloatField(
+class GetPlaceNameByCoordinatesSerializer(Serializer):
+    lat: float = FloatField(
         validators=[
             MinValueValidator(-90),
             MaxValueValidator(90),
         ]
     )
-    lon: float = serializers.FloatField(
+    lon: float = FloatField(
         validators=[
             MinValueValidator(-180),
             MaxValueValidator(180),

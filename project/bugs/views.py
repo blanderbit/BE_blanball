@@ -12,13 +12,15 @@ from bugs.models import Bug
 from bugs.openapi import bugs_list_query_params
 from bugs.serializers import (
     BugsListSerializer,
-    BulkDeleteBugsSerializer,
     CreateBugSerializer,
     MyBugsListSerializer,
 )
 from bugs.services import (
     bulk_delete_bugs,
     create_bug,
+)
+from config.serializers import (
+    BaseBulkDeleteSerializer,
 )
 from django.db.models import QuerySet
 from django.utils.decorators import (
@@ -47,6 +49,7 @@ from rest_framework.status import (
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
 )
+
 
 class CreateBug(GenericAPIView):
     """
@@ -129,7 +132,7 @@ class BulkDeleteBugs(GenericAPIView):
     then they will be read.
     """
 
-    serializer_class: Type[Serializer] = BulkDeleteBugsSerializer
+    serializer_class: Type[Serializer] = BaseBulkDeleteSerializer
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
@@ -139,10 +142,4 @@ class BulkDeleteBugs(GenericAPIView):
 
 
 class ChangeBugType(GenericAPIView):
-    """
-    Change bug type
-
-    """
-
-    def put(self, request: Request) -> Response:
-        pass
+    pass

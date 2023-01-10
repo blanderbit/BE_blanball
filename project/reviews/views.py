@@ -7,31 +7,26 @@ from django.utils.decorators import (
 )
 from drf_yasg.utils import swagger_auto_schema
 from events.services import (
-    skip_objects_from_response_by_id,
     only_for_event_members,
+    skip_objects_from_response_by_id,
 )
 from rest_framework.generics import (
     CreateAPIView,
-    ListAPIView,
     GenericAPIView,
+    ListAPIView,
 )
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
-from rest_framework.status import (
-    HTTP_201_CREATED
-)
-from reviews.models import (
-    Review,
-    EventReview,
-)
-from reviews.serializers import (
-    CreateReviewSerializer,
-    ReviewListSerializer,
-    CreateEventReviewSerializer,
-)
+from rest_framework.status import HTTP_201_CREATED
 from reviews.constants.success import (
     EVENT_REVIEW_CREATED_SUCCESS,
+)
+from reviews.models import EventReview, Review
+from reviews.serializers import (
+    CreateEventReviewSerializer,
+    CreateReviewSerializer,
+    ReviewListSerializer,
 )
 from reviews.services import hide_user_reviews
 
@@ -97,8 +92,5 @@ class CreateEventReview(GenericAPIView):
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        EventReview.objects.create(author=request.user, 
-            **serializer.validated_data
-        )
+        EventReview.objects.create(author=request.user, **serializer.validated_data)
         return Response(EVENT_REVIEW_CREATED_SUCCESS, HTTP_201_CREATED)
-
