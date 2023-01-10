@@ -50,7 +50,7 @@ class ApiKey(models.Model):
 
     @final
     def save(self, *args: Any, **kwargs: Any) -> None:
-        if self.expire_time  and self.expire_time < timezone.now():
+        if self.expire_time and self.expire_time < timezone.now():
             raise ValidationError(API_KEY_BAD_EXPIRE_TIME_ERROR, HTTP_400_BAD_REQUEST)
         self.value = self.make_api_key()
         super(ApiKey, self).save(*args, **kwargs)

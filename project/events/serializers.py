@@ -27,12 +27,12 @@ from events.validators import (
     EventDateTimeValidator,
 )
 from rest_framework.serializers import (
+    BooleanField,
+    CharField,
+    IntegerField,
     ModelSerializer,
     Serializer,
-    BooleanField,
-    IntegerField,
     ValidationError,
-    CharField,
 )
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
@@ -163,13 +163,9 @@ class JoinOrRemoveRoomSerializer(Serializer):
         try:
             event: Event = Event.get_all().get(id=event_id)
             if event.status != event.Status.PLANNED:
-                raise ValidationError(
-                    EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST
-                )
+                raise ValidationError(EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST)
             if event.amount_members < event.count_current_users + 1:
-                raise ValidationError(
-                    NO_EVENT_PLACE_ERROR, HTTP_400_BAD_REQUEST
-                )
+                raise ValidationError(NO_EVENT_PLACE_ERROR, HTTP_400_BAD_REQUEST)
             return super().validate(attrs)
         except Event.DoesNotExist:
             raise _404(object=Event)
@@ -190,9 +186,7 @@ class InviteUserToEventSerializer(Serializer):
             invite_user: User = User.get_all().get(id=attrs.get("user_id"))
             event: Event = Event.get_all().get(id=attrs.get("event_id"))
             if event.status == Event.Status.FINISHED:
-                raise ValidationError(
-                    EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST
-                )
+                raise ValidationError(EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST)
             if invite_user.current_rooms.filter(id=event.id).exists():
                 raise ValidationError(
                     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, HTTP_400_BAD_REQUEST
@@ -225,9 +219,7 @@ class RemoveUserFromEventSerializer(Serializer):
             removed_user: User = User.get_all().get(id=attrs.get("user_id"))
             event: Event = Event.get_all().get(id=attrs.get("event_id"))
             if event.status == event.Status.FINISHED:
-                raise ValidationError(
-                    EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST
-                )
+                raise ValidationError(EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST)
             if not removed_user.current_rooms.filter(id=event.id).exists():
                 raise ValidationError(
                     NO_IN_EVENT_MEMBERS_LIST_ERROR, HTTP_400_BAD_REQUEST

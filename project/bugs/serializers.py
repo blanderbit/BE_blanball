@@ -5,9 +5,9 @@ from authentication.serializers import (
 )
 from bugs.models import Bug, BugImage
 from rest_framework.serializers import (
-    ModelSerializer,
     ImageField,
     ListField,
+    ModelSerializer,
 )
 
 

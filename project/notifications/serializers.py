@@ -2,10 +2,10 @@ from typing import Union
 
 from notifications.models import Notification
 from rest_framework.serializers import (
+    BooleanField,
+    IntegerField,
     ModelSerializer,
     Serializer,
-    IntegerField,
-    BooleanField,
 )
 
 
