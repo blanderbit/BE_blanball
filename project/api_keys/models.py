@@ -3,6 +3,8 @@ from typing import (
     Any
 )
 from django.db import models
+from django.utils import timezone
+from django.db.models.query import QuerySet
 from django.contrib.auth.hashers import (
     make_password,
     check_password,
@@ -23,9 +25,14 @@ class ApiKey(models.Model):
         return "<ApiKey %s>" % self.id
 
     @final
+    def get_only_active() -> QuerySet["ApiKey"]:
+        return ApiKey.objects.filter(expire_time__gte=timezone.now())
+
+    @final
     def __str__(self) -> str:
         return self.value
 
+    @final
     def make_api_key(self) -> str:
         return get_random_string(settings.API_KEY_MAX_LENGTH)
 
