@@ -13,6 +13,15 @@ from django.contrib.auth.hashers import (
 from django.utils.crypto import get_random_string
 from datetime import datetime
 from django.conf import settings
+from rest_framework.serializers import (
+    ValidationError,
+)
+from rest_framework.status import (
+    HTTP_400_BAD_REQUEST,
+)
+from api_keys.constants.errors import (
+    API_KEY_BAD_EXPIRE_TIME_ERROR,
+)
 
 
 class ApiKey(models.Model):
@@ -43,6 +52,10 @@ class ApiKey(models.Model):
 
     @final
     def save(self, *args: Any, **kwargs: Any) -> None:
+        if self.expire_time < timezone.now():
+            raise ValidationError(
+                API_KEY_BAD_EXPIRE_TIME_ERROR, HTTP_400_BAD_REQUEST
+            )
         self.value = self.make_api_key()
         super(ApiKey, self).save(*args, **kwargs)
 
