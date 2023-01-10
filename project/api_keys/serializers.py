@@ -2,7 +2,7 @@ from typing import Union
 
 from api_keys.models import ApiKey
 from rest_framework.serializers import (
-    ModelSerializer
+    ModelSerializer,
 )
 
 

@@ -23,14 +23,14 @@ from cities.serializers import PlaceSerializer
 from config.exceptions import _404
 from django.contrib import auth
 from rest_framework.serializers import (
-    ModelSerializer,
-    Serializer,
     BooleanField,
-    IntegerField,
-    ValidationError,
     CharField,
     EmailField,
+    IntegerField,
+    ModelSerializer,
+    Serializer,
     SerializerMethodField,
+    ValidationError,
 )
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
@@ -196,18 +196,14 @@ class UpdateUserProfileSerializer(ModelSerializer):
             "phone",
         ]
 
-    def validate(
-        self, attrs: OrderedDict[str, Any]
-    ) -> OrderedDict[str, Any]:
+    def validate(self, attrs: OrderedDict[str, Any]) -> OrderedDict[str, Any]:
         conf: str = attrs.get("configuration")
         keys: list[str] = ["email", "phone", "show_reviews"]
         try:
             planned_events = attrs.get("get_planned_events")
             string: str = re.findall(r"\D", planned_events)[0]
             if string not in ["d", "m", "y"]:
-                raise ValidationError(
-                    GET_PLANNED_EVENTS_ERROR, HTTP_400_BAD_REQUEST
-                )
+                raise ValidationError(GET_PLANNED_EVENTS_ERROR, HTTP_400_BAD_REQUEST)
             if sorted(conf) != sorted(keys):
                 raise ValidationError(
                     CONFIGURATION_IS_REQUIRED_ERROR, HTTP_400_BAD_REQUEST
@@ -232,9 +228,7 @@ class UpdateUserProfileImageSerializer(ModelSerializer):
 class RegisterSerializer(ModelSerializer):
 
     password: str = CharField(max_length=68, min_length=8, write_only=True)
-    re_password: str = CharField(
-        max_length=68, min_length=8, write_only=True
-    )
+    re_password: str = CharField(max_length=68, min_length=8, write_only=True)
     profile: Profile = CreateProfileSerializer()
 
     class Meta:
@@ -247,16 +241,12 @@ class RegisterSerializer(ModelSerializer):
             "profile",
         ]
 
-    def validate(
-        self, attrs: OrderedDict[str, Any]
-    ) -> OrderedDict[str, Any]:
+    def validate(self, attrs: OrderedDict[str, Any]) -> OrderedDict[str, Any]:
         password: str = attrs.get("password", "")
         re_password: str = attrs.get("re_password", "")
 
         if password != re_password:
-            raise ValidationError(
-                PASSWORDS_DO_NOT_MATCH_ERROR, HTTP_400_BAD_REQUEST
-            )
+            raise ValidationError(PASSWORDS_DO_NOT_MATCH_ERROR, HTTP_400_BAD_REQUEST)
         return attrs
 
     def create(self, validated_data: dict[str, Any]) -> User:
@@ -291,9 +281,7 @@ class LoginSerializer(ModelSerializer):
         password: str = attrs.get("password", "")
         user: User = auth.authenticate(email=email, password=password)
         if not user:
-            raise ValidationError(
-                INVALID_CREDENTIALS_ERROR, HTTP_400_BAD_REQUEST
-            )
+            raise ValidationError(INVALID_CREDENTIALS_ERROR, HTTP_400_BAD_REQUEST)
         return {"email": user.email, "tokens": user.tokens}
 
         return super().validate(attrs)
@@ -398,12 +386,8 @@ class RequestChangePasswordSerializer(Serializer):
 
 
 class ResetPasswordSerializer(Serializer):
-    new_password: str = CharField(
-        min_length=8, max_length=68, write_only=True
-    )
-    verify_code: str = CharField(
-        min_length=5, max_length=5, write_only=True
-    )
+    new_password: str = CharField(min_length=8, max_length=68, write_only=True)
+    verify_code: str = CharField(min_length=5, max_length=5, write_only=True)
 
     class Meta:
         validators = [CodeValidator(token_type=PASSWORD_RESET_CODE_TYPE)]
@@ -414,9 +398,7 @@ class ResetPasswordSerializer(Serializer):
 
 
 class ValidateResetPasswordCodeSerializer(Serializer):
-    verify_code: str = CharField(
-        min_length=5, max_length=5, write_only=True
-    )
+    verify_code: str = CharField(min_length=5, max_length=5, write_only=True)
 
     class Meta:
         validators = [CodeValidator(token_type=PASSWORD_RESET_CODE_TYPE)]
@@ -434,9 +416,7 @@ class ValidatePhoneByUniqueSerializer(ModelSerializer):
 
 
 class CheckCodeSerializer(Serializer):
-    verify_code: str = CharField(
-        min_length=5, max_length=5, write_only=True
-    )
+    verify_code: str = CharField(min_length=5, max_length=5, write_only=True)
 
     class Meta:
         validators = [
@@ -462,9 +442,7 @@ class CheckUserActiveSerializer(Serializer):
             "user_id",
         ]
 
-    def validate(
-        self, attrs: OrderedDict[str, Any]
-    ) -> OrderedDict[str, Any]:
+    def validate(self, attrs: OrderedDict[str, Any]) -> OrderedDict[str, Any]:
         user_id: int = attrs.get("user_id")
         try:
             User.get_all().get(id=user_id)

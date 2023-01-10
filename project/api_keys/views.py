@@ -12,11 +12,9 @@ from api_keys.serializers import (
     ApiKeysListSerializer,
     CreateApiKeySerializer,
 )
-from api_keys.services import (
-    bulk_delete_api_keys,
-)
+from api_keys.services import bulk_delete_api_keys
 from config.serializers import (
-    BaseBulkDeleteSerializer
+    BaseBulkDeleteSerializer,
 )
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
@@ -120,7 +118,5 @@ class BulkDeleteApiKeys(GenericAPIView):
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        data = bulk_delete_api_keys(
-            ids=serializer.validated_data["ids"]
-        )
+        data = bulk_delete_api_keys(ids=serializer.validated_data["ids"])
         return Response(data, HTTP_200_OK)

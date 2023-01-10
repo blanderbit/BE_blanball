@@ -5,9 +5,9 @@ from django.core.validators import (
     MinValueValidator,
 )
 from rest_framework.serializers import (
-    Serializer,
     CharField,
     FloatField,
+    Serializer,
 )
 
 
