@@ -347,9 +347,7 @@ def skip_objects_from_response_by_id(
                 ~Q(id__in=list(self.request.query_params["skipids"].split(",")))
             )
             return func(self, *args, **kwargs)
-        except KeyError:
-            pass
-        except ValueError:
+        except (KeyError, ValueError):
             pass
         finally:
             return func(self, *args, **kwargs)
