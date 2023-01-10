@@ -1,16 +1,21 @@
 from typing import Union
 
 from notifications.models import Notification
-from rest_framework import serializers
+from rest_framework.serializers import (
+    ModelSerializer,
+    Serializer,
+    IntegerField,
+    BooleanField,
+)
 
 
-class NotificationSerializer(serializers.ModelSerializer):
+class NotificationSerializer(ModelSerializer):
     class Meta:
         model: Notification = Notification
         fields: Union[str, list[str]] = "__all__"
 
 
-class UserNotificationSerializer(serializers.ModelSerializer):
+class UserNotificationSerializer(ModelSerializer):
     class Meta:
         model: Notification = Notification
         fields: Union[str, list[str]] = [
@@ -20,9 +25,9 @@ class UserNotificationSerializer(serializers.ModelSerializer):
         ]
 
 
-class UserNotificationsCount(serializers.Serializer):
-    all_notifications_count: int = serializers.IntegerField(min_value=0)
-    not_read_notifications_count: int = serializers.IntegerField(min_value=0)
+class UserNotificationsCount(Serializer):
+    all_notifications_count: int = IntegerField(min_value=0)
+    not_read_notifications_count: int = IntegerField(min_value=0)
 
     class Meta:
         fields: Union[str, list[str]] = [
@@ -31,8 +36,8 @@ class UserNotificationsCount(serializers.Serializer):
         ]
 
 
-class ChangeMaintenanceSerializer(serializers.Serializer):
-    isMaintenance: bool = serializers.BooleanField()
+class ChangeMaintenanceSerializer(Serializer):
+    isMaintenance: bool = BooleanField()
 
     class Meta:
         fields: Union[str, list[str]] = [
