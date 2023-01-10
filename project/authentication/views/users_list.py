@@ -38,11 +38,14 @@ from rest_framework.filters import (
     SearchFilter,
 )
 from rest_framework.generics import ListAPIView
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import (
+   IsAuthenticated
+)
 from rest_framework.serializers import Serializer
 from rest_framework_gis.filters import (
     DistanceToPointOrderingFilter,
 )
+from api_keys.permissions import ApiKeyPermission
 
 
 @method_decorator(
@@ -70,6 +73,10 @@ class UsersList(ListAPIView):
     search_fields = USERS_LIST_SEARCH_FIELDS
     distance_ordering_filter_field = USERS_LIST_DISTANCE_ORDERING_FIELD
     distance_filter_convert_meters: bool = True
+    permission_classes = [
+        ApiKeyPermission | IsAuthenticated
+    ]
+
 
     @skip_objects_from_response_by_id
     @add_dist_filter_to_view
@@ -86,7 +93,7 @@ class UsersDetailList(UsersList):
     """
 
     permission_classes = [
-        AllowAny,
+        ApiKeyPermission
     ]
     serializer_class: Type[Serializer] = UsersListDetailSerializer
 
@@ -105,6 +112,9 @@ class UsersRelevantList(ListAPIView):
 
     filter_backends = [
         RankedFuzzySearchFilter,
+    ]
+    permission_classes = [
+        ApiKeyPermission | IsAuthenticated
     ]
     serializer_class: Type[Serializer] = UsersListSerializer
     queryset: QuerySet[User] = User.get_all()
