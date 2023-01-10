@@ -142,10 +142,4 @@ class BulkDeleteBugs(GenericAPIView):
 
 
 class ChangeBugType(GenericAPIView):
-    """
-    Change bug type
-
-    """
-
-    def put(self, request: Request) -> Response:
-        pass
+    pass
