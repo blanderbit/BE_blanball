@@ -85,7 +85,7 @@ SWAGGER_SETTINGS: dict[str, Any] = {
     "HIDE_HOSTNAME": True,
     "SECURITY_DEFINITIONS": {
         "User": {"type": "apiKey", "name": "Authorization", "in": "Header"},
-        "Admin": {"type": "apiKey", "name": "ApiKey", "in": "Header"}
+        "Admin": {"type": "apiKey", "name": "ApiKey", "in": "Header"},
     },
     "USE_SESSION_AUTH": config("USE_SESSION_AUTH", cast=bool),
     "JSON_EDITOR": config("JSON_EDITOR", cast=bool),
