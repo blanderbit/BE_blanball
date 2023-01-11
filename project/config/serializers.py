@@ -14,3 +14,4 @@ class BaseBulkDeleteSerializer(Serializer):
         fields: Union[str, list[str]] = [
             "ids",
         ]
+
