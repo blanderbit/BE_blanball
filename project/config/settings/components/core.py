@@ -146,4 +146,5 @@ CORS_ALLOW_HEADERS: list[str] = [
     "user-agent",
     "x-csrftoken",
     "x-requested-with",
+    "apikey",
 ]
