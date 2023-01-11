@@ -8,12 +8,10 @@ from api_keys.models import ApiKey
 from api_keys.openapi import (
     api_keys_list_query_params,
 )
+from api_keys.permissions import ApiKeyPermission
 from api_keys.serializers import (
     ApiKeysListSerializer,
     CreateApiKeySerializer,
-)
-from api_keys.permissions import (
-    ApiKeyPermission,
 )
 from api_keys.services import bulk_delete_api_keys
 from config.serializers import (

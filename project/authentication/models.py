@@ -88,6 +88,7 @@ def validate_image(image: TemporaryUploadedFile) -> str:
     if image.size > megabyte_limit * 1024 * 1024:
         raise ValidationError(AVATAR_MAX_SIZE_ERROR, HTTP_400_BAD_REQUEST)
 
+
 @final
 class Profile(models.Model):
     class Position(models.TextChoices):
