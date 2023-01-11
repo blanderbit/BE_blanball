@@ -23,7 +23,7 @@ def bulk_delete_api_keys(*, ids: dict[str, int]) -> None:
 def validate_api_key(*, api_key: str) -> None:
     try:
         api_key: ApiKey = ApiKey.objects.get(value=api_key)
-        if not api_key.check_api_key_status():
+        if api_key.check_api_key_status():
             pass
         else:
             raise ValidationError(
