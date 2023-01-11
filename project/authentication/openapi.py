@@ -26,8 +26,6 @@ users_searh_query = openapi.Parameter(
         {concat_search_fields(USERS_LIST_SEARCH_FIELDS)}",
     type=openapi.TYPE_STRING,
 )
-
-
 users_relevant_searh_query = openapi.Parameter(
     "search",
     openapi.IN_QUERY,
