@@ -12,7 +12,6 @@ from config.openapi import (
 )
 from drf_yasg import openapi
 
-
 users_searh_query = openapi.Parameter(
     "search",
     openapi.IN_QUERY,

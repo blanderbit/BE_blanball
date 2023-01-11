@@ -1,6 +1,7 @@
 import json
 from typing import Any, Type
 
+from api_keys.permissions import ApiKeyPermission
 from config.openapi import skip_param_query
 from config.serializers import (
     BaseBulkDeleteSerializer,
@@ -51,8 +52,6 @@ from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
 from rest_framework.views import APIView
-from api_keys.permissions import ApiKeyPermission
-
 
 
 @method_decorator(swagger_auto_schema(manual_parameters=[skip_param_query]), name="get")
@@ -189,7 +188,7 @@ class ChangeMaintenance(GenericAPIView):
     permission_classes = [
         ApiKeyPermission,
     ]
-    
+
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)

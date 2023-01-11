@@ -66,7 +66,7 @@ AUTHENTICATION_SWAGGER_TAG_DOCS: dict[str, str] = {
     registration, password change, mail, login, etc) \
     \nRU - блок конечных точек, которые полностью \
     отвечает за взаимодействие с пользователем (создание учетной записи, \
-    регистрация, смена пароля, почта, логин и т.д.) ",            
+    регистрация, смена пароля, почта, логин и т.д.) ",
 }
 EVENTS_SWAGGER_TAG_DOCS: dict[str, str] = {
     "name": "events",
@@ -124,7 +124,6 @@ API_KEYS_SWAGGER_TAG_DOCS: dict[str, str] = {
     за работу админа с апи ключами, генереция апи ключа, \
     удаление, просмотр и тд",
 }
-
 
 
 class CustomOpenAPISchemaGenerator(OpenAPISchemaGenerator):
