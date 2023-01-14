@@ -1,5 +1,8 @@
 from typing import Type
 
+from api_keys.constants.success import (
+    API_KEY_IS_VALID_SUCCESS,
+)
 from api_keys.filters import (
     API_KEYS_LIST_ORDERING_FIELDS,
     API_KEYS_LIST_SEARCH_FIELDS,
@@ -18,9 +21,7 @@ from api_keys.services import (
     bulk_delete_api_keys,
     validate_api_key,
 )
-from api_keys.constants.success import (
-    API_KEY_IS_VALID_SUCCESS,
-)
+from authentication.permissions import AllowAny
 from config.serializers import (
     BaseBulkDeleteSerializer,
 )
@@ -51,9 +52,6 @@ from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
-)
-from authentication.permissions import (
-    AllowAny
 )
 
 
@@ -146,7 +144,7 @@ class ValidateApiKey(GenericAPIView):
     """
     Validate api key
 
-    This endpoint allows you to check if 
+    This endpoint allows you to check if
     the entered api key is valid or not
     """
 
@@ -158,8 +156,5 @@ class ValidateApiKey(GenericAPIView):
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        validate_api_key(
-            api_key=serializer.validated_data["value"]
-        )
+        validate_api_key(api_key=serializer.validated_data["value"])
         return Response(API_KEY_IS_VALID_SUCCESS, HTTP_200_OK)
-

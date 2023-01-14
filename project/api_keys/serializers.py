@@ -2,9 +2,9 @@ from typing import Union
 
 from api_keys.models import ApiKey
 from rest_framework.serializers import (
+    CharField,
     ModelSerializer,
     Serializer,
-    CharField
 )
 
 
@@ -26,6 +26,4 @@ class ValidateApiKeySerializer(Serializer):
     value = CharField(max_length=255)
 
     class Meta:
-        fields: Union[str, list[str]] = [
-            "value"
-        ]
+        fields: Union[str, list[str]] = ["value"]
