@@ -43,7 +43,7 @@ bugs_ordering_query = openapi.Parameter(
     enum=[k for k in BUGS_LIST_ORDERING_FIELDS],
     type=openapi.TYPE_STRING,
 )
-bugs_profile_time_created_min_query = openapi.Parameter(
+bugs_time_created_min_query = openapi.Parameter(
     "time_created_min",
     openapi.IN_QUERY,
     description="EN - This parameter allows the user to filter \
@@ -53,7 +53,7 @@ bugs_profile_time_created_min_query = openapi.Parameter(
         список пользователей, указав минимальное значение даты создания.",
     type=openapi.TYPE_STRING,
 )
-users_profile_time_created_max_query = openapi.Parameter(
+bugs_time_created_max_query = openapi.Parameter(
     "time_created_max",
     openapi.IN_QUERY,
     description="EN - This parameter allows the user to filter \
@@ -69,5 +69,6 @@ bugs_list_query_params: list[openapi.Parameter] = [
     bugs_searh_query,
     bugs_type_query,
     bugs_ordering_query,
-    bugs_profile_time_created_min_query,
+    bugs_time_created_min_query,
+    bugs_time_created_max_query,
 ]
