@@ -1,14 +1,12 @@
 from typing import Any, Callable
 
 from authentication.models import User
+from config.exceptions import _404
 from django.db.models import QuerySet
 from rest_framework.exceptions import (
     PermissionDenied,
 )
 from reviews.models import Review
-from config.exceptions import (
-    _404
-)
 
 
 def hide_user_reviews(func: Callable[[], QuerySet[Review]]):
