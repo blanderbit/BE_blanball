@@ -6,6 +6,7 @@ from decouple import Csv, config
 from django.conf import settings
 
 INSTALLED_APPS: list[str] = [
+    # default django apps:
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
