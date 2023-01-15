@@ -16,9 +16,9 @@ from django.db.models.query import QuerySet
 from events.constants.notification_types import (
     INVITE_USER_TO_EVENT_NOTIFICATION_TYPE,
 )
-from events.constants.response_error import (
+from events.constants.errors import (
     AUTHOR_CAN_NOT_INVITE_ERROR,
-    SENT_INVATION_ERROR,
+    CAN_NOT_INVITE_YOURSELF,
     THIS_USER_CAN_NOT_BE_INVITED,
     USER_CAN_NOT_INVITE_TO_THIS_EVENT_ERROR,
 )
@@ -184,7 +184,7 @@ class InviteToEventManager(models.Manager):
     ) -> "InviteToEvent":
 
         if invite_user.id == request_user.id:
-            raise ValidationError(SENT_INVATION_ERROR, HTTP_403_FORBIDDEN)
+            raise ValidationError(CAN_NOT_INVITE_YOURSELF, HTTP_403_FORBIDDEN)
         if invite_user.id == event.author.id:
             raise ValidationError(AUTHOR_CAN_NOT_INVITE_ERROR, HTTP_403_FORBIDDEN)
         if invite_user in event.black_list.all():

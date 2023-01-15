@@ -24,7 +24,7 @@ from events.constants.notification_types import (
     RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_NOTIFICATION_TYPE,
     USER_REMOVE_FROM_EVENT_NOTIFICATION_TYPE,
 )
-from events.constants.response_error import (
+from events.constants.errors import (
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,
     ALREADY_SENT_REQUEST_TO_PARTICIPATE_ERROR,
     EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,

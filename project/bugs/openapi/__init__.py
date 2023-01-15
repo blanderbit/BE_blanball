@@ -1,9 +1,5 @@
 # ==============================================================
 # Filter and ordering query params
-
-from bugs.openapi.openapi_filters import (
-    bugs_list_query_params as bugs_list_query_params,
-)
 from bugs.openapi.openapi_filters import (
     bugs_ordering_query as bugs_ordering_query,
 )
@@ -25,5 +21,7 @@ from bugs.openapi.openapi_filters import (
 # ==============================================================
 # list-documented query parameters for use in view classes
 
-
+from bugs.openapi.openapi_filters import (
+    bugs_list_query_params as bugs_list_query_params,
+)
 # ==============================================================
