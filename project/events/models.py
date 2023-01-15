@@ -16,7 +16,7 @@ from django.db.models.query import QuerySet
 from events.constants.notification_types import (
     INVITE_USER_TO_EVENT_NOTIFICATION_TYPE,
 )
-from events.constants.response_error import (
+from events.constants.errors import (
     AUTHOR_CAN_NOT_INVITE_ERROR,
     CAN_NOT_INVITE_YOURSELF,
     THIS_USER_CAN_NOT_BE_INVITED,

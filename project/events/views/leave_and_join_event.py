@@ -6,13 +6,13 @@
 from typing import Any, Type, final
 
 from authentication.models import User
-from events.constants.response_error import (
+from events.constants.errors import (
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,
     EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,
     NO_IN_EVENT_FANS_LIST_ERROR,
     NO_IN_EVENT_MEMBERS_LIST_ERROR,
 )
-from events.constants.response_success import (
+from events.constants.success import (
     APPLICATION_FOR_PARTICIPATION_SUCCESS,
     DISCONNECT_FROM_EVENT_SUCCESS,
     JOIN_TO_EVENT_SUCCESS,
