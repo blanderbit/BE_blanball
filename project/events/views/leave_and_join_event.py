@@ -13,7 +13,7 @@ from events.constants.errors import (
     NO_IN_EVENT_MEMBERS_LIST_ERROR,
 )
 from events.constants.success import (
-    APPLICATION_FOR_PARTICIPATION_SUCCESS,
+    SENT_REQUEST_TO_PARTICIPATION_SUCCESS,
     DISCONNECT_FROM_EVENT_SUCCESS,
     JOIN_TO_EVENT_SUCCESS,
     USER_REMOVED_FROM_EVENT_SUCCESS,
@@ -72,7 +72,7 @@ class JoinToEvent(GenericAPIView):
         RequestToParticipation.objects.create(
             recipient=event.author, sender=user, event=event
         )
-        return Response(APPLICATION_FOR_PARTICIPATION_SUCCESS, status=HTTP_200_OK)
+        return Response(SENT_REQUEST_TO_PARTICIPATION_SUCCESS, status=HTTP_200_OK)
 
 
 class FanJoinToEvent(GenericAPIView):
