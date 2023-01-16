@@ -67,3 +67,4 @@ RUN target="$POETRY_CACHE_DIR" \
 COPY . $APP_PATH
 
 RUN chmod 777 project/config/config.json
+RUN chmod 777 api_key.json
