@@ -11,7 +11,7 @@ from config.exceptions import _404
 from config.serializers import (
     BaseBulkDeleteSerializer,
 )
-from events.constants.response_error import (
+from events.constants.errors import (
     ALREADY_IN_EVENT_FANS_LIST_ERROR,
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,
     EVENT_TIME_EXPIRED_ERROR,

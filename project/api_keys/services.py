@@ -1,13 +1,13 @@
-from api_keys.models import ApiKey
 from api_keys.constants.errors import (
     API_KEY_EXPIRED_ERROR,
 )
+from api_keys.models import ApiKey
 from config.exceptions import _404
 from rest_framework.serializers import (
-    ValidationError
+    ValidationError,
 )
 from rest_framework.status import (
-    HTTP_400_BAD_REQUEST
+    HTTP_400_BAD_REQUEST,
 )
 
 
@@ -26,8 +26,6 @@ def validate_api_key(*, api_key: str) -> None:
         if api_key.check_api_key_status():
             pass
         else:
-            raise ValidationError(
-                API_KEY_EXPIRED_ERROR, HTTP_400_BAD_REQUEST
-            )
+            raise ValidationError(API_KEY_EXPIRED_ERROR, HTTP_400_BAD_REQUEST)
     except ApiKey.DoesNotExist:
         raise _404(object=ApiKey)

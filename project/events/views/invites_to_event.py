@@ -13,7 +13,7 @@ from django.utils.decorators import (
     method_decorator,
 )
 from drf_yasg.utils import swagger_auto_schema
-from events.constants.response_success import (
+from events.constants.success import (
     SENT_INVATION_SUCCESS,
 )
 from events.models import (

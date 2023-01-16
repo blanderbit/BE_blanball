@@ -7,7 +7,7 @@ from django.db.models.query import QuerySet
 from events.constants.notification_types import (
     EVENT_UPDATE_NOTIFICATION_TYPE,
 )
-from events.constants.response_success import (
+from events.constants.success import (
     EVENT_UPDATE_SUCCESS,
 )
 from events.models import Event

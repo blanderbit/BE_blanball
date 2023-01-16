@@ -27,7 +27,7 @@ def get_place_name_by_coordinates(
     geolocator = Nominatim(user_agent="geoapiExercises")
     try:
         location = geolocator.reverse(f"{data['lat']}, {data['lon']}", timeout=None)
-        if location and location.raw["address"].get('country_code') == 'ua':
+        if location and location.raw["address"].get("country_code") == "ua":
             return {"data": location.raw["address"]}
         else:
             raise _404(detail=NOTHING_FOUND_FOR_USER_REQUEST_ERROR)

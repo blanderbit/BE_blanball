@@ -6,14 +6,14 @@
 from typing import Any, Type, final
 
 from authentication.models import User
-from events.constants.response_error import (
+from events.constants.errors import (
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,
     EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,
     NO_IN_EVENT_FANS_LIST_ERROR,
     NO_IN_EVENT_MEMBERS_LIST_ERROR,
 )
-from events.constants.response_success import (
-    APPLICATION_FOR_PARTICIPATION_SUCCESS,
+from events.constants.success import (
+    SENT_REQUEST_TO_PARTICIPATION_SUCCESS,
     DISCONNECT_FROM_EVENT_SUCCESS,
     JOIN_TO_EVENT_SUCCESS,
     USER_REMOVED_FROM_EVENT_SUCCESS,
@@ -72,7 +72,7 @@ class JoinToEvent(GenericAPIView):
         RequestToParticipation.objects.create(
             recipient=event.author, sender=user, event=event
         )
-        return Response(APPLICATION_FOR_PARTICIPATION_SUCCESS, status=HTTP_200_OK)
+        return Response(SENT_REQUEST_TO_PARTICIPATION_SUCCESS, status=HTTP_200_OK)
 
 
 class FanJoinToEvent(GenericAPIView):

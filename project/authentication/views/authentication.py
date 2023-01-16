@@ -97,11 +97,6 @@ class RegisterUser(GenericAPIView):
     List of optional fields:  "birthday", "height",
     "weight", "position", "about_me", "working_leg",
     "avatar"
-
-    position field options: "GK", "LB", "RB", "CB",
-    "LWB", "RWB", "CDM", "CM", "CAM", "RM", "LM", "RF",
-    "CF", "LF", "ST"
-    working_leg options: "Left", "Right"
     """
 
     serializer_class: Type[Serializer] = RegisterSerializer
