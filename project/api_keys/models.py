@@ -19,6 +19,7 @@ from rest_framework.serializers import (
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
+from django.db.models import Q
 
 
 class ApiKey(models.Model):
@@ -27,6 +28,7 @@ class ApiKey(models.Model):
     )
     created_at: datetime = models.DateTimeField(auto_now_add=True)
     expire_time: Optional[datetime] = models.DateTimeField(null=True)
+    name: str = models.CharField(max_length=55, unique=True)
 
     @final
     def __repr__(self) -> str:
@@ -34,7 +36,7 @@ class ApiKey(models.Model):
 
     @final
     def get_only_active() -> QuerySet["ApiKey"]:
-        return ApiKey.objects.filter(expire_time__gt=timezone.now())
+        return ApiKey.objects.filter(Q(expire_time__gt=timezone.now()) | Q(expire_time=None))
 
     @final
     def get_only_expired() -> QuerySet["ApiKey"]:
