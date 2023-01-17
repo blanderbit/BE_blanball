@@ -14,10 +14,12 @@ from bugs.serializers import (
     BugsListSerializer,
     CreateBugSerializer,
     MyBugsListSerializer,
+    ChangeBugTypeSerializer,
 )
 from bugs.services import (
     bulk_delete_bugs,
     create_bug,
+    bulk_change_bugs_type,
 )
 from config.serializers import (
     BaseBulkDeleteSerializer,
@@ -48,6 +50,12 @@ from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
+)
+from api_keys.permissions import (
+    ApiKeyPermission
+)
+from rest_framework.permissions import (
+    IsAuthenticated,
 )
 
 
@@ -85,6 +93,7 @@ class BugsList(ListAPIView):
 
     serializer_class: Type[Serializer] = BugsListSerializer
     queryset: QuerySet[Bug] = Bug.get_all()
+    permission_classes = [ApiKeyPermission | IsAuthenticated]
     filterset_class = BugFilter
     filter_backends = [
         DjangoFilterBackend,
@@ -142,4 +151,23 @@ class BulkDeleteBugs(GenericAPIView):
 
 
 class ChangeBugType(GenericAPIView):
-    pass
+    """
+    Change bug report type
+
+    This endpoint allows admins to 
+    change the type of a bug report
+    """
+    
+    serializer_class: Type[Serializer] = ChangeBugTypeSerializer
+    permission_classes = [
+        ApiKeyPermission,
+    ]
+
+    def post(self, request: Request) -> Response:
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = bulk_change_bugs_type(
+            ids=serializer.validated_data["ids"],
+            type=serializer.validated_data["type"]
+        )
+        return Response(data, HTTP_200_OK)

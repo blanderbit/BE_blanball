@@ -15,6 +15,18 @@ def bulk_delete_bugs(*, ids: dict[str, int], user: User):
             pass
 
 
+def bulk_change_bugs_type(*, ids: dict[str, int], type: str):
+    for bug_id in ids:
+        try:
+            bug = Bug.objects.get(id=bug_id)
+            if bug.type != type:
+                bug.type = type
+                bug.save()
+                yield bug_id
+        except Bug.DoesNotExist:
+            pass
+
+
 def create_bug(validated_data: dict[str, Any], request_user: User) -> None:
     try:
         images = validated_data.get("images")
