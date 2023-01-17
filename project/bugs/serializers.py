@@ -8,6 +8,10 @@ from rest_framework.serializers import (
     ImageField,
     ListField,
     ModelSerializer,
+    IntegerField,
+)
+from config.serializers import (
+    BaseBulkDeleteSerializer,
 )
 
 
@@ -43,4 +47,15 @@ class BugsListSerializer(ModelSerializer):
 class MyBugsListSerializer(ModelSerializer):
     class Meta:
         model: Bug = Bug
-        exclude: list[str] = ["author"]
+        exclude: Union[str, list[str]] = ["author"]
+
+
+class ChangeBugTypeSerializer(ModelSerializer):
+    ids: list[int] = ListField(child=IntegerField(min_value=0))
+
+    class Meta:
+        model: Bug = Bug
+        fields: Union[str, list[str]] = [
+            "type",
+            "ids",
+        ]
