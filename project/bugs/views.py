@@ -118,6 +118,7 @@ class MyBugs(BugsList):
     """
 
     serializer_class: Type[Serializer] = MyBugsListSerializer
+    permission_classes = [IsAuthenticated]
 
     @skip_objects_from_response_by_id
     def get_queryset(self):
@@ -142,6 +143,7 @@ class BulkDeleteBugs(GenericAPIView):
     """
 
     serializer_class: Type[Serializer] = BaseBulkDeleteSerializer
+    permission_classes = [ApiKeyPermission]
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
