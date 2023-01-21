@@ -148,7 +148,7 @@ class BulkDeleteBugs(GenericAPIView):
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        data = bulk_delete_bugs(ids=serializer.validated_data["ids"], user=request.user)
+        data = bulk_delete_bugs(ids=serializer.validated_data["ids"])
         return Response(data, HTTP_200_OK)
 
 
