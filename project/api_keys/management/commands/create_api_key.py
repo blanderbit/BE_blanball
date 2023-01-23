@@ -51,20 +51,17 @@ class Command(BaseCommand):
             action="store_true",
             help="With this argument, the key will simply be created in the database without writing to a file and output to the console",
         )
-        parser.add_argument(
-            'name', 
-            type=str, 
-            help='API key name'
-        )
+        parser.add_argument("name", type=str, help="API key name")
 
     def handle(self, *args, **options) -> None:
 
         try:
             api_key: ApiKey = ApiKey.objects.create(name=options["name"])
         except IntegrityError:
-            self.stdout.write(self.style.ERROR("API KEY with the same name already exists"))
-            return 
-
+            self.stdout.write(
+                self.style.ERROR("API KEY with the same name already exists")
+            )
+            return
 
         if options.get("only_create"):
             self.stdout.write(self.style.SUCCESS("API KEY created"))

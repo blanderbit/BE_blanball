@@ -4,14 +4,15 @@ from django.db import migrations
 
 
 def set_name(apps, schema_editor):
-    '''
+    """
     We can't import the Post model directly as it may be a newer
     version than this migration expects. We use the historical version.
-    '''
-    ApiKey = apps.get_model('api_keys', 'ApiKey')
+    """
+    ApiKey = apps.get_model("api_keys", "ApiKey")
     for api_key in ApiKey.objects.all():
         api_key.name = api_key.id
         api_key.save()
+
 
 class Migration(migrations.Migration):
 

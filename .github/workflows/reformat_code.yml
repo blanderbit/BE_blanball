@@ -1,0 +1,35 @@
+name: Reformat code
+
+on:
+  push:
+
+jobs:
+  create-change-log:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Reformat code using black
+      uses: psf/black@stable
+      with:
+        src: "."
+        version: "~= 22.10.0"
+    - name: Install isort
+      run: pip install isort
+    - name: Reformat code using isort
+      run: isort --atomic .
+    - name: Reformat code using prettier
+      uses: creyD/prettier_action@v4.2
+      with:
+        prettier_options: --write
+        github_token: ${{ secrets.AUTH_TOKEN }}
+    - name: Commit files
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git commit -am "auto reformated code using: black, isort and prettier for branch ${{ github.ref_name }}"
+        git tag ${{ steps.semantic_release_info.outputs.git_tag }}
+    - name: Push changes
+      uses: ad-m/github-push-action@v0.6.0
+      with:
+        branch: ${{ github.ref_name }}
+        github_token: ${{ secrets.AUTH_TOKEN }}
