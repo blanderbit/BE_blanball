@@ -20,7 +20,7 @@ jobs:
     - name: Reformat code using prettier
       uses: creyD/prettier_action@v4.2
       with:
-        prettier_options: --write
+        prettier_options: --write .
         github_token: ${{ secrets.AUTH_TOKEN }}
     - name: Commit files
       run: |
