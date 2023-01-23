@@ -8,6 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
+      with:
+        token: ${{ secrets.AUTH_TOKEN }}
     - name: Reformat code using black
       uses: psf/black@stable
       with:
