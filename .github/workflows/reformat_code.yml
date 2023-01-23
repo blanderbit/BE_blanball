@@ -7,31 +7,31 @@ jobs:
   reformat-code:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
-      with:
-        token: ${{ secrets.AUTH_TOKEN }}
-    - name: Reformat code using black
-      uses: psf/black@stable
-      with:
-        src: "."
-        version: "~= 22.10.0"
-    - name: Install isort
-      run: pip install isort
-    - name: Reformat code using isort
-      run: isort --atomic .
-    - name: Install prettier
-      run: npm install
-    - name: Reformat code using prettier
-      run: npx prettier --write .
-    - name: Commit files
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add .
-        git commit -am "auto reformated code using: black, isort and prettier for branch ${{ github.ref_name }}"
-        git tag ${{ steps.semantic_release_info.outputs.git_tag }}
-    - name: Push changes
-      uses: ad-m/github-push-action@v0.6.0
-      with:
-        branch: ${{ github.ref_name }}
-        github_token: ${{ secrets.AUTH_TOKEN }}
+      - uses: actions/checkout@master
+        with:
+          token: ${{ secrets.AUTH_TOKEN }}
+      - name: Reformat code using black
+        uses: psf/black@stable
+        with:
+          src: "."
+          version: "~= 22.10.0"
+      - name: Install isort
+        run: pip install isort
+      - name: Reformat code using isort
+        run: isort --atomic .
+      - name: Install prettier
+        run: npm install
+      - name: Reformat code using prettier
+        run: npx prettier --write .
+      - name: Commit files
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -am "auto reformated code using: black, isort and prettier for branch ${{ github.ref_name }}"
+          git tag ${{ steps.semantic_release_info.outputs.git_tag }}
+      - name: Push changes
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          branch: ${{ github.ref_name }}
+          github_token: ${{ secrets.AUTH_TOKEN }}

@@ -1,35 +1,35 @@
 version: "3.8"
 
 x-api-common: &api-common
-  env_file: 
+  env_file:
     - .env
   entrypoint: scripts/entrypoint.sh
-  build: 
+  build:
     context: .
     dockerfile: Dockerfile
-  volumes: 
+  volumes:
     - .:/usr/src/blanball
   networks:
     - app-network
   depends_on:
-    db: 
+    db:
       condition: service_healthy
-    redis: 
+    redis:
       condition: service_healthy
-  links: 
+  links:
     - redis
 
 services:
   db:
     container_name: db
-    env_file: 
+    env_file:
       - .env
     image: postgis/postgis:latest
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
     networks:
       - app-network
-    ports: 
+    ports:
       - 5432:5432
     healthcheck:
       test: pg_isready -U postgres -d postgres
@@ -38,10 +38,10 @@ services:
 
   redis:
     container_name: redis
-    env_file: 
+    env_file:
       - .env
     image: redis:7.0.4-alpine
-    volumes: 
+    volumes:
       - redis-data:/usr/src/blanball/storage/redis/data
     networks:
       - app-network
@@ -54,10 +54,10 @@ services:
     <<: *api-common
     container_name: api
     command: api
-    ports: 
+    ports:
       - 8000:8000
 
-  celery-worker: 
+  celery-worker:
     <<: *api-common
     container_name: celery-worker
     command: celery-worker
@@ -68,10 +68,10 @@ services:
     container_name: celery-beat
     command: celery-beat
     user: deploy
-    
+
   minio:
     container_name: minio
-    env_file: 
+    env_file:
       - .env
     image: minio/minio
     volumes:
@@ -81,7 +81,7 @@ services:
       - 9000:9000
       - 9001:9001
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
       timeout: 20s
       retries: 3
@@ -89,7 +89,7 @@ services:
       - app-network
   pgadmin:
     container_name: pgadmin
-    env_file: 
+    env_file:
       - .env
     image: dpage/pgadmin4:latest
     restart: always

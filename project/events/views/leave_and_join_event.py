@@ -13,9 +13,9 @@ from events.constants.errors import (
     NO_IN_EVENT_MEMBERS_LIST_ERROR,
 )
 from events.constants.success import (
-    SENT_REQUEST_TO_PARTICIPATION_SUCCESS,
     DISCONNECT_FROM_EVENT_SUCCESS,
     JOIN_TO_EVENT_SUCCESS,
+    SENT_REQUEST_TO_PARTICIPATION_SUCCESS,
     USER_REMOVED_FROM_EVENT_SUCCESS,
 )
 from events.models import (

@@ -4,8 +4,8 @@ from api_keys.models import ApiKey
 from django.core.management.base import (
     BaseCommand,
 )
-from django.utils import timezone
 from django.db.utils import IntegrityError
+from django.utils import timezone
 
 
 class Command(BaseCommand):

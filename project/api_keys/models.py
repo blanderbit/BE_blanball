@@ -6,6 +6,7 @@ from api_keys.constants.errors import (
 )
 from django.conf import settings
 from django.db import models
+from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.utils.crypto import get_random_string
@@ -15,7 +16,6 @@ from rest_framework.serializers import (
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
-from django.db.models import Q
 
 
 class ApiKey(models.Model):

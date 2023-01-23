@@ -4,14 +4,14 @@ from authentication.serializers import (
     ReviewAuthorSerializer,
 )
 from bugs.models import Bug, BugImage
-from rest_framework.serializers import (
-    ImageField,
-    ListField,
-    ModelSerializer,
-    IntegerField,
-)
 from config.serializers import (
     BaseBulkDeleteSerializer,
+)
+from rest_framework.serializers import (
+    ImageField,
+    IntegerField,
+    ListField,
+    ModelSerializer,
 )
 
 

@@ -3,39 +3,39 @@ name: change_version
 on:
   push:
     branches:
-      - 'version__**'
+      - "version__**"
 
 jobs:
   change_version:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
-    - name: Split branch name to get the version number
-      run: |
-        branch_name=${{ github.ref_name }}
-        echo "BRANCH_VERSION_VALUE=${branch_name//version__/}" >> $GITHUB_ENV
-    - name: Get version value
-      run: |
-        githubjson=`cat project/config/config.json`
-        version=`echo $(jq -r '.version' <<< "$githubjson")`
-        echo "CONFIG_FILE_JSON_VERSION_VALUE=${version}" >> $GITHUB_ENV
-    - name: Update project version
-      if: ${{ env.BRANCH_VERSION_VALUE != env.CONFIG_FILE_JSON_VERSION_VALUE }}
-      uses: jossef/action-set-json-field@v2.1
-      with:
-        file: project/config/config.json
-        field: version
-        value: ${{ env.BRANCH_VERSION_VALUE }}
-    - name: Commit files
-      if: ${{ env.BRANCH_VERSION_VALUE != env.CONFIG_FILE_JSON_VERSION_VALUE }}
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git commit -am "auto update version, new version - ${{ env.BRANCH_VERSION_VALUE }}"
-        git tag ${{ steps.semantic_release_info.outputs.git_tag }}
-    - name: Push changes
-      if: ${{ env.BRANCH_VERSION_VALUE != env.CONFIG_FILE_JSON_VERSION_VALUE }}
-      uses: ad-m/github-push-action@v0.6.0
-      with:
-        branch: ${{ github.ref_name }}
-        github_token: ${{ secrets.AUTH_TOKEN }}
+      - uses: actions/checkout@master
+      - name: Split branch name to get the version number
+        run: |
+          branch_name=${{ github.ref_name }}
+          echo "BRANCH_VERSION_VALUE=${branch_name//version__/}" >> $GITHUB_ENV
+      - name: Get version value
+        run: |
+          githubjson=`cat project/config/config.json`
+          version=`echo $(jq -r '.version' <<< "$githubjson")`
+          echo "CONFIG_FILE_JSON_VERSION_VALUE=${version}" >> $GITHUB_ENV
+      - name: Update project version
+        if: ${{ env.BRANCH_VERSION_VALUE != env.CONFIG_FILE_JSON_VERSION_VALUE }}
+        uses: jossef/action-set-json-field@v2.1
+        with:
+          file: project/config/config.json
+          field: version
+          value: ${{ env.BRANCH_VERSION_VALUE }}
+      - name: Commit files
+        if: ${{ env.BRANCH_VERSION_VALUE != env.CONFIG_FILE_JSON_VERSION_VALUE }}
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -am "auto update version, new version - ${{ env.BRANCH_VERSION_VALUE }}"
+          git tag ${{ steps.semantic_release_info.outputs.git_tag }}
+      - name: Push changes
+        if: ${{ env.BRANCH_VERSION_VALUE != env.CONFIG_FILE_JSON_VERSION_VALUE }}
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          branch: ${{ github.ref_name }}
+          github_token: ${{ secrets.AUTH_TOKEN }}
