@@ -4,7 +4,7 @@ on:
   push:
 
 jobs:
-  create-change-log:
+  reformat-code:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
@@ -20,7 +20,7 @@ jobs:
     - name: Install prettier
       run: npm install
     - name: Reformat code using prettier
-      run: npx prettier --write **/*.{yml,md,json}
+      run: npx prettier --write .
     - name: Commit files
       run: |
         git config --local user.email "action@github.com"
