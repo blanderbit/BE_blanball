@@ -20,7 +20,7 @@ jobs:
     - name: Install prettier
       run: npm install
     - name: Reformat code using prettier
-      run: npx prettier --write **/*.{yml,yaml,md,json}
+      run: npx prettier --write **/*.{yml,md,json}
     - name: Commit files
       run: |
         git config --local user.email "action@github.com"
