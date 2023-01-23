@@ -1,5 +1,4 @@
-from datetime import date, datetime
-from email.policy import default
+from datetime import datetime
 from typing import Any, Optional, Union, final
 
 from authentication.models import Gender, User

@@ -30,9 +30,6 @@ class ApiKey(models.Model):
     expire_time: Optional[datetime] = models.DateTimeField(null=True)
     name: str = models.CharField(max_length=55, unique=True)
 
-    @final
-    def __repr__(self) -> str:
-        return "<ApiKey %s>" % self.id
 
     @final
     def get_only_active() -> QuerySet["ApiKey"]:
@@ -52,6 +49,11 @@ class ApiKey(models.Model):
     @final
     def __str__(self) -> str:
         return self.value
+        
+
+    @final
+    def __repr__(self) -> str:
+        return "<ApiKey %s>" % self.id
 
     @final
     def make_api_key(self) -> str:

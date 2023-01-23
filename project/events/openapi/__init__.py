@@ -34,11 +34,4 @@ from events.openapi.openapi_filters import (
 from events.openapi.openapi_filters import (
     events_type_query as events_type_query,
 )
-
-# ==============================================================
-
-# ==============================================================
-# list-documented query parameters for use in view classes
-
-
 # ==============================================================
