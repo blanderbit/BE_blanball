@@ -1,4 +1,4 @@
-project/static/
-node_modules/
-.vscode/
-postgres-data/
+**/project/static
+**/.vscode
+**/postgres-data
+**/.github/ISSUE_TEMPLATE
