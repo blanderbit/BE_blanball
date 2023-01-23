@@ -17,11 +17,10 @@ jobs:
       run: pip install isort
     - name: Reformat code using isort
       run: isort --atomic .
+    - name: Install prettier
+      run: npm install
     - name: Reformat code using prettier
-      uses: creyD/prettier_action@v4.2
-      with:
-        prettier_options: --write .
-        github_token: ${{ secrets.AUTH_TOKEN }}
+      run: npx prettier --write **/*.{yml,yaml,md,json}
     - name: Commit files
       run: |
         git config --local user.email "action@github.com"
