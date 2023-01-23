@@ -10,6 +10,19 @@ jobs:
       - uses: actions/checkout@master
         with:
           token: ${{ secrets.AUTH_TOKEN }}
+
+      - name: Cache node modules
+        id: cache-npm
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
       - name: Reformat code using black
         uses: psf/black@stable
         with:
@@ -24,6 +37,7 @@ jobs:
       - name: Reformat code using prettier
         run: npx prettier --write .
       - name: Commit files
+        continue-on-error: true
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
