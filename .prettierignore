@@ -1,5 +1,4 @@
-project/static
-static/templates
-node_modules
-.vscode
-postgres-data
+project/static/
+node_modules/
+.vscode/
+postgres-data/
