@@ -125,6 +125,7 @@ SIMPLE_JWT: dict[str, Any] = {
 CORS_ALLOWED_ORIGINS: list[str] = [
     "http://localhost:5173",
     "http://178.151.201.167:49201",
+    "http://178.151.201.167:49204",
     "http://localhost:4172",
 ]
 
