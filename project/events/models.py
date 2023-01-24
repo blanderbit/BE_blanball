@@ -12,14 +12,14 @@ from django.core.validators import (
 )
 from django.db import models
 from django.db.models.query import QuerySet
-from events.constants.notification_types import (
-    INVITE_USER_TO_EVENT_NOTIFICATION_TYPE,
-)
 from events.constants.errors import (
     AUTHOR_CAN_NOT_INVITE_ERROR,
     CAN_NOT_INVITE_YOURSELF,
     THIS_USER_CAN_NOT_BE_INVITED,
     USER_CAN_NOT_INVITE_TO_THIS_EVENT_ERROR,
+)
+from events.constants.notification_types import (
+    INVITE_USER_TO_EVENT_NOTIFICATION_TYPE,
 )
 from notifications.tasks import send_to_user
 from phonenumber_field.modelfields import (

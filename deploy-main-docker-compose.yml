@@ -1,10 +1,9 @@
 version: "3.8"
 
-services: 
-
+services:
   proxy:
     container_name: proxy
-    env_file: 
+    env_file:
       - stack.env
     image: registry.it-flumx.com/blanball-proxy:latest
     ports:
@@ -14,10 +13,10 @@ services:
     depends_on:
       api:
         condition: service_started
-      
+
   api:
     container_name: api
-    env_file: 
+    env_file:
       - stack.env
     image: registry.it-flumx.com/flumx_pr_blanball_be_prod:latest
     user: deploy
@@ -31,13 +30,13 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - app-network    
+      - app-network
     links:
       - redis
 
   daphne:
     container_name: daphne
-    env_file: 
+    env_file:
       - stack.env
     image: registry.it-flumx.com/flumx_pr_blanball_be_prod:latest
     user: deploy
@@ -51,13 +50,13 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - app-network    
+      - app-network
     links:
       - redis
 
   db:
     container_name: db
-    env_file: 
+    env_file:
       - stack.env
     image: postgres:latest
     restart: always
@@ -72,21 +71,21 @@ services:
 
   redis:
     container_name: redis
-    env_file: 
+    env_file:
       - stack.env
     image: redis:latest
     restart: always
     volumes:
       - redis-data:/usr/src/blanball/storage/redis/data
     networks:
-      - app-network  
+      - app-network
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
       timeout: 3s
       retries: 5
 
   celery-worker:
-    env_file: 
+    env_file:
       - stack.env
     container_name: celery-worker
     image: registry.it-flumx.com/flumx_pr_blanball_be_prod:latest
@@ -94,14 +93,14 @@ services:
     entrypoint: scripts/entrypoint.sh
     command: celery-worker
     networks:
-      - app-network  
+      - app-network
     depends_on:
       redis:
         condition: service_healthy
 
   celery-beat:
     container_name: celery-beat
-    env_file: 
+    env_file:
       - stack.env
     image: registry.it-flumx.com/flumx_pr_blanball_be_prod:latest
     user: deploy
@@ -115,7 +114,7 @@ services:
 
   pgadmin:
     container_name: pgadmin
-    env_file: 
+    env_file:
       - stack.env
     image: dpage/pgadmin4
     restart: always
@@ -128,7 +127,7 @@ services:
 
   db_backup:
     container_name: db_backup
-    env_file: 
+    env_file:
       - stack.env
     image: prodrigestivill/postgres-backup-local
     restart: always
@@ -147,16 +146,16 @@ services:
     image: garethflowers/ftp-server
     restart: always
     ports:
-      - '49222:21/tcp'
+      - "49222:21/tcp"
     volumes:
       - ftp-server-data:/home/user
     networks:
       - app-network
-    
+
 networks:
   app-network:
-    driver: bridge    
-     
+    driver: bridge
+
 volumes:
   redis-data:
   pgadmin-data:

@@ -1,5 +1,4 @@
-
-# the notification type that is sent to all 
+# the notification type that is sent to all
 # users when the type of technical work changed
 CHANGE_MAINTENANCE_NOTIFICATION_TYPE: str = "change_maintenance"
 

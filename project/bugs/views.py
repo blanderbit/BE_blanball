@@ -1,5 +1,6 @@
 from typing import Type
 
+from api_keys.permissions import ApiKeyPermission
 from bugs.constants.success import (
     BUG_REPORT_CREATED_SUCCESS,
 )
@@ -12,14 +13,14 @@ from bugs.models import Bug
 from bugs.openapi import bugs_list_query_params
 from bugs.serializers import (
     BugsListSerializer,
+    ChangeBugTypeSerializer,
     CreateBugSerializer,
     MyBugsListSerializer,
-    ChangeBugTypeSerializer,
 )
 from bugs.services import (
+    bulk_change_bugs_type,
     bulk_delete_bugs,
     create_bug,
-    bulk_change_bugs_type,
 )
 from config.serializers import (
     BaseBulkDeleteSerializer,
@@ -43,6 +44,9 @@ from rest_framework.generics import (
     GenericAPIView,
     ListAPIView,
 )
+from rest_framework.permissions import (
+    IsAuthenticated,
+)
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
@@ -50,12 +54,6 @@ from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
-)
-from api_keys.permissions import (
-    ApiKeyPermission
-)
-from rest_framework.permissions import (
-    IsAuthenticated,
 )
 
 
@@ -156,10 +154,10 @@ class ChangeBugType(GenericAPIView):
     """
     Change bug report type
 
-    This endpoint allows admins to 
+    This endpoint allows admins to
     change the type of a bug report
     """
-    
+
     serializer_class: Type[Serializer] = ChangeBugTypeSerializer
     permission_classes = [
         ApiKeyPermission,
@@ -169,7 +167,6 @@ class ChangeBugType(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = bulk_change_bugs_type(
-            ids=serializer.validated_data["ids"],
-            type=serializer.validated_data["type"]
+            ids=serializer.validated_data["ids"], type=serializer.validated_data["type"]
         )
         return Response(data, HTTP_200_OK)

@@ -1,4 +1,4 @@
-# the response message which means that the current 
+# the response message which means that the current
 # status of technical works has been successfully updated
 MAINTENANCE_UPDATED_SUCCESS: dict[str, str] = {"success": "maintenance_updated"}
 

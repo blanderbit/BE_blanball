@@ -5,11 +5,8 @@ from api_keys.constants.errors import (
     API_KEY_BAD_EXPIRE_TIME_ERROR,
 )
 from django.conf import settings
-from django.contrib.auth.hashers import (
-    check_password,
-    make_password,
-)
 from django.db import models
+from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.utils.crypto import get_random_string
@@ -19,7 +16,6 @@ from rest_framework.serializers import (
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
-from django.db.models import Q
 
 
 class ApiKey(models.Model):
@@ -30,10 +26,11 @@ class ApiKey(models.Model):
     expire_time: Optional[datetime] = models.DateTimeField(null=True)
     name: str = models.CharField(max_length=55, unique=True)
 
-
     @final
     def get_only_active() -> QuerySet["ApiKey"]:
-        return ApiKey.objects.filter(Q(expire_time__gt=timezone.now()) | Q(expire_time=None))
+        return ApiKey.objects.filter(
+            Q(expire_time__gt=timezone.now()) | Q(expire_time=None)
+        )
 
     @final
     def get_only_expired() -> QuerySet["ApiKey"]:
@@ -49,7 +46,6 @@ class ApiKey(models.Model):
     @final
     def __str__(self) -> str:
         return self.value
-        
 
     @final
     def __repr__(self) -> str:
