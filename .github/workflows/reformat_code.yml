@@ -1,5 +1,5 @@
-# Github workflow that runs on each push to any of the branches for auto code formatting. 
-# It uses such formatters as isort - sorting imports, 
+# Github workflow that runs on each push to any of the branches for auto code formatting.
+# It uses such formatters as isort - sorting imports,
 # black - formats according to pep8 and prettier standards - formats json, yaml, readme, etc.
 # After formatting, a commit will be made to the branch in which the changes were pushed
 

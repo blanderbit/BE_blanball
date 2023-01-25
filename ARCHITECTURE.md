@@ -19,14 +19,13 @@ Contains all the main application modules
 - /components/celery.py - celery framework settings.
 - /components/core.py - the main settings file, all applications and configs are connected there.
 - /components/smtp.py - google smtp settings file.
-- /components/storages.py - project storages settings. 
+- /components/storages.py - project storages settings.
 
-    * PostgreSQL - database 
-    * Redis - temporary data store
-    * MinioStorage - images storage
+  - PostgreSQL - database
+  - Redis - temporary data store
+  - MinioStorage - images storage
 
 - /components/valiables.py - the file that contains all the basic constants and settings variables.
-
 
 ## `project/templates` - All project html templates
 
@@ -34,7 +33,7 @@ Contains html templates, in particular templates for sending by mail
 
 ## `project/static` - All project static files
 
-contains all the static files of the project. In particular css and js. 
+contains all the static files of the project. In particular css and js.
 Files are placed in this folder when executing the command python manage.py collectstatic
 
 ## `changelog/` - Project changelog
