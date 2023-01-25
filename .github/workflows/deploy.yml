@@ -1,3 +1,13 @@
+# A github workflow that is designed to auto-deploy a project on a server
+# It consists of two main parts, run_tests and auto_deploy.
+# run_tests - run unit tests of the project, if the unit tests 
+# are not passed, the deployment will be canceled.
+# auto_deploy of the application on the server, here the images 
+# are assembled, the images are sent to the registry and a post request 
+# is made to the server webhook so that the server picks up new 
+# images and starts up with new images
+
+
 name: deploy
 
 on:

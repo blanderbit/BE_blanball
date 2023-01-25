@@ -66,5 +66,13 @@ RUN target="$POETRY_CACHE_DIR" \
 # copy ource code to project workind directory
 COPY . $APP_PATH
 
+
+# necessary so that a non-root user 
+# can edit the configuration file
 RUN chmod 777 project/config/config.json
+
+# necessary so that non-root users 
+# have the right to edit this file
+# it is edited when creating an 
+# api key through the console
 RUN chmod 777 api_key.json

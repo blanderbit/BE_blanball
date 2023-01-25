@@ -1,3 +1,8 @@
+# Github workflow that works every time you push to 
+# the version branches, it is needed in order to 
+# automatically change the current version number 
+# in the file project/config/config.json
+
 name: change_version
 
 on:
