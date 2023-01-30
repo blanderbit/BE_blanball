@@ -51,5 +51,3 @@ It contains all possible bash and not only scripts. Mainly used to run container
 ## `.github/workflows/` - Continuous Integration and Deployment
 
 Contains Continuous-integration (CI) workflows, run on commits/PRs to the GitHub repository.
-
-## Parent theme - `pydata-sphinx-theme`

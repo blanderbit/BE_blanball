@@ -63,7 +63,9 @@ class ApiKey(models.Model):
         super(ApiKey, self).save(*args, **kwargs)
 
     class Meta:
+        # the name of the table in the database for this model
         db_table: str = "api_key"
         verbose_name: str = "api key"
         verbose_name_plural: str = "api keys"
+        # sorting database records for this model by default
         ordering: list[str] = ["-id"]

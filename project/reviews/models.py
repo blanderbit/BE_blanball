@@ -34,6 +34,9 @@ class Review(models.Model):
     @final
     @staticmethod
     def get_all() -> QuerySet["Review"]:
+        """
+        getting all records with optimized selection from the database
+        """
         return Review.objects.select_related("user", "author")
 
     @final
@@ -41,9 +44,11 @@ class Review(models.Model):
         return str(self.id)
 
     class Meta:
+        # the name of the table in the database for this model
         db_table: str = "review"
         verbose_name: str = "review"
         verbose_name_plural: str = "reviews"
+        # sorting database records for this model by default
         ordering: list[str] = ["-id"]
 
 
@@ -66,6 +71,9 @@ class EventReview(models.Model):
     @final
     @staticmethod
     def get_all() -> QuerySet["EventReview"]:
+        """
+        getting all records with optimized selection from the database
+        """
         return EventReview.objects.select_related("user", "event")
 
     @final
@@ -73,7 +81,9 @@ class EventReview(models.Model):
         return str(self.id)
 
     class Meta:
+        # the name of the table in the database for this model
         db_table: str = "event_review"
         verbose_name: str = "event review"
         verbose_name_plural: str = "event reviews"
+        # sorting database records for this model by default
         ordering: list[str] = ["-id"]

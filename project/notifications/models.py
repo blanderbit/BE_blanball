@@ -26,6 +26,9 @@ class Notification(models.Model):
     @final
     @staticmethod
     def get_all() -> QuerySet["Notification"]:
+        """
+        getting all records with optimized selection from the database
+        """
         return Notification.objects.select_related("user")
 
     @final
@@ -33,7 +36,9 @@ class Notification(models.Model):
         return str(self.id)
 
     class Meta:
+        # the name of the table in the database for this model
         db_table: str = "notification"
         verbose_name: str = "notification"
         verbose_name_plural: str = "notifications"
+        # sorting database records for this model by default
         ordering: list[str] = ["-id"]

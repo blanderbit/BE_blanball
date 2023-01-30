@@ -15,6 +15,9 @@ from django.utils import timezone
 
 
 def bug_image_name(instance: "BugImage", filename: str) -> str:
+    """
+    setting the name for uploaded bug report image
+    """
     datetime = timezone.now().strftime("%Y-%m-%d-%H-%M")
     filename: str = f"{datetime}"
     return path.join("bugs", filename)
@@ -27,6 +30,11 @@ class BugImage(models.Model):
 
     @property
     def image_url(self) -> Optional[str]:
+        """
+        Getting the correct path to the image. 
+        This replaces the default image host "minio:9000" with 
+        the host where the image storage is located.
+        """
         if self.image:
             return self.image.url.replace("minio:9000", settings.MINIO_IMAGE_HOST)
         return None
@@ -40,6 +48,7 @@ class BugImage(models.Model):
         return self.image
 
     class Meta:
+        # the name of the table in the database for this model
         db_table: str = "bug_image"
         verbose_name: str = "bug_image"
         verbose_name_plural: str = "bug_images"
@@ -61,6 +70,9 @@ class Bug(models.Model):
     @final
     @staticmethod
     def get_all() -> QuerySet["Bug"]:
+        """
+        getting all records with optimized selection from the database
+        """
         return Bug.objects.prefetch_related("images").select_related("author")
 
     @final
@@ -72,7 +84,9 @@ class Bug(models.Model):
         return self.title
 
     class Meta:
+        # the name of the table in the database for this model
         db_table: str = "bug"
         verbose_name: str = "bug"
         verbose_name_plural: str = "bugs"
+        # sorting database records for this model by default
         ordering: list[str] = ["-id"]

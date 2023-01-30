@@ -104,10 +104,16 @@ class Event(models.Model):
 
     @property
     def count_current_users(self) -> int:
+        """
+        getting the count of participants in the event
+        """
         return self.current_users.count()
 
     @property
     def count_current_fans(self) -> int:
+        """
+        getting the count of fans in the event
+        """
         return self.current_fans.count()
 
     @final
@@ -121,6 +127,9 @@ class Event(models.Model):
     @final
     @staticmethod
     def get_all() -> QuerySet["Event"]:
+        """
+        getting all records with optimized selection from the database
+        """
         return Event.objects.select_related("author").prefetch_related(
             "current_users", "current_fans"
         )
@@ -132,9 +141,11 @@ class Event(models.Model):
         super(Event, self).save(*args, **kwargs)
 
     class Meta:
+        # the name of the table in the database for this model
         db_table: str = "event"
         verbose_name: str = "event"
         verbose_name_plural: str = "events"
+        # sorting database records for this model by default
         ordering: list[str] = ["-id"]
 
 
@@ -166,14 +177,19 @@ class RequestToParticipation(models.Model):
 
     @staticmethod
     def get_all() -> QuerySet["RequestToParticipation"]:
+        """
+        getting all records with optimized selection from the database
+        """
         return RequestToParticipation.objects.select_related(
             "recipient", "event", "sender"
         )
 
     class Meta:
+        # the name of the table in the database for this model
         db_table: str = "request_to_participation"
         verbose_name: str = "request to participation"
         verbose_name_plural: str = "requests to participation"
+        # sorting database records for this model by default
         ordering: list[str] = ["-id"]
 
 
@@ -247,10 +263,15 @@ class InviteToEvent(RequestToParticipation):
     @final
     @staticmethod
     def get_all() -> QuerySet["InviteToEvent"]:
+        """
+        getting all records with optimized selection from the database
+        """
         return InviteToEvent.objects.select_related("recipient", "event", "sender")
 
     class Meta:
+        # the name of the table in the database for this model
         db_table: str = "invite_to_event"
         verbose_name: str = "invite to event"
         verbose_name_plural: str = "invites to event"
+        # sorting database records for this model by default
         ordering: list[str] = ["-id"]

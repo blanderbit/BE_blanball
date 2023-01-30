@@ -68,6 +68,9 @@ class Gender(models.TextChoices):
 
 
 def validate_birthday(value: date) -> None:
+    """
+    validation of a user-entered date of birth ranging from 6 to 80 years
+    """
     if timezone.now().date() - value > timezone.timedelta(days=29200):
         raise ValidationError(MAX_AGE_VALUE_ERROR, HTTP_400_BAD_REQUEST)
     if timezone.now().date() - value < timezone.timedelta(days=2191):
@@ -76,14 +79,23 @@ def validate_birthday(value: date) -> None:
 
 @final
 def configuration_dict() -> dict[str, bool]:
+    """
+    the default configuration field value for the user
+    """
     return {"email": True, "phone": True, "show_reviews": True}
 
 
 def image_file_name(instance: "Profile", filename: str) -> str:
+    """
+    setting the name for the avatar uploaded by the user
+    """
     return os.path.join("users", str(filename))
 
 
 def validate_image(image: TemporaryUploadedFile) -> str:
+    """
+    validation of the image uploaded by the user by the maximum size value
+    """
     megabyte_limit: float = 1.0
     if image.size > megabyte_limit * 1024 * 1024:
         raise ValidationError(AVATAR_MAX_SIZE_ERROR, HTTP_400_BAD_REQUEST)
@@ -174,16 +186,26 @@ class Profile(models.Model):
     @property
     @final
     def new_image_name(self) -> str:
+        """
+        Generates a new name for the picture the user has uploaded. 
+        The new picture will consist of the encoded user id and the current date
+        """
         datetime = timezone.now().strftime("%Y-%m-%d-%H-%M")
         return f"users/{urlsafe_base64_encode(smart_bytes(self.id))}_{datetime}.jpg"
 
     @property
     def avatar_url(self) -> Optional[str]:
+        """
+        Getting the correct path to the image. 
+        This replaces the default image host "minio:9000" with 
+        the host where the image storage is located.
+        """
         if self.avatar:
             return self.avatar.url.replace("minio:9000", settings.MINIO_IMAGE_HOST)
         return None
 
     class Meta:
+        # the name of the table in the database for this model
         db_table: str = "profile"
         verbose_name: str = "profile"
         verbose_name_plural: str = "profiles"
@@ -223,10 +245,16 @@ class User(AbstractBaseUser):
     @final
     @staticmethod
     def get_all() -> QuerySet["User"]:
+        """
+        getting all records with optimized selection from the database
+        """
         return User.objects.select_related("profile")
 
     @final
     def tokens(self) -> dict[str, str]:
+        """
+        generating jwt tokens for user object
+        """
         refresh: RefreshToken = RefreshToken.for_user(self)
         access: AccessToken = AccessToken.for_user(self)
         return {"refresh": str(refresh), "access": str(access)}
@@ -236,9 +264,11 @@ class User(AbstractBaseUser):
         return "user_%s" % self.id
 
     class Meta:
+        # the name of the table in the database for this model
         db_table: str = "user"
         verbose_name: str = "user"
         verbose_name_plural: str = "users"
+        # sorting database records for this model by default
         ordering: list[str] = ["-id"]
 
 
@@ -251,6 +281,9 @@ class Code(models.Model):
 
     @final
     def get_only_expired() -> QuerySet["Code"]:
+        """
+        get all expired codes
+        """
         return Code.objects.filter(life_time__lt=timezone.now())
 
     @final
@@ -262,6 +295,7 @@ class Code(models.Model):
         return self.verify_code
 
     class Meta:
+        # the name of the table in the database for this model
         db_table: str = "code"
         verbose_name: str = "code"
         verbose_name_plural: str = "codes"
