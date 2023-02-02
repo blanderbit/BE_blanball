@@ -1,28 +1,28 @@
 name: Create change log
 
 on:
-  release:
-    types: [published]
+    release:
+        types: [published]
 
 jobs:
-  create-change-log:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-      - name: Create new change log file
-        uses: "finnp/create-file-action@master"
-        env:
-          FILE_NAME: changelog/${{ github.event.release.name }}.txt
-          FILE_DATA: ${{ github.event.release.body }}
-      - name: Commit files
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git commit -am "auto create change log for ${{ github.event.release.name }}"
-          git tag ${{ steps.semantic_release_info.outputs.git_tag }}
-          git add changelog/${{ github.event.release.name }}.txt
-      - name: Push changes
-        uses: ad-m/github-push-action@v0.6.0
-        with:
-          branch: develop
-          github_token: ${{ secrets.AUTH_TOKEN }}
+    create-change-log:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@master
+            - name: Create new change log file
+              uses: 'finnp/create-file-action@master'
+              env:
+                  FILE_NAME: changelog/${{ github.event.release.name }}.txt
+                  FILE_DATA: ${{ github.event.release.body }}
+            - name: Commit files
+              run: |
+                  git config --local user.email "action@github.com"
+                  git config --local user.name "GitHub Action"
+                  git commit -am "auto create change log for ${{ github.event.release.name }}"
+                  git tag ${{ steps.semantic_release_info.outputs.git_tag }}
+                  git add changelog/${{ github.event.release.name }}.txt
+            - name: Push changes
+              uses: ad-m/github-push-action@v0.6.0
+              with:
+                  branch: develop
+                  github_token: ${{ secrets.AUTH_TOKEN }}
