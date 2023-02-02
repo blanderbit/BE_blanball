@@ -187,7 +187,7 @@ class Profile(models.Model):
     @final
     def new_image_name(self) -> str:
         """
-        Generates a new name for the picture the user has uploaded. 
+        Generates a new name for the picture the user has uploaded.
         The new picture will consist of the encoded user id and the current date
         """
         datetime = timezone.now().strftime("%Y-%m-%d-%H-%M")
@@ -196,8 +196,8 @@ class Profile(models.Model):
     @property
     def avatar_url(self) -> Optional[str]:
         """
-        Getting the correct path to the image. 
-        This replaces the default image host "minio:9000" with 
+        Getting the correct path to the image.
+        This replaces the default image host "minio:9000" with
         the host where the image storage is located.
         """
         if self.avatar:

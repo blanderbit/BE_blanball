@@ -31,8 +31,8 @@ class BugImage(models.Model):
     @property
     def image_url(self) -> Optional[str]:
         """
-        Getting the correct path to the image. 
-        This replaces the default image host "minio:9000" with 
+        Getting the correct path to the image.
+        This replaces the default image host "minio:9000" with
         the host where the image storage is located.
         """
         if self.image:
