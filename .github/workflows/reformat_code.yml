@@ -34,7 +34,7 @@ jobs:
           src: "."
           version: "~= 22.10.0"
       - name: Linting .env files 
-        uses: wemake-services/dotenv-linter
+        uses: wemake-services/dotenv-linter@master
       - name: Install isort
         run: pip install isort
       - name: Reformat code using isort
