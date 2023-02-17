@@ -20,7 +20,16 @@ class SetUpEventsViews(APITestCase):
             "need_form": True,
             "privacy": False,
             "duration": 10,
-            "forms": "Shirt-Front",
+            "forms": {
+                "first_team": {
+                    "type": "Shirt-Front",
+                    "color": "string"
+                },
+                "second_team": {
+                    "type": "Shirt-Front",
+                    "color": "string"
+                }
+            },
             "current_users": [],
         }
 
@@ -38,7 +47,16 @@ class SetUpEventsViews(APITestCase):
             "need_form": True,
             "privacy": False,
             "duration": 10,
-            "forms": "Shirt-Front",
+            "forms": {
+                "first_team": {
+                    "type": "Shirt-Front",
+                    "color": "string"
+                },
+                "second_team": {
+                    "type": "Shirt-Front",
+                    "color": "string"
+                }
+            },
             "current_users": [],
         }
 
@@ -57,7 +75,16 @@ class SetUpEventsViews(APITestCase):
             "need_form": True,
             "privacy": False,
             "duration": 10,
-            "forms": "Shirt-Front",
+            "forms": {
+                "first_team": {
+                    "type": "Shirt-Front",
+                    "color": "string"
+                },
+                "second_team": {
+                    "type": "Shirt-Front",
+                    "color": "string"
+                }
+            },
         }
 
         self.event_join_data = {"event_id": 1}
