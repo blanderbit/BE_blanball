@@ -87,7 +87,7 @@ class Event(models.Model):
     need_form: bool = models.BooleanField()
     privacy: bool = models.BooleanField()
     duration: int = models.PositiveSmallIntegerField(choices=Duration.choices)
-    forms: str = models.CharField(choices=CloseType.choices, max_length=15)
+    forms: str = models.JSONField(null=True)
     status: str = models.CharField(
         choices=Status.choices, max_length=10, default=Status.PLANNED
     )
