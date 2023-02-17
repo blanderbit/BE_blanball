@@ -27,6 +27,7 @@ from events.views import (
     UserEventsRelevantList,
     UserParticipantEventsList,
     UserPlannedEventsList,
+    PlannedEventsList,
 )
 
 urlpatterns: list[Union[URLResolver, URLPattern]] = [
@@ -77,6 +78,11 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
         "client/user/planned/events/list/<int:pk>",
         UserPlannedEventsList.as_view(),
         name="user-planned-events-list",
+    ),
+    path(
+        "client/planned/events/list",
+        PlannedEventsList.as_view(),
+        name="planned-events-list",
     ),
     path(
         "client/popular/events/list",

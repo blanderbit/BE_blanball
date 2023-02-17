@@ -148,6 +148,19 @@ class UserParticipantEventsList(EventsList):
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Event]:
         return self.queryset.filter(current_users__in=[self.request.user.id])
+    
+
+class PlannedEventsList(EventsList):
+    """
+    List of the user participation history
+
+    This endpoint allows the user to get only
+    planned events
+    """
+
+    @skip_objects_from_response_by_id
+    def get_queryset(self) -> QuerySet[Event]:
+        return EventsList.get_queryset(self).filter(status=Event.Status.PLANNED)
 
 
 class PopularEventsList(ListAPIView):

@@ -76,12 +76,12 @@ class UpdateEventSerializer(ModelSerializer):
 class EventSerializer(ModelSerializer):
     author = EventAuthorSerializer()
     current_users = EventUsersSerializer(many=True)
+    current_fans = EventUsersSerializer(many=True)
 
     class Meta:
         model: Event = Event
         exclude: Union[str, list[str]] = [
             "black_list",
-            "current_fans",
         ]
 
 

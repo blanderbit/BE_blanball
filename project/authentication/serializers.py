@@ -106,6 +106,7 @@ class EventAuthorSerializer(ModelSerializer):
         model: User = User
         fields: Union[str, list[str]] = [
             "id",
+            "phone",
             "profile",
         ]
 
@@ -117,6 +118,7 @@ class EventUsersSerializer(ModelSerializer):
         model: User = User
         fields: Union[str, list[str]] = [
             "id",
+            "raiting",
             "profile",
         ]
 

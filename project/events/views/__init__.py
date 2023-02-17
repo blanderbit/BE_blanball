@@ -14,6 +14,9 @@ from events.views.events_list import (
     UserEventsRelevantList as UserEventsRelevantList,
 )
 from events.views.events_list import (
+    PlannedEventsList as PlannedEventsList,
+)
+from events.views.events_list import (
     UserParticipantEventsList as UserParticipantEventsList,
 )
 from events.views.events_list import (
