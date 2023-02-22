@@ -104,8 +104,29 @@ class EventSerializer(ModelSerializer):
 
     class Meta:
         model: Event = Event
-        exclude: Union[str, list[str]] = [
-            "black_list",
+        fields: Union[str, list[str]] = [
+            "id",
+            "author",
+            "name",
+            "description",
+            "gender",
+            "date_and_time",
+            "contact_number",
+            "need_ball",
+            "amount_members",
+            "type",
+            "price",
+            "price_description",
+            "need_form",
+            "status",
+            "privacy",
+            "duration",
+            "forms",
+            "request_user_role",
+            "place",
+            "coordinates",
+            "current_users",
+            "current_fans",
         ]
 
 
@@ -148,6 +169,7 @@ class EventListSerializer(ModelSerializer):
             "date_and_time",
             "count_current_users",
             "count_current_fans",
+            "request_user_role",
         ]
 
 
