@@ -129,9 +129,16 @@ class RequestToParticipationsList(ListAPIView):
     @not_in_black_list
     @skip_objects_from_response_by_id
     def list(self, request: Request, pk: int) -> Response:
+        
         try:
             event: Event = Event.get_all().get(id=pk)
             queryset = self.queryset.filter(event=event)
+            serializer = self.serializer_class(queryset, many=True)
+
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
             serializer = self.serializer_class(queryset, many=True)
             return Response(serializer.data, status=HTTP_200_OK)
         except Event.DoesNotExist:

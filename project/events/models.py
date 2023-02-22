@@ -18,6 +18,9 @@ from events.constants.errors import (
     THIS_USER_CAN_NOT_BE_INVITED,
     USER_CAN_NOT_INVITE_TO_THIS_EVENT_ERROR,
 )
+from events.middlewares import (
+    current_request,
+)
 from events.constants.notification_types import (
     INVITE_USER_TO_EVENT_NOTIFICATION_TYPE,
 )
@@ -31,6 +34,7 @@ from rest_framework.serializers import (
 from rest_framework.status import (
     HTTP_403_FORBIDDEN,
 )
+
 
 
 class Event(models.Model):
@@ -133,6 +137,25 @@ class Event(models.Model):
         return Event.objects.select_related("author").prefetch_related(
             "current_users", "current_fans"
         )
+    
+    @property
+    def request_user_role(self) -> Optional[str]: 
+        request = current_request()
+        event_requests_to_participations = RequestToParticipation.get_all().filter(
+            event_id=self.id, status=RequestToParticipation.Status.WAITING
+        )
+        sender_ids = [d.sender.id for d in event_requests_to_participations]
+
+        if request.user == self.author:
+            return 'author'
+        elif request.user in self.current_users.all():
+            return 'player'
+        elif request.user in self.current_fans.all():
+            return 'fan'
+        elif request.user.id in sender_ids:
+            return 'request_participation'
+        return None
+
 
     @final
     def save(self, *args: Any, **kwargs: Any) -> None:
