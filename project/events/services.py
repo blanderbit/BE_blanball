@@ -67,6 +67,31 @@ def bulk_delete_events(
         except Event.DoesNotExist:
             pass
 
+def bulk_pin_events(
+    *, data: dict[str, Any], queryset: QuerySet[Event], user: User
+) -> bulk:
+    for event_id in data:
+        try:
+            event: Event = queryset.get(id=event_id)
+            if event.author == user:
+                event.pinned = True
+                event.save()
+                yield {"success": event_id}
+        except Event.DoesNotExist:
+            pass
+
+def bulk_unpin_events(
+    *, data: dict[str, Any], queryset: QuerySet[Event], user: User
+) -> bulk:
+    for event_id in data:
+        try:
+            event: Event = queryset.get(id=event_id)
+            if event.author == user:
+                event.pinned = False
+                event.save()
+                yield {"success": event_id}
+        except Event.DoesNotExist:
+            pass
 
 def send_message_after_bulk_accept_or_decline(
     *,

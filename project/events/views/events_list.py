@@ -34,6 +34,7 @@ from events.openapi import (
 from events.serializers import (
     EventListSerializer,
     PopularEventsListSerializer,
+    MyEventListSerializer,
 )
 from events.services import (
     add_dist_filter_to_view,
@@ -133,10 +134,13 @@ class UserEventsList(EventsList):
     sort the list of events on which he is the author
     """
 
+    serializer_class: Type[Serializer] = MyEventListSerializer
+
     def get_queryset(self) -> QuerySet[Event]:
         return EventsList.get_queryset(self).filter(
             author_id=self.request.user.id
-        ).order_by(pinned=True)
+        ).order_by('-pinned', '-id')
+
 
 
 class UserParticipantEventsList(EventsList):

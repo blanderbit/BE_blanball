@@ -24,9 +24,11 @@ from events.views import (
     RequestToParticipationsList,
     UpdateEvent,
     UserEventsList,
+    PinMyEvents,
     UserEventsRelevantList,
     UserParticipantEventsList,
     UserPlannedEventsList,
+    UnPinMyEvents,
     PlannedEventsList,
 )
 
@@ -41,6 +43,8 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
         name="invites-to-events-list",
     ),
     path("client/events/delete", DeleteEvents.as_view(), name="bulk-delete-events"),
+    path("client/events/pin", PinMyEvents.as_view(), name="bulk-pin-events"),
+    path("client/events/unpin", UnPinMyEvents.as_view(), name="bulk-unpin-events"),
     path("client/event/join", JoinToEvent.as_view(), name="join-to-event"),
     path(
         "client/remove/user/from/event",

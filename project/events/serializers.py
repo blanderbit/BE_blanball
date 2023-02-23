@@ -74,6 +74,7 @@ class CreateEventSerializer(ModelSerializer):
             "current_fans",
             "black_list",
             "coordinates",
+            "pinned",
         ]
 
 
@@ -91,6 +92,7 @@ class UpdateEventSerializer(ModelSerializer):
             "current_users",
             "black_list",
             "coordinates",
+            "pinned",
         ]
 
     def update(self, instance, validated_data: dict) -> OrderedDict:
@@ -162,6 +164,35 @@ class EventListSerializer(ModelSerializer):
             "price",
             "type",
             "need_ball",
+            "forms",
+            "duration",
+            "need_form",
+            "privacy",
+            "date_and_time",
+            "count_current_users",
+            "count_current_fans",
+            "request_user_role",
+        ]
+
+class MyEventListSerializer(ModelSerializer):
+    place = PlaceSerializer()
+    author = EventAuthorSerializer()
+
+    class Meta:
+        model: Event = Event
+        fields: Union[str, list[str]] = [
+            "id",
+            "author",
+            "name",
+            "place",
+            "amount_members",
+            "status",
+            "gender",
+            "description",
+            "price",
+            "type",
+            "need_ball",
+            "pinned",
             "forms",
             "duration",
             "need_form",

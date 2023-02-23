@@ -21,6 +21,8 @@ from events.services import (
     event_create,
     not_in_black_list,
     only_author,
+    bulk_pin_events,
+    bulk_unpin_events,
     send_notification_to_subscribe_event_user,
 )
 from rest_framework.generics import GenericAPIView
@@ -115,6 +117,51 @@ class DeleteEvents(GenericAPIView):
             user=request.user,
         )
         return Response(data, status=HTTP_200_OK)
+
+
+class PinMyEvents(GenericAPIView):
+    """
+    Pin my events
+
+    This endpoint allows the user to pin
+    their events.
+    """
+
+    serializer_class: Type[Serializer] = BaseBulkDeleteSerializer
+    queryset: QuerySet[Event] = Event.get_all()
+
+    def post(self, request: Request) -> Response:
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data: dict[str, list[int]] = bulk_pin_events(
+            data=serializer.validated_data["ids"],
+            queryset=self.queryset,
+            user=request.user,
+        )
+        return Response(data, status=HTTP_200_OK)
+
+
+class UnPinMyEvents(GenericAPIView):
+    """
+    UnPin my events
+
+    This endpoint allows the user to unpin
+    their events.
+    """
+
+    serializer_class: Type[Serializer] = BaseBulkDeleteSerializer
+    queryset: QuerySet[Event] = Event.get_all()
+
+    def post(self, request: Request) -> Response:
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data: dict[str, list[int]] = bulk_unpin_events(
+            data=serializer.validated_data["ids"],
+            queryset=self.queryset,
+            user=request.user,
+        )
+        return Response(data, status=HTTP_200_OK)
+
 
 
 class GetEvent(RetrieveModelMixin, GenericAPIView):
