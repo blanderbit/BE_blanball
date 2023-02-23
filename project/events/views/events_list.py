@@ -134,7 +134,9 @@ class UserEventsList(EventsList):
     """
 
     def get_queryset(self) -> QuerySet[Event]:
-        return EventsList.get_queryset(self).filter(author_id=self.request.user.id)
+        return EventsList.get_queryset(self).filter(
+            author_id=self.request.user.id
+        ).order_by(pinned=True)
 
 
 class UserParticipantEventsList(EventsList):
