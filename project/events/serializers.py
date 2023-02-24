@@ -39,18 +39,8 @@ from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
 
-class EventFormsSerializer(Serializer):
-
-    class Meta:
-        model: Event = Event
-        fields: Union[str, list[str]] = [
-            "first_team",
-            "second_team",
-        ]
-
 class CreateEventSerializer(ModelSerializer):
     place = PlaceSerializer()
-    forms = EventFormsSerializer()
 
     class Meta:
         model: Event = Event
@@ -67,7 +57,6 @@ class CreateEventSerializer(ModelSerializer):
 
 class UpdateEventSerializer(ModelSerializer):
     place = PlaceSerializer()
-    forms = EventFormsSerializer()
 
     class Meta:
         model: Event = Event
