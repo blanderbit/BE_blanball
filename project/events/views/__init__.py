@@ -70,3 +70,6 @@ from events.views.manage_event import (
 from events.views.manage_event import (
     UnPinMyEvents as UnPinMyEvents
 )
+from events.views.events_list import (
+    MyPlannedParticipantAndViewEventsList as MyPlannedParticipantAndViewEventsList
+)

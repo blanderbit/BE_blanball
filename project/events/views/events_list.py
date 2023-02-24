@@ -167,9 +167,26 @@ class PlannedEventsList(EventsList):
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Event]:
         return EventsList.get_queryset(self).filter(status=Event.Status.PLANNED)
+    
+
+class MyPlannedParticipantAndViewEventsList(EventsList):
+    """
+    List of the user planned participation
+
+    This endpoint allows the user to get only
+    planned events
+    """
+
+    @skip_objects_from_response_by_id
+    def get_queryset(self) -> QuerySet[Event]:
+        return EventsList.get_queryset(self).filter(
+            status=Event.Status.PLANNED,
+            current_users__in=[self.request.user.id],
+            current_fans__in=[self.request.user.id],
+        )
 
 
-class PopularEventsList(ListAPIView):
+class PopularEventsList(EventsList):
     """
     List of the most popular events
 
@@ -178,12 +195,10 @@ class PopularEventsList(ListAPIView):
     active users at the event
     """
 
-    serializer_class: Type[Serializer] = PopularEventsListSerializer
-    queryset: QuerySet[Event] = Event.get_all().filter(status=Event.Status.PLANNED)
-
     def get_queryset(self) -> QuerySet[Event]:
         return (
             EventsList.get_queryset(self)
+            .filter(status=Event.Status.PLANNED)
             .annotate(count=Count("current_users"))
             .order_by("-count")[:10]
         )
