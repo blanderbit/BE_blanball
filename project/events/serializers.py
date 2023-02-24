@@ -39,20 +39,7 @@ from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
 
-class FormsSerializer(Serializer):
-    type = ChoiceField(choices=Event.CloseType)
-    color = CharField(max_length=55)
-
-    class Meta:
-        model: Event = Event
-        fields: Union[str, list[str]] = [
-            "type",
-            "color",
-        ]
-
 class EventFormsSerializer(Serializer):
-    first_team = FormsSerializer(required=False)
-    second_team = FormsSerializer(required=False)
 
     class Meta:
         model: Event = Event
