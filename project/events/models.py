@@ -87,7 +87,7 @@ class Event(models.Model):
     price: Optional[int] = models.PositiveSmallIntegerField(
         null=True, validators=[MinValueValidator(1)]
     )
-    price_description: Optional[str] = models.CharField(max_length=500, null=True)
+    price_description: Optional[str] = models.CharField(max_length=265, null=True)
     need_form: bool = models.BooleanField()
     privacy: bool = models.BooleanField()
     pinned: bool = models.BooleanField(default=False)
