@@ -47,4 +47,4 @@ THIS_EMAIL_ALREADY_IN_USE_ERROR: dict[str, str] = {"error": "email_already_in_us
 
 # the error that means that the image uploaded by the
 # user exceeds the weight limit
-AVATAR_MAX_SIZE_ERROR: dict[str, str] = {"error": "avatar_max_size"}
+AVATAR_MAX_SIZE_ERROR: dict[str, str] = {"error": "avatar_max_size_1mb"}
