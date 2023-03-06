@@ -7,7 +7,13 @@ from typing import Any, Type, final
 
 from authentication.models import User
 from config.exceptions import _404
-from config.openapi import skip_param_query
+from config.openapi import (
+    skip_param_query, 
+    offset_query
+)
+from config.pagination import (
+    paginate_by_offset
+)
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
     method_decorator,
@@ -66,9 +72,11 @@ class InviteUserToEvent(GenericAPIView):
 
 
 @method_decorator(
-    swagger_auto_schema(manual_parameters=[skip_param_query]),
+    swagger_auto_schema(
+    manual_parameters=[skip_param_query, offset_query]),
     name="get",
 )
+@paginate_by_offset
 class InvitesToEventList(ListAPIView):
     """
     List of my invitations to events
@@ -109,7 +117,12 @@ class BulkAcceptOrDeclineInvitesToEvent(GenericAPIView):
         return Response(data, status=HTTP_200_OK)
 
 
-@method_decorator(swagger_auto_schema(manual_parameters=[skip_param_query]), name="get")
+@method_decorator(
+    swagger_auto_schema(
+    manual_parameters=[skip_param_query, offset_query]),
+    name="get"
+)
+@paginate_by_offset
 class RequestToParticipationsList(ListAPIView):
     """
     List of requests for participation in the event

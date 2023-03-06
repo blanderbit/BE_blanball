@@ -4,6 +4,7 @@ from config.openapi import (
     distance_query,
     point_query,
     skip_param_query,
+    offset_query
 )
 from drf_yasg import openapi
 from events.filters import (
@@ -147,6 +148,7 @@ events_list_query_params: list[openapi.Parameter] = [
     events_searh_query,
     events_ordering_query,
     distance_query,
+    offset_query,
 ]
 events_relevant_list_query_params: list[openapi.Parameter] = [
     skip_param_query,

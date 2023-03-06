@@ -59,6 +59,20 @@ distance_query = openapi.Parameter(
     type=openapi.TYPE_INTEGER,
 )
 
+offset_query = openapi.Parameter(
+    "offset",
+    openapi.IN_QUERY,
+    type=openapi.TYPE_INTEGER,
+    description="EN - This option allows the user to specify \
+    how many records he wants to receive. \
+    By default, this number is 10. \
+    \n \
+    RU - Эта опция дает возможность пользователю указать какое \
+    количество записей он хочет получить. \
+    По стандарту это число равняется 10"
+)
+
+
 AUTHENTICATION_SWAGGER_TAG_DOCS: dict[str, str] = {
     "name": "authentication",
     "description": "EN - a block of endpoints that are fully \

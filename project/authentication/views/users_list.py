@@ -13,6 +13,9 @@ from authentication.filters import (
     RankedFuzzySearchFilter,
     UserAgeRangeFilter,
 )
+from config.pagination import (
+    paginate_by_offset
+)
 from authentication.models import User
 from authentication.openapi import (
     users_list_query_params,
@@ -52,6 +55,7 @@ from rest_framework_gis.filters import (
     swagger_auto_schema(manual_parameters=users_list_query_params),
     name="get",
 )
+@paginate_by_offset
 class UsersList(ListAPIView):
     """
     List of users

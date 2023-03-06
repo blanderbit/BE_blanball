@@ -9,6 +9,7 @@ from config.openapi import (
     distance_query,
     point_query,
     skip_param_query,
+    offset_query
 )
 from drf_yasg import openapi
 
@@ -115,6 +116,7 @@ users_list_query_params: list[openapi.Parameter] = [
     users_profile_age_min_query,
     users_profile_age_max_query,
     users_searh_query,
+    offset_query,
 ]
 users_relevant_list_query_params: list[openapi.Parameter] = [
     skip_param_query,

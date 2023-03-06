@@ -2,7 +2,13 @@ import json
 from typing import Any, Type
 
 from api_keys.permissions import ApiKeyPermission
-from config.openapi import skip_param_query
+from config.openapi import (
+    skip_param_query,
+    offset_query
+)
+from config.pagination import (
+    paginate_by_offset
+)
 from config.serializers import (
     BaseBulkDeleteSerializer,
 )
@@ -54,7 +60,11 @@ from rest_framework.status import (
 from rest_framework.views import APIView
 
 
-@method_decorator(swagger_auto_schema(manual_parameters=[skip_param_query]), name="get")
+@method_decorator(swagger_auto_schema(
+    manual_parameters=[skip_param_query, offset_query]), 
+    name="get"
+)
+@paginate_by_offset
 class UserNotificationsList(ListAPIView):
     """
     List of user notifications

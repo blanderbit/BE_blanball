@@ -10,6 +10,9 @@ from authentication.filters import (
 )
 from authentication.models import User
 from config.exceptions import _404
+from config.pagination import (
+    paginate_by_offset
+)
 from django.db.models import Count, Q
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
@@ -59,6 +62,7 @@ from rest_framework_gis.filters import (
     swagger_auto_schema(manual_parameters=events_list_query_params),
     name="get",
 )
+@paginate_by_offset
 class EventsList(ListAPIView):
     """
     List of events
