@@ -149,4 +149,5 @@ CORS_ALLOW_HEADERS: list[str] = [
     "x-csrftoken",
     "x-requested-with",
     "apikey",
+    "App-Version",
 ]

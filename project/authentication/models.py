@@ -126,8 +126,8 @@ class Profile(models.Model):
         LEFT: str = "Left"
         RIGHT: str = "Right"
 
-    name: str = models.CharField(max_length=255)
-    last_name: str = models.CharField(max_length=255)
+    name: str = models.CharField(max_length=20)
+    last_name: str = models.CharField(max_length=20)
     gender: Optional[str] = models.CharField(
         choices=Gender.choices, max_length=10, null=True
     )
@@ -156,7 +156,7 @@ class Profile(models.Model):
         choices=Position.choices, max_length=255, null=True
     )
     created_at: datetime = models.DateTimeField(auto_now_add=True)
-    about_me: Optional[str] = models.TextField(null=True)
+    about_me: Optional[str] = models.CharField(null=True, blank=True, max_length=110)
     working_leg: Optional[str] = models.CharField(
         choices=Leg.choices, max_length=255, null=True
     )
