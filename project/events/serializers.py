@@ -60,7 +60,6 @@ class UpdateEventSerializer(ModelSerializer):
 
     class Meta:
         model: Event = Event
-        validators = [EventDateTimeValidator()]
         exclude: Union[str, list[str]] = [
             "author",
             "status",
