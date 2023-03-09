@@ -1,38 +1,84 @@
-from .views import *
+from typing import Union
 
+from authentication.views import (
+    CheckCode,
+    LoginUser,
+    RegisterUser,
+    RequestChangePassword,
+    RequestEmailVerify,
+    RequestPasswordReset,
+    RequetChangeEmail,
+    ResetPassword,
+    UpdateProfile,
+    UpdateProfileImage,
+    UserOwnerProfile,
+    UserProfile,
+    UsersDetailList,
+    UsersList,
+    UsersRelevantList,
+    ValidatePhoneByUnique,
+    ValidateResetPasswordCode,
+)
 from django.urls import path
+from django.urls.resolvers import (
+    URLPattern,
+    URLResolver,
+)
 
-urlpatterns = [
-    # endpoint where user can register
-    path('client/register', RegisterUser.as_view(),name='register'),
-    # endpoint where user can login
-    path('client/login', LoginUser.as_view(),name='login'),
-    # endpoint where user can get users list
-    path('client/users/list',UserList.as_view(),name='users-list'),
-    # endpoint where user can get relevant users list
-    path('client/users/relevant/list',UsersRelevantList.as_view(),name='users-relevant-list'),
-    # endpoint where user can get admins list
-    path('admins/list',AdminUsersList.as_view(),name='admins-list'),
-    # endpoint where user can get his profile
-    path('client/me', UserOwnerProfile.as_view(),name='my-profile'),
-    # endpoint where user can get profile of any user
-    path('client/profile/<int:pk>', UserProfile.as_view(),name='user-profile'),
-    # endpoint where user can request reset password
-    path('client/request-reset/password', RequestPasswordReset.as_view(),name='request-reset-password'),
-    # endpoint where user can confirm password reset
-    path('client/password/reset-complete', ResetPassword.as_view(),name='complete-reset-password'),
-    # endpoint where user can request change password
-    path('client/request-change/password', RequestChangePassword.as_view(),name='request-change-password'),
-    # endpoint where user can confirm password chagne,email change,phone change,account verification
-    path('client/check/code',CheckCode.as_view(),name='check-code'),
-    # endpoint where user can update his profile
-    path('client/me/update', UpdateProfile.as_view(),name='update-my-profile'),
-    # endpoint where user can request change email
-    path('client/request-change/email',RequetChangeEmail.as_view(),name='request-change-email'),
-    # endpoint where user can request change phone
-    path('client/request-change/phone',RequestChangePhone.as_view(),name='request-change-phone'),
-    # endpoint where user can check is another user active
-    path('client/search/user/active',CheckUserActive.as_view(),name='check-user-active'),
-    # endpoint where user can check is another user active
-    path('client/request-verify/email',RequestEmailVerify.as_view(),name='request-email-verify'),
+urlpatterns: list[Union[URLResolver, URLPattern]] = [
+    path("client/register", RegisterUser.as_view(), name="register"),
+    path("client/login", LoginUser.as_view(), name="login"),
+    path("client/users/list", UsersList.as_view(), name="users-list"),
+    path(
+        "admin/users/list/detail", UsersDetailList.as_view(), name="users-list-detail"
+    ),
+    path(
+        "client/users/relevant/list",
+        UsersRelevantList.as_view(),
+        name="users-relevant-list",
+    ),
+    path("client/me", UserOwnerProfile.as_view(), name="my-profile"),
+    path("client/profile/<int:pk>", UserProfile.as_view(), name="user-profile"),
+    path(
+        "client/request-reset/password",
+        RequestPasswordReset.as_view(),
+        name="request-reset-password",
+    ),
+    path(
+        "client/password/reset-complete",
+        ResetPassword.as_view(),
+        name="complete-reset-password",
+    ),
+    path(
+        "client/validate/reset-password/code",
+        ValidateResetPasswordCode.as_view(),
+        name="validate-reset-password-code",
+    ),
+    path(
+        "client/validate/phone",
+        ValidatePhoneByUnique.as_view(),
+        name="validate-phone-by-unique",
+    ),
+    path(
+        "client/request-change/password",
+        RequestChangePassword.as_view(),
+        name="request-change-password",
+    ),
+    path("client/check/code", CheckCode.as_view(), name="check-code"),
+    path("client/me/update", UpdateProfile.as_view(), name="update-my-profile"),
+    path(
+        "client/request-change/email",
+        RequetChangeEmail.as_view(),
+        name="request-change-email",
+    ),
+    path(
+        "client/request-verify/email",
+        RequestEmailVerify.as_view(),
+        name="request-email-verify",
+    ),
+    path(
+        "client/update/my/profile/avatar",
+        UpdateProfileImage.as_view(),
+        name="update-profile-image",
+    ),
 ]

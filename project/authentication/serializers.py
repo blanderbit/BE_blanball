@@ -1,25 +1,72 @@
 import re
-
 from collections import OrderedDict
+from typing import Any, List, Union
 
-from .models import *
-from project.constaints import *
-from .validators import CodeValidator
-
+from authentication.constants.code_types import (
+    ACCOUNT_DELETE_CODE_TYPE,
+    EMAIL_CHANGE_CODE_TYPE,
+    EMAIL_VERIFY_CODE_TYPE,
+    PASSWORD_CHANGE_CODE_TYPE,
+    PASSWORD_RESET_CODE_TYPE,
+)
+from authentication.constants.errors import (
+    CONFIGURATION_IS_REQUIRED_ERROR,
+    GET_PLANNED_EVENTS_ERROR,
+    INVALID_CREDENTIALS_ERROR,
+    PASSWORDS_DO_NOT_MATCH_ERROR,
+)
+from authentication.models import Profile, User
+from authentication.validators import (
+    CodeValidator,
+)
+from cities.serializers import PlaceSerializer
+from config.exceptions import _404
 from django.contrib import auth
+from rest_framework.serializers import (
+    BooleanField,
+    CharField,
+    EmailField,
+    IntegerField,
+    ModelSerializer,
+    Serializer,
+    SerializerMethodField,
+    ValidationError,
+)
+from rest_framework.status import (
+    HTTP_400_BAD_REQUEST,
+)
 
-from rest_framework import serializers,status
 
-class DynamicFieldsModelSerializer(serializers.ModelSerializer):
-    """
-    A ModelSerializer that takes an additional `fields` argument that
-    controls which fields should be displayed.
-    """
+class UserPublicProfilePlaceSerializer(Serializer):
+    place_name: str = CharField(max_length=255)
 
+    class Meta:
+        fields = [
+            "place_name",
+        ]
+
+
+class ReviewAuthorProfileSerializer(ModelSerializer):
+    class Meta:
+        model: User = Profile
+        fields: Union[str, list[str]] = [
+            "name",
+            "last_name",
+        ]
+
+
+class ReviewAuthorSerializer(ModelSerializer):
+    profile = ReviewAuthorProfileSerializer()
+
+    class Meta:
+        model: User = User
+        fields: Union[str, list[str]] = ["id", "profile"]
+
+
+class DynamicFieldsModelSerializer(ModelSerializer):
     def __init__(self, *args, **kwargs) -> None:
-        fields:dict[any] = kwargs.pop('fields', None)
+        fields: list[str] = kwargs.pop("fields", None)
 
-        # Instantiate the superclass normally
         super().__init__(*args, **kwargs)
 
         if fields is not None:
@@ -29,188 +76,378 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
                 self.fields.pop(field_name)
 
 
-
-class EventUsersProfileSerializer(DynamicFieldsModelSerializer):
+class EventUsersProfileSerializer(ModelSerializer):
     class Meta:
-        model = Profile
-        fields = ('name','last_name','avatar','position')
+        model: Profile = Profile
+        fields: Union[str, list[str]] = [
+            "name",
+            "last_name",
+            "avatar_url",
+            "position",
+            "working_leg",
+        ]
 
-class EventUsersSerializer(serializers.ModelSerializer):
+
+class EventAuthorProfileSerializer(ModelSerializer):
+    class Meta:
+        model: Profile = Profile
+        fields: Union[str, list[str]] = [
+            "id",
+            "name",
+            "last_name",
+            "avatar_url",
+        ]
+
+
+class EventAuthorSerializer(ModelSerializer):
+    profile = EventAuthorProfileSerializer()
+
+    class Meta:
+        model: User = User
+        fields: Union[str, list[str]] = [
+            "id",
+            "phone",
+            "profile",
+        ]
+
+
+class EventUsersSerializer(ModelSerializer):
     profile = EventUsersProfileSerializer()
+
     class Meta:
-        model = User
-        fields = ('profile',)
+        model: User = User
+        fields: Union[str, list[str]] = [
+            "id",
+            "raiting",
+            "profile",
+        ]
 
 
-class ProfileSerializer(serializers.ModelSerializer):
+class ProfileSerializer(ModelSerializer):
+    place = UserPublicProfilePlaceSerializer()
+
     class Meta:
-        model = Profile
-        fields = '__all__'
+        model: Profile = Profile
+        fields: Union[str, list[str]] = [
+            "id",
+            "name",
+            "last_name",
+            "gender",
+            "birthday",
+            "avatar_url",
+            "age",
+            "place",
+            "height",
+            "weight",
+            "position",
+            "created_at",
+            "about_me",
+            "working_leg",
+        ]
 
-class CreateUpdateProfileSerializer(serializers.ModelSerializer):
+
+class CreateProfileSerializer(ModelSerializer):
+    place = PlaceSerializer(required=False, allow_null=True)
+
     class Meta:
-        model =  Profile
-        exclude = ('created_at','age')
+        model: Profile = Profile
+        exclude: Union[str, list[str]] = [
+            "created_at",
+            "age",
+            "coordinates",
+            "avatar",
+        ]
 
 
-class UpdateProfileSerializer(serializers.ModelSerializer):
-    profile = CreateUpdateProfileSerializer()
+class UpdateProfileSerializer(ModelSerializer):
+    place = PlaceSerializer(required=False, allow_null=True)
+
     class Meta:
-        model = User
-        fields = ('configuration','profile','get_planned_events')
+        model: Profile = Profile
+        exclude: Union[str, list[str]] = [
+            "created_at",
+            "age",
+            "coordinates",
+            "avatar",
+        ]
 
-    def validate(self,attrs) -> OrderedDict or Exception:
-        conf:str =  attrs.get('configuration')
-        keys:dict[str] = ['email','phone','send_email']
-        planned_events =  attrs.get('get_planned_events')
-        string = re.findall(r'\D', planned_events)[0]
-        if string not in ['d','m','y']:
-            raise serializers.ValidationError(GET_PLANNED_IVENTS_ERROR,status.HTTP_400_BAD_REQUEST) 
 
-        if sorted(conf) != sorted(keys):
-            raise serializers.ValidationError(CONFIGURATION_IS_REQUIRED_ERROR,status.HTTP_400_BAD_REQUEST)
+class UserConfigurationSerializer(Serializer):
+    email: bool = BooleanField()
+    phone: bool = BooleanField()
+    show_reviews: bool = BooleanField()
+
+    class Meta:
+        fields: Union[str, list[str]] = [
+            "email",
+            "phone",
+            "show_reviews",
+        ]
+
+
+class UpdateUserProfileSerializer(ModelSerializer):
+    profile = UpdateProfileSerializer()
+    configuration = UserConfigurationSerializer()
+
+    class Meta:
+        model: User = User
+        fields: Union[str, list[str]] = [
+            "get_planned_events",
+            "configuration",
+            "profile",
+            "phone",
+        ]
+
+    def validate(self, attrs: OrderedDict[str, Any]) -> OrderedDict[str, Any]:
+        conf: str = attrs.get("configuration")
+        keys: list[str] = ["email", "phone", "show_reviews"]
+        try:
+            planned_events = attrs.get("get_planned_events")
+            string: str = re.findall(r"\D", planned_events)[0]
+            if string not in ["d", "m", "y"]:
+                raise ValidationError(GET_PLANNED_EVENTS_ERROR, HTTP_400_BAD_REQUEST)
+            if sorted(conf) != sorted(keys):
+                raise ValidationError(
+                    CONFIGURATION_IS_REQUIRED_ERROR, HTTP_400_BAD_REQUEST
+                )
+        except TypeError:
+            pass
 
         return super().validate(attrs)
 
     def update(self, instance, validated_data) -> OrderedDict:
-        return super().update(instance,validated_data)
+        return super().update(instance, validated_data)
 
 
-class RegisterSerializer(serializers.ModelSerializer):
-    '''a class that serializes user registration'''
-    password:str = serializers.CharField(
-        max_length=68, min_length=8, write_only=True)
-    re_password:str = serializers.CharField(
-        max_length=68, min_length=8, write_only=True)
-    profile:Profile = CreateUpdateProfileSerializer()
+class UpdateUserProfileImageSerializer(ModelSerializer):
     class Meta:
-        model = User
-        fields = ['email','phone','password','re_password','profile']
+        model: Profile = Profile
+        fields: Union[str, list[str]] = [
+            "avatar",
+        ]
 
-    def validate(self, attrs) -> OrderedDict or Exception:
-        '''data validation function'''
-        password:str = attrs.get('password', '')
-        re_password:str = attrs.get('re_password', '')
-        
-        if password != re_password :
-            raise serializers.ValidationError(PASSWORDS_DO_NOT_MATCH,status.HTTP_400_BAD_REQUEST) 
+
+class RegisterSerializer(ModelSerializer):
+
+    password: str = CharField(max_length=68, min_length=8, write_only=True)
+    re_password: str = CharField(max_length=68, min_length=8, write_only=True)
+    profile: Profile = CreateProfileSerializer()
+
+    class Meta:
+        model: User = User
+        fields: Union[str, list[str]] = [
+            "email",
+            "phone",
+            "password",
+            "re_password",
+            "profile",
+        ]
+
+    def validate(self, attrs: OrderedDict[str, Any]) -> OrderedDict[str, Any]:
+        password: str = attrs.get("password", "")
+        re_password: str = attrs.get("re_password", "")
+
+        if password != re_password:
+            raise ValidationError(PASSWORDS_DO_NOT_MATCH_ERROR, HTTP_400_BAD_REQUEST)
         return attrs
 
-    def create(self, validated_data)-> User:
+    def create(self, validated_data: dict[str, Any]) -> User:
         validated_data.pop("re_password")
-        '''creating a user with previously validated data'''
         return User.objects.create_user(**validated_data)
 
 
-class LoginSerializer(serializers.ModelSerializer):
-    '''class that serializes user login'''
-    email:str = serializers.EmailField(min_length=3,max_length=255)
-    password:str = serializers.CharField(min_length=8,
-        max_length=68, write_only=True)
+class LoginSerializer(ModelSerializer):
 
-    tokens = serializers.SerializerMethodField()
+    email: str = EmailField(min_length=3, max_length=255)
+    password: str = CharField(min_length=8, max_length=68, write_only=True)
 
-    def get_tokens(self, obj) -> dict:
-        '''function that issues jwt tokens for an authorized user'''
-        user = User.objects.get(email=obj['email'])
-        return {
-            'refresh': user.tokens()['refresh'],
-            'access': user.tokens()['access']
-        }
+    tokens = SerializerMethodField()
+
+    def get_tokens(self, obj) -> dict[str, str]:
+        user: User = User.get_all().get(email=obj["email"])
+        return {"refresh": user.tokens()["refresh"], "access": user.tokens()["access"]}
 
     class Meta:
-        model = User
-        fields = ['email', 'password', 'tokens']
+        model: User = User
+        fields: Union[str, list[str]] = [
+            "email",
+            "password",
+            "tokens",
+        ]
 
-    def validate(self, attrs) -> OrderedDict or Exception:
-        '''data validation function for user authorization'''
-        email:str = attrs.get('email', '')
-        password:str = attrs.get('password', '')
-        user:User = auth.authenticate(email=email, password=password)
+    def validate(
+        self, attrs: OrderedDict
+    ) -> Union[ValidationError, dict[str, str], OrderedDict]:
+        """data validation function for user authorization"""
+        email: str = attrs.get("email", "")
+        password: str = attrs.get("password", "")
+        user: User = auth.authenticate(email=email, password=password)
         if not user:
-            raise serializers.ValidationError(INVALID_CREDENTIALS_ERROR,status.HTTP_400_BAD_REQUEST)
-        return {
-            'email': user.email,
-            'tokens': user.tokens
-        }
+            raise ValidationError(INVALID_CREDENTIALS_ERROR, HTTP_400_BAD_REQUEST)
+        return {"email": user.email, "tokens": user.tokens}
 
         return super().validate(attrs)
 
 
 class UserSerializer(DynamicFieldsModelSerializer):
-    '''user pricate and public profile serializer'''
-    profile:Profile = ProfileSerializer()
+
+    profile: Profile = ProfileSerializer()
+
     class Meta:
-        model = User
-        fields = ('email','role','phone','is_verified','raiting','profile','configuration')
+        model: User = User
+        fields: Union[str, list[str]] = [
+            "id",
+            "email",
+            "role",
+            "phone",
+            "is_verified",
+            "is_online",
+            "raiting",
+            "configuration",
+            "profile",
+        ]
 
 
-class ProfileListSerializer(serializers.ModelSerializer):
+class ProfileListSerializer(ModelSerializer):
     class Meta:
-        model =  Profile
-        fields = ('id','name','last_name','avatar','position','gender','age')
+        model: Profile = Profile
+        fields: Union[str, list[str]] = [
+            "id",
+            "name",
+            "last_name",
+            "avatar_url",
+            "position",
+            "gender",
+            "age",
+        ]
 
-class UsersListSerializer(serializers.ModelSerializer):
+
+class UsersListSerializer(ModelSerializer):
     profile = ProfileListSerializer()
-    class Meta:
-        model =  User
-        fields = ('profile','raiting','role')
-
-
-class EmailSerializer(serializers.Serializer):
-    email:str = serializers.EmailField(min_length=3,max_length=255)
 
     class Meta:
-        fields = ('email',)
+        model: User = User
+        fields: Union[str, list[str]] = [
+            "id",
+            "raiting",
+            "role",
+            "is_online",
+            "profile",
+        ]
 
-        
-class RequestChangePhoneSerializer(serializers.ModelSerializer):
+
+class ProfileListDetailSerializer(ModelSerializer):
+    class Meta:
+        model: Profile = Profile
+        fields: Union[str, list[str]] = [
+            "id",
+            "name",
+            "last_name",
+            "gender",
+            "birthday",
+            "age",
+            "height",
+            "weight",
+            "position",
+            "created_at",
+            "about_me",
+            "working_leg",
+            "avatar_url",
+            "place",
+        ]
+
+
+class UsersListDetailSerializer(ModelSerializer):
+    profile = ProfileListDetailSerializer()
 
     class Meta:
-        model =  User
-        fields = ('phone',)
-
-class RequestChangePasswordSerializer(serializers.Serializer):
-    new_password:str = serializers.CharField(
-        min_length=8, max_length=68)
-    old_password:str = serializers.CharField(
-        min_length=8, max_length=68)
-
-    class Meta:
-        fields = ('new_password','old_password')
+        model: User = User
+        exclude: Union[str, list[str]] = [
+            "password",
+        ]
 
 
-class ResetPasswordSerializer(serializers.Serializer):
-    new_password:str = serializers.CharField(
-        min_length=8, max_length=68, write_only=True)
-    verify_code:str = serializers.CharField(
-        min_length=5,max_length=5, write_only=True)
+class EmailSerializer(Serializer):
+    email: str = EmailField(min_length=3, max_length=255)
 
     class Meta:
-        validators = [CodeValidator(token_type = PASSWORD_RESET_CODE_TYPE)]
-        fields = ('verify_code','new_password')
+        fields: Union[str, list[str]] = [
+            "email",
+        ]
 
 
-class CheckCodeSerializer(serializers.Serializer):
-    verify_code:str = serializers.CharField(
-        min_length=5,max_length=5, write_only=True)
-
-    class Meta:
-        validators = [CodeValidator(token_type = [PASSWORD_CHANGE_CODE_TYPE,EMAIL_CHANGE_CODE_TYPE,
-        EMAIL_VERIFY_CODE_TYPE,PHONE_CHANGE_CODE_TYPE,ACCOUNT_DELETE_CODE_TYPE])]
-        fields = ('verify_code',)
-
-
-class CheckUserActiveSerializer(serializers.Serializer):
-    user_id:int = serializers.IntegerField(min_value=0)
+class RequestChangePasswordSerializer(Serializer):
+    new_password: str = CharField(min_length=8, max_length=68)
+    old_password: str = CharField(min_length=8, max_length=68)
 
     class Meta:
-        fields = ('user_id',)
+        fields: Union[str, list[str]] = [
+            "new_password",
+            "old_password",
+        ]
 
-    def validate(self,attrs) -> OrderedDict or Exception:
-        user_id:int = attrs.get('user_id')
+
+class ResetPasswordSerializer(Serializer):
+    new_password: str = CharField(min_length=8, max_length=68, write_only=True)
+    verify_code: str = CharField(min_length=5, max_length=5, write_only=True)
+
+    class Meta:
+        validators = [CodeValidator(token_type=PASSWORD_RESET_CODE_TYPE)]
+        fields: Union[str, list[str]] = [
+            "verify_code",
+            "new_password",
+        ]
+
+
+class ValidateResetPasswordCodeSerializer(Serializer):
+    verify_code: str = CharField(min_length=5, max_length=5, write_only=True)
+
+    class Meta:
+        validators = [CodeValidator(token_type=PASSWORD_RESET_CODE_TYPE)]
+        fields: Union[str, list[str]] = [
+            "verify_code",
+        ]
+
+
+class ValidatePhoneByUniqueSerializer(ModelSerializer):
+    class Meta:
+        model: User = User
+        fields: Union[str, list[str]] = [
+            "phone",
+        ]
+
+
+class CheckCodeSerializer(Serializer):
+    verify_code: str = CharField(min_length=5, max_length=5, write_only=True)
+
+    class Meta:
+        validators = [
+            CodeValidator(
+                token_type=[
+                    PASSWORD_CHANGE_CODE_TYPE,
+                    EMAIL_CHANGE_CODE_TYPE,
+                    EMAIL_VERIFY_CODE_TYPE,
+                    ACCOUNT_DELETE_CODE_TYPE,
+                ]
+            )
+        ]
+        fields: Union[str, list[str]] = [
+            "verify_code",
+        ]
+
+
+class CheckUserActiveSerializer(Serializer):
+    user_id: int = IntegerField(min_value=0)
+
+    class Meta:
+        fields: Union[str, list[str]] = [
+            "user_id",
+        ]
+
+    def validate(self, attrs: OrderedDict[str, Any]) -> OrderedDict[str, Any]:
+        user_id: int = attrs.get("user_id")
         try:
-            User.objects.get(id = user_id)
+            User.get_all().get(id=user_id)
             return super().validate(attrs)
         except User.DoesNotExist:
-            raise serializers.ValidationError(NO_SUCH_USER_ERROR,status.HTTP_400_BAD_REQUEST)
+            raise _404(object=User)

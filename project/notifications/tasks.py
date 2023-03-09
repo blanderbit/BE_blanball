@@ -1,37 +1,106 @@
-from project.celery import app
-from notifications.models import Notification
-from authentication.models  import User,ActiveUser
-from authentication.tasks import Util
-from events.models import Event
-
-from django.template.loader import render_to_string
+from datetime import datetime
+from typing import Any, Union
 
 from asgiref.sync import async_to_sync
+from authentication.models import User
 from channels.layers import get_channel_layer
+from config.celery import app
+from django.db.models import QuerySet
+from django.utils import timezone
+from notifications.constants.notification_types import (
+    ALL_USER_NOTIFICATIONS_DELETED_NOTIFICATION_TYPE,
+    ALL_USER_NOTIFICATIONS_READED_NOTIFICATION_TYPE,
+    CHANGE_MAINTENANCE_NOTIFICATION_TYPE,
+)
+from notifications.models import Notification
 
-def send_to_user(user:User,notification_text:str,message_type:str) -> None:
-    channel_layer = get_channel_layer()
-    Notification.objects.create(user=user,notification_text=f'{notification_text}')
-    if ActiveUser.objects.filter(user = user.id):
-        async_to_sync(channel_layer.group_send)(
-            user.group_name,
-            {
-                'type': 'kafka.message',
-                'message': notification_text,
-                'message_type': message_type, 
-            }
+
+@app.task(
+    ignore_result=True,
+    time_limit=5,
+    soft_time_limit=3,
+    default_retry_delay=5,
+)
+def send(user: User, data: dict[str, Any]) -> None:
+    async_to_sync(get_channel_layer().group_send)(user.group_name, data)
+
+
+def send_to_user(
+    user: User,
+    message_type: str,
+    data: dict[str, Union[str, int, datetime, bool]] = None,
+) -> None:
+    if message_type != CHANGE_MAINTENANCE_NOTIFICATION_TYPE:
+        notification = Notification.objects.create(
+            user=user, message_type=message_type, data=data
         )
-    # else:
-    #     if user.configuration['send_email']:
-    #         # context = ({'code': list(code.verify_code),'name':user.profile.name,'surname':user.profile.last_name})
-    #         template = render_to_string('email_code.html')
-    #         Util.send_email.delay(data = {'email_body': template,
-    #         'to_email': user.email})
+    send(
+        user=user,
+        data={
+            "type": "kafka.message",
+            "message": {
+                "message_type": message_type,
+                "notification_id": notification.id,
+                "data": data,
+            },
+        },
+    )
 
 
+@app.task(
+    ignore_result=True,
+    time_limit=5,
+    soft_time_limit=3,
+    default_retry_delay=5,
+)
+def read_all_user_notifications(*, request_user_id: int) -> None:
+    user_notifications: QuerySet[Notification] = Notification.get_all().filter(
+        user_id=request_user_id, type=Notification.Type.UNREAD
+    )
+    if len(user_notifications) > 0:
+        user_notifications.update(type=Notification.Type.READ)
+        try:
+            send(
+                user=User.objects.get(id=request_user_id),
+                data={
+                    "type": "kafka.message",
+                    "message": {
+                        "message_type": ALL_USER_NOTIFICATIONS_READED_NOTIFICATION_TYPE,
+                    },
+                },
+            )
+        except User.DoesNotExist:
+            pass
 
-def send_notification_to_subscribe_event_user(event:Event,notification_text:str,message_type:str) -> None:
-    for user in event.current_users.all():
-        send_to_user(user=user,notification_text=notification_text,message_type=message_type)
-    for fan in event.fans.all():
-        send_to_user(user=fan,notification_text=notification_text,message_type=message_type)
+
+@app.task(
+    ignore_result=True,
+    time_limit=5,
+    soft_time_limit=3,
+    default_retry_delay=5,
+)
+def delete_all_user_notifications(*, request_user_id: int) -> None:
+    user_notifications: QuerySet[Notification] = Notification.get_all().filter(
+        user_id=request_user_id
+    )
+    if len(user_notifications) > 0:
+        user_notifications.delete()
+        try:
+            send(
+                user=User.objects.get(id=request_user_id),
+                data={
+                    "type": "kafka.message",
+                    "message": {
+                        "message_type": ALL_USER_NOTIFICATIONS_DELETED_NOTIFICATION_TYPE,
+                    },
+                },
+            )
+        except User.DoesNotExist:
+            pass
+
+
+@app.task
+def delete_expire_notifications():
+    Notification.objects.filter(
+        time_created__lte=timezone.now() - timezone.timedelta(days=85)
+    )

@@ -1,7 +1,14 @@
-# syntax=docker/dockerfile:1.4
-FROM python:3.10
+FROM python:3.10.7
 
-ENV DJANGO_ENV=${DJANGO_ENV} \
+# `DJANGO_ENV` arg is used to make prod / dev builds:
+ARG DEPLOY \
+  # Needed for fixing permissions of files created by Docker:
+  UID=1000 \
+  GID=1000
+
+ENV DEPLOY=${DEPLOY} \
+  # project workind directory
+  APP_PATH='/usr/src/blanball' \
   # python:
   PYTHONFAULTHANDLER=1 \
   PYTHONUNBUFFERED=1 \
@@ -19,21 +26,53 @@ ENV DJANGO_ENV=${DJANGO_ENV} \
   POETRY_CACHE_DIR='/var/cache/pypoetry' \
   POETRY_HOME='/usr/local'
 
+# set project workind directory
+WORKDIR $APP_PATH
 
-WORKDIR /usr/src/blanball
+# Copy only requirements, to cache them in docker layer
+COPY ./poetry.lock ./pyproject.toml $APP_PATH/
 
-COPY . /usr/src/blanball
 
+RUN apt-get update && apt-get install -y gettext
+
+RUN apt-get update && apt-get upgrade -y \
+  && apt-get install --no-install-recommends -y \
+  && groupadd -g "${GID}" -r deploy \
+  && useradd -d $APP_PATH -g deploy -l -r -u "${UID}" deploy \
+  && chown deploy:deploy -R $APP_PATH \
+  #setup project with postgis + GeoDjango
+  && apt-get install -y gdal-bin libgdal-dev \
+  && apt-get install -y python3-gdal \
+  && apt-get install -y binutils libproj-dev
+
+# Installing `poetry` package manager:
+# https://github.com/python-poetry/poetry
 RUN pip install --upgrade pip\
-  &&pip install poetry=="$POETRY_VERSION"
+  &&pip install poetry=="$POETRY_VERSION" 
 
 ENV PATH "/root/.poetry/bin:/opt/venv/bin:${PATH}"
-  
+
 # Cleaning cache:
 RUN apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/* \
-    && echo "$DJANGO_ENV" \
-    && poetry version \
+    && poetry version 
     #Install deps:
+RUN target="$POETRY_CACHE_DIR" \
     &&poetry run pip install -U pip \
-    &&poetry install 
+    &&poetry install \
+      $(if [ "$DEPLOY" = 'true' ]; then echo '--no-root --only main'; fi) \
+      --no-interaction --no-ansi
+
+# copy ource code to project workind directory
+COPY . $APP_PATH
+
+
+# necessary so that a non-root user 
+# can edit the configuration file
+RUN chmod 777 project/config/config.json
+
+# necessary so that non-root users 
+# have the right to edit this file
+# it is edited when creating an 
+# api key through the console
+RUN chmod 777 api_key.json

@@ -1,27 +1,45 @@
-from .models import Notification
+from typing import Union
 
-from rest_framework import serializers
+from notifications.models import Notification
+from rest_framework.serializers import (
+    BooleanField,
+    IntegerField,
+    ModelSerializer,
+    Serializer,
+)
 
-class NotificationSerializer(serializers.ModelSerializer):
+
+class NotificationSerializer(ModelSerializer):
     class Meta:
-        model = Notification
-        fields = '__all__'
+        model: Notification = Notification
+        fields: Union[str, list[str]] = "__all__"
 
 
-class UserNotificationSerializer(serializers.ModelSerializer):
+class UserNotificationSerializer(ModelSerializer):
     class Meta:
-        model = Notification
-        fields = ('notification_text','time_created')
+        model: Notification = Notification
+        fields: Union[str, list[str]] = [
+            "id",
+            "type",
+            "time_created",
+        ]
 
 
-class ReadOrDeleteNotificationsSerializer(serializers.Serializer):
-    notifications = serializers.ListField(child=serializers.IntegerField(min_value=0))
+class UserNotificationsCount(Serializer):
+    all_notifications_count: int = IntegerField(min_value=0)
+    not_read_notifications_count: int = IntegerField(min_value=0)
 
     class Meta:
-        fields = ('notifications',)
+        fields: Union[str, list[str]] = [
+            "all_notifications_count",
+            "not_read_notifications_count",
+        ]
 
-class ChangeMaintenanceSerializer(serializers.Serializer):
-    isMaintenance = serializers.BooleanField() 
+
+class ChangeMaintenanceSerializer(Serializer):
+    isMaintenance: bool = BooleanField()
 
     class Meta:
-        fields = ('isMaintenance',)
+        fields: Union[str, list[str]] = [
+            "isMaintenance",
+        ]

@@ -1,0 +1,12 @@
+EN
+- Added autochange version logger
+- Added tags for version branches
+- Refactoring functions that give location by coordinates and coordinates by location name
+- Added changelogs for previous versions of the project
+- Fixed various minor bugs
+RU
+- Добавлен авточендж логер версий
+- Добавлены теги для веток версий
+- Рефакторинг функций которые отдают местоположение по координатам и координаты по имени местоположения
+- Добавлены ченджлоги для прошлых версий проекта
+- Исправлены разные не значительные баги

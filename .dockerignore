@@ -1,0 +1,10 @@
+__pycache__
+venv
+project/celerybeat-schedule
+changelog
+.vscode
+.git
+.github
+changelog
+.gitignore
+postgres-data

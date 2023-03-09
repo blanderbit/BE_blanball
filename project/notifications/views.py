@@ -1,108 +1,275 @@
 import json
-from webbrowser import GenericBrowser
+from typing import Any, Type
 
-from .tasks import send_to_user
-
-from .serializers import *
-from .models import *
-from project.constaints import *
-from project.services import CustomPagination
-
-from rest_framework import generics,status,filters
+from api_keys.permissions import ApiKeyPermission
+from config.openapi import (
+    skip_param_query,
+    offset_query
+)
+from config.pagination import (
+    paginate_by_offset
+)
+from config.serializers import (
+    BaseBulkDeleteSerializer,
+)
+from django.db.models.query import QuerySet
+from django.utils.decorators import (
+    method_decorator,
+)
+from drf_yasg.utils import swagger_auto_schema
+from events.services import (
+    skip_objects_from_response_by_id,
+)
+from notifications.constants.errors import (
+    MAINTENANCE_CAN_NOT_GET_ERROR,
+    MAINTENANCE_CAN_NOT_UPDATE_ERROR,
+)
+from notifications.constants.success import (
+    MAINTENANCE_UPDATED_SUCCESS,
+    NOTIFICATIONS_DELETED_SUCCESS,
+    NOTIFICATIONS_READED_SUCCESS,
+)
+from notifications.models import Notification
+from notifications.serializers import (
+    ChangeMaintenanceSerializer,
+    NotificationSerializer,
+    UserNotificationsCount,
+)
+from notifications.services import (
+    bulk_delete_notifications,
+    bulk_read_notifications,
+    update_maintenance,
+)
+from notifications.tasks import (
+    delete_all_user_notifications,
+    read_all_user_notifications,
+)
+from rest_framework.filters import OrderingFilter
+from rest_framework.generics import (
+    GenericAPIView,
+    ListAPIView,
+)
+from rest_framework.permissions import AllowAny
+from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.serializers import Serializer
+from rest_framework.status import (
+    HTTP_200_OK,
+    HTTP_400_BAD_REQUEST,
+)
+from rest_framework.views import APIView
 
 
-class NotificationsList(generics.ListAPIView):
-    serializer_class = NotificationSerializer
-    pagination_class = CustomPagination
-    filter_backends = (filters.OrderingFilter,)
-    ordering_fields = ('id',)
-    queryset = Notification.objects.all().order_by('-id')
+@method_decorator(swagger_auto_schema(
+    manual_parameters=[skip_param_query, offset_query]), 
+    name="get"
+)
+@paginate_by_offset
+class UserNotificationsList(ListAPIView):
+    """
+    List of user notifications
+
+    This endpoint allows the user to get a
+    complete list of his notifications, as
+    well as sort them by newest.
+    Allowed fields for sorting: 'id', '-id'
+    """
+
+    serializer_class: Type[Serializer] = NotificationSerializer
+    filter_backends = [
+        OrderingFilter,
+    ]
+    ordering_fields: list[str] = [
+        "id",
+    ]
+    queryset: QuerySet[Notification] = Notification.get_all()
+
+    @skip_objects_from_response_by_id
+    def get_queryset(self) -> QuerySet[Notification]:
+        return self.queryset.filter(user_id=self.request.user.id)
 
 
-class UserNotificationsList(NotificationsList):     
-    def get_queryset(self) -> list:
-        return self.queryset.filter(user_id = self.request.user.id)
+class UserNotificaitonsCount(GenericAPIView):
+    """
+    User notifications count
 
-class ReadNotifications(generics.GenericAPIView):
-    serializer_class = ReadOrDeleteNotificationsSerializer
-    queryset = Notification.objects.all()
-    
-    def post(self,request) -> Response:
+    This endpoint allows the user to get the
+    total number of his notifications, as well
+    as the number of unread notifications.
+
+    all_notifications_count - Number of all
+        notifications
+    not_read_notifications_count - Number of
+        unread notifications
+    """
+
+    queryset: QuerySet[Notification] = Notification.get_all()
+    serializer_class: Type[Serializer] = UserNotificationsCount
+
+    def get(self, request: Request) -> Response:
+        data: dict[str, int] = {
+            "all_notifications_count": self.queryset.filter(
+                user_id=self.request.user.id
+            ).count(),
+            "not_read_notifications_count": self.queryset.filter(
+                type=Notification.Type.UNREAD, user_id=self.request.user.id
+            ).count(),
+        }
+        serializer = self.serializer_class(data=data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.data)
+
+
+class ReadNotifications(GenericAPIView):
+    """
+    Read notifications
+
+    This endpoint allows the user to
+    read a certain number of notifications by ID.
+    Example:
+    {
+        "ids": [
+            1, 2, 3, 4, 5
+        ]
+    }
+    If the user who sent the request has unread
+    notifications under identifiers: 1,2,3,4,5
+    then they will be read.
+    """
+
+    serializer_class: Type[Serializer] = BaseBulkDeleteSerializer
+    queryset: QuerySet[Notification] = Notification.get_all()
+
+    def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        read:list = [] 
-        not_read:list = []
-        for notification in serializer.validated_data['notifications']:
-            notify = self.queryset.filter(id = notification)
-            if notify:
-                notify = self.queryset.get(id = notification)
-                if notify.type != 'Read':
-                    notify.type = 'Read'
-                    notify.save()
-                    read.append(notification)
-                else:
-                    not_read.append(notification) 
-            else:
-                not_read.append(notification)        
-        return Response({"read success": read, "read error": not_read},status=status.HTTP_200_OK)
-            
+        return Response(
+            bulk_read_notifications(
+                ids=serializer.validated_data["ids"],
+                user=request.user,
+            ),
+            status=HTTP_200_OK,
+        )
 
-class DeleteNotifcations(generics.GenericAPIView):
-    serializer_class = ReadOrDeleteNotificationsSerializer
-    queryset = Notification.objects.all()
 
-    def post(self,request) -> Response:
+class DeleteNotifcations(GenericAPIView):
+    """
+    Delete notifications
+
+    This endpoint allows the user to
+    delete a certain number of notifications by ID.
+    Example:
+    {
+        "ids": [
+            1, 2, 3, 4, 5
+        ]
+    }
+    If the user who sent the request has
+    notifications under identifiers: 1,2,3,4,5
+    then they will be delete.
+    """
+
+    serializer_class: Type[Serializer] = BaseBulkDeleteSerializer
+    queryset: QuerySet[Notification] = Notification.get_all()
+
+    def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        deleted:list = [] 
-        not_deleted:list = []
-        for notification in serializer.validated_data['notifications']:
-            notify =  self.queryset.filter(id = notification)
-            if notify:
-                notify = self.queryset.get(id = notification)
-                if notify.user == request.user:
-                    notify.delete()
-                    deleted.append(notification)
-                else:
-                    not_deleted.append(notification)
-            else:
-                not_deleted.append(notification)
-        return Response({"delete success": deleted, "delete error":  not_deleted},status=status.HTTP_200_OK)
+        return Response(
+            bulk_delete_notifications(
+                ids=serializer.validated_data["ids"],
+                user=request.user,
+            ),
+            status=HTTP_200_OK,
+        )
 
 
+class ChangeMaintenance(GenericAPIView):
+    """
+    Change maintenance
 
-class ChangeMaintenance(generics.GenericAPIView):
-    serializer_class = ChangeMaintenanceSerializer
+    This endpoint allows you to change the
+    current state of technical work in the application.
+    \nIf technical work is true then the client side of the
+    application will be blocked
+    """
 
-    def post(self,request) -> Response:
+    serializer_class: Type[Serializer] = ChangeMaintenanceSerializer
+    permission_classes = [
+        ApiKeyPermission,
+    ]
+
+    def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        data = request.data
         try:
-            with open('./project/project/config.json', 'w') as f:
-                json.dump(data,f)
-                for user in User.objects.all():
-                    if data["isMaintenance"] == True:
-                        notification_text=MAINTENANCE_TRUE_NOTIFICATION_TEXT.format(username=user.profile.name,last_name=user.profile.last_name)
-                    else:
-                        notification_text=MAINTENANCE_FALSE_NOTIFICATION_TEXT.format(username=user.profile.name,last_name=user.profile.last_name)
-                    send_to_user(user = user,notification_text=notification_text,message_type=CHANGE_MAINTENANCE_MESSAGE_TYPE)
-            return Response(MAINTENANCE_UPDATED_SUCCESS,status=status.HTTP_200_OK)
-        except:
-            return Response(MAINTENANCE_CAN_NOT_UPDATE_ERROR,status=status.HTTP_400_BAD_REQUEST)
+            update_maintenance(data=request.data)
+            return Response(MAINTENANCE_UPDATED_SUCCESS, status=HTTP_200_OK)
+        except FileNotFoundError:
+            return Response(
+                MAINTENANCE_CAN_NOT_UPDATE_ERROR, status=HTTP_400_BAD_REQUEST
+            )
 
 
-class GetMaintenance(generics.GenericAPIView):
-    key:str = 'isMaintenance'
+class GetMaintenance(APIView):
+    """
+    Get maintenance
 
-    def get(self,request) -> Response:
+    This endpoint allows the user to get the
+    current state of the technical work
+    of the application.
+    If technical work is true then the
+    client side of the application will be blocked
+    """
+
+    key: str = "isMaintenance"
+    permission_classes = [AllowAny]
+
+    def get(self, request: Request) -> Response:
         try:
-            with open('./project/project/config.json', 'r') as f:
+            with open("./config/config.json", "r") as f:
                 data = f.read()
-            return Response({self.key:json.loads(data)[self.key]},status=status.HTTP_200_OK)
-        except:
-            return Response(CONFIG_FILE_ERROR,status=status.HTTP_400_BAD_REQUEST)
+            return Response({self.key: json.loads(data)[self.key]}, status=HTTP_200_OK)
+        except FileNotFoundError:
+            return Response(MAINTENANCE_CAN_NOT_GET_ERROR, status=HTTP_400_BAD_REQUEST)
+
 
 class GetCurrentVersion(GetMaintenance):
-    key:str = 'version'
+    """
+    Get current version
+
+    This endpoint allows any user to get
+    the current version of the application.
+    """
+
+    key: str = "version"
+
+
+class DeleteAllUserNotifications(APIView):
+    """
+    Delete all notifications
+
+    This endpoint allows the user to
+    delete all his notifications at once.
+    """
+
+    queryset: QuerySet[Notification] = Notification.get_all()
+
+    def delete(self, request: Request) -> Response:
+        delete_all_user_notifications.delay(request_user_id=request.user.id)
+        return Response(NOTIFICATIONS_DELETED_SUCCESS, status=HTTP_200_OK)
+
+
+class ReadAllUserNotifications(APIView):
+    """
+    Read all notifcations
+
+    This endpoint allows the user to
+    read all his notifications at once.
+    """
+
+    queryset: QuerySet[Notification] = Notification.get_all()
+
+    def get(self, request: Request) -> Response:
+        read_all_user_notifications.delay(request_user_id=request.user.id)
+        return Response(NOTIFICATIONS_READED_SUCCESS, status=HTTP_200_OK)

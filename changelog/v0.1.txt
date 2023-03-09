@@ -1,0 +1,22 @@
+EN
+- Big code review
+- Proxy server for pgadmin, api and wsockets
+- Fixed a bug when the user could invite the author to the event
+- Fixed a bug when a user could go to an event that has already ended
+- Added project auto testing
+- Updated tests for the authentication block
+- Updated tests for the events block
+- Translated the text of errors and notifications into English
+- Fixed text for most notifications
+- Changed the names of tables in the database
+RU
+- Большое ревью кода
+- Прокси сервер для pgadmin, api and wsockets
+- Исправлены баг когда пользователь мог пригласить на событие автора
+- Исправлен баг когда пользователь мог зайти на событие которое уже закончилось
+- Добавлено авто тестирование проекта
+- Обновлены тесты для блока authentication
+- Обновлены тесты для блока events
+- Переведены текста ошибок и нотификаций на англиский язык
+- Исправлены текста для большинства нотификаций
+- Изменены названия таблиц в базe

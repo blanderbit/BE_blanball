@@ -1,115 +1,171 @@
-version: "3.8"
+version: '3.8'
 
-services: 
-  db:
-    container_name: db-prod
-    image: "postgres:latest"
+x-api-common: &api-common
+    image: registry.it-flumx.com/flumx_te_blanball_be_prod:latest
+
     env_file:
-      - stack.env
-    volumes:
-      - ./postgres-data:/var/lib/postgresql/data
-    healthcheck:
-      test: pg_isready -U postgres -d postgres
-      timeout: 40s
-      retries: 20
-    networks:
-      - app-network
-      
-  api:
-    container_name: api-prod
-    env_file:
-      - stack.env
-    image: registry.it-flumx.com/flumx_prod_blanball_be:latest
-    command: bash compose/local/django-start.sh
-    ports:
-      - "49205:8000"
+        - stack.env
+    entrypoint: scripts/entrypoint.sh
+
     depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+        db:
+            condition: service_healthy
+        redis-prod:
+            condition: service_healthy
     networks:
-      - app-network    
+        - app-network
     links:
-     - redis
-     
-  redis:
-    container_name: redis-prod
-    env_file:
-      - stack.env
-    image: redis:latest
-    volumes:
-      - redis-data:/usr/src/blanball/storage/redis/data
-    networks:
-      - app-network  
-    healthcheck:
-      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
-      timeout: 3s
-      retries: 5
+        - redis-prod
 
-  celery-worker:
-    env_file:
-      - stack.env
-    container_name: celery-worker-prod
-    image: registry.it-flumx.com/flumx_prod_blanball_be:latest
-    restart: always
-    command: bash compose/local/celery-worker-start.sh
-    volumes: 
-      - celery-worker-data:/usr/src/blanball/storage/celery-worker/data
-    networks:
-      - app-network  
-    depends_on:
-      redis:
-        condition: service_healthy
+services:
+    proxy-prod:
+        container_name: proxy-prod
+        env_file:
+            - stack.env
+        image: registry.it-flumx.com/blanball-proxy:latest
+        ports:
+            - 50000:80
+        networks:
+            - app-network
+        depends_on:
+            api-prod:
+                condition: service_started
 
-  celery-beat:
-    env_file:
-      - stack.env
-    container_name: celery-beat-prod
-    image: registry.it-flumx.com/flumx_prod_blanball_be:latest
-    restart: always 
-    command: bash compose/local/celery-beat-start.sh
-    volumes: 
-      - celery-beat-data:/usr/src/blanball/storage/celery-beat/data
-    networks:
-      - app-network
-    depends_on:
-      redis:
-        condition: service_healthy
+    api-prod:
+        <<: *api-common
+        container_name: api-prod
+        command: api-deploy
+        user: deploy
+        labels:
+          - "traefik.enable=true"
+          ## HTTP
+          - "traefik.http.routers.api-prod-web.entrypoints=web"
+          - "traefik.http.routers.api-prod-web.rule=Host(`api.blanball.com`) && PathPrefix(`/api`)"
+          - "traefik.http.services.api-prod.loadbalancer.server.port=8000"
+          ## Redirect  
+          - "traefik.http.middlewares.api-prod-redirect-web-secure.redirectscheme.scheme=https"
+          - "traefik.http.routers.api-prod-web.middlewares=api-prod-redirect-web-secure"
+          ## HTTPS
+          - "traefik.http.routers.api-prod-web-secure.entrypoints=web-secure"
+          - "traefik.http.routers.api-prod-secure.rule=Host(`api-prod.blanball.com`) && PathPrefix(`/api`)"
+          - "traefik.http.routers.api-prod-web-secure.tls=true"
+          - "traefik.http.routers.api-prod-web-secure.tls.certResolver=sample"
+        
+    daphne-prod:
+        <<: *api-common
+        container_name: daphne-prod
+        command: daphne
+        user: deploy
+        labels:
+          - "traefik.enable=true"
+          ## HTTP
+          - "traefik.http.routers.daphne-prod-web.entrypoints=web"
+          - "traefik.http.routers.daphne-prod-web.rule=Host(`api.blanball.com`) && PathPrefix(`/ws`)"
+          - "traefik.http.services.daphne-prod.loadbalancer.server.port=10000"
+          ## Redirect  
+          - "traefik.http.middlewares.daphne-prod-redirect-web-secure.redirectscheme.scheme=https"
+          - "traefik.http.routers.daphne-prod-web.middlewares=daphne-prod-redirect-web-secure"
+          ## HTTPS
+          - "traefik.http.routers.daphne-prod-web-secure.entrypoints=web-secure"
+          - "traefik.http.routers.daphne-prod-secure.rule=Host(`api.blanball.com`) && PathPrefix(`/ws`)"
+          - "traefik.http.routers.daphne-prod-web-secure.tls=true"
+          - "traefik.http.routers.daphne-prod-web-secure.tls.certResolver=sample"
+        
+    celery-worker-prod:
+        <<: *api-common
+        container_name: celery-worker-prod
+        user: deploy
+        command: celery-worker-prod
 
-  # pgadmin:
-  #   container_name: pgadmin
-  #   env_file:
-  #     - stack.env
-  #   image: dpage/pgadmin4
-  #   volumes:
-  #     - pgadmin-data:/usr/src/blanball/storage/pgadmin/data
-  #   ports:
-  #     - "49201:80"
-  #   networks:
-  #     - app-network
+    celery-beat-prod:
+        <<: *api-common
+        container_name: celery-beat-prod
+        command: celery-beat-prod
 
-  db_backup:
-    container_name: db-backup-prod
-    env_file:
-      - stack.env
-    image: prodrigestivill/postgres-backup-local
-    restart: always
-    volumes:
-      - db-backup-data:/usr/src/blanball/storage/db-backup/data
-    networks:
-      - app-network
-    depends_on:
-      db:
-        condition: service_started
-    
+    db-prod:
+        container_name: db-prod
+        env_file:
+            - stack.env
+        image: postgis/postgis:latest
+        restart: always
+        volumes:
+            - db-data:/var/lib/postgresql/data
+        networks:
+            - app-network
+        healthcheck:
+            test: pg_isready -U postgres -d postgres
+            timeout: 5s
+            retries: 20
+
+    redis-prod:
+        container_name: redis-prod
+        env_file:
+            - stack.env
+        image: redis:latest
+        restart: always
+        volumes:
+            - redis-data:/usr/src/blanball/storage/redis/data
+        networks:
+            - app-network
+        healthcheck:
+            test: ['CMD-SHELL', 'redis-cli ping | grep PONG']
+            timeout: 3s
+            retries: 5
+
+    pgadmin-prod:
+        container_name: pgadmin-prod
+        env_file:
+            - stack.env
+        image: dpage/pgadmin4:latest
+        restart: always
+        volumes:
+            - pgadmin-data:/usr/src/blanball/storage/pgadmin/data
+        networks:
+            - app-network
+        ports:
+            - 49283:${PGADMIN_LISTEN_PORT}
+
+    db_backup-prod:
+        container_name: db_backup-prod
+        env_file:
+            - stack.env
+        image: prodrigestivill/postgres-backup-local
+        restart: always
+        volumes:
+            - db-backup-data:/usr/src/blanball/storage/db-backup/data
+        networks:
+            - app-network
+        depends_on:
+            db-prod:
+                condition: service_started
+
+    minio-prod:
+        container_name: minio-prod
+        env_file:
+            - stack.env
+        image: minio/minio
+        volumes:
+            - minio-data:/minio-data
+        command: 'minio server /minio-data --console-address ":9001"'
+        ports:
+            - 49292:9000
+            - 49293:9001
+        healthcheck:
+            test:
+                ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+            interval: 30s
+            timeout: 20s
+            retries: 3
+        networks:
+            - app-network
+
 networks:
-  app-network:
-     driver: bridge    
-     
+    app-network:
+        driver: bridge
+
 volumes:
-  redis-data:
-  # pgadmin-data:
-  celery-worker-data:
-  celery-beat-data:
-  db-backup-data:
+    redis-data:
+    pgadmin-data:
+    db-backup-data:
+    minio-data:
+    db-data:

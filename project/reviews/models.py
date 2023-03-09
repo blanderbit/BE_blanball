@@ -1,16 +1,89 @@
 from datetime import datetime
-from authentication.models import User
+from typing import final
 
+from authentication.models import User
+from django.core.validators import (
+    MaxValueValidator,
+    MinValueValidator,
+)
 from django.db import models
-from django.core.validators import MaxValueValidator,MinValueValidator
+from django.db.models.query import QuerySet
+from events.models import Event
+
 
 class Review(models.Model):
-    email:str = models.EmailField(max_length=255,db_index=True)
-    text:str =  models.CharField(max_length=200)
-    time_created:datetime = models.DateTimeField(auto_now_add=True)
-    stars:int =  models.PositiveSmallIntegerField(validators=[MinValueValidator(1),MaxValueValidator(5)])
-    user:int =  models.ForeignKey(User,on_delete=models.PROTECT,related_name='reviews')
+    author: User = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="author"
+    )
+    text: str = models.CharField(max_length=200)
+    time_created: datetime = models.DateTimeField(auto_now_add=True)
+    stars: int = models.PositiveSmallIntegerField(
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(5),
+        ]
+    )
+    user: User = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="reviews"
+    )
 
-    def __str__(self):
-        return self.email
-        
+    @final
+    def __repr__(self) -> str:
+        return "<Review %s>" % self.id
+
+    @final
+    @staticmethod
+    def get_all() -> QuerySet["Review"]:
+        """
+        getting all records with optimized selection from the database
+        """
+        return Review.objects.select_related("user", "author")
+
+    @final
+    def __str__(self) -> str:
+        return str(self.id)
+
+    class Meta:
+        # the name of the table in the database for this model
+        db_table: str = "review"
+        verbose_name: str = "review"
+        verbose_name_plural: str = "reviews"
+        # sorting database records for this model by default
+        ordering: list[str] = ["-id"]
+
+
+class EventReview(models.Model):
+    author: User = models.ForeignKey(User, on_delete=models.CASCADE)
+    text: str = models.CharField(max_length=200, null=True)
+    time_created: datetime = models.DateTimeField(auto_now_add=True)
+    stars: int = models.PositiveSmallIntegerField(
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(5),
+        ]
+    )
+    event: Event = models.ForeignKey(Event, on_delete=models.CASCADE)
+
+    @final
+    def __repr__(self) -> str:
+        return "<EventReview %s>" % self.id
+
+    @final
+    @staticmethod
+    def get_all() -> QuerySet["EventReview"]:
+        """
+        getting all records with optimized selection from the database
+        """
+        return EventReview.objects.select_related("user", "event")
+
+    @final
+    def __str__(self) -> str:
+        return str(self.id)
+
+    class Meta:
+        # the name of the table in the database for this model
+        db_table: str = "event_review"
+        verbose_name: str = "event review"
+        verbose_name_plural: str = "event reviews"
+        # sorting database records for this model by default
+        ordering: list[str] = ["-id"]
