@@ -22,7 +22,7 @@ services:
         container_name: proxy
         env_file:
             - stack.env
-        image: registry.it-flumx.com/blanball-proxy:latest
+        image: registry.it-flumx.com/blanball-proxy-test:latest
         ports:
             - 49299:80
         networks:
