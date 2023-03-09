@@ -1,7 +1,7 @@
 version: '3.8'
 
 x-api-common: &api-common
-    image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
+    image: registry.it-flumx.com/flumx_te_blanball_be_prod:latest
 
     env_file:
         - stack.env
@@ -10,80 +10,80 @@ x-api-common: &api-common
     depends_on:
         db:
             condition: service_healthy
-        redis:
+        redis-prod:
             condition: service_healthy
     networks:
         - app-network
     links:
-        - redis
+        - redis-prod
 
 services:
-    proxy:
-        container_name: proxy
+    proxy-prod:
+        container_name: proxy-prod
         env_file:
             - stack.env
         image: registry.it-flumx.com/blanball-proxy:latest
         ports:
-            - 49299:80
+            - 50000:80
         networks:
             - app-network
         depends_on:
-            api:
+            api-prod:
                 condition: service_started
 
-    api:
+    api-prod:
         <<: *api-common
-        container_name: api
+        container_name: api-prod
         command: api-deploy
         user: deploy
         labels:
           - "traefik.enable=true"
           ## HTTP
-          - "traefik.http.routers.api-web.entrypoints=web"
-          - "traefik.http.routers.api-web.rule=Host(`api.blanball.com`) && PathPrefix(`/api`)"
-          - "traefik.http.services.api.loadbalancer.server.port=8000"
+          - "traefik.http.routers.api-prod-web.entrypoints=web"
+          - "traefik.http.routers.api-prod-web.rule=Host(`api.blanball.com`) && PathPrefix(`/api`)"
+          - "traefik.http.services.api-prod.loadbalancer.server.port=8000"
           ## Redirect  
-          - "traefik.http.middlewares.api-redirect-web-secure.redirectscheme.scheme=https"
-          - "traefik.http.routers.api-web.middlewares=api-redirect-web-secure"
+          - "traefik.http.middlewares.api-prod-redirect-web-secure.redirectscheme.scheme=https"
+          - "traefik.http.routers.api-prod-web.middlewares=api-prod-redirect-web-secure"
           ## HTTPS
-          - "traefik.http.routers.api-web-secure.entrypoints=web-secure"
-          - "traefik.http.routers.api-secure.rule=Host(`api.blanball.com`) && PathPrefix(`/api`)"
-          - "traefik.http.routers.api-web-secure.tls=true"
-          - "traefik.http.routers.api-web-secure.tls.certResolver=sample"
+          - "traefik.http.routers.api-prod-web-secure.entrypoints=web-secure"
+          - "traefik.http.routers.api-prod-secure.rule=Host(`api-prod.blanball.com`) && PathPrefix(`/api`)"
+          - "traefik.http.routers.api-prod-web-secure.tls=true"
+          - "traefik.http.routers.api-prod-web-secure.tls.certResolver=sample"
         
-    daphne:
+    daphne-prod:
         <<: *api-common
-        container_name: daphne
+        container_name: daphne-prod
         command: daphne
         user: deploy
         labels:
           - "traefik.enable=true"
           ## HTTP
-          - "traefik.http.routers.daphne-web.entrypoints=web"
-          - "traefik.http.routers.daphne-web.rule=Host(`api.blanball.com`) && PathPrefix(`/ws`)"
-          - "traefik.http.services.daphne.loadbalancer.server.port=10000"
+          - "traefik.http.routers.daphne-prod-web.entrypoints=web"
+          - "traefik.http.routers.daphne-prod-web.rule=Host(`api.blanball.com`) && PathPrefix(`/ws`)"
+          - "traefik.http.services.daphne-prod.loadbalancer.server.port=10000"
           ## Redirect  
-          - "traefik.http.middlewares.daphne-redirect-web-secure.redirectscheme.scheme=https"
-          - "traefik.http.routers.daphne-web.middlewares=daphne-redirect-web-secure"
+          - "traefik.http.middlewares.daphne-prod-redirect-web-secure.redirectscheme.scheme=https"
+          - "traefik.http.routers.daphne-prod-web.middlewares=daphne-prod-redirect-web-secure"
           ## HTTPS
-          - "traefik.http.routers.daphne-web-secure.entrypoints=web-secure"
-          - "traefik.http.routers.daphne-secure.rule=Host(`api.blanball.com`) && PathPrefix(`/ws`)"
-          - "traefik.http.routers.daphne-web-secure.tls=true"
-          - "traefik.http.routers.daphne-web-secure.tls.certResolver=sample"
+          - "traefik.http.routers.daphne-prod-web-secure.entrypoints=web-secure"
+          - "traefik.http.routers.daphne-prod-secure.rule=Host(`api.blanball.com`) && PathPrefix(`/ws`)"
+          - "traefik.http.routers.daphne-prod-web-secure.tls=true"
+          - "traefik.http.routers.daphne-prod-web-secure.tls.certResolver=sample"
         
-    celery-worker:
+    celery-worker-prod:
         <<: *api-common
-        container_name: celery-worker
+        container_name: celery-worker-prod
         user: deploy
-        command: celery-worker
+        command: celery-worker-prod
 
-    celery-beat:
+    celery-beat-prod:
         <<: *api-common
-        container_name: celery-beat
-        command: celery-beat
+        container_name: celery-beat-prod
+        command: celery-beat-prod
 
-    db:
-        container_name: db
+    db-prod:
+        container_name: db-prod
         env_file:
             - stack.env
         image: postgis/postgis:latest
@@ -97,8 +97,8 @@ services:
             timeout: 5s
             retries: 20
 
-    redis:
-        container_name: redis
+    redis-prod:
+        container_name: redis-prod
         env_file:
             - stack.env
         image: redis:latest
@@ -112,8 +112,8 @@ services:
             timeout: 3s
             retries: 5
 
-    pgadmin:
-        container_name: pgadmin
+    pgadmin-prod:
+        container_name: pgadmin-prod
         env_file:
             - stack.env
         image: dpage/pgadmin4:latest
@@ -123,10 +123,10 @@ services:
         networks:
             - app-network
         ports:
-            - 49280:${PGADMIN_LISTEN_PORT}
+            - 49283:${PGADMIN_LISTEN_PORT}
 
-    db_backup:
-        container_name: db_backup
+    db_backup-prod:
+        container_name: db_backup-prod
         env_file:
             - stack.env
         image: prodrigestivill/postgres-backup-local
@@ -136,11 +136,11 @@ services:
         networks:
             - app-network
         depends_on:
-            db:
+            db-prod:
                 condition: service_started
 
-    minio:
-        container_name: minio
+    minio-prod:
+        container_name: minio-prod
         env_file:
             - stack.env
         image: minio/minio
@@ -148,8 +148,8 @@ services:
             - minio-data:/minio-data
         command: 'minio server /minio-data --console-address ":9001"'
         ports:
-            - 49291:9000
-            - 49292:9001
+            - 49292:9000
+            - 49293:9001
         healthcheck:
             test:
                 ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
