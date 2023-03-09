@@ -1,7 +1,7 @@
 version: '3.8'
 
 x-api-common: &api-common
-    image: registry.it-flumx.com/flumx_te_blanball_be_prod:latest
+    image: registry.it-flumx.com/flumx_blanball_be_prod:latest
 
     env_file:
         - stack.env
