@@ -148,8 +148,8 @@ services:
             - minio-data-prod:/minio-data-prod
         command: 'minio server /minio-data-prod --console-address ":9001"'
         ports:
-            - 49292:9000
-            - 49293:9001
+            - 49293:9000
+            - 49294:9001
         healthcheck:
             test:
                 ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
