@@ -8,12 +8,12 @@ x-api-common: &api-common
     entrypoint: scripts/entrypoint.sh
 
     depends_on:
-        db:
+        db-prod:
             condition: service_healthy
         redis-prod:
             condition: service_healthy
     networks:
-        - app-network
+        - app-network-prod
     links:
         - redis-prod
 
@@ -26,7 +26,7 @@ services:
         ports:
             - 50000:80
         networks:
-            - app-network
+            - app-network-prod
         depends_on:
             api-prod:
                 condition: service_started
@@ -89,9 +89,9 @@ services:
         image: postgis/postgis:latest
         restart: always
         volumes:
-            - db-data:/var/lib/postgresql/data
+            - db-data-prod:/var/lib/postgresql/data
         networks:
-            - app-network
+            - app-network-prod
         healthcheck:
             test: pg_isready -U postgres -d postgres
             timeout: 5s
@@ -104,9 +104,9 @@ services:
         image: redis:latest
         restart: always
         volumes:
-            - redis-data:/usr/src/blanball/storage/redis/data
+            - redis-data-prod:/usr/src/blanball/storage/redis-prod/data
         networks:
-            - app-network
+            - app-network-prod
         healthcheck:
             test: ['CMD-SHELL', 'redis-cli ping | grep PONG']
             timeout: 3s
@@ -119,9 +119,9 @@ services:
         image: dpage/pgadmin4:latest
         restart: always
         volumes:
-            - pgadmin-data:/usr/src/blanball/storage/pgadmin/data
+            - pgadmin-data-prod:/usr/src/blanball/storage/pgadmin-prod/data
         networks:
-            - app-network
+            - app-network-prod
         ports:
             - 49283:${PGADMIN_LISTEN_PORT}
 
@@ -132,9 +132,9 @@ services:
         image: prodrigestivill/postgres-backup-local
         restart: always
         volumes:
-            - db-backup-data:/usr/src/blanball/storage/db-backup/data
+            - db-backup-data-prod:/usr/src/blanball/storage/db-backup-prod/data
         networks:
-            - app-network
+            - app-network-prod
         depends_on:
             db-prod:
                 condition: service_started
@@ -145,8 +145,8 @@ services:
             - stack.env
         image: minio/minio
         volumes:
-            - minio-data:/minio-data
-        command: 'minio server /minio-data --console-address ":9001"'
+            - minio-data-prod:/minio-data-prod
+        command: 'minio server /minio-data-prod --console-address ":9001"'
         ports:
             - 49292:9000
             - 49293:9001
@@ -157,15 +157,15 @@ services:
             timeout: 20s
             retries: 3
         networks:
-            - app-network
+            - app-network-prod
 
 networks:
-    app-network:
+    app-network-prod:
         driver: bridge
 
 volumes:
-    redis-data:
-    pgadmin-data:
-    db-backup-data:
-    minio-data:
-    db-data:
+    redis-data-prod:
+    pgadmin-data-prod:
+    db-backup-data-prod:
+    minio-data-prod:
+    db-data-prod:
