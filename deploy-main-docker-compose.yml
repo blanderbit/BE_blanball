@@ -47,7 +47,7 @@ services:
           - "traefik.http.routers.api-prod-web.middlewares=api-prod-redirect-web-secure"
           ## HTTPS
           - "traefik.http.routers.api-prod-web-secure.entrypoints=web-secure"
-          - "traefik.http.routers.api-prod-secure.rule=Host(`api-prod.blanball.com`) && PathPrefix(`/api`)"
+          - "traefik.http.routers.api-prod-secure.rule=Host(`api.blanball.com`) && PathPrefix(`/api`)"
           - "traefik.http.routers.api-prod-web-secure.tls=true"
           - "traefik.http.routers.api-prod-web-secure.tls.certResolver=sample"
         
