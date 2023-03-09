@@ -24,7 +24,7 @@ services:
             - stack.env
         image: registry.it-flumx.com/blanball-proxy:latest
         ports:
-            - 50000:80
+            - 49298:80
         networks:
             - app-network-prod
         depends_on:
@@ -75,12 +75,12 @@ services:
         <<: *api-common
         container_name: celery-worker-prod
         user: deploy
-        command: celery-worker-prod
+        command: celery-worker
 
     celery-beat-prod:
         <<: *api-common
         container_name: celery-beat-prod
-        command: celery-beat-prod
+        command: celery-beat
 
     db-prod:
         container_name: db-prod
