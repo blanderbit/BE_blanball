@@ -35,7 +35,6 @@ services:
         <<: *api-common
         container_name: api-prod
         command: api-deploy
-        user: deploy
         labels:
           - "traefik.enable=true"
           ## HTTP
@@ -55,7 +54,6 @@ services:
         <<: *api-common
         container_name: daphne-prod
         command: daphne
-        user: deploy
         labels:
           - "traefik.enable=true"
           ## HTTP
@@ -74,7 +72,6 @@ services:
     celery-worker-prod:
         <<: *api-common
         container_name: celery-worker-prod
-        user: deploy
         command: celery-worker
 
     celery-beat-prod:
