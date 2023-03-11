@@ -1,6 +1,6 @@
 from collections import OrderedDict
 from functools import wraps
-from typing import Any, Optional, Callable
+from typing import Any
 
 from django.conf import settings
 from rest_framework.pagination import (

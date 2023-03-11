@@ -126,7 +126,7 @@ class UserProfile(GenericAPIView):
     permission_classes = [ApiKeyPermission | IsAuthenticated]
 
     def get(self, request: Request, pk: int) -> Response:
-        fields: list[str] = ["configuration"]
+        fields: list[str] = []
         try:
             user: User = self.queryset.get(id=pk)
             for item in user.configuration.items():

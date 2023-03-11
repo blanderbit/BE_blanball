@@ -221,18 +221,10 @@ class UserPlannedEventsList(EventsList):
     records will be displayed one month ahead.
     """
 
-    serializer_class: Type[Serializer] = PopularEventsListSerializer
     queryset: QuerySet[Event] = Event.get_all().filter(status=Event.Status.PLANNED)
 
     @skip_objects_from_response_by_id
-    def list(self, request: Request, pk: int) -> Response:
-        try:
-            serializer = self.serializer_class(
-                filter_event_by_user_planned_events_time(
-                    pk=pk, queryset=self.queryset.all()
-                ),
-                many=True,
-            )
-            return Response(serializer.data, status=HTTP_200_OK)
-        except User.DoesNotExist:
-            raise _404(object=User)
+    def get_queryset(self) -> QuerySet[Event]:
+        user_id = self.kwargs.get("pk")
+        return self.queryset.filter(Q(current_users__in=[user_id]) | 
+                                    Q(current_fans__in=[user_id]))
