@@ -139,23 +139,35 @@ class Event(models.Model):
             "current_users", "current_fans"
         )
     
-    @property
-    def request_user_role(self) -> Optional[str]: 
-        request = current_request()
+    def get_user_role(self, pk: Optional[int] = None):
+        if pk:
+            try:
+                user = User.objects.get(id=pk)
+            except User.DoesNotExist:
+                pass
+        else:
+            request = current_request()
+            user = request.user
+
         event_requests_to_participations = RequestToParticipation.get_all().filter(
             event_id=self.id, status=RequestToParticipation.Status.WAITING
         )
         sender_ids = [d.sender.id for d in event_requests_to_participations]
 
-        if request.user == self.author:
+        if user == self.author:
             return 'author'
-        elif request.user in self.current_users.all():
+        elif user in self.current_users.all():
             return 'player'
-        elif request.user in self.current_fans.all():
+        elif user in self.current_fans.all():
             return 'fan'
-        elif request.user.id in sender_ids:
+        elif user.id in sender_ids:
             return 'request_participation'
         return None
+
+    
+    @property
+    def request_user_role(self) -> Optional[str]: 
+        return self.get_user_role()
 
 
     @final

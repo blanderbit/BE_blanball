@@ -36,12 +36,10 @@ from events.openapi import (
 )
 from events.serializers import (
     EventListSerializer,
-    PopularEventsListSerializer,
     MyEventListSerializer,
 )
 from events.services import (
     add_dist_filter_to_view,
-    filter_event_by_user_planned_events_time,
     skip_objects_from_response_by_id,
 )
 from rest_framework.filters import (
