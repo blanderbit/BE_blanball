@@ -90,7 +90,7 @@ services:
         networks:
             - app-network-prod
         healthcheck:
-            test: pg_isready -U postgres -d postgres
+            test: pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
             timeout: 5s
             retries: 20
 
@@ -121,20 +121,6 @@ services:
             - app-network-prod
         ports:
             - 49283:${PGADMIN_LISTEN_PORT}
-
-    db_backup-prod:
-        container_name: db_backup-prod
-        env_file:
-            - stack.env
-        image: prodrigestivill/postgres-backup-local
-        restart: always
-        volumes:
-            - db-backup-data-prod:/usr/src/blanball/storage/db-backup-prod/data
-        networks:
-            - app-network-prod
-        depends_on:
-            db-prod:
-                condition: service_started
 
     minio-prod:
         container_name: minio-prod
