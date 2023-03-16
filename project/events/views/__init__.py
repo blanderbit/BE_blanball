@@ -73,3 +73,6 @@ from events.views.manage_event import (
 from events.views.events_list import (
     MyPlannedParticipantAndViewEventsList as MyPlannedParticipantAndViewEventsList
 )
+from events.views.manage_event import (
+    MyPinnedEventsCount as MyPinnedEventsCount
+)

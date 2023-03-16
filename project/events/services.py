@@ -16,6 +16,7 @@ from config.exceptions import _404
 from django.db import transaction
 from django.db.models import Q
 from django.db.models.query import QuerySet
+from django.conf import settings
 from django.utils import timezone
 from events.constants.errors import (
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,
@@ -73,7 +74,7 @@ def bulk_pin_events(
     for event_id in data:
         try:
             event: Event = queryset.get(id=event_id)
-            if event.author == user:
+            if event.author == user and user.count_pinned_events < settings.MAX_COUNT_PINNED_EVENTS:
                 event.pinned = True
                 event.save()
                 yield {"success": event_id}

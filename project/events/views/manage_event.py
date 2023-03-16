@@ -179,3 +179,11 @@ class GetEvent(RetrieveModelMixin, GenericAPIView):
     @not_in_black_list
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
+
+
+class MyPinnedEventsCount(GenericAPIView):
+
+    def get(self, request):
+        return Response({
+            "count": request.user.count_pinned_events
+        }, status=HTTP_200_OK)

@@ -30,6 +30,7 @@ from events.views import (
     UserParticipantEventsList,
     UserPlannedEventsList,
     UnPinMyEvents,
+    MyPinnedEventsCount,
     PlannedEventsList,
 )
 
@@ -119,4 +120,9 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
         BulkAcceptOrDeclineInvitesToEvent.as_view(),
         name="accept-decline-invites-to-event",
     ),
+    path(
+        "client/my/pinned/events/count",
+        MyPinnedEventsCount.as_view(),
+        name="my-pinned-events-count",
+    )
 ]
