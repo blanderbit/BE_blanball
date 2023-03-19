@@ -273,3 +273,20 @@ class ReadAllUserNotifications(APIView):
     def get(self, request: Request) -> Response:
         read_all_user_notifications.delay(request_user_id=request.user.id)
         return Response(NOTIFICATIONS_READED_SUCCESS, status=HTTP_200_OK)
+
+
+class GetAllNotificationsIds(GenericAPIView):
+    """
+    Get user notifications ids array
+
+    This endpoint allows the user to
+    get the array of all his notifications ids
+    """
+
+    queryset: QuerySet[Notification] = Notification.get_all()
+
+    def get(self, request: Request) -> Response:
+
+        return Response({
+            "ids": self.queryset.filter(user=request.user).values_list('id', flat=True)
+        })
