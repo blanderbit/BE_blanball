@@ -265,7 +265,11 @@ class InviteToEventManager(models.Manager):
                         "last_name": invite_user.profile.last_name,
                         "avatar": invite_user.profile.avatar_url,
                     },
-                    "event": {"id": event.id, "name": event.name},
+                    "event": {
+                        "id": event.id, 
+                        "name": event.name,
+                        "date_and_time": event.date_and_time
+                    },
                     "invite": {
                         "id": invite.id,
                     },

@@ -53,6 +53,7 @@ class CreateReviewSerializer(ModelSerializer):
                 },
                 "review": {
                     "id": review.id,
+                    "text": review.text
                 },
                 "sender": {
                     "id": review.author.id,
