@@ -43,3 +43,13 @@ class ChangeMaintenanceSerializer(Serializer):
         fields: Union[str, list[str]] = [
             "isMaintenance",
         ]
+
+
+class GetNotificationsIdsSerializer(Serializer):
+
+    count: bool = IntegerField()
+
+    class Meta:
+        fields: Union[str, list[str]] = [
+            "count",
+        ]

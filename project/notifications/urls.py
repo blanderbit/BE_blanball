@@ -15,7 +15,7 @@ from notifications.views import (
     ReadNotifications,
     UserNotificaitonsCount,
     UserNotificationsList,
-    GetAllNotificationsIds,
+    GetNotificationsIds,
 )
 
 urlpatterns: list[Union[URLResolver, URLPattern]] = [
@@ -50,9 +50,9 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
         name="delete-all-notifications",
     ),
     path(
-        "client/get/all/my/notifications/ids",
-        GetAllNotificationsIds.as_view(),
-        name="get-all-my-notifications-ids",
+        "client/get/my/notifications/ids",
+        GetNotificationsIds.as_view(),
+        name="get-my-notifications-ids",
     ),
     path(
         "admin/change/maintenance",

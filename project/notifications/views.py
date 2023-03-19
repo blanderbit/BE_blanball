@@ -34,6 +34,7 @@ from notifications.serializers import (
     ChangeMaintenanceSerializer,
     NotificationSerializer,
     UserNotificationsCount,
+    GetNotificationsIdsSerializer,
 )
 from notifications.services import (
     bulk_delete_notifications,
@@ -275,7 +276,7 @@ class ReadAllUserNotifications(APIView):
         return Response(NOTIFICATIONS_READED_SUCCESS, status=HTTP_200_OK)
 
 
-class GetAllNotificationsIds(GenericAPIView):
+class GetNotificationsIds(GenericAPIView):
     """
     Get user notifications ids array
 
@@ -284,9 +285,13 @@ class GetAllNotificationsIds(GenericAPIView):
     """
 
     queryset: QuerySet[Notification] = Notification.get_all()
+    serializer_class: Type[Serializer] = GetNotificationsIdsSerializer
 
-    def get(self, request: Request) -> Response:
+    def post(self, request: Request) -> Response:
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
         return Response({
             "ids": self.queryset.filter(user=request.user).values_list('id', flat=True)
+            [:serializer.validated_data["count"]]
         })
