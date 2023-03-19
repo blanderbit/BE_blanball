@@ -9,7 +9,6 @@ from config.celery import app
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.mail import EmailMessage
-from django.db.models import Q
 from django.utils import timezone
 from django.utils.encoding import smart_bytes
 from django.utils.http import (
@@ -17,7 +16,6 @@ from django.utils.http import (
 )
 from minio import Minio
 from minio.deleteobjects import DeleteObject
-from notifications.models import Notification
 
 
 class EmailThread(threading.Thread):
@@ -59,24 +57,6 @@ def check_user_age() -> None:
             if rdelta.months == 0 and rdelta.days == 0:
                 user_profile.age += 1
                 user_profile.save()
-
-
-@app.task(
-    ignore_result=True,
-    default_retry_delay=5,
-)
-def update_user_messages_after_change_avatar(*, profile_id: int) -> None:
-    profile: Profile = Profile.objects.get(id=profile_id)
-    for notification in Notification.get_all().filter(
-        Q(data__recipient__id=profile_id) | Q(data__sender__id=profile_id)
-    ):
-        if profile.avatar_url != notification.data["recipient"]["avatar"]:
-            if profile.id == notification.data["recipient"]["id"]:
-                notification.data["recipient"]["avatar"] = profile.avatar_url
-                notification.save()
-            elif profile.id == notification.data["sender"]["id"]:
-                notification.data["sender"]["avatar"] = profile.avatar_url
-                notification.save()
 
 
 @app.task(

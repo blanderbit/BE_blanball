@@ -6,17 +6,14 @@ from typing import (
     Optional,
     TypeVar,
 )
-
-from asgiref.sync import async_to_sync
 from authentication.models import User
-from channels.layers import get_channel_layer
 from notifications.constants.notification_types import (
     CHANGE_MAINTENANCE_NOTIFICATION_TYPE,
     NOTIFICATIONS_BULK_DELETE_NOTIFICATION_TYPE,
     NOTIFICATIONS_BULK_READ_NOTIFICATION_TYPE,
 )
 from notifications.models import Notification
-from notifications.tasks import send
+from notifications.tasks import send, send_to_general_layer
 
 bulk = TypeVar(Optional[Generator[list[dict[str, int]], None, None]])
 
@@ -30,22 +27,16 @@ def update_maintenance(*, data: dict[str, str]) -> None:
     with open("./config/config.json", "w") as f:
         f.write(json.dumps(json_data))
 
-        async_to_sync(get_channel_layer().group_send)(
-            "general",
-            {
-                "type": "general.message",
-                "message": {
-                    "message_type": CHANGE_MAINTENANCE_NOTIFICATION_TYPE,
-                    "data": {
-                        "maintenance": {
-                            "type": data["isMaintenance"],
-                        }
-                    },
-                },
-            },
+        send_to_general_layer(
+            message_type=CHANGE_MAINTENANCE_NOTIFICATION_TYPE,
+            data={
+                "maintenance": {
+                    "type": data["isMaintenance"],
+                }
+            }
         )
 
-
+        
 def send_message_after_bulk_method(message_type: str) -> ...:
     def wrap(
         func: Callable[[Any, Any], bulk]

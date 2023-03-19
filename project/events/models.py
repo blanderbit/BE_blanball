@@ -263,12 +263,11 @@ class InviteToEventManager(models.Manager):
                         "id": invite_user.id,
                         "name": invite_user.profile.name,
                         "last_name": invite_user.profile.last_name,
-                        "avatar": invite_user.profile.avatar_url,
                     },
                     "event": {
                         "id": event.id, 
                         "name": event.name,
-                        "date_and_time": event.date_and_time
+                        "date_and_time": str(event.date_and_time)
                     },
                     "invite": {
                         "id": invite.id,
@@ -277,7 +276,6 @@ class InviteToEventManager(models.Manager):
                         "id": request_user.id,
                         "name": request_user.profile.name,
                         "last_name": request_user.profile.last_name,
-                        "avatar": request_user.profile.avatar_url,
                     },
                 },
             )

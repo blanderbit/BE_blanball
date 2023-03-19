@@ -17,6 +17,10 @@ from authentication.constants.success import (
     TEMPLATE_SUCCESS_TEXT,
     TEMPLATE_SUCCESS_TITLE,
 )
+from authentication.constants.notification_types import (
+    USER_UPDATED_AVATAR_NOTIFICATION_TYPE
+)
+
 from authentication.models import (
     Code,
     Profile,
@@ -25,11 +29,13 @@ from authentication.models import (
 from authentication.tasks import (
     Util,
     delete_old_user_profile_avatar,
-    update_user_messages_after_change_avatar,
 )
 from django.conf import settings
 from django.template.loader import (
     render_to_string,
+)
+from notifications.tasks import (
+    send_to_general_layer
 )
 from django.utils import timezone
 from minio import Minio
@@ -137,13 +143,21 @@ def profile_update(*, profile_id: int, serializer: Serializer) -> dict[str, Any]
     return result
 
 
-def update_profile_avatar(*, profile: Profile, data: dict[str, Any]) -> None:
-    delete_old_user_profile_avatar.delay(profile_id=profile.id)
-    profile.avatar = data.get("avatar")
+def update_profile_avatar(*, user: User, data: dict[str, Any]) -> None:
+    delete_old_user_profile_avatar.delay(profile_id=user.profile.id)
+    user.profile.avatar = data.get("avatar")
     if data.get("avatar") != None:
-        profile.avatar.name: str = profile.new_image_name.replace("users/", "")
-    profile.save()
-    update_user_messages_after_change_avatar.delay(profile_id=profile.id)
+        user.profile.avatar.name: str = user.profile.new_image_name.replace("users/", "")
+    user.profile.save()
+    send_to_general_layer(
+            message_type=USER_UPDATED_AVATAR_NOTIFICATION_TYPE,
+            data={
+                "user": {
+                    "id": user.id,
+                    "new_avatar": user.profile.avatar_url,
+                }
+            }
+        )
 
 
 def reset_password(*, data: dict[str, Any]) -> None:

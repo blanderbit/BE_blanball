@@ -1,11 +1,17 @@
 import json
-from types import NoneType
 from typing import Any, Literal, Optional
 
 from authentication.models import User
+from authentication.constants.notification_types import (
+    USER_ONLINE_NOTIFICATION_TYPE,
+    USER_OFFLINE_NOTIFICATION_TYPE
+)
 from channels.db import database_sync_to_async
 from channels.generic.websocket import (
     AsyncWebsocketConsumer,
+)
+from notifications.services import (
+    send_to_general_layer
 )
 from django.utils import timezone
 
@@ -43,12 +49,28 @@ class UserConsumer(AsyncWebsocketConsumer):
         user: User = User.get_all().get(email=self.scope["user"])
         user.is_online = True
         user.save()
+        send_to_general_layer(
+            message_type=USER_ONLINE_NOTIFICATION_TYPE,
+            data={
+                "user": {
+                    "id": user.id,
+                }
+            }
+        )
 
     @database_sync_to_async
     def delete_user_from_active(self) -> None:
         user: User = User.get_all().get(email=self.scope["user"])
         user.is_online = False
         user.save()
+        send_to_general_layer(
+            message_type=USER_OFFLINE_NOTIFICATION_TYPE,
+            data={
+                "user": {
+                    "id": user.id,
+                }
+            }
+        )
 
     async def disconnect(self, close_code: int) -> None:
         # Leave room group
