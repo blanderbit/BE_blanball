@@ -36,6 +36,9 @@ from notifications.serializers import (
     UserNotificationsCount,
     GetNotificationsIdsSerializer,
 )
+from notifications.filters import (
+    NotificationsFilterSet
+)
 from notifications.services import (
     bulk_delete_notifications,
     bulk_read_notifications,
@@ -45,7 +48,15 @@ from notifications.tasks import (
     delete_all_user_notifications,
     read_all_user_notifications,
 )
-from rest_framework.filters import OrderingFilter
+from notifications.openapi import (
+    notifications_list_query_params,
+)
+from rest_framework.filters import (
+    OrderingFilter,
+)
+from django_filters.rest_framework import (
+    DjangoFilterBackend,
+)
 from rest_framework.generics import (
     GenericAPIView,
     ListAPIView,
@@ -62,7 +73,7 @@ from rest_framework.views import APIView
 
 
 @method_decorator(swagger_auto_schema(
-    manual_parameters=[skip_param_query, offset_query]), 
+    manual_parameters=notifications_list_query_params), 
     name="get"
 )
 @paginate_by_offset
@@ -77,7 +88,9 @@ class UserNotificationsList(ListAPIView):
     """
 
     serializer_class: Type[Serializer] = NotificationSerializer
+    filterset_class = NotificationsFilterSet
     filter_backends = [
+        DjangoFilterBackend,
         OrderingFilter,
     ]
     ordering_fields: list[str] = [

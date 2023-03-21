@@ -18,7 +18,7 @@ from authentication.constants.success import (
     TEMPLATE_SUCCESS_TITLE,
 )
 from authentication.constants.notification_types import (
-    USER_UPDATED_AVATAR_NOTIFICATION_TYPE
+    UPDATE_MESSAGE_USER_UPDATED_AVATAR
 )
 
 from authentication.models import (
@@ -150,7 +150,7 @@ def update_profile_avatar(*, user: User, data: dict[str, Any]) -> None:
         user.profile.avatar.name: str = user.profile.new_image_name.replace("users/", "")
     user.profile.save()
     send_to_general_layer(
-            message_type=USER_UPDATED_AVATAR_NOTIFICATION_TYPE,
+            message_type=UPDATE_MESSAGE_USER_UPDATED_AVATAR,
             data={
                 "user": {
                     "id": user.id,

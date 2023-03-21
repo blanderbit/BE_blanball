@@ -3,8 +3,8 @@ from typing import Any, Literal, Optional
 
 from authentication.models import User
 from authentication.constants.notification_types import (
-    USER_ONLINE_NOTIFICATION_TYPE,
-    USER_OFFLINE_NOTIFICATION_TYPE
+    UPDATE_MESSAGE_USER_ONLINE,
+    UPDATE_MESSAGE_USER_OFFLINE
 )
 from channels.db import database_sync_to_async
 from channels.generic.websocket import (
@@ -50,7 +50,7 @@ class UserConsumer(AsyncWebsocketConsumer):
         user.is_online = True
         user.save()
         send_to_general_layer(
-            message_type=USER_ONLINE_NOTIFICATION_TYPE,
+            message_type=UPDATE_MESSAGE_USER_ONLINE,
             data={
                 "user": {
                     "id": user.id,
@@ -64,7 +64,7 @@ class UserConsumer(AsyncWebsocketConsumer):
         user.is_online = False
         user.save()
         send_to_general_layer(
-            message_type=USER_OFFLINE_NOTIFICATION_TYPE,
+            message_type=UPDATE_MESSAGE_USER_OFFLINE,
             data={
                 "user": {
                     "id": user.id,
