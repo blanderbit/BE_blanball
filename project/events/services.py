@@ -227,6 +227,11 @@ def send_notification_to_subscribe_event_user(
             user=user,
             message_type=message_type,
             data={
+                "sender": {
+                    "id": event.author.id,
+                    "name": event.author.profile.name,
+                    "last_name": event.author.profile.last_name,
+                },
                 "recipient": {
                     "id": user.id,
                     "name": user.profile.name,
