@@ -136,7 +136,8 @@ def update_user_profile_avatar(*, avatar, profile_id: int) -> None:
 def profile_update(*, profile_id: int, serializer: Serializer) -> dict[str, Any]:
     profile: Profile = Profile.objects.filter(id=profile_id)
     profile.update(**serializer.validated_data["profile"])
-    count_age(profile=profile[0], data=serializer.validated_data["profile"].items())
+    if (serializer.validated_data["profile"].get("birthday")):
+        count_age(profile=profile[0], data=serializer.validated_data["profile"].items())
     result: dict[str, Any] = copy.deepcopy(serializer.validated_data)
     serializer.validated_data.pop("profile")
     serializer.save()
