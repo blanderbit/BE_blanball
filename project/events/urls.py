@@ -23,7 +23,9 @@ from events.views import (
     RemoveUserFromEvent,
     RequestToParticipationsList,
     UpdateEvent,
-    UserEventsList,
+    MyEventsList,
+    MyFinishedEventsList,
+    MyTopicalEventsList,
     PinMyEvents,
     UserEventsRelevantList,
     MyPlannedParticipantAndViewEventsList,
@@ -64,7 +66,17 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
         FanLeaveFromEvent.as_view(),
         name="spectator-leave-from-event",
     ),
-    path("client/my/events/list", UserEventsList.as_view(), name="user-events-list"),
+    path("client/my/events/list", MyEventsList.as_view(), name="my-events-list"),
+    path(
+        "client/my/topical/events/list", 
+        MyTopicalEventsList.as_view(),  
+        name="my-topical-events-list"
+    ),
+    path(
+        "client/my/finished/events/list", 
+        MyFinishedEventsList.as_view(),
+        name="my-finished-events-list"
+    ),
     path(
         "client/my/participant/events/list",
         UserParticipantEventsList.as_view(),
