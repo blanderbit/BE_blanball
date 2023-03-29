@@ -340,6 +340,7 @@ class CheckCode(GenericAPIView):
 
         elif self.code.type == EMAIL_CHANGE_CODE_TYPE:
             self.user.email = self.code.dop_info
+            self.user.is_verified = False
             self.success(key="email")
             return Response(CHANGE_EMAIL_SUCCESS, status=HTTP_200_OK)
 
