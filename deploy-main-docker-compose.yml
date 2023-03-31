@@ -39,19 +39,12 @@ services:
           - "8000"
         labels:
           - "traefik.enable=true"
-          ## HTTP
-          - "traefik.http.routers.api-prod-web.entrypoints=web"
-          - "traefik.http.routers.api-prod-web.rule=Host(`api.blanball.com`) && PathPrefix(`/api`)"
+          - "traefik.http.routers.api-prod.rule=Host(`api.blanball.com`) && PathPrefix(`/api`)"
+          - "traefik.http.routers.api-prod.entrypoints=websecure"
+          - "traefik.http.routers.api-prod.tls.certresolver=myresolver"
+          - "traefik.http.routers.api-prod.service=api-prod"
           - "traefik.http.services.api-prod.loadbalancer.server.port=8000"
-          ## Redirect  
-          - "traefik.http.middlewares.api-prod-redirect-web-secure.redirectscheme.scheme=https"
-          - "traefik.http.routers.api-prod-web.middlewares=api-prod-redirect-web-secure"
-          ## HTTPS
-          - "traefik.http.routers.api-prod-web-secure.entrypoints=websecure"
-          - "traefik.http.routers.api-prod-web-secure.rule=Host(`api.blanball.com`) && PathPrefix(`/api`)"
-          - "traefik.http.routers.api-prod-web-secure.tls=true"
-          - "traefik.http.routers.api-prod-web-secure.tls.certResolver=myresolver"
-        
+
     daphne-prod:
         <<: *api-common
         container_name: daphne-prod
@@ -60,19 +53,12 @@ services:
           - "10000"
         labels:
           - "traefik.enable=true"
-          ## HTTP
-          - "traefik.http.routers.daphne-prod-web.entrypoints=web"
-          - "traefik.http.routers.daphne-prod-web.rule=Host(`api.blanball.com`) && PathPrefix(`/ws`)"
+          - "traefik.http.routers.daphne-prod.rule=Host(`api.blanball.com`) && PathPrefix(`/ws`)"
+          - "traefik.http.routers.daphne-prod.entrypoints=websecure"
+          - "traefik.http.routers.daphne-prod.tls.certresolver=myresolver"
+          - "traefik.http.routers.daphne-prod.service=daphne-prod"
           - "traefik.http.services.daphne-prod.loadbalancer.server.port=10000"
-          ## Redirect  
-          - "traefik.http.middlewares.daphne-prod-redirect-web-secure.redirectscheme.scheme=https"
-          - "traefik.http.routers.daphne-prod-web.middlewares=daphne-prod-redirect-web-secure"
-          ## HTTPS
-          - "traefik.http.routers.daphne-prod-web-secure.entrypoints=websecure"
-          - "traefik.http.routers.daphne-prod-web-secure.rule=Host(`api.blanball.com`) && PathPrefix(`/ws`)"
-          - "traefik.http.routers.daphne-prod-web-secure.tls=true"
-          - "traefik.http.routers.daphne-prod-web-secure.tls.certResolver=myresolver"
-        
+
     celery-worker-prod:
         <<: *api-common
         container_name: celery-worker-prod
