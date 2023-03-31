@@ -35,6 +35,8 @@ services:
         <<: *api-common
         container_name: api-prod
         command: api-deploy
+        expose:
+          - "8000"
         labels:
           - "traefik.enable=true"
           ## HTTP
@@ -54,6 +56,8 @@ services:
         <<: *api-common
         container_name: daphne-prod
         command: daphne
+        expose:
+          - "10000"
         labels:
           - "traefik.enable=true"
           ## HTTP
