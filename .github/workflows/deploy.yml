@@ -32,7 +32,7 @@ jobs:
               uses: jossef/action-set-json-field@v2.1
               with:
                   file: project/config/config.json
-                  field: version
+                  field: isMaintenance
                   value: ${{ env.MAINTENANCE_VALUE }}
             - name: Commit files
               continue-on-error: true
