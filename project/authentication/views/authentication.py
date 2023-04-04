@@ -356,7 +356,7 @@ class CheckCode(GenericAPIView):
             return Response(ACCOUNT_DELETED_SUCCESS, status=HTTP_200_OK)
 
         elif self.code.type == EMAIL_VERIFY_CODE_TYPE:
-            self.user.is_verified = False
+            self.user.is_verified = True
             self.user.save()
             self.code.delete()
             send_email_template(
