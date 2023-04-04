@@ -21,12 +21,16 @@ jobs:
         steps:
             - uses: actions/checkout@master
             - name: Update maintenance value
-              uses: jossef/action-set-json-field@v2.1
+              uses: actions/github-script@v3
               with:
-                  file: project/config/config.json
-                  field: isMaintenance
-                  value: ${{ github.ref == 'refs/heads/main' }}
-                  value_is_string: false
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const fs = require('fs');
+                      const path = require('path');
+                      const filePath = path.join(process.env.GITHUB_WORKSPACE, 'project/config/config.jso');
+                      const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+                      fileContent.isMaintenance = ${{ github.ref == 'refs/heads/main' }};
+                      fs.writeFileSync(filePath, JSON.stringify(fileContent));
             - name: Commit files
               continue-on-error: true
               run: |
