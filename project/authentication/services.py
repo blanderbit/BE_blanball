@@ -11,6 +11,9 @@ from authentication.constants.code_types import (
     PASSWORD_CHANGE_CODE_TYPE,
     PASSWORD_RESET_CODE_TYPE,
 )
+from authentication.constants.notification_types import (
+    UPDATE_MESSAGE_USER_UPDATED_AVATAR,
+)
 from authentication.constants.success import (
     EMAIL_MESSAGE_TEMPLATE_TITLE,
     TEMPLATE_SUCCESS_BODY_TITLE,
@@ -25,7 +28,6 @@ from authentication.models import (
 from authentication.tasks import (
     Util,
     delete_old_user_profile_avatar,
-    update_user_messages_after_change_avatar,
 )
 from django.conf import settings
 from django.template.loader import (
@@ -34,6 +36,9 @@ from django.template.loader import (
 from django.utils import timezone
 from minio import Minio
 from minio.commonconfig import REPLACE, CopySource
+from notifications.tasks import (
+    send_to_general_layer,
+)
 from rest_framework.serializers import Serializer
 
 
@@ -130,20 +135,31 @@ def update_user_profile_avatar(*, avatar, profile_id: int) -> None:
 def profile_update(*, profile_id: int, serializer: Serializer) -> dict[str, Any]:
     profile: Profile = Profile.objects.filter(id=profile_id)
     profile.update(**serializer.validated_data["profile"])
-    count_age(profile=profile[0], data=serializer.validated_data["profile"].items())
+    if serializer.validated_data["profile"].get("birthday"):
+        count_age(profile=profile[0], data=serializer.validated_data["profile"].items())
     result: dict[str, Any] = copy.deepcopy(serializer.validated_data)
     serializer.validated_data.pop("profile")
     serializer.save()
     return result
 
 
-def update_profile_avatar(*, profile: Profile, data: dict[str, Any]) -> None:
-    delete_old_user_profile_avatar.delay(profile_id=profile.id)
-    profile.avatar = data.get("avatar")
+def update_profile_avatar(*, user: User, data: dict[str, Any]) -> None:
+    delete_old_user_profile_avatar.delay(profile_id=user.profile.id)
+    user.profile.avatar = data.get("avatar")
     if data.get("avatar") != None:
-        profile.avatar.name: str = profile.new_image_name.replace("users/", "")
-    profile.save()
-    update_user_messages_after_change_avatar.delay(profile_id=profile.id)
+        user.profile.avatar.name: str = user.profile.new_image_name.replace(
+            "users/", ""
+        )
+    user.profile.save()
+    send_to_general_layer(
+        message_type=UPDATE_MESSAGE_USER_UPDATED_AVATAR,
+        data={
+            "user": {
+                "id": user.id,
+                "new_avatar": user.profile.avatar_url,
+            }
+        },
+    )
 
 
 def reset_password(*, data: dict[str, Any]) -> None:

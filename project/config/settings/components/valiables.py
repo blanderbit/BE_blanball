@@ -72,6 +72,7 @@ AUTH_USER_MODEL: str = config("AUTH_USER_MODEL", cast=str)
 # code for various actions, reset email, password, etc.
 CODE_EXPIRE_MINUTES_TIME: int = config("CODE_EXPIRE_MINUTES_TIME", cast=int)
 
+MAX_COUNT_PINNED_EVENTS: int = 5
 
 # the algorithm by which the token
 # for the websocket connection is hashed

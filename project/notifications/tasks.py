@@ -30,10 +30,9 @@ def send_to_user(
     message_type: str,
     data: dict[str, Union[str, int, datetime, bool]] = None,
 ) -> None:
-    if message_type != CHANGE_MAINTENANCE_NOTIFICATION_TYPE:
-        notification = Notification.objects.create(
-            user=user, message_type=message_type, data=data
-        )
+    notification = Notification.objects.create(
+        user=user, message_type=message_type, data=data
+    )
     send(
         user=user,
         data={
@@ -43,6 +42,20 @@ def send_to_user(
                 "notification_id": notification.id,
                 "data": data,
             },
+        },
+    )
+
+
+def send_to_general_layer(
+    message_type: str,
+    data: dict[str, Union[str, int, datetime, bool]] = None,
+) -> None:
+
+    async_to_sync(get_channel_layer().group_send)(
+        "general",
+        {
+            "type": "general.message",
+            "message": {"message_type": message_type, "data": data},
         },
     )
 

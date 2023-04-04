@@ -18,12 +18,10 @@ from events.constants.errors import (
     THIS_USER_CAN_NOT_BE_INVITED,
     USER_CAN_NOT_INVITE_TO_THIS_EVENT_ERROR,
 )
-from events.middlewares import (
-    current_request,
-)
 from events.constants.notification_types import (
     INVITE_USER_TO_EVENT_NOTIFICATION_TYPE,
 )
+from events.middlewares import current_request
 from notifications.tasks import send_to_user
 from phonenumber_field.modelfields import (
     PhoneNumberField,
@@ -34,7 +32,6 @@ from rest_framework.serializers import (
 from rest_framework.status import (
     HTTP_403_FORBIDDEN,
 )
-
 
 
 class Event(models.Model):
@@ -138,25 +135,35 @@ class Event(models.Model):
         return Event.objects.select_related("author").prefetch_related(
             "current_users", "current_fans"
         )
-    
-    @property
-    def request_user_role(self) -> Optional[str]: 
-        request = current_request()
+
+    def get_user_role(self, pk: Optional[int] = None):
+        if pk:
+            try:
+                user = User.objects.get(id=pk)
+            except User.DoesNotExist:
+                pass
+        else:
+            request = current_request()
+            user = request.user
+
         event_requests_to_participations = RequestToParticipation.get_all().filter(
             event_id=self.id, status=RequestToParticipation.Status.WAITING
         )
         sender_ids = [d.sender.id for d in event_requests_to_participations]
 
-        if request.user == self.author:
-            return 'author'
-        elif request.user in self.current_users.all():
-            return 'player'
-        elif request.user in self.current_fans.all():
-            return 'fan'
-        elif request.user.id in sender_ids:
-            return 'request_participation'
+        if user == self.author:
+            return "author"
+        elif user in self.current_users.all():
+            return "player"
+        elif user in self.current_fans.all():
+            return "fan"
+        elif user.id in sender_ids:
+            return "request_participation"
         return None
 
+    @property
+    def request_user_role(self) -> Optional[str]:
+        return self.get_user_role()
 
     @final
     def save(self, *args: Any, **kwargs: Any) -> None:
@@ -251,9 +258,12 @@ class InviteToEventManager(models.Manager):
                         "id": invite_user.id,
                         "name": invite_user.profile.name,
                         "last_name": invite_user.profile.last_name,
-                        "avatar": invite_user.profile.avatar_url,
                     },
-                    "event": {"id": event.id, "name": event.name},
+                    "event": {
+                        "id": event.id,
+                        "name": event.name,
+                        "date_and_time": str(event.date_and_time),
+                    },
                     "invite": {
                         "id": invite.id,
                     },
@@ -261,7 +271,6 @@ class InviteToEventManager(models.Manager):
                         "id": request_user.id,
                         "name": request_user.profile.name,
                         "last_name": request_user.profile.last_name,
-                        "avatar": request_user.profile.avatar_url,
                     },
                 },
             )

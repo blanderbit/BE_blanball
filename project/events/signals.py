@@ -32,7 +32,7 @@ from notifications.tasks import send, send_to_user
 def send_to_all_event_users(
     *, event: Event, message_type: str, data: dict[str, Any]
 ) -> None:
-    for user in list(event.current_users.all()) + [event.author]:
+    for user in list(event.current_users.all()):
         send_to_user(user, message_type=message_type, data=data)
 
 
@@ -160,14 +160,12 @@ def after_send_request_to_PARTICIPATION(
                     "id": instance.recipient.id,
                     "name": instance.recipient.profile.name,
                     "last_name": instance.recipient.profile.last_name,
-                    "avatar": instance.recipient.profile.avatar_url,
                 },
                 "request": {"id": instance.id},
                 "sender": {
                     "id": instance.sender.id,
                     "name": instance.sender.profile.name,
                     "last_name": instance.sender.profile.last_name,
-                    "avatar": instance.sender.profile.avatar_url,
                 },
                 "event": {
                     "id": instance.event.id,

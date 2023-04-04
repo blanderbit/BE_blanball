@@ -5,16 +5,25 @@ from events.views.events_list import (
     EventsRelevantList as EventsRelevantList,
 )
 from events.views.events_list import (
-    PopularEventsList as PopularEventsList,
+    MyEventsList as MyEventsList,
 )
 from events.views.events_list import (
-    UserEventsList as UserEventsList,
+    MyFinishedEventsList as MyFinishedEventsList,
 )
 from events.views.events_list import (
-    UserEventsRelevantList as UserEventsRelevantList,
+    MyPlannedParticipantAndViewEventsList as MyPlannedParticipantAndViewEventsList,
+)
+from events.views.events_list import (
+    MyTopicalEventsList as MyTopicalEventsList,
 )
 from events.views.events_list import (
     PlannedEventsList as PlannedEventsList,
+)
+from events.views.events_list import (
+    PopularEventsList as PopularEventsList,
+)
+from events.views.events_list import (
+    UserEventsRelevantList as UserEventsRelevantList,
 )
 from events.views.events_list import (
     UserParticipantEventsList as UserParticipantEventsList,
@@ -62,14 +71,14 @@ from events.views.manage_event import (
     GetEvent as GetEvent,
 )
 from events.views.manage_event import (
+    MyPinnedEventsCount as MyPinnedEventsCount,
+)
+from events.views.manage_event import (
+    PinMyEvents as PinMyEvents,
+)
+from events.views.manage_event import (
+    UnPinMyEvents as UnPinMyEvents,
+)
+from events.views.manage_event import (
     UpdateEvent as UpdateEvent,
-)
-from events.views.manage_event import (
-    PinMyEvents as PinMyEvents
-)
-from events.views.manage_event import (
-    UnPinMyEvents as UnPinMyEvents
-)
-from events.views.events_list import (
-    MyPlannedParticipantAndViewEventsList as MyPlannedParticipantAndViewEventsList
 )

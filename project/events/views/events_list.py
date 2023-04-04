@@ -10,9 +10,7 @@ from authentication.filters import (
 )
 from authentication.models import User
 from config.exceptions import _404
-from config.pagination import (
-    paginate_by_offset
-)
+from config.pagination import paginate_by_offset
 from django.db.models import Count, Q
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
@@ -36,12 +34,10 @@ from events.openapi import (
 )
 from events.serializers import (
     EventListSerializer,
-    PopularEventsListSerializer,
     MyEventListSerializer,
 )
 from events.services import (
     add_dist_filter_to_view,
-    filter_event_by_user_planned_events_time,
     skip_objects_from_response_by_id,
 )
 from rest_framework.filters import (
@@ -130,7 +126,7 @@ class UserEventsRelevantList(EventsRelevantList):
         return self.queryset.filter(author_id=self.request.user.id)
 
 
-class UserEventsList(EventsList):
+class MyEventsList(EventsList):
     """
     List of my events
 
@@ -141,10 +137,50 @@ class UserEventsList(EventsList):
     serializer_class: Type[Serializer] = MyEventListSerializer
 
     def get_queryset(self) -> QuerySet[Event]:
-        return EventsList.get_queryset(self).filter(
-            author_id=self.request.user.id
-        ).order_by('-pinned', '-id')
+        return (
+            EventsList.get_queryset(self)
+            .filter(author_id=self.request.user.id)
+            .order_by("-pinned", "-id")
+        )
 
+
+class MyTopicalEventsList(EventsList):
+    """
+    List of my topical events
+
+    This endpoint allows the user to get, filter,
+    sort the list of events on which he is the author
+    """
+
+    serializer_class: Type[Serializer] = MyEventListSerializer
+
+    def get_queryset(self) -> QuerySet[Event]:
+        return (
+            EventsList.get_queryset(self)
+            .filter(
+                author_id=self.request.user.id,
+                status__in=[Event.Status.PLANNED, Event.Status.ACTIVE],
+            )
+            .order_by("-pinned", "-id")
+        )
+
+
+class MyFinishedEventsList(EventsList):
+    """
+    List of my topical events
+
+    This endpoint allows the user to get, filter,
+    sort the list of events on which he is the author
+    """
+
+    serializer_class: Type[Serializer] = MyEventListSerializer
+
+    def get_queryset(self) -> QuerySet[Event]:
+        return (
+            EventsList.get_queryset(self)
+            .filter(author_id=self.request.user.id, status=Event.Status.FINISHED)
+            .order_by("-pinned", "-id")
+        )
 
 
 class UserParticipantEventsList(EventsList):
@@ -158,7 +194,7 @@ class UserParticipantEventsList(EventsList):
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Event]:
         return self.queryset.filter(current_users__in=[self.request.user.id])
-    
+
 
 class PlannedEventsList(EventsList):
     """
@@ -171,7 +207,7 @@ class PlannedEventsList(EventsList):
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Event]:
         return EventsList.get_queryset(self).filter(status=Event.Status.PLANNED)
-    
+
 
 class MyPlannedParticipantAndViewEventsList(EventsList):
     """
@@ -221,18 +257,11 @@ class UserPlannedEventsList(EventsList):
     records will be displayed one month ahead.
     """
 
-    serializer_class: Type[Serializer] = PopularEventsListSerializer
     queryset: QuerySet[Event] = Event.get_all().filter(status=Event.Status.PLANNED)
 
     @skip_objects_from_response_by_id
-    def list(self, request: Request, pk: int) -> Response:
-        try:
-            serializer = self.serializer_class(
-                filter_event_by_user_planned_events_time(
-                    pk=pk, queryset=self.queryset.all()
-                ),
-                many=True,
-            )
-            return Response(serializer.data, status=HTTP_200_OK)
-        except User.DoesNotExist:
-            raise _404(object=User)
+    def get_queryset(self) -> QuerySet[Event]:
+        user_id = self.kwargs.get("pk")
+        return self.queryset.filter(
+            Q(current_users__in=[user_id]) | Q(current_fans__in=[user_id])
+        )

@@ -3,18 +3,19 @@ from typing import Any, Type
 
 from api_keys.permissions import ApiKeyPermission
 from config.openapi import (
+    offset_query,
     skip_param_query,
-    offset_query
 )
-from config.pagination import (
-    paginate_by_offset
-)
+from config.pagination import paginate_by_offset
 from config.serializers import (
     BaseBulkDeleteSerializer,
 )
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
     method_decorator,
+)
+from django_filters.rest_framework import (
+    DjangoFilterBackend,
 )
 from drf_yasg.utils import swagger_auto_schema
 from events.services import (
@@ -29,9 +30,16 @@ from notifications.constants.success import (
     NOTIFICATIONS_DELETED_SUCCESS,
     NOTIFICATIONS_READED_SUCCESS,
 )
+from notifications.filters import (
+    NotificationsFilterSet,
+)
 from notifications.models import Notification
+from notifications.openapi import (
+    notifications_list_query_params,
+)
 from notifications.serializers import (
     ChangeMaintenanceSerializer,
+    GetNotificationsIdsSerializer,
     NotificationSerializer,
     UserNotificationsCount,
 )
@@ -60,9 +68,8 @@ from rest_framework.status import (
 from rest_framework.views import APIView
 
 
-@method_decorator(swagger_auto_schema(
-    manual_parameters=[skip_param_query, offset_query]), 
-    name="get"
+@method_decorator(
+    swagger_auto_schema(manual_parameters=notifications_list_query_params), name="get"
 )
 @paginate_by_offset
 class UserNotificationsList(ListAPIView):
@@ -76,7 +83,9 @@ class UserNotificationsList(ListAPIView):
     """
 
     serializer_class: Type[Serializer] = NotificationSerializer
+    filterset_class = NotificationsFilterSet
     filter_backends = [
+        DjangoFilterBackend,
         OrderingFilter,
     ]
     ordering_fields: list[str] = [
@@ -273,3 +282,27 @@ class ReadAllUserNotifications(APIView):
     def get(self, request: Request) -> Response:
         read_all_user_notifications.delay(request_user_id=request.user.id)
         return Response(NOTIFICATIONS_READED_SUCCESS, status=HTTP_200_OK)
+
+
+class GetNotificationsIds(GenericAPIView):
+    """
+    Get user notifications ids array
+
+    This endpoint allows the user to
+    get the array of all his notifications ids
+    """
+
+    queryset: QuerySet[Notification] = Notification.get_all()
+    serializer_class: Type[Serializer] = GetNotificationsIdsSerializer
+
+    def post(self, request: Request) -> Response:
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        return Response(
+            {
+                "ids": self.queryset.filter(user=request.user).values_list(
+                    "id", flat=True
+                )[: serializer.validated_data["count"]]
+            }
+        )

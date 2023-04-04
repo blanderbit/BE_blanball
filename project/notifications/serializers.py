@@ -1,5 +1,6 @@
 from typing import Union
 
+from authentication.models import User
 from notifications.models import Notification
 from rest_framework.serializers import (
     BooleanField,
@@ -13,6 +14,24 @@ class NotificationSerializer(ModelSerializer):
     class Meta:
         model: Notification = Notification
         fields: Union[str, list[str]] = "__all__"
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+
+        try:
+            sender = User.objects.get(id=data["data"]["sender"]["id"])
+            data["data"]["sender"]["avatar"] = sender.profile.avatar_url
+            data["data"]["sender"]["is_online"] = sender.is_online
+        except KeyError:
+            pass
+
+        try:
+            recipient = User.objects.get(id=data["data"]["recipient"]["id"])
+            data["data"]["recipient"]["avatar"] = recipient.profile.avatar_url
+        except KeyError:
+            pass
+
+        return data
 
 
 class UserNotificationSerializer(ModelSerializer):
@@ -42,4 +61,14 @@ class ChangeMaintenanceSerializer(Serializer):
     class Meta:
         fields: Union[str, list[str]] = [
             "isMaintenance",
+        ]
+
+
+class GetNotificationsIdsSerializer(Serializer):
+
+    count: bool = IntegerField()
+
+    class Meta:
+        fields: Union[str, list[str]] = [
+            "count",
         ]

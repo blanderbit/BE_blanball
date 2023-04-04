@@ -1,7 +1,8 @@
 name: build_proxy
 
 on:
-    push:
+    pull_request:
+        types: [merged]
         branches:
             - develop
             - main

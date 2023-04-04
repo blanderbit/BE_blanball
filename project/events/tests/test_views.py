@@ -133,13 +133,13 @@ class TestEventsViews(SetUpEventsViews):
     @freeze_time("2022-9-29")
     def test_user_events_list(self) -> None:
         self.create_events(10)
-        get_user_events_list = self.client.get(reverse("user-events-list"))
+        get_user_events_list = self.client.get(reverse("my-events-list"))
         self.client.force_authenticate(None)
         self.client.post(reverse("register"), self.user_reg_data_2)
         self.client.force_authenticate(
             User.get_all().get(email=self.user_reg_data_2["email"])
         )
-        get_user_events_list_2 = self.client.get(reverse("user-events-list"))
+        get_user_events_list_2 = self.client.get(reverse("my-events-list"))
         self.assertEqual(Event.objects.count(), 10)
         self.assertEqual(get_user_events_list.data["total_count"], 10)
         self.assertEqual(get_user_events_list.status_code, HTTP_200_OK)

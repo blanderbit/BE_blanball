@@ -260,6 +260,12 @@ class User(AbstractBaseUser):
         return {"refresh": str(refresh), "access": str(access)}
 
     @property
+    def count_pinned_events(self) -> int:
+        from events.models import Event
+
+        return Event.get_all().filter(author_id=self.id, pinned=True).count()
+
+    @property
     def group_name(self) -> str:
         return "user_%s" % self.id
 

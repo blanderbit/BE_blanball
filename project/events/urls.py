@@ -19,18 +19,21 @@ from events.views import (
     InviteUserToEvent,
     JoinToEvent,
     LeaveFromEvent,
+    MyEventsList,
+    MyFinishedEventsList,
+    MyPinnedEventsCount,
+    MyPlannedParticipantAndViewEventsList,
+    MyTopicalEventsList,
+    PinMyEvents,
+    PlannedEventsList,
     PopularEventsList,
     RemoveUserFromEvent,
     RequestToParticipationsList,
+    UnPinMyEvents,
     UpdateEvent,
-    UserEventsList,
-    PinMyEvents,
     UserEventsRelevantList,
-    MyPlannedParticipantAndViewEventsList,
     UserParticipantEventsList,
     UserPlannedEventsList,
-    UnPinMyEvents,
-    PlannedEventsList,
 )
 
 urlpatterns: list[Union[URLResolver, URLPattern]] = [
@@ -63,7 +66,17 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
         FanLeaveFromEvent.as_view(),
         name="spectator-leave-from-event",
     ),
-    path("client/my/events/list", UserEventsList.as_view(), name="user-events-list"),
+    path("client/my/events/list", MyEventsList.as_view(), name="my-events-list"),
+    path(
+        "client/my/topical/events/list",
+        MyTopicalEventsList.as_view(),
+        name="my-topical-events-list",
+    ),
+    path(
+        "client/my/finished/events/list",
+        MyFinishedEventsList.as_view(),
+        name="my-finished-events-list",
+    ),
     path(
         "client/my/participant/events/list",
         UserParticipantEventsList.as_view(),
@@ -118,5 +131,10 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
         "client/accept/or/decline/invites/to/events",
         BulkAcceptOrDeclineInvitesToEvent.as_view(),
         name="accept-decline-invites-to-event",
+    ),
+    path(
+        "client/my/pinned/events/count",
+        MyPinnedEventsCount.as_view(),
+        name="my-pinned-events-count",
     ),
 ]

@@ -8,12 +8,10 @@ from typing import Any, Type, final
 from authentication.models import User
 from config.exceptions import _404
 from config.openapi import (
-    skip_param_query, 
-    offset_query
+    offset_query,
+    skip_param_query,
 )
-from config.pagination import (
-    paginate_by_offset
-)
+from config.pagination import paginate_by_offset
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
     method_decorator,
@@ -72,8 +70,7 @@ class InviteUserToEvent(GenericAPIView):
 
 
 @method_decorator(
-    swagger_auto_schema(
-    manual_parameters=[skip_param_query, offset_query]),
+    swagger_auto_schema(manual_parameters=[skip_param_query, offset_query]),
     name="get",
 )
 @paginate_by_offset
@@ -118,9 +115,7 @@ class BulkAcceptOrDeclineInvitesToEvent(GenericAPIView):
 
 
 @method_decorator(
-    swagger_auto_schema(
-    manual_parameters=[skip_param_query, offset_query]),
-    name="get"
+    swagger_auto_schema(manual_parameters=[skip_param_query, offset_query]), name="get"
 )
 @paginate_by_offset
 class RequestToParticipationsList(ListAPIView):
@@ -142,7 +137,7 @@ class RequestToParticipationsList(ListAPIView):
     @not_in_black_list
     @skip_objects_from_response_by_id
     def list(self, request: Request, pk: int) -> Response:
-        
+
         try:
             event: Event = Event.get_all().get(id=pk)
             queryset = self.queryset.filter(event=event)

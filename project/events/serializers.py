@@ -29,15 +29,16 @@ from events.validators import (
 from rest_framework.serializers import (
     BooleanField,
     CharField,
+    ChoiceField,
     IntegerField,
     ModelSerializer,
     Serializer,
     ValidationError,
-    ChoiceField
 )
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
+
 
 class CreateEventSerializer(ModelSerializer):
     place = PlaceSerializer()
@@ -148,6 +149,19 @@ class EventListSerializer(ModelSerializer):
             "count_current_fans",
             "request_user_role",
         ]
+
+    def to_representation(self, instance):
+        try:
+            event_id = instance.id
+            user_id = self.context.get("request").parser_context["kwargs"]["pk"]
+            event = Event.objects.get(id=event_id)
+            data = super().to_representation(instance)
+            data["pk_user_role"] = event.get_user_role(pk=user_id)
+            return data
+        except KeyError:
+            data = super().to_representation(instance)
+            return data
+
 
 class MyEventListSerializer(ModelSerializer):
     place = PlaceSerializer()

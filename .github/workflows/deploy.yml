@@ -10,14 +10,44 @@
 name: deploy
 
 on:
-    push:
+    pull_request:
+        types: [merged]
         branches:
             - develop
             - main
 
 jobs:
+    update_maintenance_value:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@master
+            - name: Update maintenance value
+              uses: actions/github-script@v3
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const fs = require('fs');
+                      const path = require('path');
+                      const filePath = path.join(process.env.GITHUB_WORKSPACE, 'project/config/config.json');
+                      const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+                      fileContent.isMaintenance = ${{ github.ref == 'refs/heads/main' }};
+                      fs.writeFileSync(filePath, JSON.stringify(fileContent));
+            - name: Commit files
+              continue-on-error: true
+              run: |
+                  git config --local user.email "action@github.com"
+                  git config --local user.name "GitHub Action"
+                  git commit -am "auto update maintenance value"
+                  git tag ${{ steps.semantic_release_info.outputs.git_tag }}
+            - name: Push changes
+              continue-on-error: true
+              uses: ad-m/github-push-action@v0.6.0
+              with:
+                  branch: ${{ github.ref_name }}
+                  github_token: ${{ secrets.AUTH_TOKEN }}
     run_tests:
         runs-on: ubuntu-latest
+        needs: update_maintenance_value
         env:
             ENV_FILE: ${{ secrets.ENV_FILE }}
             PYTHON_VERSION: 3.10.7

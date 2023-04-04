@@ -13,9 +13,6 @@ from authentication.filters import (
     RankedFuzzySearchFilter,
     UserAgeRangeFilter,
 )
-from config.pagination import (
-    paginate_by_offset
-)
 from authentication.models import User
 from authentication.openapi import (
     users_list_query_params,
@@ -25,6 +22,7 @@ from authentication.serializers import (
     UsersListDetailSerializer,
     UsersListSerializer,
 )
+from config.pagination import paginate_by_offset
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
     method_decorator,

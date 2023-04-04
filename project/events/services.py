@@ -13,6 +13,7 @@ from typing import (
 import pandas
 from authentication.models import User
 from config.exceptions import _404
+from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
 from django.db.models.query import QuerySet
@@ -67,18 +68,23 @@ def bulk_delete_events(
         except Event.DoesNotExist:
             pass
 
+
 def bulk_pin_events(
     *, data: dict[str, Any], queryset: QuerySet[Event], user: User
 ) -> bulk:
     for event_id in data:
         try:
             event: Event = queryset.get(id=event_id)
-            if event.author == user:
+            if (
+                event.author == user
+                and user.count_pinned_events < settings.MAX_COUNT_PINNED_EVENTS
+            ):
                 event.pinned = True
                 event.save()
                 yield {"success": event_id}
         except Event.DoesNotExist:
             pass
+
 
 def bulk_unpin_events(
     *, data: dict[str, Any], queryset: QuerySet[Event], user: User
@@ -92,6 +98,7 @@ def bulk_unpin_events(
                 yield {"success": event_id}
         except Event.DoesNotExist:
             pass
+
 
 def send_message_after_bulk_accept_or_decline(
     *,
@@ -111,7 +118,6 @@ def send_message_after_bulk_accept_or_decline(
                 "id": object.sender.id,
                 "name": object.sender.profile.name,
                 "last_name": object.sender.profile.last_name,
-                "avatar": object.sender.profile.avatar_url,
             },
             "event": {
                 "id": object.event.id,
@@ -125,7 +131,6 @@ def send_message_after_bulk_accept_or_decline(
                 "id": object.recipient.id,
                 "name": object.recipient.profile.name,
                 "last_name": object.recipient.profile.last_name,
-                "avatar": object.recipient.profile.avatar_url,
             },
         },
     )
@@ -228,6 +233,11 @@ def send_notification_to_subscribe_event_user(
             user=user,
             message_type=message_type,
             data={
+                "sender": {
+                    "id": event.author.id,
+                    "name": event.author.profile.name,
+                    "last_name": event.author.profile.last_name,
+                },
                 "recipient": {
                     "id": user.id,
                     "name": user.profile.name,
@@ -268,7 +278,6 @@ def send_notification_to_event_author(*, event: Event, request_user: User) -> No
                 "id": event.author.id,
                 "name": event.author.profile.name,
                 "last_name": event.author.profile.last_name,
-                "avatar": event.author.profile.avatar_url,
             },
             "event": {
                 "id": event.id,
@@ -278,7 +287,6 @@ def send_notification_to_event_author(*, event: Event, request_user: User) -> No
                 "id": request_user.id,
                 "name": request_user.profile.name,
                 "last_name": request_user.profile.last_name,
-                "avatar": request_user.profile.avatar_url,
             },
         },
     )
@@ -421,7 +429,6 @@ def send_message_to_event_author_after_leave_user_from_event(
                 "id": event.author.id,
                 "name": event.author.profile.name,
                 "last_name": event.author.profile.last_name,
-                "avatar": event.author.profile.avatar_url,
             },
             "event": {
                 "id": event.id,
@@ -431,7 +438,6 @@ def send_message_to_event_author_after_leave_user_from_event(
                 "id": user.id,
                 "name": user.profile.name,
                 "last_name": user.profile.last_name,
-                "avatar": user.profile.avatar_url,
             },
         },
     )
