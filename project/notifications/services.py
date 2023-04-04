@@ -6,6 +6,7 @@ from typing import (
     Optional,
     TypeVar,
 )
+
 from authentication.models import User
 from notifications.constants.notification_types import (
     CHANGE_MAINTENANCE_NOTIFICATION_TYPE,
@@ -13,7 +14,10 @@ from notifications.constants.notification_types import (
     NOTIFICATIONS_BULK_READ_NOTIFICATION_TYPE,
 )
 from notifications.models import Notification
-from notifications.tasks import send, send_to_general_layer
+from notifications.tasks import (
+    send,
+    send_to_general_layer,
+)
 
 bulk = TypeVar(Optional[Generator[list[dict[str, int]], None, None]])
 
@@ -33,10 +37,10 @@ def update_maintenance(*, data: dict[str, str]) -> None:
                 "maintenance": {
                     "type": data["isMaintenance"],
                 }
-            }
+            },
         )
 
-        
+
 def send_message_after_bulk_method(message_type: str) -> ...:
     def wrap(
         func: Callable[[Any, Any], bulk]

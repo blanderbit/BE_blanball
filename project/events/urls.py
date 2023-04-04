@@ -19,21 +19,21 @@ from events.views import (
     InviteUserToEvent,
     JoinToEvent,
     LeaveFromEvent,
+    MyEventsList,
+    MyFinishedEventsList,
+    MyPinnedEventsCount,
+    MyPlannedParticipantAndViewEventsList,
+    MyTopicalEventsList,
+    PinMyEvents,
+    PlannedEventsList,
     PopularEventsList,
     RemoveUserFromEvent,
     RequestToParticipationsList,
+    UnPinMyEvents,
     UpdateEvent,
-    MyEventsList,
-    MyFinishedEventsList,
-    MyTopicalEventsList,
-    PinMyEvents,
     UserEventsRelevantList,
-    MyPlannedParticipantAndViewEventsList,
     UserParticipantEventsList,
     UserPlannedEventsList,
-    UnPinMyEvents,
-    MyPinnedEventsCount,
-    PlannedEventsList,
 )
 
 urlpatterns: list[Union[URLResolver, URLPattern]] = [
@@ -68,14 +68,14 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     ),
     path("client/my/events/list", MyEventsList.as_view(), name="my-events-list"),
     path(
-        "client/my/topical/events/list", 
-        MyTopicalEventsList.as_view(),  
-        name="my-topical-events-list"
+        "client/my/topical/events/list",
+        MyTopicalEventsList.as_view(),
+        name="my-topical-events-list",
     ),
     path(
-        "client/my/finished/events/list", 
+        "client/my/finished/events/list",
         MyFinishedEventsList.as_view(),
-        name="my-finished-events-list"
+        name="my-finished-events-list",
     ),
     path(
         "client/my/participant/events/list",
@@ -136,5 +136,5 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
         "client/my/pinned/events/count",
         MyPinnedEventsCount.as_view(),
         name="my-pinned-events-count",
-    )
+    ),
 ]

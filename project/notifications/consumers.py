@@ -1,19 +1,19 @@
 import json
 from typing import Any, Literal, Optional
 
-from authentication.models import User
 from authentication.constants.notification_types import (
+    UPDATE_MESSAGE_USER_OFFLINE,
     UPDATE_MESSAGE_USER_ONLINE,
-    UPDATE_MESSAGE_USER_OFFLINE
 )
+from authentication.models import User
 from channels.db import database_sync_to_async
 from channels.generic.websocket import (
     AsyncWebsocketConsumer,
 )
-from notifications.services import (
-    send_to_general_layer
-)
 from django.utils import timezone
+from notifications.services import (
+    send_to_general_layer,
+)
 
 
 class UserConsumer(AsyncWebsocketConsumer):
@@ -55,7 +55,7 @@ class UserConsumer(AsyncWebsocketConsumer):
                 "user": {
                     "id": user.id,
                 }
-            }
+            },
         )
 
     @database_sync_to_async
@@ -69,7 +69,7 @@ class UserConsumer(AsyncWebsocketConsumer):
                 "user": {
                     "id": user.id,
                 }
-            }
+            },
         )
 
     async def disconnect(self, close_code: int) -> None:

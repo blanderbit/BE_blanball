@@ -50,10 +50,7 @@ class CreateReviewSerializer(ModelSerializer):
                     "name": review.user.profile.name,
                     "last_name": review.user.profile.last_name,
                 },
-                "review": {
-                    "id": review.id,
-                    "text": review.text
-                },
+                "review": {"id": review.id, "text": review.text},
                 "sender": {
                     "id": review.author.id,
                     "name": review.author.profile.name,

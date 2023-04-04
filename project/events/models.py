@@ -18,12 +18,10 @@ from events.constants.errors import (
     THIS_USER_CAN_NOT_BE_INVITED,
     USER_CAN_NOT_INVITE_TO_THIS_EVENT_ERROR,
 )
-from events.middlewares import (
-    current_request,
-)
 from events.constants.notification_types import (
     INVITE_USER_TO_EVENT_NOTIFICATION_TYPE,
 )
+from events.middlewares import current_request
 from notifications.tasks import send_to_user
 from phonenumber_field.modelfields import (
     PhoneNumberField,
@@ -34,7 +32,6 @@ from rest_framework.serializers import (
 from rest_framework.status import (
     HTTP_403_FORBIDDEN,
 )
-
 
 
 class Event(models.Model):
@@ -138,7 +135,7 @@ class Event(models.Model):
         return Event.objects.select_related("author").prefetch_related(
             "current_users", "current_fans"
         )
-    
+
     def get_user_role(self, pk: Optional[int] = None):
         if pk:
             try:
@@ -155,20 +152,18 @@ class Event(models.Model):
         sender_ids = [d.sender.id for d in event_requests_to_participations]
 
         if user == self.author:
-            return 'author'
+            return "author"
         elif user in self.current_users.all():
-            return 'player'
+            return "player"
         elif user in self.current_fans.all():
-            return 'fan'
+            return "fan"
         elif user.id in sender_ids:
-            return 'request_participation'
+            return "request_participation"
         return None
 
-    
     @property
-    def request_user_role(self) -> Optional[str]: 
+    def request_user_role(self) -> Optional[str]:
         return self.get_user_role()
-
 
     @final
     def save(self, *args: Any, **kwargs: Any) -> None:
@@ -265,9 +260,9 @@ class InviteToEventManager(models.Manager):
                         "last_name": invite_user.profile.last_name,
                     },
                     "event": {
-                        "id": event.id, 
+                        "id": event.id,
                         "name": event.name,
-                        "date_and_time": str(event.date_and_time)
+                        "date_and_time": str(event.date_and_time),
                     },
                     "invite": {
                         "id": invite.id,

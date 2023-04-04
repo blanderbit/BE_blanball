@@ -3,18 +3,19 @@ from typing import Any, Type
 
 from api_keys.permissions import ApiKeyPermission
 from config.openapi import (
+    offset_query,
     skip_param_query,
-    offset_query
 )
-from config.pagination import (
-    paginate_by_offset
-)
+from config.pagination import paginate_by_offset
 from config.serializers import (
     BaseBulkDeleteSerializer,
 )
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
     method_decorator,
+)
+from django_filters.rest_framework import (
+    DjangoFilterBackend,
 )
 from drf_yasg.utils import swagger_auto_schema
 from events.services import (
@@ -29,15 +30,18 @@ from notifications.constants.success import (
     NOTIFICATIONS_DELETED_SUCCESS,
     NOTIFICATIONS_READED_SUCCESS,
 )
+from notifications.filters import (
+    NotificationsFilterSet,
+)
 from notifications.models import Notification
+from notifications.openapi import (
+    notifications_list_query_params,
+)
 from notifications.serializers import (
     ChangeMaintenanceSerializer,
+    GetNotificationsIdsSerializer,
     NotificationSerializer,
     UserNotificationsCount,
-    GetNotificationsIdsSerializer,
-)
-from notifications.filters import (
-    NotificationsFilterSet
 )
 from notifications.services import (
     bulk_delete_notifications,
@@ -48,15 +52,7 @@ from notifications.tasks import (
     delete_all_user_notifications,
     read_all_user_notifications,
 )
-from notifications.openapi import (
-    notifications_list_query_params,
-)
-from rest_framework.filters import (
-    OrderingFilter,
-)
-from django_filters.rest_framework import (
-    DjangoFilterBackend,
-)
+from rest_framework.filters import OrderingFilter
 from rest_framework.generics import (
     GenericAPIView,
     ListAPIView,
@@ -72,9 +68,8 @@ from rest_framework.status import (
 from rest_framework.views import APIView
 
 
-@method_decorator(swagger_auto_schema(
-    manual_parameters=notifications_list_query_params), 
-    name="get"
+@method_decorator(
+    swagger_auto_schema(manual_parameters=notifications_list_query_params), name="get"
 )
 @paginate_by_offset
 class UserNotificationsList(ListAPIView):
@@ -304,7 +299,10 @@ class GetNotificationsIds(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        return Response({
-            "ids": self.queryset.filter(user=request.user).values_list('id', flat=True)
-            [:serializer.validated_data["count"]]
-        })
+        return Response(
+            {
+                "ids": self.queryset.filter(user=request.user).values_list(
+                    "id", flat=True
+                )[: serializer.validated_data["count"]]
+            }
+        )

@@ -11,11 +11,11 @@ from notifications.views import (
     DeleteNotifcations,
     GetCurrentVersion,
     GetMaintenance,
+    GetNotificationsIds,
     ReadAllUserNotifications,
     ReadNotifications,
     UserNotificaitonsCount,
     UserNotificationsList,
-    GetNotificationsIds,
 )
 
 urlpatterns: list[Union[URLResolver, URLPattern]] = [

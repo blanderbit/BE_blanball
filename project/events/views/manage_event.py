@@ -18,11 +18,11 @@ from events.serializers import (
 )
 from events.services import (
     bulk_delete_events,
+    bulk_pin_events,
+    bulk_unpin_events,
     event_create,
     not_in_black_list,
     only_author,
-    bulk_pin_events,
-    bulk_unpin_events,
     send_notification_to_subscribe_event_user,
 )
 from rest_framework.generics import GenericAPIView
@@ -163,7 +163,6 @@ class UnPinMyEvents(GenericAPIView):
         return Response(data, status=HTTP_200_OK)
 
 
-
 class GetEvent(RetrieveModelMixin, GenericAPIView):
     """
     Get event
@@ -182,8 +181,5 @@ class GetEvent(RetrieveModelMixin, GenericAPIView):
 
 
 class MyPinnedEventsCount(GenericAPIView):
-
     def get(self, request):
-        return Response({
-            "count": request.user.count_pinned_events
-        }, status=HTTP_200_OK)
+        return Response({"count": request.user.count_pinned_events}, status=HTTP_200_OK)

@@ -10,9 +10,7 @@ from authentication.filters import (
 )
 from authentication.models import User
 from config.exceptions import _404
-from config.pagination import (
-    paginate_by_offset
-)
+from config.pagination import paginate_by_offset
 from django.db.models import Count, Q
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
@@ -139,9 +137,11 @@ class MyEventsList(EventsList):
     serializer_class: Type[Serializer] = MyEventListSerializer
 
     def get_queryset(self) -> QuerySet[Event]:
-        return EventsList.get_queryset(self).filter(
-            author_id=self.request.user.id
-        ).order_by('-pinned', '-id')
+        return (
+            EventsList.get_queryset(self)
+            .filter(author_id=self.request.user.id)
+            .order_by("-pinned", "-id")
+        )
 
 
 class MyTopicalEventsList(EventsList):
@@ -155,10 +155,14 @@ class MyTopicalEventsList(EventsList):
     serializer_class: Type[Serializer] = MyEventListSerializer
 
     def get_queryset(self) -> QuerySet[Event]:
-        return EventsList.get_queryset(self).filter(
-            author_id=self.request.user.id,
-            status__in=[Event.Status.PLANNED, Event.Status.ACTIVE]
-        ).order_by('-pinned', '-id')
+        return (
+            EventsList.get_queryset(self)
+            .filter(
+                author_id=self.request.user.id,
+                status__in=[Event.Status.PLANNED, Event.Status.ACTIVE],
+            )
+            .order_by("-pinned", "-id")
+        )
 
 
 class MyFinishedEventsList(EventsList):
@@ -172,10 +176,11 @@ class MyFinishedEventsList(EventsList):
     serializer_class: Type[Serializer] = MyEventListSerializer
 
     def get_queryset(self) -> QuerySet[Event]:
-        return EventsList.get_queryset(self).filter(
-            author_id=self.request.user.id,
-            status=Event.Status.FINISHED
-        ).order_by('-pinned', '-id')
+        return (
+            EventsList.get_queryset(self)
+            .filter(author_id=self.request.user.id, status=Event.Status.FINISHED)
+            .order_by("-pinned", "-id")
+        )
 
 
 class UserParticipantEventsList(EventsList):
@@ -257,5 +262,6 @@ class UserPlannedEventsList(EventsList):
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Event]:
         user_id = self.kwargs.get("pk")
-        return self.queryset.filter(Q(current_users__in=[user_id]) |
-                                    Q(current_fans__in=[user_id]))
+        return self.queryset.filter(
+            Q(current_users__in=[user_id]) | Q(current_fans__in=[user_id])
+        )

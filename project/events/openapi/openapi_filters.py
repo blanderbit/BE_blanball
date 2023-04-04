@@ -2,9 +2,9 @@ from authentication.models import Gender
 from config.openapi import (
     concat_search_fields,
     distance_query,
+    offset_query,
     point_query,
     skip_param_query,
-    offset_query
 )
 from drf_yasg import openapi
 from events.filters import (

@@ -122,26 +122,12 @@ SIMPLE_JWT: dict[str, Any] = {
     ),
 }
 
-CORS_ALLOWED_ORIGINS = config('ALLOWED_ORIGINS', cast=lambda v: [s.strip() for s in v.split(',')])
-CORS_ALLOW_METHODS: list[str] = [
-    "DELETE",
-    "GET",
-    "OPTIONS",
-    "POST",
-    "PUT",
-    "PATCH",
-]
-
-CORS_ALLOW_HEADERS: list[str] = [
-    "accept",
-    "accept-encoding",
-    "authorization",
-    "content-type",
-    "dnt",
-    "origin",
-    "user-agent",
-    "x-csrftoken",
-    "x-requested-with",
-    "apikey",
-    "App-Version",
-]
+CORS_ALLOWED_ORIGINS = config(
+    "ALLOWED_ORIGINS", cast=lambda v: [s.strip() for s in v.split(",")]
+)
+CORS_ALLOW_METHODS: list[str] = config(
+    "CORS_ALLOW_METHODS", cast=lambda v: [s.strip() for s in v.split(",")]
+)
+CORS_ALLOW_HEADERS: list[str] = config(
+    "CORS_ALLOW_HEADERS", cast=lambda v: [s.strip() for s in v.split(",")]
+)

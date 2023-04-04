@@ -1,12 +1,10 @@
 from typing import Type
 
 from config.openapi import (
+    offset_query,
     skip_param_query,
-    offset_query
 )
-from config.pagination import (
-    paginate_by_offset
-)
+from config.pagination import paginate_by_offset
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
     method_decorator,
@@ -52,9 +50,8 @@ class ReviewCreate(CreateAPIView):
     queryset: QuerySet[Review] = Review.get_all()
 
 
-@method_decorator(swagger_auto_schema(
-    manual_parameters=[skip_param_query, offset_query]), 
-    name="get"
+@method_decorator(
+    swagger_auto_schema(manual_parameters=[skip_param_query, offset_query]), name="get"
 )
 @paginate_by_offset
 class MyReviewsList(ListAPIView):

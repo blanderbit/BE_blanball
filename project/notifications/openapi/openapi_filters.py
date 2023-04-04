@@ -1,11 +1,10 @@
 from config.openapi import (
     concat_search_fields,
+    offset_query,
     skip_param_query,
-    offset_query
 )
 from drf_yasg import openapi
 from notifications.models import Notification
-
 
 notifications_type_query = openapi.Parameter(
     "type",

@@ -28,7 +28,6 @@ class CustomPagination(PageNumberPagination):
         return Response(response_data)
 
 
-
 def paginate_by_offset(cls: type) -> type:
     original_get_queryset = cls.get_queryset
 

@@ -11,14 +11,8 @@ def set_forms(apps, schema_editor):
     Event = apps.get_model("events", "Event")
     for event in Event.objects.all():
         event.forms = {
-            'first_team': {
-                'type': 'Shirt-Front',
-                'color': '#000'
-            },
-            'second': {
-                'type': 'Shirt-Front',
-                'color': '#000'
-            }
+            "first_team": {"type": "Shirt-Front", "color": "#000"},
+            "second": {"type": "Shirt-Front", "color": "#000"},
         }
         event.save()
 

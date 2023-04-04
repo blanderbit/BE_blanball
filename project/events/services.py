@@ -13,10 +13,10 @@ from typing import (
 import pandas
 from authentication.models import User
 from config.exceptions import _404
+from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
 from django.db.models.query import QuerySet
-from django.conf import settings
 from django.utils import timezone
 from events.constants.errors import (
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,
@@ -68,18 +68,23 @@ def bulk_delete_events(
         except Event.DoesNotExist:
             pass
 
+
 def bulk_pin_events(
     *, data: dict[str, Any], queryset: QuerySet[Event], user: User
 ) -> bulk:
     for event_id in data:
         try:
             event: Event = queryset.get(id=event_id)
-            if event.author == user and user.count_pinned_events < settings.MAX_COUNT_PINNED_EVENTS:
+            if (
+                event.author == user
+                and user.count_pinned_events < settings.MAX_COUNT_PINNED_EVENTS
+            ):
                 event.pinned = True
                 event.save()
                 yield {"success": event_id}
         except Event.DoesNotExist:
             pass
+
 
 def bulk_unpin_events(
     *, data: dict[str, Any], queryset: QuerySet[Event], user: User
@@ -93,6 +98,7 @@ def bulk_unpin_events(
                 yield {"success": event_id}
         except Event.DoesNotExist:
             pass
+
 
 def send_message_after_bulk_accept_or_decline(
     *,

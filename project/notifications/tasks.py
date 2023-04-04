@@ -55,10 +55,7 @@ def send_to_general_layer(
         "general",
         {
             "type": "general.message",
-            "message": {
-                "message_type": message_type,
-                "data": data
-            },
+            "message": {"message_type": message_type, "data": data},
         },
     )
 

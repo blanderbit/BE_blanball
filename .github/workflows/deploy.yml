@@ -16,6 +16,37 @@ on:
             - main
 
 jobs:
+    update_maintenance_value:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@master
+            - name: Set env vars (TEST)
+              if: github.ref == 'refs/heads/develop'
+              run: |
+                  echo "MAINTENANCE_VALUE=false" >> $GITHUB_ENV
+            - name: Set env vars (PROD)
+              if: github.ref == 'refs/heads/main'
+              run: |
+                  echo "MAINTENANCE_VALUE=true" >> $GITHUB_ENV
+            - name: Update maintenance value
+              uses: jossef/action-set-json-field@v2.1
+              with:
+                  file: project/config/config.json
+                  field: version
+                  value: ${{ env.MAINTENANCE_VALUE }}
+            - name: Commit files
+              continue-on-error: true
+              run: |
+                  git config --local user.email "action@github.com"
+                  git config --local user.name "GitHub Action"
+                  git commit -am "auto update maintenance value"
+                  git tag ${{ steps.semantic_release_info.outputs.git_tag }}
+            - name: Push changes
+              continue-on-error: true
+              uses: ad-m/github-push-action@v0.6.0
+              with:
+                  branch: ${{ github.ref_name }}
+                  github_token: ${{ secrets.AUTH_TOKEN }}
     run_tests:
         runs-on: ubuntu-latest
         env:
