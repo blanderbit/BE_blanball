@@ -19,6 +19,7 @@ on:
 jobs:
     update_maintenance_value:
         runs-on: ubuntu-latest
+        if: github.event.pull_request.merged
         steps:
             - uses: actions/checkout@master
             - name: Update maintenance value
@@ -47,6 +48,7 @@ jobs:
                   github_token: ${{ secrets.AUTH_TOKEN }}
     run_tests:
         runs-on: ubuntu-latest
+        if: github.event.pull_request.merged
         needs: update_maintenance_value
         env:
             ENV_FILE: ${{ secrets.ENV_FILE }}
@@ -105,6 +107,7 @@ jobs:
                   poetry run python3 manage.py test --no-input
     auto_deploy:
         runs-on: ubuntu-latest
+        if: github.event.pull_request.merged
         needs: run_tests
         steps:
             - uses: actions/checkout@master

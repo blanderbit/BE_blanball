@@ -2,7 +2,7 @@ name: build_proxy
 
 on:
     pull_request:
-        types: [merged]
+        types: [closed]
         branches:
             - develop
             - main
@@ -11,6 +11,7 @@ on:
 jobs:
     build_proxy:
         runs-on: ubuntu-latest
+        if: github.event.pull_request.merged
         steps:
             - uses: actions/checkout@master
             - name: Set env vars (TEST)
