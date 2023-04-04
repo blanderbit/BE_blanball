@@ -26,6 +26,7 @@ jobs:
                   file: project/config/config.json
                   field: isMaintenance
                   value: ${{ github.ref == 'refs/heads/main' }}
+                  value_is_string: false
             - name: Commit files
               continue-on-error: true
               run: |
