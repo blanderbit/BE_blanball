@@ -20,20 +20,12 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@master
-            - name: Set env vars (TEST)
-              if: github.ref == 'refs/heads/develop'
-              run: |
-                  echo "MAINTENANCE_VALUE=false" >> $GITHUB_ENV
-            - name: Set env vars (PROD)
-              if: github.ref == 'refs/heads/main'
-              run: |
-                  echo "MAINTENANCE_VALUE=true" >> $GITHUB_ENV
             - name: Update maintenance value
               uses: jossef/action-set-json-field@v2.1
               with:
-                  file: project/config/config.json
-                  field: isMaintenance
-                  value: ${{ env.MAINTENANCE_VALUE == 'true' }}
+                file: project/config/config.json
+                field: isMaintenance
+                value: ${{ github.ref == 'refs/heads/main' }}
             - name: Commit files
               continue-on-error: true
               run: |
