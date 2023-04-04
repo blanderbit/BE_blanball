@@ -27,7 +27,7 @@ jobs:
                   script: |
                       const fs = require('fs');
                       const path = require('path');
-                      const filePath = path.join(process.env.GITHUB_WORKSPACE, 'project/config/config.jso');
+                      const filePath = path.join(process.env.GITHUB_WORKSPACE, 'project/config/config.json');
                       const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf8'));
                       fileContent.isMaintenance = ${{ github.ref == 'refs/heads/main' }};
                       fs.writeFileSync(filePath, JSON.stringify(fileContent));
