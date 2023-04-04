@@ -3,15 +3,11 @@ name: build_proxy
 on:
     pull_request:
         types: [closed]
-        branches:
-            - develop
-            - main
-    workflow_dispatch:
 
 jobs:
     build_proxy:
         runs-on: ubuntu-latest
-        if: github.event.pull_request.merged
+        if: github.event.pull_request.merged == true && (github.event.pull_request.base.ref == 'main' || github.event.pull_request.base.ref == 'develop')
         steps:
             - uses: actions/checkout@master
             - name: Set env vars (TEST)
