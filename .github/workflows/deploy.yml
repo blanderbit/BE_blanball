@@ -46,6 +46,7 @@ jobs:
                   github_token: ${{ secrets.AUTH_TOKEN }}
     run_tests:
         runs-on: ubuntu-latest
+        needs: update_maintenance_value
         env:
             ENV_FILE: ${{ secrets.ENV_FILE }}
             PYTHON_VERSION: 3.10.7
