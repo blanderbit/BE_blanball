@@ -11,7 +11,7 @@ name: deploy
 
 on:
     pull_request:
-        types: [merged]
+        types: [closed]
         branches:
             - develop
             - main
