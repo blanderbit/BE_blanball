@@ -31,7 +31,7 @@ jobs:
                       const path = require('path');
                       const filePath = path.join(process.env.GITHUB_WORKSPACE, 'project/config/config.json');
                       const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-                      fileContent.isMaintenance = ${{ github.ref == 'refs/heads/main' }};
+                      fileContent.isMaintenance = ${{ github.event.pull_request.base.ref == 'main' }};
                       fs.writeFileSync(filePath, JSON.stringify(fileContent));
             - name: Commit files
               continue-on-error: true
@@ -44,7 +44,7 @@ jobs:
               continue-on-error: true
               uses: ad-m/github-push-action@v0.6.0
               with:
-                  branch: ${{ github.ref_name }}
+                  branch: ${{ github.event.pull_request.base.ref }}
                   github_token: ${{ secrets.AUTH_TOKEN }}
     run_tests:
         runs-on: ubuntu-latest
@@ -112,7 +112,7 @@ jobs:
         steps:
             - uses: actions/checkout@master
             - name: Set env vars (TEST)
-              if: github.ref == 'refs/heads/develop'
+              if: github.event.pull_request.base.ref == 'develop'
               run: |
                   echo "API_DOCKERFILE_PATH=Dockerfile" >> $GITHUB_ENV
                   echo "WEBHOOK=${{ secrets.PORTAINER_WEBHOOK_URL_TEST }}" >> $GITHUB_ENV
@@ -120,7 +120,7 @@ jobs:
                   echo "LATEST_IMAGE=${{ secrets.DOCKER_REGISTRY_TEST }}":latest >> $GITHUB_ENV
                   echo "COMMIT_IMAGE=${{ secrets.DOCKER_REGISTRY_TEST }}":${{ github.sha }} >> $GITHUB_ENV
             - name: Set env vars (PROD)
-              if: github.ref == 'refs/heads/main'
+              if: github.event.pull_request.base.ref == 'main'
               run: |
                   echo "API_DOCKERFILE_PATH=Dockerfile" >> $GITHUB_ENV
                   echo "REGISTRY=${{ secrets.DOCKER_REGISTRY_PROD }}" >> $GITHUB_ENV
