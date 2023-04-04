@@ -8,12 +8,12 @@ x-api-common: &api-common
     entrypoint: scripts/entrypoint.sh
 
     depends_on:
-        db:
+        db-prod:
             condition: service_healthy
         redis-prod:
             condition: service_healthy
     networks:
-        - app-network
+        - registry_default
     links:
         - redis-prod
 
@@ -22,11 +22,11 @@ services:
         container_name: proxy-prod
         env_file:
             - stack.env
-        image: registry.it-flumx.com/blanball-proxy:latest
+        image: registry.it-flumx.com/blanball-proxy-prod:latest
         ports:
-            - 50000:80
+            - 49298:80
         networks:
-            - app-network
+            - registry_default
         depends_on:
             api-prod:
                 condition: service_started
@@ -35,52 +35,39 @@ services:
         <<: *api-common
         container_name: api-prod
         command: api-deploy
-        user: deploy
+        expose:
+          - "8000"
         labels:
-            - 'traefik.enable=true'
-            ## HTTP
-            - 'traefik.http.routers.api-prod-web.entrypoints=web'
-            - 'traefik.http.routers.api-prod-web.rule=Host(`api.blanball.com`) && PathPrefix(`/api`)'
-            - 'traefik.http.services.api-prod.loadbalancer.server.port=8000'
-            ## Redirect
-            - 'traefik.http.middlewares.api-prod-redirect-web-secure.redirectscheme.scheme=https'
-            - 'traefik.http.routers.api-prod-web.middlewares=api-prod-redirect-web-secure'
-            ## HTTPS
-            - 'traefik.http.routers.api-prod-web-secure.entrypoints=web-secure'
-            - 'traefik.http.routers.api-prod-secure.rule=Host(`api-prod.blanball.com`) && PathPrefix(`/api`)'
-            - 'traefik.http.routers.api-prod-web-secure.tls=true'
-            - 'traefik.http.routers.api-prod-web-secure.tls.certResolver=sample'
+          - "traefik.enable=true"
+          - "traefik.http.routers.api-prod.rule=Host(`api.blanball.com`) && PathPrefix(`/api`)"
+          - "traefik.http.routers.api-prod.entrypoints=websecure"
+          - "traefik.http.routers.api-prod.tls.certresolver=myresolver"
+          - "traefik.http.routers.api-prod.service=api-prod"
+          - "traefik.http.services.api-prod.loadbalancer.server.port=8000"
 
     daphne-prod:
         <<: *api-common
         container_name: daphne-prod
         command: daphne
-        user: deploy
+        expose:
+          - "10000"
         labels:
-            - 'traefik.enable=true'
-            ## HTTP
-            - 'traefik.http.routers.daphne-prod-web.entrypoints=web'
-            - 'traefik.http.routers.daphne-prod-web.rule=Host(`api.blanball.com`) && PathPrefix(`/ws`)'
-            - 'traefik.http.services.daphne-prod.loadbalancer.server.port=10000'
-            ## Redirect
-            - 'traefik.http.middlewares.daphne-prod-redirect-web-secure.redirectscheme.scheme=https'
-            - 'traefik.http.routers.daphne-prod-web.middlewares=daphne-prod-redirect-web-secure'
-            ## HTTPS
-            - 'traefik.http.routers.daphne-prod-web-secure.entrypoints=web-secure'
-            - 'traefik.http.routers.daphne-prod-secure.rule=Host(`api.blanball.com`) && PathPrefix(`/ws`)'
-            - 'traefik.http.routers.daphne-prod-web-secure.tls=true'
-            - 'traefik.http.routers.daphne-prod-web-secure.tls.certResolver=sample'
+          - "traefik.enable=true"
+          - "traefik.http.routers.daphne-prod.rule=Host(`api.blanball.com`) && PathPrefix(`/ws`)"
+          - "traefik.http.routers.daphne-prod.entrypoints=websecure"
+          - "traefik.http.routers.daphne-prod.tls.certresolver=myresolver"
+          - "traefik.http.routers.daphne-prod.service=daphne-prod"
+          - "traefik.http.services.daphne-prod.loadbalancer.server.port=10000"
 
     celery-worker-prod:
         <<: *api-common
         container_name: celery-worker-prod
-        user: deploy
-        command: celery-worker-prod
+        command: celery-worker
 
     celery-beat-prod:
         <<: *api-common
         container_name: celery-beat-prod
-        command: celery-beat-prod
+        command: celery-beat
 
     db-prod:
         container_name: db-prod
@@ -89,11 +76,11 @@ services:
         image: postgis/postgis:latest
         restart: always
         volumes:
-            - db-data:/var/lib/postgresql/data
+            - db-data-prod:/var/lib/postgresql/data
         networks:
-            - app-network
+            - registry_default
         healthcheck:
-            test: pg_isready -U postgres -d postgres
+            test: pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
             timeout: 5s
             retries: 20
 
@@ -104,9 +91,9 @@ services:
         image: redis:latest
         restart: always
         volumes:
-            - redis-data:/usr/src/blanball/storage/redis/data
+            - redis-data-prod:/usr/src/blanball/storage/redis-prod/data
         networks:
-            - app-network
+            - registry_default
         healthcheck:
             test: ['CMD-SHELL', 'redis-cli ping | grep PONG']
             timeout: 3s
@@ -119,25 +106,11 @@ services:
         image: dpage/pgadmin4:latest
         restart: always
         volumes:
-            - pgadmin-data:/usr/src/blanball/storage/pgadmin/data
+            - pgadmin-data-prod:/usr/src/blanball/storage/pgadmin-prod/data
         networks:
-            - app-network
+            - registry_default
         ports:
             - 49283:${PGADMIN_LISTEN_PORT}
-
-    db_backup-prod:
-        container_name: db_backup-prod
-        env_file:
-            - stack.env
-        image: prodrigestivill/postgres-backup-local
-        restart: always
-        volumes:
-            - db-backup-data:/usr/src/blanball/storage/db-backup/data
-        networks:
-            - app-network
-        depends_on:
-            db-prod:
-                condition: service_started
 
     minio-prod:
         container_name: minio-prod
@@ -145,11 +118,11 @@ services:
             - stack.env
         image: minio/minio
         volumes:
-            - minio-data:/minio-data
-        command: 'minio server /minio-data --console-address ":9001"'
+            - minio-data-prod:/minio-data-prod
+        command: 'minio server /minio-data-prod --console-address ":9001"'
         ports:
-            - 49292:9000
-            - 49293:9001
+            - 49293:9000
+            - 49294:9001
         healthcheck:
             test:
                 ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
@@ -157,15 +130,15 @@ services:
             timeout: 20s
             retries: 3
         networks:
-            - app-network
+            - registry_default
 
 networks:
-    app-network:
-        driver: bridge
-
+    registry_default:
+        external: true
+        
 volumes:
-    redis-data:
-    pgadmin-data:
-    db-backup-data:
-    minio-data:
-    db-data:
+    redis-data-prod:
+    pgadmin-data-prod:
+    db-backup-data-prod:
+    minio-data-prod:
+    db-data-prod:

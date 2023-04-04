@@ -22,7 +22,7 @@ services:
         container_name: proxy
         env_file:
             - stack.env
-        image: registry.it-flumx.com/blanball-proxy:latest
+        image: registry.it-flumx.com/blanball-proxy-test:latest
         ports:
             - 49299:80
         networks:
@@ -69,7 +69,7 @@ services:
         networks:
             - app-network
         healthcheck:
-            test: pg_isready -U postgres -d postgres
+            test: pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
             timeout: 5s
             retries: 20
 
