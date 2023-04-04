@@ -36,28 +36,28 @@ services:
         container_name: api-prod
         command: api-deploy
         expose:
-          - "8000"
+            - '8000'
         labels:
-          - "traefik.enable=true"
-          - "traefik.http.routers.api-prod.rule=Host(`api.blanball.com`) && PathPrefix(`/api`)"
-          - "traefik.http.routers.api-prod.entrypoints=websecure"
-          - "traefik.http.routers.api-prod.tls.certresolver=myresolver"
-          - "traefik.http.routers.api-prod.service=api-prod"
-          - "traefik.http.services.api-prod.loadbalancer.server.port=8000"
+            - 'traefik.enable=true'
+            - 'traefik.http.routers.api-prod.rule=Host(`api.blanball.com`) && PathPrefix(`/api`)'
+            - 'traefik.http.routers.api-prod.entrypoints=websecure'
+            - 'traefik.http.routers.api-prod.tls.certresolver=myresolver'
+            - 'traefik.http.routers.api-prod.service=api-prod'
+            - 'traefik.http.services.api-prod.loadbalancer.server.port=8000'
 
     daphne-prod:
         <<: *api-common
         container_name: daphne-prod
         command: daphne
         expose:
-          - "10000"
+            - '10000'
         labels:
-          - "traefik.enable=true"
-          - "traefik.http.routers.daphne-prod.rule=Host(`api.blanball.com`) && PathPrefix(`/ws`)"
-          - "traefik.http.routers.daphne-prod.entrypoints=websecure"
-          - "traefik.http.routers.daphne-prod.tls.certresolver=myresolver"
-          - "traefik.http.routers.daphne-prod.service=daphne-prod"
-          - "traefik.http.services.daphne-prod.loadbalancer.server.port=10000"
+            - 'traefik.enable=true'
+            - 'traefik.http.routers.daphne-prod.rule=Host(`api.blanball.com`) && PathPrefix(`/ws`)'
+            - 'traefik.http.routers.daphne-prod.entrypoints=websecure'
+            - 'traefik.http.routers.daphne-prod.tls.certresolver=myresolver'
+            - 'traefik.http.routers.daphne-prod.service=daphne-prod'
+            - 'traefik.http.services.daphne-prod.loadbalancer.server.port=10000'
 
     celery-worker-prod:
         <<: *api-common
@@ -135,7 +135,7 @@ services:
 networks:
     registry_default:
         external: true
-        
+
 volumes:
     redis-data-prod:
     pgadmin-data-prod:
