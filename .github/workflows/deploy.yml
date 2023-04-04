@@ -33,7 +33,7 @@ jobs:
               with:
                   file: project/config/config.json
                   field: isMaintenance
-                  value: ${{ env.MAINTENANCE_VALUE }}
+                  value: ${{ env.MAINTENANCE_VALUE == 'true' }}
             - name: Commit files
               continue-on-error: true
               run: |
