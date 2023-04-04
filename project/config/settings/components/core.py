@@ -122,8 +122,7 @@ SIMPLE_JWT: dict[str, Any] = {
     ),
 }
 
-CORS_ALLOWED_ORIGINS: list[str] = config("ALLOWED_ORRIGINS", cast=Csv());
-
+CORS_ALLOWED_ORIGINS = config('ALLOWED_ORIGINS', cast=lambda v: [s.strip() for s in v.split(',')])
 CORS_ALLOW_METHODS: list[str] = [
     "DELETE",
     "GET",
