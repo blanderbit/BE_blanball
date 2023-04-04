@@ -122,7 +122,7 @@ SIMPLE_JWT: dict[str, Any] = {
     ),
 }
 
-CORS_ALLOWED_ORIGINS: list[str] = config("ALLOWED_HOSTS", cast=Csv());
+CORS_ALLOWED_ORIGINS: list[str] = config("ALLOWED_ORRIGINS", cast=Csv());
 
 CORS_ALLOW_METHODS: list[str] = [
     "DELETE",

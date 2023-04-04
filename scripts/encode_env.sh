@@ -1,1 +1,1 @@
-cat .env | base64 -w 0 > qa.txt
+cat ../.env | base64 -w 0 > qa.txt
