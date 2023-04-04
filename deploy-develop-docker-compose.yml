@@ -4,7 +4,7 @@ x-api-common: &api-common
     image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
 
     env_file:
-        - stack.env
+        - .env
     entrypoint: scripts/entrypoint.sh
 
     depends_on:
@@ -21,7 +21,7 @@ services:
     proxy:
         container_name: proxy
         env_file:
-            - stack.env
+            - .env
         image: registry.it-flumx.com/blanball-proxy-test:latest
         ports:
             - 49299:80
@@ -61,7 +61,7 @@ services:
     db:
         container_name: db
         env_file:
-            - stack.env
+            - .env
         image: postgis/postgis:latest
         restart: always
         volumes:
@@ -76,7 +76,7 @@ services:
     redis:
         container_name: redis
         env_file:
-            - stack.env
+            - .env
         image: redis:latest
         restart: always
         volumes:
@@ -91,7 +91,7 @@ services:
     pgadmin:
         container_name: pgadmin
         env_file:
-            - stack.env
+            - .env
         image: dpage/pgadmin4:latest
         restart: always
         volumes:
@@ -101,24 +101,10 @@ services:
         ports:
             - 49280:${PGADMIN_LISTEN_PORT}
 
-    db_backup:
-        container_name: db_backup
-        env_file:
-            - stack.env
-        image: prodrigestivill/postgres-backup-local
-        restart: always
-        volumes:
-            - db-backup-data:/usr/src/blanball/storage/db-backup/data
-        networks:
-            - app-network
-        depends_on:
-            db:
-                condition: service_started
-
     minio:
         container_name: minio
         env_file:
-            - stack.env
+            - .env
         image: minio/minio
         volumes:
             - minio-data:/minio-data
