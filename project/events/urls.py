@@ -113,7 +113,7 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
         name="popular-events-list",
     ),
     path(
-        "client/invite/user/to/event",
+        "client/invite/users/to/event",
         InviteUsersToEvent.as_view(),
         name="invite-to-event",
     ),

@@ -238,7 +238,7 @@ class InviteToEventManager(models.Manager):
         if (
             InviteToEvent.get_all()
             .filter(
-                recipient=invite_user, event=event, status=InviteToEvent.Status.DECLINED
+                recipient=invite_user, event=event
             )
             .exists()
         ):
