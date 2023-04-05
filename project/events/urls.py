@@ -16,7 +16,7 @@ from events.views import (
     FanLeaveFromEvent,
     GetEvent,
     InvitesToEventList,
-    InviteUserToEvent,
+    InviteUsersToEvent,
     JoinToEvent,
     LeaveFromEvent,
     MyEventsList,
@@ -114,7 +114,7 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     ),
     path(
         "client/invite/user/to/event",
-        InviteUserToEvent.as_view(),
+        InviteUsersToEvent.as_view(),
         name="invite-to-event",
     ),
     path(

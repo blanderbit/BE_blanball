@@ -1,7 +1,7 @@
 from typing import Any, Type, final
 
 from config.serializers import (
-    BaseBulkDeleteSerializer,
+    BaseBulkSerializer,
 )
 from django.db.models.query import QuerySet
 from events.constants.notification_types import (
@@ -105,7 +105,7 @@ class DeleteEvents(GenericAPIView):
     it can no longer be restored.
     """
 
-    serializer_class: Type[Serializer] = BaseBulkDeleteSerializer
+    serializer_class: Type[Serializer] = BaseBulkSerializer
     queryset: QuerySet[Event] = Event.get_all()
 
     def post(self, request: Request) -> Response:
@@ -127,7 +127,7 @@ class PinMyEvents(GenericAPIView):
     their events.
     """
 
-    serializer_class: Type[Serializer] = BaseBulkDeleteSerializer
+    serializer_class: Type[Serializer] = BaseBulkSerializer
     queryset: QuerySet[Event] = Event.get_all()
 
     def post(self, request: Request) -> Response:
@@ -149,7 +149,7 @@ class UnPinMyEvents(GenericAPIView):
     their events.
     """
 
-    serializer_class: Type[Serializer] = BaseBulkDeleteSerializer
+    serializer_class: Type[Serializer] = BaseBulkSerializer
     queryset: QuerySet[Event] = Event.get_all()
 
     def post(self, request: Request) -> Response:

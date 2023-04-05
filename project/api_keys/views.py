@@ -23,7 +23,7 @@ from api_keys.services import (
 )
 from authentication.permissions import AllowAny
 from config.serializers import (
-    BaseBulkDeleteSerializer,
+    BaseBulkSerializer,
 )
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
@@ -128,7 +128,7 @@ class BulkDeleteApiKeys(GenericAPIView):
     then they will be delete.
     """
 
-    serializer_class: Type[Serializer] = BaseBulkDeleteSerializer
+    serializer_class: Type[Serializer] = BaseBulkSerializer
     permission_classes = [
         ApiKeyPermission,
     ]

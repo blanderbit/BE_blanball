@@ -7,7 +7,7 @@ from rest_framework.serializers import (
 )
 
 
-class BaseBulkDeleteSerializer(Serializer):
+class BaseBulkSerializer(Serializer):
     ids: list[int] = ListField(child=IntegerField(min_value=0))
 
     class Meta:

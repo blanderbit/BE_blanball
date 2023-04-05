@@ -9,7 +9,7 @@ from authentication.serializers import (
 from cities.serializers import PlaceSerializer
 from config.exceptions import _404
 from config.serializers import (
-    BaseBulkDeleteSerializer,
+    BaseBulkSerializer,
 )
 from events.constants.errors import (
     ALREADY_IN_EVENT_FANS_LIST_ERROR,
@@ -238,7 +238,7 @@ class JoinOrRemoveRoomSerializer(Serializer):
             raise _404(object=Event)
 
 
-class InviteUserToEventSerializer(Serializer):
+class InviteUsersToEventSerializer(Serializer):
     user_id: int = IntegerField(min_value=0)
     event_id: int = IntegerField(min_value=0)
 
@@ -307,7 +307,7 @@ class RequestToParticipationSerializer(ModelSerializer):
         fields: Union[str, list[str]] = "__all__"
 
 
-class BulkAcceptOrDeclineRequestToParticipationSerializer(BaseBulkDeleteSerializer):
+class BulkAcceptOrDeclineRequestToParticipationSerializer(BaseBulkSerializer):
     type: bool = BooleanField()
 
     class Meta:

@@ -5,7 +5,7 @@ from authentication.serializers import (
 )
 from bugs.models import Bug, BugImage
 from config.serializers import (
-    BaseBulkDeleteSerializer,
+    BaseBulkSerializer,
 )
 from rest_framework.serializers import (
     ImageField,

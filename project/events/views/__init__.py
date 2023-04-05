@@ -41,7 +41,7 @@ from events.views.invites_to_event import (
     InvitesToEventList as InvitesToEventList,
 )
 from events.views.invites_to_event import (
-    InviteUserToEvent as InviteUserToEvent,
+    InviteUsersToEvent as InviteUsersToEvent,
 )
 from events.views.invites_to_event import (
     RequestToParticipationsList as RequestToParticipationsList,

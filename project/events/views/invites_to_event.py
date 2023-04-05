@@ -28,7 +28,7 @@ from events.models import (
 from events.serializers import (
     BulkAcceptOrDeclineRequestToParticipationSerializer,
     InvitesToEventListSerializer,
-    InviteUserToEventSerializer,
+    InviteUsersToEventSerializer,
     RequestToParticipationSerializer,
 )
 from events.services import (
@@ -47,7 +47,7 @@ from rest_framework.serializers import Serializer
 from rest_framework.status import HTTP_200_OK
 
 
-class InviteUserToEvent(GenericAPIView):
+class InviteUsersToEvent(GenericAPIView):
     """
     Invite user to event
 
@@ -56,7 +56,7 @@ class InviteUserToEvent(GenericAPIView):
     to send invitations to participate in this event
     """
 
-    serializer_class: Type[Serializer] = InviteUserToEventSerializer
+    serializer_class: Type[Serializer] = InviteUsersToEventSerializer
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)

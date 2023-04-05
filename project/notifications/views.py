@@ -8,7 +8,7 @@ from config.openapi import (
 )
 from config.pagination import paginate_by_offset
 from config.serializers import (
-    BaseBulkDeleteSerializer,
+    BaseBulkSerializer,
 )
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
@@ -146,7 +146,7 @@ class ReadNotifications(GenericAPIView):
     then they will be read.
     """
 
-    serializer_class: Type[Serializer] = BaseBulkDeleteSerializer
+    serializer_class: Type[Serializer] = BaseBulkSerializer
     queryset: QuerySet[Notification] = Notification.get_all()
 
     def post(self, request: Request) -> Response:
@@ -178,7 +178,7 @@ class DeleteNotifcations(GenericAPIView):
     then they will be delete.
     """
 
-    serializer_class: Type[Serializer] = BaseBulkDeleteSerializer
+    serializer_class: Type[Serializer] = BaseBulkSerializer
     queryset: QuerySet[Notification] = Notification.get_all()
 
     def post(self, request: Request) -> Response:
