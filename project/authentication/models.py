@@ -201,7 +201,7 @@ class Profile(models.Model):
         the host where the image storage is located.
         """
         if self.avatar:
-            return self.avatar.url.replace("minio:9000", settings.MINIO_IMAGE_HOST)
+            return self.avatar.url.replace(os.getenv("FILE_STORAGE_ENDPOINT"), settings.MINIO_IMAGE_HOST)
         return None
 
     class Meta:
