@@ -441,3 +441,18 @@ def send_message_to_event_author_after_leave_user_from_event(
             },
         },
     )
+
+
+def invite_users_to_event(*, event_id: int, users_ids: list[int], request_user: User) -> None:
+    event: Event = Event.get_all().get(id=event_id)
+
+    for user_id in users_ids:
+        invite_user: User = User.get_all().get(id=user_id)
+
+        try:
+            InviteToEvent.objects.send_invite(
+                request_user=request_user, invite_user=invite_user, event=event
+            )
+            yield {"success": invite_user.id}
+        except ValidationError:
+            pass
