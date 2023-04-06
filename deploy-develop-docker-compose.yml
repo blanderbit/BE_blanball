@@ -20,8 +20,10 @@ x-api-common: &api-common
 services:
     proxy:
         container_name: proxy
-        env_file:
-            - .env
+        environment:
+            DAPHNE_HOST_NAME: daphne
+            PGADMIN_HOST_NAME: pgadmin
+
         image: registry.it-flumx.com/blanball-proxy-test:latest
         ports:
             - 49299:80
