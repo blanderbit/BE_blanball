@@ -210,7 +210,7 @@ class TestEventsViews(SetUpEventsViews):
         response = self.client.post(
             reverse("invite-to-event"),
             {
-                "user_id": User.get_all().get(email=self.user_reg_data_2["email"]).id,
+                "ids": [User.get_all().get(email=self.user_reg_data_2["email"]).id],
                 "event_id": Event.objects.first().id,
             },
         )
@@ -226,7 +226,7 @@ class TestEventsViews(SetUpEventsViews):
         self.assertEqual(Notification.objects.count(), 0)
         response = self.client.post(
             reverse("invite-to-event"),
-            {"user_id": User.objects.first().id, "event_id": Event.objects.first().id},
+            {"ids": [User.objects.first().id], "event_id": Event.objects.first().id},
         )
         self.assertEqual(Notification.objects.count(), 0)
         self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
@@ -238,7 +238,7 @@ class TestEventsViews(SetUpEventsViews):
         response = self.client.post(
             reverse("invite-to-event"),
             {
-                "user_id": Event.objects.first().author.id,
+                "ids": [Event.objects.first().author.id],
                 "event_id": Event.objects.first().id,
             },
         )
