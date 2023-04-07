@@ -26,7 +26,7 @@ def get_place_name_by_coordinates(*, data: dict[str, float]) -> Optional[dict[st
         if result and result[0]['formatted_address']:
             address_components = result[0]['address_components']
             country = next((component['long_name'] for component in address_components if 'country' in component['types']), '')
-            if country.lower() != 'ukraine':
+            if country.lower() != 'україна':
                 raise _404(detail=NOTHING_FOUND_FOR_USER_REQUEST_ERROR)
             region = next((component['long_name'] for component in address_components if 'administrative_area_level_1' in component['types']), '')
             city = next((component['long_name'] for component in address_components if 'locality' in component['types']), '')
