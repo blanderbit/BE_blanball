@@ -175,6 +175,7 @@ class MyPlannedParticipantAndViewEventsListSerializer(ModelSerializer):
             "description",
             "price",
             "type",
+            "duration",
             "need_ball",
             "need_form",
             "privacy",
