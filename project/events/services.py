@@ -93,7 +93,8 @@ def bulk_show_or_hide_events(
         try:
             event: Event = queryset.get(id=event_id)
             if (
-                event.author == user
+                user in event.author.current_users.all() or
+                user in event.author.current_fans.all()
                 and event.status == Event.Status.PLANNED
             ):
                 event.hidden = not event.hidden
