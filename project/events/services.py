@@ -86,6 +86,24 @@ def bulk_pin_events(
             pass
 
 
+def bulk_show_or_hide_events(
+    *, data: dict[str, Any], queryset: QuerySet[Event], user: User
+) -> bulk:
+    for event_id in data:
+        try:
+            event: Event = queryset.get(id=event_id)
+            if (
+                event.author == user
+                and event.status == Event.Status.PLANNED
+            ):
+                event.hidden = not event.hidden
+                event.save()
+                yield {"success": event_id}
+        except Event.DoesNotExist:
+            pass
+
+
+
 def bulk_unpin_events(
     *, data: dict[str, Any], queryset: QuerySet[Event], user: User
 ) -> bulk:

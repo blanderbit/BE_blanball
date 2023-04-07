@@ -88,6 +88,7 @@ class Event(models.Model):
     need_form: bool = models.BooleanField()
     privacy: bool = models.BooleanField()
     pinned: bool = models.BooleanField(default=False)
+    hidden: bool = models.BooleanField(default=False)
     duration: int = models.PositiveSmallIntegerField(choices=Duration.choices)
     forms: str = models.JSONField(null=True)
     status: str = models.CharField(

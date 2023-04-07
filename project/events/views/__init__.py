@@ -82,3 +82,6 @@ from events.views.manage_event import (
 from events.views.manage_event import (
     UpdateEvent as UpdateEvent,
 )
+from events.views.manage_event import (
+    ShowOrHideMyEvents as ShowOrHideMyEvents
+)
