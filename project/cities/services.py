@@ -1,4 +1,4 @@
-from os import getenv 
+from os import getenv
 from typing import Any, Optional, Union
 
 from cities.constants.errors import (
@@ -6,6 +6,25 @@ from cities.constants.errors import (
 )
 from config.exceptions import _404
 import googlemaps
+
+
+def get_info_about_place(data):
+    country = next((component['long_name'] for component in data if 'country' in component['types']), '')
+    region = next((component['long_name'] for component in data if 'administrative_area_level_1' in component['types']), '')
+    city = next((component['long_name'] for component in data if 'locality' in component['types']), '')
+    village = next((component['long_name'] for component in data if 'sublocality' in component['types']), '')
+    district = next((component['long_name'] for component in data if 'administrative_area_level_2' in component['types']), '')
+    street = next((component['long_name'] for component in data if 'route' in component['types']), '')
+    if country.lower() != 'україна':
+        raise _404(detail=NOTHING_FOUND_FOR_USER_REQUEST_ERROR)
+    return {
+        "country": country,
+        "region": region,
+        "city": city,
+        "village": village,
+        "district": district,
+        "street": street,
+    }
 
 
 def get_place_name_by_coordinates(*, data: dict[str, float]) -> Optional[dict[str, str]]:
@@ -24,23 +43,8 @@ def get_place_name_by_coordinates(*, data: dict[str, float]) -> Optional[dict[st
     try:
         result = gmaps.reverse_geocode((data['lat'], data['lon']), language='uk')
         if result and result[0]['formatted_address']:
-            address_components = result[0]['address_components']
-            country = next((component['long_name'] for component in address_components if 'country' in component['types']), '')
-            if country.lower() != 'україна':
-                raise _404(detail=NOTHING_FOUND_FOR_USER_REQUEST_ERROR)
-            region = next((component['long_name'] for component in address_components if 'administrative_area_level_1' in component['types']), '')
-            city = next((component['long_name'] for component in address_components if 'locality' in component['types']), '')
-            village = next((component['long_name'] for component in address_components if 'sublocality' in component['types']), '')
-            district = next((component['long_name'] for component in address_components if 'administrative_area_level_2' in component['types']), '')
-            street = next((component['long_name'] for component in address_components if 'route' in component['types']), '')
-            return {
-                "country": country,
-                "region": region,
-                "city": city,
-                "village": village,
-                "district": district,
-                "street": street,
-            }
+            data = get_info_about_place(result[0]['address_components'])
+            return data
         else:
             raise _404(detail=NOTHING_FOUND_FOR_USER_REQUEST_ERROR)
     except googlemaps.exceptions.Timeout:
@@ -59,16 +63,18 @@ def get_coordinates_by_place_name(*, place_name: str) -> Optional[dict[str, Unio
         if not geocode_result:
             raise _404(detail=NOTHING_FOUND_FOR_USER_REQUEST_ERROR)
         location = geocode_result[0]['geometry']['location']
-        reverse_geocode_result = gmaps.reverse_geocode((location['lat'], location['lng']))
-        address_components = reverse_geocode_result[0]["address_components"]
-        country = next((c for c in address_components if "country" in c["types"]), None)
-        if not country or country["long_name"].lower() != "ukraine":
+        reverse_geocode_result = gmaps.reverse_geocode((location['lat'], location['lng']), language='uk')
+        if reverse_geocode_result and reverse_geocode_result[0]['formatted_address']:
+            data = get_info_about_place(reverse_geocode_result[0]["address_components"])
+            reverse_geocode_result = data
+        else:
             raise _404(detail=NOTHING_FOUND_FOR_USER_REQUEST_ERROR)
         return {
             "coordinates": {
                 "lat": location["lat"],
                 "lon": location["lng"],
             },
+            "place": reverse_geocode_result
         }
     except googlemaps.exceptions.Timeout:
         return {"Error": "Error: geocoder service timed out"}
