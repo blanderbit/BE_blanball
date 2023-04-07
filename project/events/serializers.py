@@ -161,6 +161,27 @@ class EventListSerializer(ModelSerializer):
             data = super().to_representation(instance)
             return data
 
+class MyPlannedParticipantAndViewEventsListSerializer(ModelSerializer):
+    place = PlaceSerializer()
+
+    class Meta:
+        model: Event = Event
+        fields: Union[str, list[str]] = [
+            "id",
+            "name",
+            "place",
+            "status",
+            "gender",
+            "description",
+            "price",
+            "type",
+            "need_ball",
+            "need_form",
+            "privacy",
+            "date_and_time",
+            "hidden",
+        ]
+
 
 class MyEventListSerializer(ModelSerializer):
     place = PlaceSerializer()

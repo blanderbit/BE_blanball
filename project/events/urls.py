@@ -20,6 +20,7 @@ from events.views import (
     JoinToEvent,
     LeaveFromEvent,
     MyEventsList,
+    ShowOrHideMyEvents,
     MyFinishedEventsList,
     MyPinnedEventsCount,
     MyPlannedParticipantAndViewEventsList,
@@ -136,5 +137,10 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
         "client/my/pinned/events/count",
         MyPinnedEventsCount.as_view(),
         name="my-pinned-events-count",
+    ),
+     path(
+        "client/show/or/hide/my/events",
+        ShowOrHideMyEvents.as_view(),
+        name="show-or-hide-my-events",
     ),
 ]
