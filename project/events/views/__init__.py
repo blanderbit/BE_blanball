@@ -41,7 +41,7 @@ from events.views.invites_to_event import (
     InvitesToEventList as InvitesToEventList,
 )
 from events.views.invites_to_event import (
-    InviteUserToEvent as InviteUserToEvent,
+    InviteUsersToEvent as InviteUsersToEvent,
 )
 from events.views.invites_to_event import (
     RequestToParticipationsList as RequestToParticipationsList,
@@ -81,4 +81,7 @@ from events.views.manage_event import (
 )
 from events.views.manage_event import (
     UpdateEvent as UpdateEvent,
+)
+from events.views.manage_event import (
+    ShowOrHideMyEvents as ShowOrHideMyEvents
 )

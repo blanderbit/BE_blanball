@@ -35,6 +35,7 @@ from events.openapi import (
 from events.serializers import (
     EventListSerializer,
     MyEventListSerializer,
+    MyPlannedParticipantAndViewEventsListSerializer,
 )
 from events.services import (
     add_dist_filter_to_view,
@@ -216,13 +217,14 @@ class MyPlannedParticipantAndViewEventsList(EventsList):
     This endpoint allows the user to get only
     planned events
     """
+    serializer_class: Type[Serializer] = MyPlannedParticipantAndViewEventsListSerializer
 
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Event]:
         return EventsList.get_queryset(self).filter(
-            status=Event.Status.PLANNED,
-            current_users__in=[self.request.user.id],
-            current_fans__in=[self.request.user.id],
+            Q(current_users__in=[self.request.user.id]) |
+            Q(current_fans__in=[self.request.user.id]),
+            status=Event.Status.PLANNED
         )
 
 
@@ -257,7 +259,10 @@ class UserPlannedEventsList(EventsList):
     records will be displayed one month ahead.
     """
 
-    queryset: QuerySet[Event] = Event.get_all().filter(status=Event.Status.PLANNED)
+    queryset: QuerySet[Event] = Event.get_all().filter(
+        hidden=False,
+        status=Event.Status.PLANNED
+    )
 
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Event]:

@@ -28,7 +28,7 @@ from events.models import (
 from events.serializers import (
     BulkAcceptOrDeclineRequestToParticipationSerializer,
     InvitesToEventListSerializer,
-    InviteUserToEventSerializer,
+    InviteUsersToEventSerializer,
     RequestToParticipationSerializer,
 )
 from events.services import (
@@ -36,6 +36,7 @@ from events.services import (
     bulk_accpet_or_decline_requests_to_participation,
     not_in_black_list,
     skip_objects_from_response_by_id,
+    invite_users_to_event,
 )
 from rest_framework.generics import (
     GenericAPIView,
@@ -47,7 +48,7 @@ from rest_framework.serializers import Serializer
 from rest_framework.status import HTTP_200_OK
 
 
-class InviteUserToEvent(GenericAPIView):
+class InviteUsersToEvent(GenericAPIView):
     """
     Invite user to event
 
@@ -56,17 +57,17 @@ class InviteUserToEvent(GenericAPIView):
     to send invitations to participate in this event
     """
 
-    serializer_class: Type[Serializer] = InviteUserToEventSerializer
+    serializer_class: Type[Serializer] = InviteUsersToEventSerializer
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        invite_user: User = User.get_all().get(id=serializer.validated_data["user_id"])
-        event: Event = Event.get_all().get(id=serializer.validated_data["event_id"])
-        InviteToEvent.objects.send_invite(
-            request_user=request.user, invite_user=invite_user, event=event
+        data = invite_users_to_event(
+            event_id=serializer.validated_data["event_id"], 
+            users_ids=serializer.validated_data["ids"],
+            request_user=request.user
         )
-        return Response(SENT_INVATION_SUCCESS, status=HTTP_200_OK)
+        return Response(data, status=HTTP_200_OK)
 
 
 @method_decorator(

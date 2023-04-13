@@ -1,7 +1,7 @@
 from typing import Any, Type, final
 
 from config.serializers import (
-    BaseBulkDeleteSerializer,
+    BaseBulkSerializer,
 )
 from django.db.models.query import QuerySet
 from events.constants.notification_types import (
@@ -23,6 +23,7 @@ from events.services import (
     event_create,
     not_in_black_list,
     only_author,
+    bulk_show_or_hide_events,
     send_notification_to_subscribe_event_user,
 )
 from rest_framework.generics import GenericAPIView
@@ -105,7 +106,7 @@ class DeleteEvents(GenericAPIView):
     it can no longer be restored.
     """
 
-    serializer_class: Type[Serializer] = BaseBulkDeleteSerializer
+    serializer_class: Type[Serializer] = BaseBulkSerializer
     queryset: QuerySet[Event] = Event.get_all()
 
     def post(self, request: Request) -> Response:
@@ -127,13 +128,35 @@ class PinMyEvents(GenericAPIView):
     their events.
     """
 
-    serializer_class: Type[Serializer] = BaseBulkDeleteSerializer
+    serializer_class: Type[Serializer] = BaseBulkSerializer
     queryset: QuerySet[Event] = Event.get_all()
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         data: dict[str, list[int]] = bulk_pin_events(
+            data=serializer.validated_data["ids"],
+            queryset=self.queryset,
+            user=request.user,
+        )
+        return Response(data, status=HTTP_200_OK)
+    
+
+class ShowOrHideMyEvents(GenericAPIView):
+    """
+    Show or hide my events
+
+    This endpoint allows the user to show or hide
+    their events.
+    """
+
+    serializer_class: Type[Serializer] = BaseBulkSerializer
+    queryset: QuerySet[Event] = Event.get_all()
+
+    def post(self, request: Request) -> Response:
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data: dict[str, list[int]] = bulk_show_or_hide_events(
             data=serializer.validated_data["ids"],
             queryset=self.queryset,
             user=request.user,
@@ -149,7 +172,7 @@ class UnPinMyEvents(GenericAPIView):
     their events.
     """
 
-    serializer_class: Type[Serializer] = BaseBulkDeleteSerializer
+    serializer_class: Type[Serializer] = BaseBulkSerializer
     queryset: QuerySet[Event] = Event.get_all()
 
     def post(self, request: Request) -> Response:

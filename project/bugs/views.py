@@ -23,7 +23,7 @@ from bugs.services import (
     create_bug,
 )
 from config.serializers import (
-    BaseBulkDeleteSerializer,
+    BaseBulkSerializer,
 )
 from django.db.models import QuerySet
 from django.utils.decorators import (
@@ -140,7 +140,7 @@ class BulkDeleteBugs(GenericAPIView):
     then they will be read.
     """
 
-    serializer_class: Type[Serializer] = BaseBulkDeleteSerializer
+    serializer_class: Type[Serializer] = BaseBulkSerializer
     permission_classes = [ApiKeyPermission]
 
     def post(self, request: Request) -> Response:

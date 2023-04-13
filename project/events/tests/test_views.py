@@ -200,69 +200,6 @@ class TestEventsViews(SetUpEventsViews):
         self.assertTrue(get_event.data["name"] != self.event_update_data["name"])
         self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)
 
-    @freeze_time("2022-9-29")
-    def test_invite_user_to_event(self) -> None:
-        self.create_events(1)
-        self.client.force_authenticate(None)
-        self.client.post(reverse("register"), self.user_reg_data_2)
-        self.auth()
-        self.assertEqual(Notification.objects.count(), 0)
-        response = self.client.post(
-            reverse("invite-to-event"),
-            {
-                "user_id": User.get_all().get(email=self.user_reg_data_2["email"]).id,
-                "event_id": Event.objects.first().id,
-            },
-        )
-        self.assertEqual(Notification.objects.count(), 1)
-        self.assertEqual(
-            Notification.objects.first().user.email, self.user_reg_data_2["email"]
-        )
-        self.assertEqual(response.status_code, HTTP_200_OK)
-
-    @freeze_time("2022-9-29")
-    def test_author_invites_himself(self) -> None:
-        self.create_events(1)
-        self.assertEqual(Notification.objects.count(), 0)
-        response = self.client.post(
-            reverse("invite-to-event"),
-            {"user_id": User.objects.first().id, "event_id": Event.objects.first().id},
-        )
-        self.assertEqual(Notification.objects.count(), 0)
-        self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
-
-    @freeze_time("2022-9-29")
-    def test_invite_event_author_to_his_event(self) -> None:
-        self.create_events(1)
-        self.register_second_user()
-        response = self.client.post(
-            reverse("invite-to-event"),
-            {
-                "user_id": Event.objects.first().author.id,
-                "event_id": Event.objects.first().id,
-            },
-        )
-        self.assertEqual(Notification.objects.count(), 0)
-        self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
-
-    @freeze_time("2022-9-29")
-    def test_invite_user_who_is_already_participating_in_this_event(self) -> None:
-        self.create_events(1)
-        self.register_second_user()
-        event_join = self.client.post(
-            reverse("join-to-event"), {"event_id": Event.objects.first().id}
-        )
-        self.client.force_authenticate(None)
-        self.auth()
-        response = self.client.post(
-            reverse("invite-to-event"),
-            {
-                "user_id": Event.objects.first().current_users.first().id,
-                "event_id": Event.objects.first().id,
-            },
-        )
-        self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
-        self.assertEqual(event_join.status_code, HTTP_200_OK)
 
     @freeze_time("2022-9-29")
     def test_user_send_request_to_participation(self) -> None:

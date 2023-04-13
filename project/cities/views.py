@@ -73,16 +73,3 @@ class GetPlaceNameByCoordinates(GenericAPIView):
         place = get_place_name_by_coordinates(data=serializer.data)
         return Response(place, HTTP_200_OK)
 
-
-class UkraineAreasList(APIView):
-    """
-    List of Ukraine areas
-
-
-    This endpoint allows the user to get
-    a list of regions of Ukraine
-    """
-
-    def get(self, request: Request) -> Response:
-        client = NovaPoshtaApi(api_key=settings.NOVAPOSHTA_API_KEY)
-        return Response(client.address.get_areas().json())

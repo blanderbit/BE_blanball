@@ -16,10 +16,11 @@ from events.views import (
     FanLeaveFromEvent,
     GetEvent,
     InvitesToEventList,
-    InviteUserToEvent,
+    InviteUsersToEvent,
     JoinToEvent,
     LeaveFromEvent,
     MyEventsList,
+    ShowOrHideMyEvents,
     MyFinishedEventsList,
     MyPinnedEventsCount,
     MyPlannedParticipantAndViewEventsList,
@@ -113,8 +114,8 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
         name="popular-events-list",
     ),
     path(
-        "client/invite/user/to/event",
-        InviteUserToEvent.as_view(),
+        "client/invite/users/to/event",
+        InviteUsersToEvent.as_view(),
         name="invite-to-event",
     ),
     path(
@@ -136,5 +137,10 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
         "client/my/pinned/events/count",
         MyPinnedEventsCount.as_view(),
         name="my-pinned-events-count",
+    ),
+     path(
+        "client/show/or/hide/my/events",
+        ShowOrHideMyEvents.as_view(),
+        name="show-or-hide-my-events",
     ),
 ]
