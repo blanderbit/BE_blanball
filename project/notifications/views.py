@@ -208,6 +208,9 @@ class ChangeMaintenance(GenericAPIView):
         ApiKeyPermission,
     ]
 
+    @swagger_auto_schema(
+        tags=["maintenance"],
+    )
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -234,6 +237,9 @@ class GetMaintenance(APIView):
     key: str = "isMaintenance"
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(
+        tags=["maintenance"],
+    )
     def get(self, request: Request) -> Response:
         try:
             with open("./config/config.json", "r") as f:
