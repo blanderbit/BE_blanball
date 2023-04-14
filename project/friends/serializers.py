@@ -35,3 +35,15 @@ class MyFriendsListSerializer(ModelSerializer):
             "friend",
             "created_at"
         ]
+
+
+class InvitesToFriendsListSerializer(ModelSerializer):
+    sender = FriendUserSerializer()
+
+    class Meta:
+        model: InviteToFriends = InviteToFriends
+        fields: Union[str, list[str]] = [
+            "id",
+            "time_created",
+            "sender",
+        ]

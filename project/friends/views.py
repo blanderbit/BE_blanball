@@ -17,7 +17,8 @@ from friends.models import (
     InviteToFriends
 )
 from friends.serializers import (
-    MyFriendsListSerializer
+    MyFriendsListSerializer,
+    InvitesToFriendsListSerializer,
 )
 from friends.filters import (
     MY_FRIENDS_LIST_ORDERING_FIELDS,
@@ -26,6 +27,10 @@ from friends.filters import (
 )
 from friends.openapi import (
     my_friends_list_query_params
+)
+from config.openapi import (
+    offset_query,
+    skip_param_query,
 )
 from events.services import (
     skip_objects_from_response_by_id,
@@ -68,3 +73,29 @@ class MyFriendsList(ListAPIView):
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Friend]:
         return self.queryset.filter(user_id=self.request.user.id)
+    
+
+@method_decorator(
+    swagger_auto_schema(
+        manual_parameters=[skip_param_query, offset_query],
+        tags=["invites-to-friends"]
+    ),
+    name="get",
+)
+@paginate_by_offset
+class InvitesToEventList(ListAPIView):
+    """
+    List of my invitations to friends
+
+    This endpoint allows the user to
+    view all of his event friends.
+    """
+
+    serializer_class: Type[Serializer] = InvitesToFriendsListSerializer
+    queryset: QuerySet[InviteToFriends] = InviteToFriends.get_all().filter(
+        status=InviteToFriends.Status.WAITING
+    )
+
+    @skip_objects_from_response_by_id
+    def get_queryset(self) -> QuerySet[InviteToFriends]:
+        return self.queryset.filter(recipient=self.request.user)
