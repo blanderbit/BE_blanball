@@ -1,0 +1,37 @@
+from typing import Any, Union
+
+from authentication.models import User
+from authentication.serializers import (
+    FriendUserSerializer
+)
+from config.exceptions import _404
+from config.serializers import (
+    BaseBulkSerializer,
+)
+from friends.models import (
+    Friend,
+    InviteToFriends,
+)
+from rest_framework.serializers import (
+    BooleanField,
+    CharField,
+    IntegerField,
+    ModelSerializer,
+    Serializer,
+    ValidationError,
+)
+from rest_framework.status import (
+    HTTP_400_BAD_REQUEST,
+)
+
+
+class MyFriendsListSerializer(ModelSerializer):
+    friend = FriendUserSerializer()
+
+    class Meta:
+        model: Friend = Friend
+        fields: Union[str, list[str]] = [
+            "id",
+            "friend",
+            "created_at"
+        ]

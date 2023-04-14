@@ -99,7 +99,6 @@ class InviteToFriendsManager(models.Manager):
         return invite
 
 
-
 class InviteToFriends(models.Model):
     class Status(models.TextChoices):
         WAITING: str = "Waiting"
@@ -107,11 +106,11 @@ class InviteToFriends(models.Model):
         DECLINED: str = "Declined"
 
     recipient: User = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="recipient"
+        User, on_delete=models.CASCADE, related_name="invite_recipient"
     )
     time_created: datetime = models.DateTimeField(auto_now_add=True)
     sender: User = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="sender"
+        User, on_delete=models.CASCADE, related_name="invite_sender"
     )
     status: str = models.CharField(
         choices=Status.choices, max_length=10, default=Status.WAITING
