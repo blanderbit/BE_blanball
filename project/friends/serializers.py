@@ -1,4 +1,5 @@
 from typing import Any, Union
+from collections import OrderedDict
 
 from authentication.models import User
 from authentication.serializers import (
@@ -47,3 +48,6 @@ class InvitesToFriendsListSerializer(ModelSerializer):
             "time_created",
             "sender",
         ]
+
+class InviteUsersToFriendsSerializer(BaseBulkSerializer):
+    pass

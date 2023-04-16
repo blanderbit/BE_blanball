@@ -474,3 +474,12 @@ class CheckUserActiveSerializer(Serializer):
             return super().validate(attrs)
         except User.DoesNotExist:
             raise _404(object=User)
+
+
+class LogoutSerializer(Serializer):
+    refresh: str = CharField()
+
+    class Meta:
+        fields: Union[str, list[str]] = [
+            "refresh",
+        ]

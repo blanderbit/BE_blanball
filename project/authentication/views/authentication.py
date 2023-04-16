@@ -39,6 +39,7 @@ from authentication.constants.success import (
     TEMPLATE_SUCCESS_BODY_TITLE,
     TEMPLATE_SUCCESS_TEXT,
     TEMPLATE_SUCCESS_TITLE,
+    LOGOUT_SUCCESS,
 )
 from authentication.models import (
     Code,
@@ -57,11 +58,13 @@ from authentication.serializers import (
     ResetPasswordSerializer,
     ValidatePhoneByUniqueSerializer,
     ValidateResetPasswordCodeSerializer,
+    LogoutSerializer,
 )
 from authentication.services import (
     code_create,
     count_age,
     reset_password,
+    logout,
     send_email_template,
 )
 from config.exceptions import _404
@@ -143,7 +146,6 @@ class LoginUser(GenericAPIView):
         IsNotAuthenticated,
     ]
 
-
     @swagger_auto_schema(
         tags=["authentication", "login"],
     )
@@ -151,6 +153,26 @@ class LoginUser(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data, status=HTTP_200_OK)
+
+
+class LogoutUser(GenericAPIView):
+    """
+    Logout
+
+    This endpoint allows a previously
+    registered user to logout from the system
+    """
+
+    serializer_class = LogoutSerializer
+
+    @swagger_auto_schema(
+        tags=["authentication", "logout"],
+    )
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        logout(serializer.validated_data["refresh"])
+        return Response(LOGOUT_SUCCESS, status=HTTP_200_OK)
 
 
 class RequestPasswordReset(GenericAPIView):

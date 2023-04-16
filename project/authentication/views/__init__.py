@@ -49,3 +49,6 @@ from authentication.views.users_list import (
 from authentication.views.users_list import (
     UsersRelevantList as UsersRelevantList,
 )
+from authentication.views.authentication import (
+    LogoutUser as LogoutUser
+)

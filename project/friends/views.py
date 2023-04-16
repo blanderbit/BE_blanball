@@ -19,6 +19,7 @@ from friends.models import (
 from friends.serializers import (
     MyFriendsListSerializer,
     InvitesToFriendsListSerializer,
+    InviteUsersToFriendsSerializer
 )
 from friends.filters import (
     MY_FRIENDS_LIST_ORDERING_FIELDS,
@@ -27,6 +28,9 @@ from friends.filters import (
 )
 from friends.openapi import (
     my_friends_list_query_params
+)
+from friends.services import (
+    invite_users_to_friends
 )
 from config.openapi import (
     offset_query,
@@ -39,7 +43,10 @@ from rest_framework.filters import (
     OrderingFilter,
     SearchFilter,
 )
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import (
+    ListAPIView,
+    GenericAPIView,
+)
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
@@ -78,12 +85,12 @@ class MyFriendsList(ListAPIView):
 @method_decorator(
     swagger_auto_schema(
         manual_parameters=[skip_param_query, offset_query],
-        tags=["invites-to-friends"]
+        tags=["friends"]
     ),
     name="get",
 )
 @paginate_by_offset
-class InvitesToEventList(ListAPIView):
+class InvitesToFriendsList(ListAPIView):
     """
     List of my invitations to friends
 
@@ -99,3 +106,25 @@ class InvitesToEventList(ListAPIView):
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[InviteToFriends]:
         return self.queryset.filter(recipient=self.request.user)
+
+
+
+class InviteUsersToFriends(GenericAPIView):
+    """
+    Invite user to friends
+
+    This endpoint allows the author of the event
+    and the user who is a participant in the event
+    to send invitations to participate in this event
+    """
+
+    serializer_class: Type[Serializer] = InviteUsersToFriendsSerializer
+
+    def post(self, request: Request) -> Response:
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = invite_users_to_friends(
+            users_ids=serializer.validated_data["ids"],
+            request_user=request.user
+        )
+        return Response(data, status=HTTP_200_OK)

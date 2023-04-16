@@ -116,6 +116,8 @@ class InviteToFriends(models.Model):
         choices=Status.choices, max_length=10, default=Status.WAITING
     )
 
+    objects = InviteToFriendsManager()
+
     def __repr__(self) -> str:
         return "<InviteToFriends %s>" % self.id
 

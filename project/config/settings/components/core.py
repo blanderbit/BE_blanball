@@ -18,6 +18,7 @@ INSTALLED_APPS: list[str] = [
     "rest_framework_swagger",
     "rest_framework",
     "rest_framework_gis",
+    "rest_framework_simplejwt.token_blacklist",
     "django_inlinecss",
     "drf_yasg",
     "django_filters",
@@ -121,6 +122,7 @@ SIMPLE_JWT: dict[str, Any] = {
     "REFRESH_TOKEN_LIFETIME": datetime.timedelta(
         days=config("REFRESH_TOKEN_LIFETIME", cast=int)
     ),
+    "ROTATE_REFRESH_TOKENS": True,
 }
 
 CORS_ALLOWED_ORIGINS = config(
