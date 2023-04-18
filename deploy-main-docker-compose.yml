@@ -120,9 +120,16 @@ services:
         volumes:
             - minio-data-prod:/minio-data-prod
         command: 'minio server /minio-data-prod --console-address ":9001"'
-        ports:
-            - 49293:9000
-            - 49294:9001
+        expose:
+            - '9001'
+        labels:
+            - 'traefik.enable=true'
+            - 'traefik.http.routers.minio-prod.rule=Host(`api.blanball.com`) && PathPrefix(`/minio`)'
+            - 'traefik.http.routers.minio-prod.entrypoints=websecure'
+            - 'traefik.http.routers.minio-prod.tls.certresolver=myresolver'
+            - 'traefik.http.routers.minio-prod.service=minio-prod'
+            - 'traefik.http.services.minio-prod.loadbalancer.server.port=9001'
+
         healthcheck:
             test:
                 ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
