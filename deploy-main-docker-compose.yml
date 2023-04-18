@@ -125,6 +125,10 @@ services:
         labels:
             - "traefik.enable=true"
             - "traefik.http.middlewares.minio-stripprefix.stripprefix.prefixes=/minio"
+            - "traefik.http.middlewares.minio-contenttype.headers.contenttype.suffix.css=text/css"
+            - "traefik.http.middlewares.minio-contenttype.headers.contenttype.suffix.js=application/javascript"
+            - "traefik.http.middlewares.minio-contenttype.headers.contenttype.suffix.svg=image/svg+xml"
+            - "traefik.http.middlewares.minio-contenttype.headers.contenttype.suffix.json=application/json"
             - "traefik.http.routers.minio-prod.rule=Host(`api.blanball.com`) && PathPrefix(`/minio`)"
             - "traefik.http.routers.minio-prod.entrypoints=websecure"
             - "traefik.http.routers.minio-prod.tls.certresolver=myresolver"
