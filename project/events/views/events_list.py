@@ -54,10 +54,12 @@ from rest_framework_gis.filters import (
     DistanceToPointOrderingFilter,
 )
 
-
 @method_decorator(
-    swagger_auto_schema(manual_parameters=events_list_query_params),
-    name="get",
+    swagger_auto_schema(
+        manual_parameters=events_list_query_params,
+        tags=["events"]
+    ),
+    name="get"
 )
 @paginate_by_offset
 class EventsList(ListAPIView):
@@ -69,11 +71,11 @@ class EventsList(ListAPIView):
     """
 
     serializer_class: Type[Serializer] = EventListSerializer
-    search_fields = EVENTS_LIST_SEARCH_FIELDS
-    ordering_fields = EVENTS_LIST_ORDERING_FIELDS
+    search_fields: list[str] = EVENTS_LIST_SEARCH_FIELDS
+    ordering_fields: list[str] = EVENTS_LIST_ORDERING_FIELDS
     filterset_class = EventDateTimeRangeFilter
     queryset: QuerySet[Event] = Event.get_all()
-    filter_backends = [
+    filter_backends: list = [
         DjangoFilterBackend,
         OrderingFilter,
         SearchFilter,
@@ -89,7 +91,10 @@ class EventsList(ListAPIView):
 
 
 @method_decorator(
-    swagger_auto_schema(manual_parameters=events_relevant_list_query_params),
+    swagger_auto_schema(
+        manual_parameters=events_relevant_list_query_params,
+        tags=["events"]
+    ),
     name="get",
 )
 class EventsRelevantList(ListAPIView):
@@ -137,6 +142,14 @@ class MyEventsList(EventsList):
 
     serializer_class: Type[Serializer] = MyEventListSerializer
 
+
+    @swagger_auto_schema(
+        manual_parameters=events_list_query_params,
+        tags=["my-events"]
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
     def get_queryset(self) -> QuerySet[Event]:
         return (
             EventsList.get_queryset(self)
@@ -154,6 +167,14 @@ class MyTopicalEventsList(EventsList):
     """
 
     serializer_class: Type[Serializer] = MyEventListSerializer
+
+
+    @swagger_auto_schema(
+        manual_parameters=events_list_query_params,
+        tags=["my-events"]
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
     def get_queryset(self) -> QuerySet[Event]:
         return (
@@ -175,6 +196,14 @@ class MyFinishedEventsList(EventsList):
     """
 
     serializer_class: Type[Serializer] = MyEventListSerializer
+
+
+    @swagger_auto_schema(
+        manual_parameters=events_list_query_params,
+        tags=["my-events"]
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
     def get_queryset(self) -> QuerySet[Event]:
         return (
@@ -218,6 +247,13 @@ class MyPlannedParticipantAndViewEventsList(EventsList):
     planned events
     """
     serializer_class: Type[Serializer] = MyPlannedParticipantAndViewEventsListSerializer
+    
+    @swagger_auto_schema(
+        manual_parameters=events_list_query_params,
+        tags=["my-events"]
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Event]:
@@ -226,6 +262,7 @@ class MyPlannedParticipantAndViewEventsList(EventsList):
             Q(current_fans__in=[self.request.user.id]),
             status=Event.Status.PLANNED
         )
+
 
 
 class PopularEventsList(EventsList):

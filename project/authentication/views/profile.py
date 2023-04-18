@@ -24,6 +24,10 @@ from authentication.services import (
     profile_update,
     update_profile_avatar,
 )
+from django.utils.decorators import (
+    method_decorator,
+)
+from drf_yasg.utils import swagger_auto_schema
 from config.exceptions import _404
 from django.db import transaction
 from django.db.models.query import QuerySet
@@ -42,6 +46,9 @@ class UserOwnerProfile(GenericAPIView):
 
     serializer_class: Type[Serializer] = UserSerializer
 
+    @swagger_auto_schema(
+        tags=["profile"],
+    )
     def get(self, request: Request) -> Response:
         """
         User personal profile
@@ -53,6 +60,9 @@ class UserOwnerProfile(GenericAPIView):
         serializer = self.serializer_class(user)
         return Response(serializer.data, status=HTTP_200_OK)
 
+    @swagger_auto_schema(
+        tags=["profile"],
+    )
     def delete(self, request: Request) -> Response:
         """
         Request delete profile
@@ -68,6 +78,12 @@ class UserOwnerProfile(GenericAPIView):
         return Response(SENT_CODE_TO_EMAIL_SUCCESS, status=HTTP_200_OK)
 
 
+@method_decorator(
+    swagger_auto_schema(
+        tags=["profile"],
+    ),
+    name="put",
+)
 class UpdateProfile(GenericAPIView):
     """
     Update profile
@@ -90,6 +106,12 @@ class UpdateProfile(GenericAPIView):
         return Response(result, status=HTTP_200_OK)
 
 
+@method_decorator(
+    swagger_auto_schema(
+        tags=["profile"],
+    ),
+    name="put",
+)
 class UpdateProfileImage(GenericAPIView):
     """
     Update profile avatar
@@ -110,6 +132,12 @@ class UpdateProfileImage(GenericAPIView):
         return Response(PROFILE_AVATAR_UPDATED_SUCCESS, status=HTTP_200_OK)
 
 
+@method_decorator(
+    swagger_auto_schema(
+        tags=["profile", "users"],
+    ),
+    name="get",
+)
 class UserProfile(GenericAPIView):
     """
     User profile

@@ -17,6 +17,7 @@ from authentication.views import (
     UsersList,
     UsersRelevantList,
     ValidatePhoneByUnique,
+    LogoutUser,
     ValidateResetPasswordCode,
 )
 from django.urls import path
@@ -24,10 +25,15 @@ from django.urls.resolvers import (
     URLPattern,
     URLResolver,
 )
+from rest_framework_simplejwt.views import (
+    TokenRefreshView,
+)
 
 urlpatterns: list[Union[URLResolver, URLPattern]] = [
     path("client/register", RegisterUser.as_view(), name="register"),
+    path("client/refresh/tokens", TokenRefreshView.as_view(), name="refresh-tokens"),
     path("client/login", LoginUser.as_view(), name="login"),
+    path("client/logout", LogoutUser.as_view(), name="logout"),
     path("client/users/list", UsersList.as_view(), name="users-list"),
     path(
         "admin/users/list/detail", UsersDetailList.as_view(), name="users-list-detail"

@@ -59,6 +59,9 @@ class InviteUsersToEvent(GenericAPIView):
 
     serializer_class: Type[Serializer] = InviteUsersToEventSerializer
 
+    @swagger_auto_schema(
+        tags=["invites-to-event"]
+    )
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -71,7 +74,10 @@ class InviteUsersToEvent(GenericAPIView):
 
 
 @method_decorator(
-    swagger_auto_schema(manual_parameters=[skip_param_query, offset_query]),
+    swagger_auto_schema(
+        manual_parameters=[skip_param_query, offset_query],
+        tags=["invites-to-event"]
+    ),
     name="get",
 )
 @paginate_by_offset
@@ -106,6 +112,10 @@ class BulkAcceptOrDeclineInvitesToEvent(GenericAPIView):
     ] = BulkAcceptOrDeclineRequestToParticipationSerializer
     queryset: QuerySet[Event] = InviteToEvent.get_all()
 
+
+    @swagger_auto_schema(
+        tags=["invites-to-event"]
+    )
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -116,7 +126,11 @@ class BulkAcceptOrDeclineInvitesToEvent(GenericAPIView):
 
 
 @method_decorator(
-    swagger_auto_schema(manual_parameters=[skip_param_query, offset_query]), name="get"
+    swagger_auto_schema(
+        manual_parameters=[skip_param_query, offset_query],
+        tags=["invites-to-event"]
+    ), 
+    name="get"
 )
 @paginate_by_offset
 class RequestToParticipationsList(ListAPIView):
@@ -168,6 +182,10 @@ class BulkAcceptOrDeclineRequestToParticipation(GenericAPIView):
     ] = BulkAcceptOrDeclineRequestToParticipationSerializer
     queryset: QuerySet[RequestToParticipation] = RequestToParticipation.get_all()
 
+
+    @swagger_auto_schema(
+        tags=["invites-to-event"]
+    )
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
