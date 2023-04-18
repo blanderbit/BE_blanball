@@ -49,5 +49,11 @@ class InvitesToFriendsListSerializer(ModelSerializer):
             "sender",
         ]
 
-class InviteUsersToFriendsSerializer(BaseBulkSerializer):
-    pass
+
+class BulkAcceptOrDeclineInvitionsToFriendsSerializer(BaseBulkSerializer):
+    type: bool = BooleanField()
+
+    class Meta:
+        fields: Union[str, list[str]] = [
+            "type",
+        ]

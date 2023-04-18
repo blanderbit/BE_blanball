@@ -19,7 +19,7 @@ from friends.models import (
 from friends.serializers import (
     MyFriendsListSerializer,
     InvitesToFriendsListSerializer,
-    InviteUsersToFriendsSerializer
+    BulkAcceptOrDeclineInvitionsToFriendsSerializer,
 )
 from friends.filters import (
     MY_FRIENDS_LIST_ORDERING_FIELDS,
@@ -30,11 +30,15 @@ from friends.openapi import (
     my_friends_list_query_params
 )
 from friends.services import (
-    invite_users_to_friends
+    invite_users_to_friends,
+    bulk_accept_or_decline_invitions_to_friends,
 )
 from config.openapi import (
     offset_query,
     skip_param_query,
+)
+from config.serializers import (
+    BaseBulkSerializer
 )
 from events.services import (
     skip_objects_from_response_by_id,
@@ -85,7 +89,6 @@ class MyFriendsList(ListAPIView):
 @method_decorator(
     swagger_auto_schema(
         manual_parameters=[skip_param_query, offset_query],
-        tags=["friends"]
     ),
     name="get",
 )
@@ -118,7 +121,7 @@ class InviteUsersToFriends(GenericAPIView):
     to send invitations to participate in this event
     """
 
-    serializer_class: Type[Serializer] = InviteUsersToFriendsSerializer
+    serializer_class: Type[Serializer] = BaseBulkSerializer
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
@@ -126,5 +129,28 @@ class InviteUsersToFriends(GenericAPIView):
         data = invite_users_to_friends(
             users_ids=serializer.validated_data["ids"],
             request_user=request.user
+        )
+        return Response(data, status=HTTP_200_OK)
+    
+
+class BulkAcceptOrDeclineInvitesToFriends(GenericAPIView):
+    """
+    Accepting/declining invitations to friends
+
+    This endpoint gives the user the ability to
+    accept or decline invitations to friends
+    """
+
+    serializer_class: Type[
+        Serializer
+    ] = BulkAcceptOrDeclineInvitionsToFriendsSerializer
+    queryset: QuerySet[InviteToFriends] = InviteToFriends.get_all()
+
+
+    def post(self, request: Request) -> Response:
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data: dict[str, int] = bulk_accept_or_decline_invitions_to_friends(
+            data=serializer.validated_data, request_user=request.user
         )
         return Response(data, status=HTTP_200_OK)

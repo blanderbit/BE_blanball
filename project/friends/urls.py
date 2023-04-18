@@ -8,7 +8,8 @@ from django.urls.resolvers import (
 from friends.views import (
     MyFriendsList,
     InviteUsersToFriends,
-    InvitesToFriendsList
+    InvitesToFriendsList,
+    BulkAcceptOrDeclineInvitesToFriends,
 )
 
 urlpatterns: list[Union[URLResolver, URLPattern]] = [
@@ -22,5 +23,10 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
         "client/invite/users/to/friends", 
         InviteUsersToFriends.as_view(), 
         name="invite-users-to-friends"
+    ),
+    path(
+        "client/accept/or/decline/invite/to/friends",
+        BulkAcceptOrDeclineInvitesToFriends.as_view(),
+        name="accept-decline-invite-to-friends",
     ),
 ]
