@@ -265,7 +265,7 @@ class InviteUsersToEventSerializer(BaseBulkSerializer):
     class Meta:
         fields: Union[str, list[str]] = [
             "ids",
-            "user_id",
+            "event_id"
         ]
 
     def validate(self, attrs) -> OrderedDict[str, Any]:

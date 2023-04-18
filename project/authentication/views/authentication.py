@@ -39,6 +39,7 @@ from authentication.constants.success import (
     TEMPLATE_SUCCESS_BODY_TITLE,
     TEMPLATE_SUCCESS_TEXT,
     TEMPLATE_SUCCESS_TITLE,
+    LOGOUT_SUCCESS,
 )
 from authentication.models import (
     Code,
@@ -57,11 +58,13 @@ from authentication.serializers import (
     ResetPasswordSerializer,
     ValidatePhoneByUniqueSerializer,
     ValidateResetPasswordCodeSerializer,
+    LogoutSerializer,
 )
 from authentication.services import (
     code_create,
     count_age,
     reset_password,
+    logout,
     send_email_template,
 )
 from config.exceptions import _404
@@ -78,6 +81,7 @@ from rest_framework.status import (
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
 )
+from drf_yasg.utils import swagger_auto_schema
 
 
 class RegisterUser(GenericAPIView):
@@ -105,6 +109,9 @@ class RegisterUser(GenericAPIView):
     ]
 
     @transaction.atomic
+    @swagger_auto_schema(
+        tags=["authentication", "register"],
+    )
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -139,10 +146,33 @@ class LoginUser(GenericAPIView):
         IsNotAuthenticated,
     ]
 
+    @swagger_auto_schema(
+        tags=["authentication", "login"],
+    )
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data, status=HTTP_200_OK)
+
+
+class LogoutUser(GenericAPIView):
+    """
+    Logout
+
+    This endpoint allows a previously
+    registered user to logout from the system
+    """
+
+    serializer_class = LogoutSerializer
+
+    @swagger_auto_schema(
+        tags=["authentication", "logout"],
+    )
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        logout(serializer.validated_data["refresh"])
+        return Response(LOGOUT_SUCCESS, status=HTTP_200_OK)
 
 
 class RequestPasswordReset(GenericAPIView):
@@ -160,6 +190,9 @@ class RequestPasswordReset(GenericAPIView):
         IsNotAuthenticated,
     ]
 
+    @swagger_auto_schema(
+        tags=["password-reset"],
+    )
     def post(self, request: Request) -> Response:
         email: str = request.data.get("email", "")
         try:
@@ -184,6 +217,9 @@ class ResetPassword(GenericAPIView):
         IsNotAuthenticated,
     ]
 
+    @swagger_auto_schema(
+        tags=["password-reset"],
+    )
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -207,6 +243,9 @@ class ValidateResetPasswordCode(GenericAPIView):
         IsNotAuthenticated,
     ]
 
+    @swagger_auto_schema(
+        tags=["password-reset"],
+    )
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -226,6 +265,9 @@ class ValidatePhoneByUnique(GenericAPIView):
         IsNotAuthenticated,
     ]
 
+    @swagger_auto_schema(
+        tags=["change-phone"],
+    )
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -243,6 +285,9 @@ class RequestChangePassword(GenericAPIView):
 
     serializer_class: Type[Serializer] = RequestChangePasswordSerializer
 
+    @swagger_auto_schema(
+        tags=["change-password"],
+    )
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -254,6 +299,7 @@ class RequestChangePassword(GenericAPIView):
             dop_info=serializer.validated_data["new_password"],
         )
         return Response(SENT_CODE_TO_EMAIL_SUCCESS, status=HTTP_200_OK)
+
 
 
 class RequestEmailVerify(GenericAPIView):
@@ -269,6 +315,9 @@ class RequestEmailVerify(GenericAPIView):
 
     serializer_class: Type[Serializer] = EmailSerializer
 
+    @swagger_auto_schema(
+        tags=["verify-email"],
+    )
     def get(self, request: Request) -> Response:
         user: User = request.user
         if user.is_verified:
@@ -288,6 +337,10 @@ class RequetChangeEmail(GenericAPIView):
 
     serializer_class: Type[Serializer] = EmailSerializer
 
+
+    @swagger_auto_schema(
+        tags=["change-email"],
+    )
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -324,6 +377,9 @@ class CheckCode(GenericAPIView):
             text=TEMPLATE_SUCCESS_TEXT.format(key=key),
         )
 
+    @swagger_auto_schema(
+        tags=["verify-email", "change-password", "change-phone", "change-email"],
+    )
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)

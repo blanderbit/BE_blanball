@@ -18,6 +18,7 @@ INSTALLED_APPS: list[str] = [
     "rest_framework_swagger",
     "rest_framework",
     "rest_framework_gis",
+    "rest_framework_simplejwt.token_blacklist",
     "django_inlinecss",
     "drf_yasg",
     "django_filters",
@@ -32,6 +33,7 @@ INSTALLED_APPS: list[str] = [
     "cities.apps.CitiesConfig",
     "bugs.apps.BugsConfig",
     "api_keys.apps.ApiKeysConfig",
+    "friends.apps.FriendsConfig",
 ]
 
 if not os.environ.get("GITHUB_WORKFLOW"):
@@ -120,6 +122,7 @@ SIMPLE_JWT: dict[str, Any] = {
     "REFRESH_TOKEN_LIFETIME": datetime.timedelta(
         days=config("REFRESH_TOKEN_LIFETIME", cast=int)
     ),
+    "ROTATE_REFRESH_TOKENS": True,
 }
 
 CORS_ALLOWED_ORIGINS = config(
@@ -131,3 +134,5 @@ CORS_ALLOW_METHODS: list[str] = config(
 CORS_ALLOW_HEADERS: list[str] = config(
     "CORS_ALLOW_HEADERS", cast=lambda v: [s.strip() for s in v.split(",")]
 )
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

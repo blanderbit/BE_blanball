@@ -26,6 +26,10 @@ PROFILE_AVATAR_UPDATED_SUCCESS: dict[str, str] = {"success": "profile_avatar_upd
 # confirmation code was successfully sent to the email
 SENT_CODE_TO_EMAIL_SUCCESS: dict[str, str] = {"success": "sent_code_to_email"}
 
+# the response message that indicates that the
+# the user was succes logouted
+LOGOUT_SUCCESS: dict[str, str] = {"success": "logout"}
+
 # the response message that indicates
 # that the user's email was successfully changed
 CHANGE_EMAIL_SUCCESS: dict[str, str] = {"succes": "email_change"}

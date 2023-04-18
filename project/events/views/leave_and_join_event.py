@@ -46,6 +46,7 @@ from rest_framework.status import (
     HTTP_200_OK,
     HTTP_400_BAD_REQUEST,
 )
+from drf_yasg.utils import swagger_auto_schema
 
 
 class JoinToEvent(GenericAPIView):
@@ -59,6 +60,9 @@ class JoinToEvent(GenericAPIView):
 
     serializer_class: Type[Serializer] = JoinOrRemoveRoomSerializer
 
+    @swagger_auto_schema(
+        tags=["event-join"]
+    )
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -86,6 +90,9 @@ class FanJoinToEvent(GenericAPIView):
 
     serializer_class: Type[Serializer] = JoinOrRemoveRoomSerializer
 
+    @swagger_auto_schema(
+        tags=["event-join"]
+    )
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -111,6 +118,9 @@ class FanLeaveFromEvent(GenericAPIView):
 
     serializer_class: Type[Serializer] = JoinOrRemoveRoomSerializer
 
+    @swagger_auto_schema(
+        tags=["event-leave"]
+    )
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -132,6 +142,9 @@ class LeaveFromEvent(GenericAPIView):
 
     serializer_class: Type[Serializer] = JoinOrRemoveRoomSerializer
 
+    @swagger_auto_schema(
+        tags=["event-leave"]
+    )
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -157,6 +170,9 @@ class RemoveUserFromEvent(GenericAPIView):
 
     serializer_class: Type[Serializer] = RemoveUserFromEventSerializer
 
+    @swagger_auto_schema(
+        tags=["events", "event-leave"]
+    )
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)

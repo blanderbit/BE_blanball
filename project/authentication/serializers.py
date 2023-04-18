@@ -123,6 +123,29 @@ class EventUsersSerializer(ModelSerializer):
         ]
 
 
+class FriendProfileSerializer(ModelSerializer):
+    class Meta:
+        model: Profile = Profile
+        fields: Union[str, list[str]] = [
+            "id",
+            "name",
+            "last_name",
+            "avatar_url",
+        ]
+
+
+class FriendUserSerializer(ModelSerializer):
+    profile = FriendProfileSerializer()
+
+    class Meta:
+        model: User = User
+        fields: Union[str, list[str]] = [
+            "id",
+            "profile",
+            "is_online"
+        ]
+
+
 class ProfileSerializer(ModelSerializer):
     place = UserPublicProfilePlaceSerializer()
 
@@ -451,3 +474,12 @@ class CheckUserActiveSerializer(Serializer):
             return super().validate(attrs)
         except User.DoesNotExist:
             raise _404(object=User)
+
+
+class LogoutSerializer(Serializer):
+    refresh: str = CharField()
+
+    class Meta:
+        fields: Union[str, list[str]] = [
+            "refresh",
+        ]

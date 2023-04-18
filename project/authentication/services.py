@@ -20,6 +20,9 @@ from authentication.constants.success import (
     TEMPLATE_SUCCESS_TEXT,
     TEMPLATE_SUCCESS_TITLE,
 )
+from authentication.constants.errors import (
+    INVALID_REFRESH_TOKEN,
+)
 from authentication.models import (
     Code,
     Profile,
@@ -39,7 +42,14 @@ from minio.commonconfig import REPLACE, CopySource
 from notifications.tasks import (
     send_to_general_layer,
 )
-from rest_framework.serializers import Serializer
+from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from rest_framework.serializers import (
+    Serializer,
+    ValidationError,
+)
+from rest_framework.status import (
+    HTTP_400_BAD_REQUEST,
+)
 
 
 def count_age(*, profile: Profile, data: dict[str, Any]) -> Profile:
@@ -175,3 +185,10 @@ def reset_password(*, data: dict[str, Any]) -> None:
         title=TEMPLATE_SUCCESS_TITLE.format(key="password"),
         text=TEMPLATE_SUCCESS_TEXT.format(key="password"),
     )
+
+
+def logout(refresh_token: str) -> None:
+    try:
+        RefreshToken(refresh_token).blacklist()
+    except TokenError:
+        raise ValidationError(INVALID_REFRESH_TOKEN, HTTP_400_BAD_REQUEST)
