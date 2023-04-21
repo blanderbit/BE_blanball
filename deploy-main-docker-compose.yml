@@ -121,15 +121,11 @@ services:
             - minio-data-prod:/minio-data-prod
         command: 'minio server /minio-data-prod --console-address ":9001" --address ":9000"'
         expose:
+            - '9000'
             - '9001'
         labels:
             - "traefik.enable=true"
-            - "traefik.http.middlewares.minio-stripprefix.stripprefix.prefixes=/minio"
-            - "traefik.http.middlewares.minio-contenttype.headers.contenttype.suffix.css=text/css"
-            - "traefik.http.middlewares.minio-contenttype.headers.contenttype.suffix.js=application/javascript"
-            - "traefik.http.middlewares.minio-contenttype.headers.contenttype.suffix.svg=image/svg+xml"
-            - "traefik.http.middlewares.minio-contenttype.headers.contenttype.suffix.json=application/json"
-            - "traefik.http.routers.minio-prod.rule=Host(`api.blanball.com`) && PathPrefix(`/minio`)"
+            - "traefik.http.routers.minio-prod.rule=Host(`storage.blanball.com`) && PathPrefix(`/`)"
             - "traefik.http.routers.minio-prod.entrypoints=websecure"
             - "traefik.http.routers.minio-prod.tls.certresolver=myresolver"
             - "traefik.http.routers.minio-prod.service=minio-prod"
@@ -137,8 +133,7 @@ services:
             - "traefik.http.routers.minio-prod.middlewares=minio-stripprefix"
 
         healthcheck:
-            test:
-                ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+            test: ["CMD-SHELL", "curl --fail http://localhost:9000/minio/health/live || exit 1"]
             interval: 30s
             timeout: 20s
             retries: 3
