@@ -119,24 +119,25 @@ services:
         image: minio/minio
         volumes:
             - minio-data-prod:/minio-data-prod
-        command: 'minio server /minio-data-prod --console-address ":9001" --address ":9000"'
+        command: 'minio server /minio-data-prod --console-address ":9001"'
         expose:
             - '9000'
-            - '9001'
         labels:
-            - "traefik.enable=true"
-            - "traefik.http.routers.minio-prod.rule=Host(`storage.blanball.com`) && PathPrefix(`/`)"
-            - "traefik.http.routers.minio-prod.entrypoints=websecure"
-            - "traefik.http.routers.minio-prod.tls.certresolver=myresolver"
-            - "traefik.http.routers.minio-prod.service=minio-prod"
-            - "traefik.http.services.minio-prod.loadbalancer.server.port=9000"
+            - 'traefik.enable=true'
+            - 'traefik.http.routers.minio-prod.rule=Host(`storage.blanball.com`) && PathPrefix(`/`)'
+            - 'traefik.http.routers.minio-prod.entrypoints=websecure'
+            - 'traefik.http.routers.minio-prod.tls.certresolver=myresolver'
+            - 'traefik.http.routers.minio-prod.service=minio-prod'
+            - 'traefik.http.services.minio-prod.loadbalancer.server.port=9000'
         healthcheck:
-            test: ["CMD-SHELL", "curl --fail http://localhost:9000/minio/health/live || exit 1"]
+            test:
+                ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
             interval: 30s
             timeout: 20s
             retries: 3
         networks:
             - registry_default
+
 
 networks:
     registry_default:
