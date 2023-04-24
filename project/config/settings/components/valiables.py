@@ -83,11 +83,7 @@ ALGORITHM: str = config("ALGORITHM", cast=str)
 # if false, then in prod server mode
 DEBUG: bool = config("DEBUG", cast=bool)
 
-if DEBUG == False:
-    # host where all pictures uploaded by users are located
-    MINIO_IMAGE_HOST: str = getenv("MINIO_IMAGE_HOST_PROD")
-else:
-    MINIO_IMAGE_HOST: str = getenv("MINIO_IMAGE_HOST")
+MINIO_IMAGE_HOST: str = getenv("MINIO_IMAGE_HOST")
 
 # secret key from NOVAPOSHTA api, by which we get a list of cities in Ukraine
 NOVAPOSHTA_API_KEY: str = config("NOVAPOSHTA_API_KEY", cast=str)

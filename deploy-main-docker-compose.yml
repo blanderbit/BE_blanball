@@ -112,6 +112,7 @@ services:
         ports:
             - 49283:${PGADMIN_LISTEN_PORT}
     minio-prod:
+        container_name: minio-prod
         image: minio/minio
         volumes:
             - minio-data-prod:/minio-data-prod
