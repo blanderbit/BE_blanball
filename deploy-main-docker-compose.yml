@@ -113,9 +113,9 @@ services:
             - 49283:${PGADMIN_LISTEN_PORT}
     minio-prod:
        image: minio/minio
-       command: server --console-address ":9001" /data
+       command: server --console-address ":9001" /minio-data-prod
        volumes:
-          - ./data:/data
+          - minio-data-prod:/minio-data-prod
         expose:
           - '9000'
           - '9001'

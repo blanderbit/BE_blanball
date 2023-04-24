@@ -61,7 +61,12 @@
                                     {{ code }}
                                 </div>
                                 <div class="code_copy">
-                                    <span>копіювати</span>
+                                    <span>
+                                        <!-- Need to add a variable which will comprise a domain name like - "http://localhost:3000" -->
+                                        <a href="{{ domain }}/?code={{ code }}" target=”_blank”>
+                                            копіювати
+                                        </a>
+                                    </span>
                                 </div>
                             </div>
                         </div>
