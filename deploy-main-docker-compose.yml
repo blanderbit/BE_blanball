@@ -116,7 +116,6 @@ services:
        command: server --console-address ":9001" /data
        volumes:
           - ./data:/data
-          - ./config:/root/.minio
         expose:
           - '9000'
           - '9001'
