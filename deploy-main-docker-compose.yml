@@ -111,30 +111,35 @@ services:
             - registry_default
         ports:
             - 49283:${PGADMIN_LISTEN_PORT}
-
     minio-prod:
-        container_name: minio-prod
-        env_file:
-            - stack.env
-        image: minio/minio
-        volumes:
-            - minio-data-prod:/minio-data-prod
-        command: 'minio server /minio-data-prod --console-address ":9001"'
+       image: minio/minio
+       command: server --console-address ":9001" /data
+       volumes:
+          - ./data:/data
+          - ./config:/root/.minio
         expose:
             - '9000'
-        labels:
-            - 'traefik.enable=true'
-            - 'traefik.http.routers.minio-prod.rule=Host(`storage.blanball.com`) && PathPrefix(`/`)'
-            - 'traefik.http.routers.minio-prod.entrypoints=websecure'
-            - 'traefik.http.routers.minio-prod.tls.certresolver=myresolver'
-            - 'traefik.http.routers.minio-prod.service=minio-prod'
-            - 'traefik.http.services.minio-prod.loadbalancer.server.port=9000'
-        healthcheck:
-            test:
-                ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
-            interval: 30s
-            timeout: 20s
-            retries: 3
+            - '9001'
+       environment:
+          - MINIO_ROOT_USER=minioadmin
+          - MINIO_ROOT_PASSWORD=uikui5choRith0ZieV2zohN5aish5r
+          - MINIO_DOMAIN=storage.api.blanball.com
+          - MINIO_SERVER_URL=https://storage.api.blanball.com
+          - MINIO_BROWSER_REDIRECT_URL=https://storage.console.blanball.com
+       labels:
+          - "traefik.enable=true"
+          # Console
+          - "traefik.http.routers.minio-console.rule=Host(`storage.console.blanball.com`)"
+          - "traefik.http.routers.minio-console.entrypoints=websecure"
+          - "traefik.http.routers.minio-console.tls.certresolver=myresolver"
+          - "traefik.http.routers.minio-console.service=minio-console"
+          - "traefik.http.services.minio-console.loadbalancer.server.port=9001"
+          # APi
+          - "traefik.http.routers.minio-prod.rule=Host(`storage.api.blanball.com`)"
+          - "traefik.http.routers.minio-prod.entrypoints=websecure"
+          - "traefik.http.routers.minio-prod.tls.certresolver=myresolver"
+          - "traefik.http.routers.minio-prod.service=minio-prod"
+          - "traefik.http.services.minio-prod.loadbalancer.server.port=9000"
         networks:
             - registry_default
 
