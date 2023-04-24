@@ -99,3 +99,4 @@ qa.txt
 .mypy_cache/
 
 .vscode/
+.env.prod
