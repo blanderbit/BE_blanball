@@ -39,7 +39,7 @@ services:
             - '8000'
         labels:
             - 'traefik.enable=true'
-            - 'traefik.http.routers.api-prod.rule=Host(`api.blanball.com`) && PathPrefix(`/api`)'
+            - 'traefik.http.routers.api-prod.rule=Host(`${BLANBALL_API_DOMAIN_NAME}`) && PathPrefix(`/api`)'
             - 'traefik.http.routers.api-prod.entrypoints=websecure'
             - 'traefik.http.routers.api-prod.tls.certresolver=myresolver'
             - 'traefik.http.routers.api-prod.service=api-prod'
@@ -53,7 +53,7 @@ services:
             - '10000'
         labels:
             - 'traefik.enable=true'
-            - 'traefik.http.routers.daphne-prod.rule=Host(`api.blanball.com`) && PathPrefix(`/ws`)'
+            - 'traefik.http.routers.daphne-prod.rule=Host(`${BLANBALL_WS_DOMAIN_NAME}`) && PathPrefix(`/ws`)'
             - 'traefik.http.routers.daphne-prod.entrypoints=websecure'
             - 'traefik.http.routers.daphne-prod.tls.certresolver=myresolver'
             - 'traefik.http.routers.daphne-prod.service=daphne-prod'
@@ -118,8 +118,8 @@ services:
           - ./data:/data
           - ./config:/root/.minio
         expose:
-            - '9000'
-            - '9001'
+          - '9000'
+          - '9001'
        environment:
           - MINIO_ROOT_USER=minioadmin
           - MINIO_ROOT_PASSWORD=uikui5choRith0ZieV2zohN5aish5r
@@ -129,13 +129,13 @@ services:
        labels:
           - "traefik.enable=true"
           # Console
-          - "traefik.http.routers.minio-console.rule=Host(`storage.console.blanball.com`)"
+          - "traefik.http.routers.minio-console.rule=Host(`${BLANBALL_STORAGE_CONSOLE_DOMAIN_NAME}`)"
           - "traefik.http.routers.minio-console.entrypoints=websecure"
           - "traefik.http.routers.minio-console.tls.certresolver=myresolver"
           - "traefik.http.routers.minio-console.service=minio-console"
           - "traefik.http.services.minio-console.loadbalancer.server.port=9001"
           # APi
-          - "traefik.http.routers.minio-prod.rule=Host(`storage.api.blanball.com`)"
+          - "traefik.http.routers.minio-prod.rule=Host(`${BLANBALL_STORAGE_API_DOMAIN_NAME}`)"
           - "traefik.http.routers.minio-prod.entrypoints=websecure"
           - "traefik.http.routers.minio-prod.tls.certresolver=myresolver"
           - "traefik.http.routers.minio-prod.service=minio-prod"
