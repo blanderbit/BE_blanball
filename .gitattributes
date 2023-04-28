@@ -1,0 +1,16 @@
+# Set default behavior for text files
+* text=auto
+
+# Treat certain files as binary
+*.pyc binary
+*.pyo binary
+
+# Ignore some files and directories
+__pycache__/ linguist-generated=true
+*.egg-info/ linguist-generated=true
+*.pyc linguist-generated=true
+*.pyo linguist-generated=true
+*.log linguist-generated=true
+*.sqlite3 linguist-generated=true
+*.pyc filter=python3
+*.py filter=python3

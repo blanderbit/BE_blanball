@@ -117,12 +117,13 @@ REST_FRAMEWORK: dict[str, Any] = {
 SIMPLE_JWT: dict[str, Any] = {
     "AUTH_HEADER_TYPES": (config("AUTH_HEADER_TYPES", cast=str)),
     "ACCESS_TOKEN_LIFETIME": datetime.timedelta(
-        days=config("ACCESS_TOKEN_LIFETIME", cast=int)
+        minutes=config("ACCESS_TOKEN_LIFETIME", cast=int)
     ),
     "REFRESH_TOKEN_LIFETIME": datetime.timedelta(
         days=config("REFRESH_TOKEN_LIFETIME", cast=int)
     ),
     "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
 }
 
 CORS_ALLOWED_ORIGINS = config(
