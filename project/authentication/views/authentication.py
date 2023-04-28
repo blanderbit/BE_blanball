@@ -48,6 +48,7 @@ from authentication.models import (
 )
 from authentication.permissions import (
     IsNotAuthenticated,
+    AllowAny,
 )
 from authentication.serializers import (
     CheckCodeSerializer,
@@ -82,6 +83,9 @@ from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework_simplejwt.views import (
+    TokenRefreshView,
+)
 
 
 class RegisterUser(GenericAPIView):
@@ -153,6 +157,13 @@ class LoginUser(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data, status=HTTP_200_OK)
+
+
+class RefreshTokens(TokenRefreshView):
+    permission_classes = [
+        AllowAny,
+    ]
+    pass
 
 
 class LogoutUser(GenericAPIView):
@@ -301,7 +312,6 @@ class RequestChangePassword(GenericAPIView):
         return Response(SENT_CODE_TO_EMAIL_SUCCESS, status=HTTP_200_OK)
 
 
-
 class RequestEmailVerify(GenericAPIView):
     """
     Request verify email
@@ -336,7 +346,6 @@ class RequetChangeEmail(GenericAPIView):
     """
 
     serializer_class: Type[Serializer] = EmailSerializer
-
 
     @swagger_auto_schema(
         tags=["change-email"],
