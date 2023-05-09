@@ -31,20 +31,18 @@ def get_user_scheduled_events_data(
             date_and_time__date=current_date
         )
 
-        user_author_events_count = events.filter(
-            author__id=user_id
-        ).count()
+        if len(events) > 0:
 
-        user_participation_events_count = events.filter(
-            Q(current_users=user_id) |
-            Q(current_fans=user_id)
-        ).count()
+            user_scheduled_events_count = events.filter(
+                author__id=user_id |
+                Q(current_users=user_id) |
+                Q(current_fans=user_id)
+            ).count()
 
-        if user_author_events_count > 0 or user_participation_events_count > 0:
-            scheduled_events_data[str(current_date)] = {
-                'user_author_events_count': user_author_events_count,
-                'user_participation_events_count': user_participation_events_count
-            }
+            if user_scheduled_events_count > 0:
+                scheduled_events_data[str(current_date)] = {
+                    'user_scheduled_events_count': user_scheduled_events_count,
+                }
 
         current_date += delta
 
