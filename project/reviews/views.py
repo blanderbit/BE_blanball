@@ -4,7 +4,6 @@ from config.openapi import (
     offset_query,
     skip_param_query,
 )
-from config.pagination import paginate_by_offset
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
     method_decorator,
@@ -12,7 +11,10 @@ from django.utils.decorators import (
 from drf_yasg.utils import swagger_auto_schema
 from events.services import (
     only_for_event_members,
+)
+from utils import (
     skip_objects_from_response_by_id,
+    paginate_by_offset
 )
 from rest_framework.generics import (
     CreateAPIView,

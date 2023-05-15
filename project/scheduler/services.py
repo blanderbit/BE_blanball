@@ -1,7 +1,9 @@
 
 from typing import Union
 from datetime import (
-    timedelta
+    timedelta,
+    date as datetimeDate,
+    datetime
 )
 from events.models import (
     Event
@@ -9,6 +11,24 @@ from events.models import (
 from django.db.models import (
     QuerySet,
     Q
+)
+
+from scheduler.constants.errors import (
+    SCHEDULED_EVENTS_DATE_INVALID
+)
+from events.models import (
+    Event,
+)
+from django.db.models import (
+    QuerySet,
+    Q
+)
+from rest_framework.serializers import (
+    ValidationError,
+)
+from rest_framework.request import Request
+from rest_framework.status import (
+    HTTP_400_BAD_REQUEST
 )
 
 
@@ -34,9 +54,9 @@ def get_user_scheduled_events_data(
         if len(events) > 0:
 
             user_scheduled_events_count = events.filter(
-                author__id=user_id |
-                Q(current_users=user_id) |
-                Q(current_fans=user_id)
+                Q(author__id=user_id) |
+                Q(current_users__in=[user_id]) |
+                Q(current_fans__in=[user_id])
             ).count()
 
             if user_scheduled_events_count > 0:
@@ -47,3 +67,29 @@ def get_user_scheduled_events_data(
         current_date += delta
 
     return scheduled_events_data
+
+
+def get_user_scheduled_events_on_specific_day(
+    request: Request,
+    queryest: QuerySet[Event]
+) -> QuerySet[Event]:
+    user_id = request.query_params.get("user_id")
+    date = request.query_params.get("date")
+
+    try:
+        if not user_id:
+            user_id = request.user.id
+        if not date:
+            date = datetimeDate.today()
+        else:
+            date = datetime.strptime(date, "%Y-%m-%d").date()
+
+        return queryest.filter(
+            Q(author__id=user_id) |
+            Q(current_users__in=[user_id]) |
+            Q(current_fans__in=[user_id]),
+            date_and_time__date=date
+        )
+
+    except ValueError:
+        raise ValidationError(SCHEDULED_EVENTS_DATE_INVALID, HTTP_400_BAD_REQUEST)

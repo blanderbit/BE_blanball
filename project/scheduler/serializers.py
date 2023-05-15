@@ -1,10 +1,17 @@
 from scheduler.constants.errors import (
     SCHEDULER_FINISH_DATE_LESS_THAN_START_DATE,
 )
+from events.serializers import (
+    PlaceSerializer
+)
+from events.models import (
+    Event
+)
 from typing import Any, Union
 
 from rest_framework.serializers import (
     Serializer,
+    ModelSerializer,
     DateField,
     ValidationError,
     IntegerField
@@ -34,3 +41,23 @@ class UserScheduledEventsSerializer(Serializer):
                 SCHEDULER_FINISH_DATE_LESS_THAN_START_DATE, HTTP_400_BAD_REQUEST
             )
         return data
+
+
+class ListOfUserScheduledEventsOnSpecificDaySerializer(ModelSerializer):
+    place = PlaceSerializer()
+
+    class Meta:
+        model: Event = Event
+        fields: Union[str, list[str]] = [
+            "id",
+            "name",
+            "price",
+            "date_and_time",
+            "duration",
+            "amount_members",
+            "count_current_users",
+            "place",
+            "type",
+            "status",
+            "request_user_role",
+        ]

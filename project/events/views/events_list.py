@@ -8,9 +8,6 @@ from typing import Any, Type, final
 from authentication.filters import (
     RankedFuzzySearchFilter,
 )
-from authentication.models import User
-from config.exceptions import _404
-from config.pagination import paginate_by_offset
 from django.db.models import Count, Q
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
@@ -37,9 +34,10 @@ from events.serializers import (
     MyEventListSerializer,
     MyPlannedParticipantAndViewEventsListSerializer,
 )
-from events.services import (
-    add_dist_filter_to_view,
+from utils import (
     skip_objects_from_response_by_id,
+    add_dist_filter_to_view,
+    paginate_by_offset,
 )
 from rest_framework.filters import (
     OrderingFilter,

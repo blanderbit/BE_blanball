@@ -8,6 +8,7 @@ from django.urls.resolvers import (
 
 from scheduler.views import (
     UserScheduledEvents,
+    ListOfUserScheduledEventsOnSpecificDay,
 )
 
 
@@ -16,5 +17,10 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
         "client/user/scheduler/events",
         UserScheduledEvents.as_view(),
         name="user-scheduled-events"
+    ),
+    path(
+        "client/user/scheduler/events/on/specific/day",
+        ListOfUserScheduledEventsOnSpecificDay.as_view(),
+        name="user-scheduled-events-on-specific-day"
     ),
 ]
