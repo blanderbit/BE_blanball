@@ -49,9 +49,6 @@ from rest_framework.serializers import (
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
-from rest_framework_gis.filters import (
-    DistanceToPointFilter,
-)
 
 bulk = TypeVar(Optional[Generator[list[dict[str, int]], None, None]])
 
@@ -102,7 +99,6 @@ def bulk_show_or_hide_events(
                 yield {"success": event_id}
         except Event.DoesNotExist:
             pass
-
 
 
 def bulk_unpin_events(
@@ -388,39 +384,6 @@ def remove_user_from_event(*, user: User, event: Event, reason: str) -> None:
             },
         },
     )
-
-
-def skip_objects_from_response_by_id(
-    func: Callable[[..., ...], QuerySet[Any]]
-) -> Callable[[..., ...], QuerySet[Any]]:
-    def wrap(self, *args: Any, **kwargs: Any) -> Any:
-        try:
-            self.queryset = self.queryset.filter(
-                ~Q(id__in=list(self.request.query_params["skipids"].split(",")))
-            )
-            return func(self, *args, **kwargs)
-        except (KeyError, ValueError):
-            pass
-        finally:
-            return func(self, *args, **kwargs)
-
-    return wrap
-
-
-def add_dist_filter_to_view(
-    func: Callable[[..., ...], QuerySet[QuerySet[Union[User, Event]]]]
-) -> Callable[[..., ...], QuerySet[QuerySet[Union[User, Event]]]]:
-    def wrap(self) -> QuerySet[Union[User, Event]]:
-        try:
-            distance: int = self.request.query_params["dist"]
-            if distance.isnumeric() or int(distance) > 0:
-                self.filter_backends.append(DistanceToPointFilter)
-                self.distance_filter_field = self.distance_ordering_filter_field
-                return func(self)
-        except Exception:
-            return func(self)
-
-    return wrap
 
 
 def only_for_event_members(func):

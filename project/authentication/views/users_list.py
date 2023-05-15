@@ -22,7 +22,6 @@ from authentication.serializers import (
     UsersListDetailSerializer,
     UsersListSerializer,
 )
-from config.pagination import paginate_by_offset
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
     method_decorator,
@@ -31,9 +30,10 @@ from django_filters.rest_framework import (
     DjangoFilterBackend,
 )
 from drf_yasg.utils import swagger_auto_schema
-from events.services import (
-    add_dist_filter_to_view,
+from utils import (
     skip_objects_from_response_by_id,
+    add_dist_filter_to_view,
+    paginate_by_offset
 )
 from rest_framework.filters import (
     OrderingFilter,

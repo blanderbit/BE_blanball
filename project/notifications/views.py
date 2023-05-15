@@ -2,11 +2,6 @@ import json
 from typing import Any, Type
 
 from api_keys.permissions import ApiKeyPermission
-from config.openapi import (
-    offset_query,
-    skip_param_query,
-)
-from config.pagination import paginate_by_offset
 from config.serializers import (
     BaseBulkSerializer,
 )
@@ -18,8 +13,9 @@ from django_filters.rest_framework import (
     DjangoFilterBackend,
 )
 from drf_yasg.utils import swagger_auto_schema
-from events.services import (
+from utils import (
     skip_objects_from_response_by_id,
+    paginate_by_offset
 )
 from notifications.constants.errors import (
     MAINTENANCE_CAN_NOT_GET_ERROR,

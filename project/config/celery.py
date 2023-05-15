@@ -31,4 +31,12 @@ app.conf.beat_schedule = {
         "task": "api_keys.tasks.delete_expired_api_keys",
         "schedule": crontab(minute=0, hour=0),
     },
+    "reset_outstanding_tokens": {
+        "task": "config.tasks.reset_outstanding_jwt_tokens",
+        "schedule": crontab(minute=0, hour=0),
+    },
+    "remove_expired_invitations_to_friends": {
+        "task": "friends.tasks.remove_expired_invitations_to_friends",
+        "schedule": crontab(hour="*/8"),
+    }
 }

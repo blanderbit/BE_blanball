@@ -11,15 +11,11 @@ from config.openapi import (
     offset_query,
     skip_param_query,
 )
-from config.pagination import paginate_by_offset
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
     method_decorator,
 )
 from drf_yasg.utils import swagger_auto_schema
-from events.constants.success import (
-    SENT_INVATION_SUCCESS,
-)
 from events.models import (
     Event,
     InviteToEvent,
@@ -35,8 +31,11 @@ from events.services import (
     bulk_accept_or_decline_invites_to_events,
     bulk_accpet_or_decline_requests_to_participation,
     not_in_black_list,
-    skip_objects_from_response_by_id,
     invite_users_to_event,
+)
+from utils import (
+    skip_objects_from_response_by_id,
+    paginate_by_offset
 )
 from rest_framework.generics import (
     GenericAPIView,

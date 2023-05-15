@@ -12,7 +12,7 @@ INSTALLED_APPS: list[str] = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # Other libs apps:
+    # Other libs app:
     "corsheaders",
     "drf_standardized_errors",
     "rest_framework_swagger",
@@ -34,6 +34,7 @@ INSTALLED_APPS: list[str] = [
     "bugs.apps.BugsConfig",
     "api_keys.apps.ApiKeysConfig",
     "friends.apps.FriendsConfig",
+    "scheduler.apps.SchedulerConfig",
 ]
 
 if not os.environ.get("GITHUB_WORKFLOW"):

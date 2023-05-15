@@ -33,8 +33,8 @@ from django_filters.rest_framework import (
     DjangoFilterBackend,
 )
 from drf_yasg.utils import swagger_auto_schema
-from events.services import (
-    skip_objects_from_response_by_id,
+from utils import (
+    skip_objects_from_response_by_id
 )
 from rest_framework.filters import (
     OrderingFilter,
