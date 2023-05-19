@@ -55,9 +55,9 @@ class ListOfUserScheduledEventsOnSpecificDaySerializer(ModelSerializer):
             "date_and_time",
             "duration",
             "amount_members",
-            "count_current_users",
             "place",
             "type",
             "status",
             "request_user_role",
+            "current_users"
         ]
