@@ -9,8 +9,7 @@ from django.db.models.query import QuerySet
 
 @final
 class Hint(models.Model):
-    name: str = models.CharField(max_length=255)
-    page: str = models.CharField(max_length=255)
+    name: str = models.CharField(max_length=255, unique=True)
     time_created: datetime = models.DateTimeField(auto_now_add=True)
 
     @final
@@ -19,7 +18,7 @@ class Hint(models.Model):
 
     @final
     def __str__(self) -> str:
-        return self.email
+        return self.name
 
     @final
     @staticmethod

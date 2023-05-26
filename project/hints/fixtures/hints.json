@@ -1,0 +1,10 @@
+[
+    {
+      "model": "hints.Hint",
+      "pk": 1,
+      "fields": {
+        "name": "scheduler_onboarding",
+        "time_created": "2023-05-19 12:00:00"
+      }
+    }
+]

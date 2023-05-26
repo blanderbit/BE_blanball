@@ -233,7 +233,7 @@ class User(AbstractBaseUser):
     )
     configuration: dict[str, bool] = models.JSONField(default=configuration_dict)
     checked_hints: list[Optional[Hint]] = models.ManyToManyField(
-        Hint, related_name="checked_hints", blank=True
+        Hint, blank=True
     )
 
     USERNAME_FIELD: str = "email"
