@@ -35,6 +35,7 @@ INSTALLED_APPS: list[str] = [
     "api_keys.apps.ApiKeysConfig",
     "friends.apps.FriendsConfig",
     "scheduler.apps.SchedulerConfig",
+    "hints.apps.HintsConfig",
 ]
 
 if not os.environ.get("GITHUB_WORKFLOW"):

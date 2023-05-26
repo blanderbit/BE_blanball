@@ -31,7 +31,7 @@ app.conf.beat_schedule = {
         "task": "api_keys.tasks.delete_expired_api_keys",
         "schedule": crontab(minute=0, hour=0),
     },
-    "reset_outstanding_tokens": {
+    "reset_outstanding_jwt_tokens": {
         "task": "config.tasks.reset_outstanding_jwt_tokens",
         "schedule": crontab(minute=0, hour=0),
     },

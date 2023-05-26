@@ -7,6 +7,9 @@ from authentication.constants.errors import (
     MAX_AGE_VALUE_ERROR,
     MIN_AGE_VALUE_ERROR,
 )
+from hints.models import (
+    Hint
+)
 from django.conf import settings
 from django.contrib.auth.models import (
     AbstractBaseUser,
@@ -229,6 +232,9 @@ class User(AbstractBaseUser):
         Profile, on_delete=models.CASCADE, null=True, related_name="user"
     )
     configuration: dict[str, bool] = models.JSONField(default=configuration_dict)
+    checked_hints: list[Optional[Hint]] = models.ManyToManyField(
+        Hint, blank=True
+    )
 
     USERNAME_FIELD: str = "email"
 
