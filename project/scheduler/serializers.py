@@ -4,6 +4,10 @@ from scheduler.constants.errors import (
 from events.serializers import (
     PlaceSerializer
 )
+from events.serializers import (
+    EventAuthorSerializer,
+    EventUsersSerializer
+)
 from events.models import (
     Event
 )
@@ -45,11 +49,14 @@ class UserScheduledEventsSerializer(Serializer):
 
 class ListOfUserScheduledEventsOnSpecificDaySerializer(ModelSerializer):
     place = PlaceSerializer()
+    author = EventAuthorSerializer()
+    current_users = EventUsersSerializer(many=True)
 
     class Meta:
         model: Event = Event
         fields: Union[str, list[str]] = [
             "id",
+            "author",
             "name",
             "price",
             "date_and_time",
