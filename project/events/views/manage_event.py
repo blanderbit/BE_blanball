@@ -140,7 +140,7 @@ class PinMyEvents(GenericAPIView):
             user=request.user,
         )
         return Response(data, status=HTTP_200_OK)
-    
+
 
 class ShowOrHideMyEvents(GenericAPIView):
     """

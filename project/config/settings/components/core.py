@@ -138,4 +138,4 @@ CORS_ALLOW_HEADERS: list[str] = config(
     "CORS_ALLOW_HEADERS", cast=lambda v: [s.strip() for s in v.split(",")]
 )
 
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

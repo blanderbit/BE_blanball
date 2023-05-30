@@ -33,7 +33,7 @@ from drf_yasg.utils import swagger_auto_schema
 from utils import (
     skip_objects_from_response_by_id,
     add_dist_filter_to_view,
-    paginate_by_offset
+    paginate_by_offset,
 )
 from rest_framework.filters import (
     OrderingFilter,
@@ -50,10 +50,7 @@ from rest_framework_gis.filters import (
 
 
 @method_decorator(
-    swagger_auto_schema(
-        manual_parameters=users_list_query_params,
-        tags=["users"]
-    ),
+    swagger_auto_schema(manual_parameters=users_list_query_params, tags=["users"]),
     name="get",
 )
 @paginate_by_offset
@@ -100,8 +97,7 @@ class UsersDetailList(UsersList):
 
 @method_decorator(
     swagger_auto_schema(
-        manual_parameters=users_relevant_list_query_params,
-        tags=["users"]
+        manual_parameters=users_relevant_list_query_params, tags=["users"]
     ),
     name="get",
 )

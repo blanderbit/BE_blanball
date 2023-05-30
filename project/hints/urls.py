@@ -1,8 +1,6 @@
 from typing import Union
 
-from hints.views import (
-    HintsList
-)
+from hints.views import HintsList
 from django.urls import path
 from django.urls.resolvers import (
     URLPattern,

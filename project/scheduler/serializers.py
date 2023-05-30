@@ -1,16 +1,9 @@
 from scheduler.constants.errors import (
     SCHEDULER_FINISH_DATE_LESS_THAN_START_DATE,
 )
-from events.serializers import (
-    PlaceSerializer
-)
-from events.serializers import (
-    EventAuthorSerializer,
-    EventUsersSerializer
-)
-from events.models import (
-    Event
-)
+from events.serializers import PlaceSerializer
+from events.serializers import EventAuthorSerializer, EventUsersSerializer
+from events.models import Event
 from typing import Any, Union
 
 from rest_framework.serializers import (
@@ -18,12 +11,10 @@ from rest_framework.serializers import (
     ModelSerializer,
     DateField,
     ValidationError,
-    IntegerField
+    IntegerField,
 )
 
-from rest_framework.status import (
-    HTTP_400_BAD_REQUEST
-)
+from rest_framework.status import HTTP_400_BAD_REQUEST
 
 
 class UserScheduledEventsSerializer(Serializer):
@@ -33,11 +24,7 @@ class UserScheduledEventsSerializer(Serializer):
     finish_date = DateField(format="%Y-%m-%d", input_formats=["%Y-%m-%d"])
 
     class Meta:
-        fields: Union[str, list[str]] = [
-            "user_id",
-            "start_date",
-            "finish_date"
-        ]
+        fields: Union[str, list[str]] = ["user_id", "start_date", "finish_date"]
 
     def validate(self, data):
         if data["finish_date"] < data["start_date"]:
@@ -66,5 +53,5 @@ class ListOfUserScheduledEventsOnSpecificDaySerializer(ModelSerializer):
             "type",
             "status",
             "request_user_role",
-            "current_users"
+            "current_users",
         ]

@@ -38,5 +38,5 @@ app.conf.beat_schedule = {
     "remove_expired_invitations_to_friends": {
         "task": "friends.tasks.remove_expired_invitations_to_friends",
         "schedule": crontab(hour="*/8"),
-    }
+    },
 }

@@ -17,6 +17,7 @@ from authentication.constants.errors import (
     NO_PERMISSIONS_ERROR,
     THIS_EMAIL_ALREADY_IN_USE_ERROR,
     WRONG_PASSWORD_ERROR,
+    REFRESH_TOKEN_INVALID,
 )
 from authentication.constants.success import (
     ACCOUNT_DELETE_SUCCESS_BODY_TITLE,
@@ -40,6 +41,7 @@ from authentication.constants.success import (
     TEMPLATE_SUCCESS_TEXT,
     TEMPLATE_SUCCESS_TITLE,
     LOGOUT_SUCCESS,
+    REFRESH_TOKEN_VALID,
 )
 from authentication.models import (
     Code,
@@ -59,6 +61,7 @@ from authentication.serializers import (
     ResetPasswordSerializer,
     ValidatePhoneByUniqueSerializer,
     ValidateResetPasswordCodeSerializer,
+    ValidateRefreshTokenSerializer,
     LogoutSerializer,
 )
 from authentication.services import (
@@ -86,6 +89,8 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
 
 
 class RegisterUser(GenericAPIView):
@@ -361,6 +366,26 @@ class RequetChangeEmail(GenericAPIView):
             )
             return Response(SENT_CODE_TO_EMAIL_SUCCESS, status=HTTP_200_OK)
         return Response(THIS_EMAIL_ALREADY_IN_USE_ERROR, status=HTTP_400_BAD_REQUEST)
+
+
+class ValidateRefreshToken(GenericAPIView):
+    """
+    Checking the refresh token for validity
+
+    This endpoint allows the user
+    to check the refresh token for validity
+    """
+
+    serializer_class: Type[Serializer] = ValidateRefreshTokenSerializer
+
+    def post(self, request):
+        refresh_token = request.data.get("refresh")
+        try:
+            token = RefreshToken(refresh_token)
+            token.check_blacklist()
+            return Response(REFRESH_TOKEN_VALID, HTTP_200_OK)
+        except TokenError:
+            raise ValidationError(REFRESH_TOKEN_INVALID, HTTP_400_BAD_REQUEST)
 
 
 class CheckCode(GenericAPIView):

@@ -161,6 +161,7 @@ class EventListSerializer(ModelSerializer):
             data = super().to_representation(instance)
             return data
 
+
 class MyPlannedParticipantAndViewEventsListSerializer(ModelSerializer):
     place = PlaceSerializer()
 
@@ -263,10 +264,7 @@ class InviteUsersToEventSerializer(BaseBulkSerializer):
     event_id: int = IntegerField(min_value=0)
 
     class Meta:
-        fields: Union[str, list[str]] = [
-            "ids",
-            "event_id"
-        ]
+        fields: Union[str, list[str]] = ["ids", "event_id"]
 
     def validate(self, attrs) -> OrderedDict[str, Any]:
         try:
@@ -275,7 +273,9 @@ class InviteUsersToEventSerializer(BaseBulkSerializer):
             for user_id in attrs.get("ids"):
                 invite_user: User = User.get_all().get(id=user_id)
                 if event.status == Event.Status.FINISHED:
-                    raise ValidationError(EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST)
+                    raise ValidationError(
+                        EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST
+                    )
                 if invite_user.current_rooms.filter(id=event.id).exists():
                     raise ValidationError(
                         ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, HTTP_400_BAD_REQUEST

@@ -60,9 +60,7 @@ class JoinToEvent(GenericAPIView):
 
     serializer_class: Type[Serializer] = JoinOrRemoveRoomSerializer
 
-    @swagger_auto_schema(
-        tags=["event-join"]
-    )
+    @swagger_auto_schema(tags=["event-join"])
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -90,9 +88,7 @@ class FanJoinToEvent(GenericAPIView):
 
     serializer_class: Type[Serializer] = JoinOrRemoveRoomSerializer
 
-    @swagger_auto_schema(
-        tags=["event-join"]
-    )
+    @swagger_auto_schema(tags=["event-join"])
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -118,9 +114,7 @@ class FanLeaveFromEvent(GenericAPIView):
 
     serializer_class: Type[Serializer] = JoinOrRemoveRoomSerializer
 
-    @swagger_auto_schema(
-        tags=["event-leave"]
-    )
+    @swagger_auto_schema(tags=["event-leave"])
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -142,9 +136,7 @@ class LeaveFromEvent(GenericAPIView):
 
     serializer_class: Type[Serializer] = JoinOrRemoveRoomSerializer
 
-    @swagger_auto_schema(
-        tags=["event-leave"]
-    )
+    @swagger_auto_schema(tags=["event-leave"])
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -170,9 +162,7 @@ class RemoveUserFromEvent(GenericAPIView):
 
     serializer_class: Type[Serializer] = RemoveUserFromEventSerializer
 
-    @swagger_auto_schema(
-        tags=["events", "event-leave"]
-    )
+    @swagger_auto_schema(tags=["events", "event-leave"])
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)

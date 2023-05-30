@@ -138,7 +138,7 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
         MyPinnedEventsCount.as_view(),
         name="my-pinned-events-count",
     ),
-     path(
+    path(
         "client/show/or/hide/my/events",
         ShowOrHideMyEvents.as_view(),
         name="show-or-hide-my-events",

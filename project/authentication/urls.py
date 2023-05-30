@@ -20,6 +20,7 @@ from authentication.views import (
     ValidatePhoneByUnique,
     LogoutUser,
     ValidateResetPasswordCode,
+    ValidateRefreshToken,
 )
 from django.urls import path
 from django.urls.resolvers import (
@@ -32,6 +33,11 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     path("client/refresh/tokens", RefreshTokens.as_view(), name="refresh-tokens"),
     path("client/login", LoginUser.as_view(), name="login"),
     path("client/logout", LogoutUser.as_view(), name="logout"),
+    path(
+        "client/validate/refresh/token",
+        ValidateRefreshToken.as_view(),
+        name="validate-refresh-token",
+    ),
     path("client/users/list", UsersList.as_view(), name="users-list"),
     path(
         "admin/users/list/detail", UsersDetailList.as_view(), name="users-list-detail"

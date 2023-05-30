@@ -2,9 +2,7 @@ from typing import Any, Union
 from collections import OrderedDict
 
 from authentication.models import User
-from authentication.serializers import (
-    FriendUserSerializer
-)
+from authentication.serializers import FriendUserSerializer
 from config.exceptions import _404
 from config.serializers import (
     BaseBulkSerializer,
@@ -31,11 +29,7 @@ class MyFriendsListSerializer(ModelSerializer):
 
     class Meta:
         model: Friend = Friend
-        fields: Union[str, list[str]] = [
-            "id",
-            "friend",
-            "created_at"
-        ]
+        fields: Union[str, list[str]] = ["id", "friend", "created_at"]
 
 
 class InvitesToFriendsListSerializer(ModelSerializer):

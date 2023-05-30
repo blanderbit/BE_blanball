@@ -49,9 +49,8 @@ from authentication.views.users_list import (
 from authentication.views.users_list import (
     UsersRelevantList as UsersRelevantList,
 )
+from authentication.views.authentication import LogoutUser as LogoutUser
+from authentication.views.authentication import RefreshTokens as RefreshTokens
 from authentication.views.authentication import (
-    LogoutUser as LogoutUser
-)
-from authentication.views.authentication import (
-    RefreshTokens as RefreshTokens
+    ValidateRefreshToken as ValidateRefreshToken,
 )

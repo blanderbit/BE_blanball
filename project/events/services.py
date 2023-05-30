@@ -90,8 +90,8 @@ def bulk_show_or_hide_events(
         try:
             event: Event = queryset.get(id=event_id)
             if (
-                user in event.current_users.all() or
-                user in event.current_fans.all()
+                user in event.current_users.all()
+                or user in event.current_fans.all()
                 and event.status == Event.Status.PLANNED
             ):
                 event.hidden = not event.hidden
@@ -425,7 +425,9 @@ def send_message_to_event_author_after_leave_user_from_event(
     )
 
 
-def invite_users_to_event(*, event_id: int, users_ids: list[int], request_user: User) -> None:
+def invite_users_to_event(
+    *, event_id: int, users_ids: list[int], request_user: User
+) -> None:
     event: Event = Event.get_all().get(id=event_id)
 
     for user_id in users_ids:

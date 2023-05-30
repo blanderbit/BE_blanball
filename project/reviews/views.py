@@ -12,10 +12,7 @@ from drf_yasg.utils import swagger_auto_schema
 from events.services import (
     only_for_event_members,
 )
-from utils import (
-    skip_objects_from_response_by_id,
-    paginate_by_offset
-)
+from utils import skip_objects_from_response_by_id, paginate_by_offset
 from rest_framework.generics import (
     CreateAPIView,
     GenericAPIView,

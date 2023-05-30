@@ -51,3 +51,7 @@ THIS_EMAIL_ALREADY_IN_USE_ERROR: dict[str, str] = {"error": "email_already_in_us
 # the error that means that the image uploaded by the
 # user exceeds the weight limit
 AVATAR_MAX_SIZE_ERROR: dict[str, str] = {"error": "avatar_max_size_1mb"}
+
+# the response message that indicates
+# that the refresh token is not valid
+REFRESH_TOKEN_INVALID: dict[str, str] = {"error": "refresh_token_invalid"}

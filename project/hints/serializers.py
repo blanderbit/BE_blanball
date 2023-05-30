@@ -8,7 +8,6 @@ from rest_framework.serializers import (
 
 
 class HintsListSerializer(ModelSerializer):
-
     class Meta:
         model: Hint = Hint
         fields: Union[str, list[str]] = "__all__"

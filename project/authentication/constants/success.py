@@ -39,6 +39,11 @@ CHANGE_EMAIL_SUCCESS: dict[str, str] = {"succes": "email_change"}
 CHANGE_PASSWORD_SUCCESS: dict[str, str] = {"succes": "password_change"}
 
 
+# the response message that indicates
+# that the refresh token is fully valid
+REFRESH_TOKEN_VALID: dict[str, str] = {"succes": "refresh_token_valid"}
+
+
 REGISTER_SUCCESS_TITLE: str = "Thank you for registering with BlanBall"
 REGISTER_SUCCESS_TEXT: str = (
     "You received this message because this email is registered in the BlanBall app."

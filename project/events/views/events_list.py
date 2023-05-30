@@ -52,12 +52,10 @@ from rest_framework_gis.filters import (
     DistanceToPointOrderingFilter,
 )
 
+
 @method_decorator(
-    swagger_auto_schema(
-        manual_parameters=events_list_query_params,
-        tags=["events"]
-    ),
-    name="get"
+    swagger_auto_schema(manual_parameters=events_list_query_params, tags=["events"]),
+    name="get",
 )
 @paginate_by_offset
 class EventsList(ListAPIView):
@@ -90,8 +88,7 @@ class EventsList(ListAPIView):
 
 @method_decorator(
     swagger_auto_schema(
-        manual_parameters=events_relevant_list_query_params,
-        tags=["events"]
+        manual_parameters=events_relevant_list_query_params, tags=["events"]
     ),
     name="get",
 )
@@ -140,11 +137,7 @@ class MyEventsList(EventsList):
 
     serializer_class: Type[Serializer] = MyEventListSerializer
 
-
-    @swagger_auto_schema(
-        manual_parameters=events_list_query_params,
-        tags=["my-events"]
-    )
+    @swagger_auto_schema(manual_parameters=events_list_query_params, tags=["my-events"])
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
@@ -166,11 +159,7 @@ class MyTopicalEventsList(EventsList):
 
     serializer_class: Type[Serializer] = MyEventListSerializer
 
-
-    @swagger_auto_schema(
-        manual_parameters=events_list_query_params,
-        tags=["my-events"]
-    )
+    @swagger_auto_schema(manual_parameters=events_list_query_params, tags=["my-events"])
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
@@ -195,11 +184,7 @@ class MyFinishedEventsList(EventsList):
 
     serializer_class: Type[Serializer] = MyEventListSerializer
 
-
-    @swagger_auto_schema(
-        manual_parameters=events_list_query_params,
-        tags=["my-events"]
-    )
+    @swagger_auto_schema(manual_parameters=events_list_query_params, tags=["my-events"])
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
@@ -244,23 +229,20 @@ class MyPlannedParticipantAndViewEventsList(EventsList):
     This endpoint allows the user to get only
     planned events
     """
+
     serializer_class: Type[Serializer] = MyPlannedParticipantAndViewEventsListSerializer
-    
-    @swagger_auto_schema(
-        manual_parameters=events_list_query_params,
-        tags=["my-events"]
-    )
+
+    @swagger_auto_schema(manual_parameters=events_list_query_params, tags=["my-events"])
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Event]:
         return EventsList.get_queryset(self).filter(
-            Q(current_users__in=[self.request.user.id]) |
-            Q(current_fans__in=[self.request.user.id]),
-            status=Event.Status.PLANNED
+            Q(current_users__in=[self.request.user.id])
+            | Q(current_fans__in=[self.request.user.id]),
+            status=Event.Status.PLANNED,
         )
-
 
 
 class PopularEventsList(EventsList):
@@ -295,8 +277,7 @@ class UserPlannedEventsList(EventsList):
     """
 
     queryset: QuerySet[Event] = Event.get_all().filter(
-        hidden=False,
-        status=Event.Status.PLANNED
+        hidden=False, status=Event.Status.PLANNED
     )
 
     @skip_objects_from_response_by_id
