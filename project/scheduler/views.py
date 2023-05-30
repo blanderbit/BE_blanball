@@ -1,32 +1,33 @@
+from typing import Type
+
+from django.db.models import QuerySet
 from django.utils.decorators import (
     method_decorator,
 )
 from drf_yasg.utils import swagger_auto_schema
-from typing import Type
-from utils import paginate_by_offset, skip_objects_from_response_by_id
-from scheduler.serializers import (
-    UserScheduledEventsSerializer,
-    ListOfUserScheduledEventsOnSpecificDaySerializer,
+from events.models import Event
+from rest_framework.generics import (
+    GenericAPIView,
+    ListAPIView,
 )
-from scheduler.openapi import scheduled_events_list_query_params
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.serializers import Serializer
+from rest_framework.status import HTTP_200_OK
+from scheduler.openapi import (
+    scheduled_events_list_query_params,
+)
+from scheduler.serializers import (
+    ListOfUserScheduledEventsOnSpecificDaySerializer,
+    UserScheduledEventsSerializer,
+)
 from scheduler.services import (
     get_user_scheduled_events_data,
     get_user_scheduled_events_on_specific_day,
 )
-from events.models import (
-    Event,
-)
-from django.db.models import (
-    QuerySet,
-)
-from rest_framework.generics import GenericAPIView, ListAPIView
-from rest_framework.serializers import (
-    Serializer,
-)
-from rest_framework.request import Request
-from rest_framework.response import Response
-from rest_framework.status import (
-    HTTP_200_OK,
+from utils import (
+    paginate_by_offset,
+    skip_objects_from_response_by_id,
 )
 
 

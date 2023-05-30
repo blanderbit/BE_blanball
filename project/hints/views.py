@@ -1,11 +1,12 @@
 from typing import Type
+
+from django.db.models import QuerySet
 from hints.models import Hint
 from hints.serializers import HintsListSerializer
-
-from django.db.models import (
-    QuerySet,
+from rest_framework.generics import (
+    GenericAPIView,
+    ListAPIView,
 )
-from rest_framework.generics import ListAPIView, GenericAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer

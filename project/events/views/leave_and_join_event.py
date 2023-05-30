@@ -6,6 +6,7 @@
 from typing import Any, Type, final
 
 from authentication.models import User
+from drf_yasg.utils import swagger_auto_schema
 from events.constants.errors import (
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,
     EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,
@@ -46,7 +47,6 @@ from rest_framework.status import (
     HTTP_200_OK,
     HTTP_400_BAD_REQUEST,
 )
-from drf_yasg.utils import swagger_auto_schema
 
 
 class JoinToEvent(GenericAPIView):

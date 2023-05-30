@@ -1,23 +1,23 @@
-from typing import final
 from datetime import datetime
-from friends.constants.notification_types import (
-    INVITE_USER_TO_FRIENDS_NOTIFICATION_TYPE,
-)
+from typing import final
+
+from authentication.models import User
+from django.db import models
+from django.db.models.query import QuerySet
 from friends.constants.errors import (
     ALREADY_SENT_REQUEST_TO_THIS_USER_IN_FRIENDS,
     CAN_NOT_INVITE_YOURSELF_TO_FRIENDS,
 )
-from authentication.models import User
-
-from django.db.models.query import QuerySet
-from django.db import models
-from rest_framework.status import (
-    HTTP_403_FORBIDDEN,
+from friends.constants.notification_types import (
+    INVITE_USER_TO_FRIENDS_NOTIFICATION_TYPE,
 )
+from notifications.tasks import send_to_user
 from rest_framework.serializers import (
     ValidationError,
 )
-from notifications.tasks import send_to_user
+from rest_framework.status import (
+    HTTP_403_FORBIDDEN,
+)
 
 
 class Friend(models.Model):

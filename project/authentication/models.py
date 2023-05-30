@@ -7,7 +7,6 @@ from authentication.constants.errors import (
     MAX_AGE_VALUE_ERROR,
     MIN_AGE_VALUE_ERROR,
 )
-from hints.models import Hint
 from django.conf import settings
 from django.contrib.auth.models import (
     AbstractBaseUser,
@@ -34,6 +33,7 @@ from django.utils.encoding import smart_bytes
 from django.utils.http import (
     urlsafe_base64_encode,
 )
+from hints.models import Hint
 from phonenumber_field.modelfields import (
     PhoneNumberField,
 )

@@ -1,20 +1,24 @@
+from typing import Any, Union
+
+from events.models import Event
+from events.serializers import (
+    EventAuthorSerializer,
+    EventUsersSerializer,
+    PlaceSerializer,
+)
+from rest_framework.serializers import (
+    DateField,
+    IntegerField,
+    ModelSerializer,
+    Serializer,
+    ValidationError,
+)
+from rest_framework.status import (
+    HTTP_400_BAD_REQUEST,
+)
 from scheduler.constants.errors import (
     SCHEDULER_FINISH_DATE_LESS_THAN_START_DATE,
 )
-from events.serializers import PlaceSerializer
-from events.serializers import EventAuthorSerializer, EventUsersSerializer
-from events.models import Event
-from typing import Any, Union
-
-from rest_framework.serializers import (
-    Serializer,
-    ModelSerializer,
-    DateField,
-    ValidationError,
-    IntegerField,
-)
-
-from rest_framework.status import HTTP_400_BAD_REQUEST
 
 
 class UserScheduledEventsSerializer(Serializer):

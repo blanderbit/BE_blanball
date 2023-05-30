@@ -8,9 +8,7 @@ from authentication.serializers import (
 )
 from cities.serializers import PlaceSerializer
 from config.exceptions import _404
-from config.serializers import (
-    BaseBulkSerializer,
-)
+from config.serializers import BaseBulkSerializer
 from events.constants.errors import (
     ALREADY_IN_EVENT_FANS_LIST_ERROR,
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,

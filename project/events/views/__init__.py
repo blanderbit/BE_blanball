@@ -77,9 +77,11 @@ from events.views.manage_event import (
     PinMyEvents as PinMyEvents,
 )
 from events.views.manage_event import (
+    ShowOrHideMyEvents as ShowOrHideMyEvents,
+)
+from events.views.manage_event import (
     UnPinMyEvents as UnPinMyEvents,
 )
 from events.views.manage_event import (
     UpdateEvent as UpdateEvent,
 )
-from events.views.manage_event import ShowOrHideMyEvents as ShowOrHideMyEvents

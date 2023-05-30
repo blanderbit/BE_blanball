@@ -30,10 +30,9 @@ from events.serializers import (
 from events.services import (
     bulk_accept_or_decline_invites_to_events,
     bulk_accpet_or_decline_requests_to_participation,
-    not_in_black_list,
     invite_users_to_event,
+    not_in_black_list,
 )
-from utils import skip_objects_from_response_by_id, paginate_by_offset
 from rest_framework.generics import (
     GenericAPIView,
     ListAPIView,
@@ -42,6 +41,10 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 from rest_framework.status import HTTP_200_OK
+from utils import (
+    paginate_by_offset,
+    skip_objects_from_response_by_id,
+)
 
 
 class InviteUsersToEvent(GenericAPIView):

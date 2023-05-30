@@ -22,9 +22,7 @@ from bugs.services import (
     bulk_delete_bugs,
     create_bug,
 )
-from config.serializers import (
-    BaseBulkSerializer,
-)
+from config.serializers import BaseBulkSerializer
 from django.db.models import QuerySet
 from django.utils.decorators import (
     method_decorator,
@@ -33,7 +31,6 @@ from django_filters.rest_framework import (
     DjangoFilterBackend,
 )
 from drf_yasg.utils import swagger_auto_schema
-from utils import skip_objects_from_response_by_id
 from rest_framework.filters import (
     OrderingFilter,
     SearchFilter,
@@ -53,6 +50,7 @@ from rest_framework.status import (
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
 )
+from utils import skip_objects_from_response_by_id
 
 
 class CreateBug(GenericAPIView):

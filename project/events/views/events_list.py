@@ -34,11 +34,6 @@ from events.serializers import (
     MyEventListSerializer,
     MyPlannedParticipantAndViewEventsListSerializer,
 )
-from utils import (
-    skip_objects_from_response_by_id,
-    add_dist_filter_to_view,
-    paginate_by_offset,
-)
 from rest_framework.filters import (
     OrderingFilter,
     SearchFilter,
@@ -50,6 +45,11 @@ from rest_framework.serializers import Serializer
 from rest_framework.status import HTTP_200_OK
 from rest_framework_gis.filters import (
     DistanceToPointOrderingFilter,
+)
+from utils import (
+    add_dist_filter_to_view,
+    paginate_by_offset,
+    skip_objects_from_response_by_id,
 )
 
 

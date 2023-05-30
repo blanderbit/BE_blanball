@@ -22,16 +22,12 @@ from api_keys.services import (
     validate_api_key,
 )
 from authentication.permissions import AllowAny
-from config.serializers import (
-    BaseBulkSerializer,
-)
+from config.serializers import BaseBulkSerializer
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
     method_decorator,
 )
 from drf_yasg.utils import swagger_auto_schema
-from utils import skip_objects_from_response_by_id
-
 from rest_framework.filters import (
     OrderingFilter,
     SearchFilter,
@@ -52,6 +48,7 @@ from rest_framework.status import (
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
 )
+from utils import skip_objects_from_response_by_id
 
 
 class CreateApiKey(GenericAPIView):

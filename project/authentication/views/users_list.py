@@ -30,11 +30,6 @@ from django_filters.rest_framework import (
     DjangoFilterBackend,
 )
 from drf_yasg.utils import swagger_auto_schema
-from utils import (
-    skip_objects_from_response_by_id,
-    add_dist_filter_to_view,
-    paginate_by_offset,
-)
 from rest_framework.filters import (
     OrderingFilter,
     SearchFilter,
@@ -46,6 +41,11 @@ from rest_framework.permissions import (
 from rest_framework.serializers import Serializer
 from rest_framework_gis.filters import (
     DistanceToPointOrderingFilter,
+)
+from utils import (
+    add_dist_filter_to_view,
+    paginate_by_offset,
+    skip_objects_from_response_by_id,
 )
 
 

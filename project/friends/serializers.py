@@ -1,16 +1,13 @@
-from typing import Any, Union
 from collections import OrderedDict
+from typing import Any, Union
 
 from authentication.models import User
-from authentication.serializers import FriendUserSerializer
+from authentication.serializers import (
+    FriendUserSerializer,
+)
 from config.exceptions import _404
-from config.serializers import (
-    BaseBulkSerializer,
-)
-from friends.models import (
-    Friend,
-    InviteToFriends,
-)
+from config.serializers import BaseBulkSerializer
+from friends.models import Friend, InviteToFriends
 from rest_framework.serializers import (
     BooleanField,
     CharField,

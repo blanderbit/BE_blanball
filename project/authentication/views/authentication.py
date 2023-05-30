@@ -15,9 +15,9 @@ from authentication.constants.code_types import (
 from authentication.constants.errors import (
     ALREADY_VERIFIED_ERROR,
     NO_PERMISSIONS_ERROR,
+    REFRESH_TOKEN_INVALID,
     THIS_EMAIL_ALREADY_IN_USE_ERROR,
     WRONG_PASSWORD_ERROR,
-    REFRESH_TOKEN_INVALID,
 )
 from authentication.constants.success import (
     ACCOUNT_DELETE_SUCCESS_BODY_TITLE,
@@ -30,8 +30,10 @@ from authentication.constants.success import (
     EMAIL_VERIFY_SUCCESS_BODY_TITLE,
     EMAIL_VERIFY_SUCCESS_TEXT,
     EMAIL_VERIFY_SUCCESS_TITLE,
+    LOGOUT_SUCCESS,
     PASSWORD_RESET_SUCCESS,
     PHONE_IS_VALID_SUCCESS,
+    REFRESH_TOKEN_VALID,
     REGISTER_SUCCESS_BODY_TITLE,
     REGISTER_SUCCESS_TEXT,
     REGISTER_SUCCESS_TITLE,
@@ -40,8 +42,6 @@ from authentication.constants.success import (
     TEMPLATE_SUCCESS_BODY_TITLE,
     TEMPLATE_SUCCESS_TEXT,
     TEMPLATE_SUCCESS_TITLE,
-    LOGOUT_SUCCESS,
-    REFRESH_TOKEN_VALID,
 )
 from authentication.models import (
     Code,
@@ -49,30 +49,31 @@ from authentication.models import (
     User,
 )
 from authentication.permissions import (
-    IsNotAuthenticated,
     AllowAny,
+    IsNotAuthenticated,
 )
 from authentication.serializers import (
     CheckCodeSerializer,
     EmailSerializer,
     LoginSerializer,
+    LogoutSerializer,
     RegisterSerializer,
     RequestChangePasswordSerializer,
     ResetPasswordSerializer,
     ValidatePhoneByUniqueSerializer,
-    ValidateResetPasswordCodeSerializer,
     ValidateRefreshTokenSerializer,
-    LogoutSerializer,
+    ValidateResetPasswordCodeSerializer,
 )
 from authentication.services import (
     code_create,
     count_age,
-    reset_password,
     logout,
+    reset_password,
     send_email_template,
 )
 from config.exceptions import _404
 from django.db import transaction
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.generics import GenericAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -85,12 +86,15 @@ from rest_framework.status import (
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
 )
-from drf_yasg.utils import swagger_auto_schema
+from rest_framework_simplejwt.exceptions import (
+    TokenError,
+)
+from rest_framework_simplejwt.tokens import (
+    RefreshToken,
+)
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.exceptions import TokenError
 
 
 class RegisterUser(GenericAPIView):

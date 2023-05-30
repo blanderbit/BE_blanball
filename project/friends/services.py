@@ -6,12 +6,12 @@ from typing import (
     TypeVar,
     Union,
 )
-from friends.models import InviteToFriends, Friend
+
 from authentication.models import User
+from friends.models import Friend, InviteToFriends
 from rest_framework.serializers import (
     ValidationError,
 )
-
 
 bulk = TypeVar(Optional[Generator[list[dict[str, int]], None, None]])
 

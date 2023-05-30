@@ -1,7 +1,6 @@
 from typing import Any, Union
 
 from hints.models import Hint
-
 from rest_framework.serializers import (
     ModelSerializer,
 )

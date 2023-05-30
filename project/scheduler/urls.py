@@ -5,12 +5,10 @@ from django.urls.resolvers import (
     URLPattern,
     URLResolver,
 )
-
 from scheduler.views import (
-    UserScheduledEvents,
     ListOfUserScheduledEventsOnSpecificDay,
+    UserScheduledEvents,
 )
-
 
 urlpatterns: list[Union[URLResolver, URLPattern]] = [
     path(

@@ -1,11 +1,11 @@
 from os import getenv
 from typing import Any, Optional, Union
 
+import googlemaps
 from cities.constants.errors import (
     NOTHING_FOUND_FOR_USER_REQUEST_ERROR,
 )
 from config.exceptions import _404
-import googlemaps
 
 
 def get_info_about_place(data):

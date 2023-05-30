@@ -1,13 +1,8 @@
-from typing import (
-    Any,
-    Callable,
-    Union,
-)
+from typing import Any, Callable, Union
+
 from authentication.models import User
 from django.db.models.query import QuerySet
-from events.models import (
-    Event,
-)
+from events.models import Event
 from rest_framework_gis.filters import (
     DistanceToPointFilter,
 )

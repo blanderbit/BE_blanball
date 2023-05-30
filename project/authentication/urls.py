@@ -3,6 +3,8 @@ from typing import Union
 from authentication.views import (
     CheckCode,
     LoginUser,
+    LogoutUser,
+    RefreshTokens,
     RegisterUser,
     RequestChangePassword,
     RequestEmailVerify,
@@ -15,12 +17,10 @@ from authentication.views import (
     UserProfile,
     UsersDetailList,
     UsersList,
-    RefreshTokens,
     UsersRelevantList,
     ValidatePhoneByUnique,
-    LogoutUser,
-    ValidateResetPasswordCode,
     ValidateRefreshToken,
+    ValidateResetPasswordCode,
 )
 from django.urls import path
 from django.urls.resolvers import (

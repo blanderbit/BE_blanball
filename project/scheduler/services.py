@@ -1,18 +1,19 @@
+from datetime import date as datetimeDate
+from datetime import datetime, timedelta
 from typing import Union
-from datetime import timedelta, date as datetimeDate, datetime
-from events.models import Event
-from django.db.models import QuerySet, Q
 
-from scheduler.constants.errors import SCHEDULED_EVENTS_DATE_INVALID
-from events.models import (
-    Event,
-)
-from django.db.models import QuerySet, Q
+from django.db.models import Q, QuerySet
+from events.models import Event
+from rest_framework.request import Request
 from rest_framework.serializers import (
     ValidationError,
 )
-from rest_framework.request import Request
-from rest_framework.status import HTTP_400_BAD_REQUEST
+from rest_framework.status import (
+    HTTP_400_BAD_REQUEST,
+)
+from scheduler.constants.errors import (
+    SCHEDULED_EVENTS_DATE_INVALID,
+)
 
 
 def get_user_scheduled_events_data(

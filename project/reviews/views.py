@@ -9,10 +9,7 @@ from django.utils.decorators import (
     method_decorator,
 )
 from drf_yasg.utils import swagger_auto_schema
-from events.services import (
-    only_for_event_members,
-)
-from utils import skip_objects_from_response_by_id, paginate_by_offset
+from events.services import only_for_event_members
 from rest_framework.generics import (
     CreateAPIView,
     GenericAPIView,
@@ -32,6 +29,10 @@ from reviews.serializers import (
     ReviewListSerializer,
 )
 from reviews.services import hide_user_reviews
+from utils import (
+    paginate_by_offset,
+    skip_objects_from_response_by_id,
+)
 
 
 class ReviewCreate(CreateAPIView):

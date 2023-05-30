@@ -11,6 +11,9 @@ from authentication.constants.code_types import (
     PASSWORD_CHANGE_CODE_TYPE,
     PASSWORD_RESET_CODE_TYPE,
 )
+from authentication.constants.errors import (
+    INVALID_REFRESH_TOKEN,
+)
 from authentication.constants.notification_types import (
     UPDATE_MESSAGE_USER_UPDATED_AVATAR,
 )
@@ -19,9 +22,6 @@ from authentication.constants.success import (
     TEMPLATE_SUCCESS_BODY_TITLE,
     TEMPLATE_SUCCESS_TEXT,
     TEMPLATE_SUCCESS_TITLE,
-)
-from authentication.constants.errors import (
-    INVALID_REFRESH_TOKEN,
 )
 from authentication.models import (
     Code,
@@ -42,13 +42,16 @@ from minio.commonconfig import REPLACE, CopySource
 from notifications.tasks import (
     send_to_general_layer,
 )
-from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from rest_framework.serializers import (
     Serializer,
     ValidationError,
 )
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
+)
+from rest_framework_simplejwt.tokens import (
+    RefreshToken,
+    TokenError,
 )
 
 

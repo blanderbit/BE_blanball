@@ -6,10 +6,10 @@ from django.urls.resolvers import (
     URLResolver,
 )
 from friends.views import (
-    MyFriendsList,
-    InviteUsersToFriends,
-    InvitesToFriendsList,
     BulkAcceptOrDeclineInvitesToFriends,
+    InvitesToFriendsList,
+    InviteUsersToFriends,
+    MyFriendsList,
 )
 
 urlpatterns: list[Union[URLResolver, URLPattern]] = [

@@ -5,6 +5,12 @@ from authentication.views.authentication import (
     LoginUser as LoginUser,
 )
 from authentication.views.authentication import (
+    LogoutUser as LogoutUser,
+)
+from authentication.views.authentication import (
+    RefreshTokens as RefreshTokens,
+)
+from authentication.views.authentication import (
     RegisterUser as RegisterUser,
 )
 from authentication.views.authentication import (
@@ -24,6 +30,9 @@ from authentication.views.authentication import (
 )
 from authentication.views.authentication import (
     ValidatePhoneByUnique as ValidatePhoneByUnique,
+)
+from authentication.views.authentication import (
+    ValidateRefreshToken as ValidateRefreshToken,
 )
 from authentication.views.authentication import (
     ValidateResetPasswordCode as ValidateResetPasswordCode,
@@ -48,9 +57,4 @@ from authentication.views.users_list import (
 )
 from authentication.views.users_list import (
     UsersRelevantList as UsersRelevantList,
-)
-from authentication.views.authentication import LogoutUser as LogoutUser
-from authentication.views.authentication import RefreshTokens as RefreshTokens
-from authentication.views.authentication import (
-    ValidateRefreshToken as ValidateRefreshToken,
 )

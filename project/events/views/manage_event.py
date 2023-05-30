@@ -1,8 +1,6 @@
 from typing import Any, Type, final
 
-from config.serializers import (
-    BaseBulkSerializer,
-)
+from config.serializers import BaseBulkSerializer
 from django.db.models.query import QuerySet
 from events.constants.notification_types import (
     EVENT_UPDATE_NOTIFICATION_TYPE,
@@ -19,11 +17,11 @@ from events.serializers import (
 from events.services import (
     bulk_delete_events,
     bulk_pin_events,
+    bulk_show_or_hide_events,
     bulk_unpin_events,
     event_create,
     not_in_black_list,
     only_author,
-    bulk_show_or_hide_events,
     send_notification_to_subscribe_event_user,
 )
 from rest_framework.generics import GenericAPIView
