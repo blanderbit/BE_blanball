@@ -24,11 +24,15 @@ class NotificationSerializer(ModelSerializer):
             data["data"]["sender"]["is_online"] = sender.is_online
         except KeyError:
             pass
+        except User.DoesNotExist:
+            pass
 
         try:
             recipient = User.objects.get(id=data["data"]["recipient"]["id"])
             data["data"]["recipient"]["avatar"] = recipient.profile.avatar_url
         except KeyError:
+            pass
+        except User.DoesNotExist:
             pass
 
         return data
