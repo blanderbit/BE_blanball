@@ -1,10 +1,53 @@
-__pycache__
+# Ignore the document files
+CODE_OF_CONDUCT
+LICENSE
+README.md
+changelog
+
+# Ignore Node.js modules
+node_modules
+
+# Ignore development files
+.DS_Store
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.staging.local
+.env.production.local
+.env.example
 venv
 project/celerybeat-schedule
-changelog
+
+# Ignore editor-specific files
+.idea
 .vscode
+*.sublime-*
+
+# Ignore Docker-related files
+Dockerfile
+.dockerignore
+.docker
+
+# Ignore version control files
 .git
-.github
-changelog
 .gitignore
-postgres-data
+.github
+.gitattributes
+
+# Ignore log and cache files
+*.log
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+__pycache__
+
+# Ignore test and coverage files
+/coverage
+
+# Ignore miscellaneous files
+*.bak
+*.swp
+*~

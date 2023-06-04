@@ -100,6 +100,36 @@ services:
             - app-network
         ports:
             - 49280:49299
+    
+    kafka:
+        container_name: kafka
+        env_file:
+            - .env
+        image: confluentinc/cp-kafka:latest
+        depends_on:
+            - zookeeper
+        ports:
+            - 9092:9092
+            - 9093:9093
+        restart: always
+        volumes:
+            - kafka-data:/usr/src/blanball/storage/kafka/data
+        networks:
+            - app-network
+
+    zookeeper:
+        container_name: zookeeper
+        env_file:
+            - .env
+        image: zookeeper:latest
+        ports:
+            - 2181:2181
+        restart: always
+        volumes:
+            - zookeeper-data:/usr/src/blanball/storage/zookeeper/data \
+            - zookeeper-logs-data:/usr/src/blanball/storage/zookeeper-logs/data \
+        networks:
+            - app-network
 
 networks:
     app-network:
@@ -107,6 +137,8 @@ networks:
 
 volumes:
     redis-data:
-    ftp-server-data:
     minio-data:
     pgadmin-data:
+    kafka-data:
+    zookeeper-data:
+    zookeeper-logs-data:

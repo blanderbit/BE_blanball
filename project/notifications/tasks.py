@@ -4,7 +4,7 @@ from typing import Any, Union
 from asgiref.sync import async_to_sync
 from authentication.models import User
 from channels.layers import get_channel_layer
-from config.celery import app
+from config.celery import celery
 from django.db.models import QuerySet
 from django.utils import timezone
 from notifications.constants.notification_types import (
@@ -14,7 +14,7 @@ from notifications.constants.notification_types import (
 from notifications.models import Notification
 
 
-@app.task(
+@celery.task(
     ignore_result=True,
     time_limit=5,
     soft_time_limit=3,
@@ -59,7 +59,7 @@ def send_to_general_layer(
     )
 
 
-@app.task(
+@celery.task(
     ignore_result=True,
     time_limit=5,
     soft_time_limit=3,
@@ -85,7 +85,7 @@ def read_all_user_notifications(*, request_user_id: int) -> None:
             pass
 
 
-@app.task(
+@celery.task(
     ignore_result=True,
     time_limit=5,
     soft_time_limit=3,
@@ -111,7 +111,7 @@ def delete_all_user_notifications(*, request_user_id: int) -> None:
             pass
 
 
-@app.task
+@celery.task
 def delete_expire_notifications():
     Notification.objects.filter(
         time_created__lte=timezone.now() - timezone.timedelta(days=85)

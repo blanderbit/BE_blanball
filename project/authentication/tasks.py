@@ -5,7 +5,7 @@ from authentication.constants.success import (
     BLANBALL,
 )
 from authentication.models import Code, Profile
-from config.celery import app
+from config.celery import celery
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.mail import EmailMessage
@@ -30,7 +30,7 @@ class EmailThread(threading.Thread):
 @final
 class Util:
     @staticmethod
-    @app.task(
+    @celery.task(
         ignore_result=True,
         time_limit=5,
         soft_time_limit=3,
@@ -44,12 +44,12 @@ class Util:
         EmailThread(send).start()
 
 
-@app.task
+@celery.task
 def delete_expire_codes() -> None:
     Code.get_only_expired().delete()
 
 
-@app.task
+@celery.task
 def check_user_age() -> None:
     for user_profile in Profile.objects.all():
         if user_profile.birthday != None:
@@ -59,7 +59,7 @@ def check_user_age() -> None:
                 user_profile.save()
 
 
-@app.task(
+@celery.task(
     ignore_result=True,
     default_retry_delay=5,
 )

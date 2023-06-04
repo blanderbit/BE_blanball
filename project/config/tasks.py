@@ -1,8 +1,8 @@
-from config.celery import app
+from config.celery import celery
 from django.core.management import call_command
 
 
-@app.task(
+@celery.task(
     ignore_result=True,
     time_limit=5,
     soft_time_limit=3,

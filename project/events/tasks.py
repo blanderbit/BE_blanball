@@ -1,5 +1,5 @@
 import pandas
-from config.celery import app
+from config.celery import celery
 from django.db.models import Q
 from django.utils import timezone
 from events.constants.notification_types import (
@@ -11,7 +11,7 @@ from events.services import (
 )
 
 
-@app.task
+@celery.task
 def check_event_start_time() -> None:
 
     rounded_current_datetime = (

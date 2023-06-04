@@ -90,3 +90,6 @@ NOVAPOSHTA_API_KEY: str = config("NOVAPOSHTA_API_KEY", cast=str)
 
 # maximum API key length
 API_KEY_MAX_LENGTH: int = 255
+
+KAFKA_CONSUMER_ADRESS: str = 'localhost:9094'
+KAFKA_BOOTSTRAP_ADRESS: str = 'kafka:9092'
