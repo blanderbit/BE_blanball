@@ -23,7 +23,7 @@ bulk = TypeVar(Optional[Generator[list[dict[str, int]], None, None]])
 def invite_users_to_friends(*, users_ids: list[int], request_user: User) -> bulk:
     for user_id in users_ids:
         try:
-            invite_user: User = User.get_all().get(id=user_id)
+            invite_user: User = User.objects.get(id=user_id)
             InviteToFriends.objects.send_invite(
                 request_user=request_user, invite_user=invite_user,
             )
@@ -39,7 +39,7 @@ def bulk_accept_or_decline_invitions_to_friends(
 ) -> bulk:
     for invite_id in data["ids"]:
         try:
-            invite: InviteToFriends = InviteToFriends.get_all().get(id=invite_id)
+            invite: InviteToFriends = InviteToFriends.objects.get(id=invite_id)
             if invite.recipient == request_user and invite.status == invite.Status.WAITING: 
                 if data["type"] == True:
                     invite.status = invite.Status.ACCEPTED

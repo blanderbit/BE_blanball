@@ -249,7 +249,7 @@ class JoinOrRemoveRoomSerializer(Serializer):
     def validate(self, attrs: OrderedDict) -> OrderedDict:
         event_id: int = attrs.get("event_id")
         try:
-            event: Event = Event.get_all().get(id=event_id)
+            event: Event = Event.objects.get(id=event_id)
             if event.status != event.Status.PLANNED:
                 raise ValidationError(EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST)
             if event.amount_members < event.count_current_users + 1:
@@ -270,10 +270,10 @@ class InviteUsersToEventSerializer(BaseBulkSerializer):
 
     def validate(self, attrs) -> OrderedDict[str, Any]:
         try:
-            event: Event = Event.get_all().get(id=attrs.get("event_id"))
+            event: Event = Event.objects.get(id=attrs.get("event_id"))
 
             for user_id in attrs.get("ids"):
-                invite_user: User = User.get_all().get(id=user_id)
+                invite_user: User = User.objects.get(id=user_id)
                 if event.status == Event.Status.FINISHED:
                     raise ValidationError(EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST)
                 if invite_user.current_rooms.filter(id=event.id).exists():
@@ -305,8 +305,8 @@ class RemoveUserFromEventSerializer(Serializer):
 
     def validate(self, attrs) -> OrderedDict[str, Any]:
         try:
-            removed_user: User = User.get_all().get(id=attrs.get("user_id"))
-            event: Event = Event.get_all().get(id=attrs.get("event_id"))
+            removed_user: User = User.objects.get(id=attrs.get("user_id"))
+            event: Event = Event.objects.get(id=attrs.get("event_id"))
             if event.status == event.Status.FINISHED:
                 raise ValidationError(EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST)
             if not removed_user.current_rooms.filter(id=event.id).exists():

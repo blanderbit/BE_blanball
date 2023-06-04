@@ -10,7 +10,7 @@ x-api-common: &api-common
     volumes:
         - .:/usr/src/blanball
     networks:
-        - app-network
+        - blaball-network
     depends_on:
         db:
             condition: service_healthy
@@ -28,7 +28,7 @@ services:
         volumes:
             - ./postgres-data:/var/lib/postgresql/data
         networks:
-            - app-network
+            - blaball-network
         ports:
             - 5432:5432
         healthcheck:
@@ -44,7 +44,7 @@ services:
         volumes:
             - redis-data:/usr/src/blanball/storage/redis/data
         networks:
-            - app-network
+            - blaball-network
         healthcheck:
             test: ['CMD-SHELL', 'redis-cli ping | grep PONG']
             timeout: 5s
@@ -87,7 +87,7 @@ services:
             timeout: 20s
             retries: 3
         networks:
-            - app-network
+            - blaball-network
     pgadmin:
         container_name: pgadmin
         env_file:
@@ -97,7 +97,7 @@ services:
         volumes:
             - pgadmin-data:/usr/src/blanball/storage/pgadmin/data
         networks:
-            - app-network
+            - blaball-network
         ports:
             - 49280:49299
     
@@ -115,7 +115,7 @@ services:
         volumes:
             - kafka-data:/usr/src/blanball/storage/kafka/data
         networks:
-            - app-network
+            - blaball-network
 
     zookeeper:
         container_name: zookeeper
@@ -129,11 +129,11 @@ services:
             - zookeeper-data:/usr/src/blanball/storage/zookeeper/data \
             - zookeeper-logs-data:/usr/src/blanball/storage/zookeeper-logs/data \
         networks:
-            - app-network
+            - blaball-network
 
 networks:
-    app-network:
-        driver: bridge
+  blaball-network:
+    name: blaball-network
 
 volumes:
     redis-data:

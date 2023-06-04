@@ -41,12 +41,12 @@ class UserConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def room_groop_name(self) -> User:
-        return User.get_all().get(email=self.scope["user"]).group_name
+        return User.objects.get(email=self.scope["user"]).group_name
 
     @database_sync_to_async
     def add_user_to_active(self) -> None:
         self.disconnect(200)
-        user: User = User.get_all().get(email=self.scope["user"])
+        user: User = User.objects.get(email=self.scope["user"])
         user.is_online = True
         user.save()
         send_to_general_layer(
@@ -60,7 +60,7 @@ class UserConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def delete_user_from_active(self) -> None:
-        user: User = User.get_all().get(email=self.scope["user"])
+        user: User = User.objects.get(email=self.scope["user"])
         user.is_online = False
         user.save()
         send_to_general_layer(

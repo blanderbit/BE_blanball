@@ -25,6 +25,7 @@ from notifications.tasks import (
     send_to_user
 )
 
+@final
 class Friend(models.Model):
     user: User = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="user"
@@ -34,7 +35,6 @@ class Friend(models.Model):
         User, on_delete=models.CASCADE, related_name="friend"
     )
 
-    @final
     @staticmethod
     def get_all() -> QuerySet["Friend"]:
         """
@@ -42,11 +42,9 @@ class Friend(models.Model):
         """
         return Friend.objects.select_related("user", "friend")
 
-    @final
     def __repr__(self) -> str:
         return "<Friend %s>" % self.id
 
-    @final
     def __str__(self) -> str:
         return self.user.profile.name
     
@@ -99,6 +97,7 @@ class InviteToFriendsManager(models.Manager):
         return invite
 
 
+@final
 class InviteToFriends(models.Model):
     class Status(models.TextChoices):
         WAITING: str = "Waiting"

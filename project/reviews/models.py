@@ -11,6 +11,7 @@ from django.db.models.query import QuerySet
 from events.models import Event
 
 
+@final
 class Review(models.Model):
     author: User = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="author"
@@ -27,11 +28,9 @@ class Review(models.Model):
         User, on_delete=models.CASCADE, related_name="reviews"
     )
 
-    @final
     def __repr__(self) -> str:
         return "<Review %s>" % self.id
 
-    @final
     @staticmethod
     def get_all() -> QuerySet["Review"]:
         """
@@ -39,7 +38,6 @@ class Review(models.Model):
         """
         return Review.objects.select_related("user", "author")
 
-    @final
     def __str__(self) -> str:
         return str(self.id)
 
@@ -52,6 +50,7 @@ class Review(models.Model):
         ordering: list[str] = ["-id"]
 
 
+@final
 class EventReview(models.Model):
     author: User = models.ForeignKey(User, on_delete=models.CASCADE)
     text: str = models.CharField(max_length=200, null=True)
@@ -64,11 +63,9 @@ class EventReview(models.Model):
     )
     event: Event = models.ForeignKey(Event, on_delete=models.CASCADE)
 
-    @final
     def __repr__(self) -> str:
         return "<EventReview %s>" % self.id
 
-    @final
     @staticmethod
     def get_all() -> QuerySet["EventReview"]:
         """
@@ -76,7 +73,6 @@ class EventReview(models.Model):
         """
         return EventReview.objects.select_related("user", "event")
 
-    @final
     def __str__(self) -> str:
         return str(self.id)
 

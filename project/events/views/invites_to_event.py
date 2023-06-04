@@ -153,7 +153,7 @@ class RequestToParticipationsList(ListAPIView):
     def list(self, request: Request, pk: int) -> Response:
 
         try:
-            event: Event = Event.get_all().get(id=pk)
+            event: Event = Event.objects.get(id=pk)
             queryset = self.queryset.filter(event=event)
             serializer = self.serializer_class(queryset, many=True)
 

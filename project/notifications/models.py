@@ -6,6 +6,7 @@ from django.db import models
 from django.db.models.query import QuerySet
 
 
+@final
 class Notification(models.Model):
     class Type(models.TextChoices):
         UNREAD: str = "Unread"
@@ -19,11 +20,9 @@ class Notification(models.Model):
     message_type: str = models.CharField(max_length=100)
     data: dict[str, Any] = models.JSONField()
 
-    @final
     def __repr__(self) -> str:
         return "<Notification %s>" % self.id
 
-    @final
     @staticmethod
     def get_all() -> QuerySet["Notification"]:
         """
@@ -31,7 +30,6 @@ class Notification(models.Model):
         """
         return Notification.objects.select_related("user")
 
-    @final
     def __str__(self) -> str:
         return str(self.id)
 

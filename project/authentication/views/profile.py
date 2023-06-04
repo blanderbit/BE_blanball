@@ -56,7 +56,7 @@ class UserOwnerProfile(GenericAPIView):
         This endpoint allows an authorized user to
         get detailed information about their profile,
         """
-        user: User = User.get_all().get(id=self.request.user.id)
+        user: User = User.objects.get(id=self.request.user.id)
         serializer = self.serializer_class(user)
         return Response(serializer.data, status=HTTP_200_OK)
 

@@ -166,15 +166,12 @@ class Profile(models.Model):
     place: Optional[dict[str, Union[str, float]]] = models.JSONField(null=True)
     coordinates: Optional[Point] = PointField(null=True, srid=4326)
 
-    @final
     def __repr__(self) -> str:
         return "<Profile %s>" % self.id
 
-    @final
     def __str__(self) -> str:
         return self.name
 
-    @final
     @transaction.atomic
     def save(self, *args: Any, **kwargs: Any) -> None:
         if self.place != None:
@@ -187,7 +184,6 @@ class Profile(models.Model):
         update_user_profile_avatar(avatar=self.avatar, profile_id=self.id)
 
     @property
-    @final
     def new_image_name(self) -> str:
         """
         Generates a new name for the picture the user has uploaded.
@@ -240,15 +236,12 @@ class User(AbstractBaseUser):
 
     objects = UserManager()
 
-    @final
     def __repr__(self) -> str:
         return "<User %s>" % self.id
 
-    @final
     def __str__(self) -> str:
         return self.email
 
-    @final
     @staticmethod
     def get_all() -> QuerySet["User"]:
         """
@@ -256,7 +249,6 @@ class User(AbstractBaseUser):
         """
         return User.objects.select_related("profile")
 
-    @final
     def tokens(self) -> dict[str, str]:
         """
         generating jwt tokens for user object
@@ -284,6 +276,7 @@ class User(AbstractBaseUser):
         ordering: list[str] = ["-id"]
 
 
+@final
 class Code(models.Model):
     verify_code: str = models.CharField(max_length=5, unique=True)
     life_time: datetime = models.DateTimeField(null=True)
@@ -291,18 +284,15 @@ class Code(models.Model):
     user_email: str = models.CharField(max_length=255)
     dop_info: Optional[str] = models.CharField(max_length=255, null=True)
 
-    @final
     def get_only_expired() -> QuerySet["Code"]:
         """
         get all expired codes
         """
         return Code.objects.filter(life_time__lt=timezone.now())
 
-    @final
     def __repr__(self) -> str:
         return "<Code %s>" % self.id
 
-    @final
     def __str__(self) -> str:
         return self.verify_code
 

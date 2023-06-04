@@ -156,7 +156,7 @@ def bulk_accept_or_decline_invites_to_events(
 ) -> bulk:
     for invite_id in data["ids"]:
         try:
-            invite: InviteToEvent = InviteToEvent.get_all().get(id=invite_id)
+            invite: InviteToEvent = InviteToEvent.objects.get(id=invite_id)
             if (
                 invite.recipient.id == request_user.id
                 and invite.status == invite.Status.WAITING
@@ -184,7 +184,7 @@ def bulk_accpet_or_decline_requests_to_participation(
 ) -> bulk:
     for request_id in data["ids"]:
         try:
-            request_to_p: RequestToParticipation = RequestToParticipation.get_all().get(
+            request_to_p: RequestToParticipation = RequestToParticipation.objects.get(
                 id=request_id
             )
             if (
@@ -220,7 +220,7 @@ def event_create(
     try:
         contact_number: str = data["contact_number"]
     except KeyError:
-        contact_number: str = str(User.get_all().get(id=request_user.id).phone)
+        contact_number: str = str(User.objects.get(id=request_user.id).phone)
     data["contact_number"] = contact_number
     data["date_and_time"] = (
         pandas.to_datetime(data["date_and_time"].isoformat())
@@ -286,7 +286,7 @@ def validate_user_before_join_to_event(*, user: User, event: Event) -> None:
 
 def send_notification_to_event_author(*, event: Event, request_user: User) -> None:
     send_to_user(
-        user=User.get_all().get(id=event.author.id),
+        user=User.objects.get(id=event.author.id),
         message_type=NEW_USER_ON_THE_EVENT_NOTIFICATION_TYPE,
         data={
             "recipient": {
@@ -308,7 +308,7 @@ def send_notification_to_event_author(*, event: Event, request_user: User) -> No
 
 
 def validate_get_user_planned_events(*, pk: int, request_user: User) -> None:
-    user: User = User.get_all().get(id=pk)
+    user: User = User.objects.get(id=pk)
     if (
         user.configuration["show_my_planned_events"] == False
         and request_user.id != user.id
@@ -319,7 +319,7 @@ def validate_get_user_planned_events(*, pk: int, request_user: User) -> None:
 def filter_event_by_user_planned_events_time(
     *, pk: int, queryset: QuerySet[Event]
 ) -> QuerySet[Event]:
-    user: User = User.get_all().get(id=pk)
+    user: User = User.objects.get(id=pk)
     num: str = re.findall(r"\d{1,10}", user.get_planned_events)[0]
     string: str = re.findall(r"\D", user.get_planned_events)[0]
     if string == "d":
@@ -426,10 +426,10 @@ def send_message_to_event_author_after_leave_user_from_event(
 
 
 def invite_users_to_event(*, event_id: int, users_ids: list[int], request_user: User) -> None:
-    event: Event = Event.get_all().get(id=event_id)
+    event: Event = Event.objects.get(id=event_id)
 
     for user_id in users_ids:
-        invite_user: User = User.get_all().get(id=user_id)
+        invite_user: User = User.objects.get(id=user_id)
 
         try:
             InviteToEvent.objects.send_invite(

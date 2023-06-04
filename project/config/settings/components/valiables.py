@@ -1,6 +1,7 @@
-from os import getenv, path
-
 import django
+import json
+from os import getenv, path
+from typing import Any
 from decouple import Csv, config
 from django.conf import settings
 from django.utils.encoding import smart_str
@@ -91,5 +92,8 @@ NOVAPOSHTA_API_KEY: str = config("NOVAPOSHTA_API_KEY", cast=str)
 # maximum API key length
 API_KEY_MAX_LENGTH: int = 255
 
-KAFKA_CONSUMER_ADRESS: str = 'localhost:9094'
-KAFKA_BOOTSTRAP_ADRESS: str = 'kafka:9092'
+
+KAFKA_PRODUCER_CONFIG: dict[str, Any] = {
+    'bootstrap_servers': [config("KAFKA_PRODUCER_ADRESS", cast=str)],
+    'value_serializer': lambda v: json.dumps(v).encode('utf-8'),
+}

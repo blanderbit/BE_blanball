@@ -287,7 +287,7 @@ class LoginSerializer(ModelSerializer):
     tokens = SerializerMethodField()
 
     def get_tokens(self, obj) -> dict[str, str]:
-        user: User = User.get_all().get(email=obj["email"])
+        user: User = User.objects.get(email=obj["email"])
         return {"refresh": user.tokens()["refresh"], "access": user.tokens()["access"]}
 
     class Meta:
@@ -470,7 +470,7 @@ class CheckUserActiveSerializer(Serializer):
     def validate(self, attrs: OrderedDict[str, Any]) -> OrderedDict[str, Any]:
         user_id: int = attrs.get("user_id")
         try:
-            User.get_all().get(id=user_id)
+            User.objects.get(id=user_id)
             return super().validate(attrs)
         except User.DoesNotExist:
             raise _404(object=User)

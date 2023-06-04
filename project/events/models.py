@@ -34,6 +34,7 @@ from rest_framework.status import (
 )
 
 
+@final
 class Event(models.Model):
     class Type(models.TextChoices):
         FOOTBALL: str = "Football"
@@ -119,15 +120,12 @@ class Event(models.Model):
         """
         return self.current_fans.count()
 
-    @final
     def __repr__(self) -> str:
         return "<Event %s>" % self.id
 
-    @final
     def __str__(self) -> str:
         return self.name
 
-    @final
     @staticmethod
     def get_all() -> QuerySet["Event"]:
         """
@@ -166,7 +164,6 @@ class Event(models.Model):
     def request_user_role(self) -> Optional[str]:
         return self.get_user_role()
 
-    @final
     def save(self, *args: Any, **kwargs: Any) -> None:
         if self.place != None:
             self.coordinates = Point(self.place["lon"], self.place["lat"])
@@ -282,19 +279,17 @@ class InviteToEventManager(models.Manager):
             )
 
 
+@final
 class InviteToEvent(RequestToParticipation):
 
     objects = InviteToEventManager()
 
-    @final
     def __repr__(self) -> str:
         return "<InviteToEvent %s>" % self.id
 
-    @final
     def __str__(self) -> str:
         return str(self.id)
 
-    @final
     @staticmethod
     def get_all() -> QuerySet["InviteToEvent"]:
         """

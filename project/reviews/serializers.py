@@ -37,7 +37,7 @@ class CreateReviewSerializer(ModelSerializer):
         return attrs
 
     def create(self, validated_data: dict[str, Any]) -> Review:
-        user: User = User.get_all().get(email=validated_data["user"])
+        user: User = User.objects.get(email=validated_data["user"])
         review: Review = Review.objects.create(
             author=self.context["request"].user, **validated_data
         )
@@ -58,7 +58,7 @@ class CreateReviewSerializer(ModelSerializer):
                 },
             },
         )
-        user: User = User.get_all().get(email=validated_data["user"])
+        user: User = User.objects.get(email=validated_data["user"])
         stars = 0
         for item in user.reviews.all():
             stars += item.stars
