@@ -5,7 +5,8 @@ BackendDeploy()
 {
     python manage.py migrate --noinput
     python manage.py loaddata */fixtures/*.json
-    uwsgi --ini uwsgi.ini
+    uwsgi --ini uwsgi.ini &
+    python manage.py start_consume_messages
 }
 
 Backend()
@@ -14,7 +15,8 @@ Backend()
     python manage.py migrate --noinput
     python manage.py collectstatic --noinput
     python manage.py loaddata */fixtures/*.json
-    python manage.py runserver 0.0.0.0:8000
+    python manage.py runserver 0.0.0.0:8000 &
+    python manage.py start_consume_messages
 }
 
 Daphne()

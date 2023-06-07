@@ -38,8 +38,6 @@ from rest_framework.status import (
     HTTP_201_CREATED,
 )
 
-from chat.tasks import base_producer
-
 
 class CreateEvent(GenericAPIView):
     """
@@ -73,7 +71,6 @@ class CreateEvent(GenericAPIView):
         data: dict[str, Any] = event_create(
             data=serializer.validated_data, request_user=request.user
         )
-        base_producer('fdfdfdfdfddf')
         return Response(data, status=HTTP_201_CREATED)
 
 
