@@ -1,5 +1,9 @@
 from typing import Any, List, Union
 from authentication.models import User
+from chat.constants.errors import (
+    CHAT_ID_OR_USER_ID_MUST_BE_PROVIDED_ERROR,
+    CHAT_ID_AND_USER_ID_CANT_BE_PROVIDED_AT_ONCE_ERROR
+)
 from config.exceptions import _404
 from rest_framework.serializers import (
     BooleanField,
@@ -19,7 +23,7 @@ from rest_framework.status import (
 class CreatePersonalChatSerializer(Serializer):
 
     name: str = CharField(max_length=255)
-    user: list[int] = IntegerField(min_value=1)
+    user: int = IntegerField(min_value=1)
 
     class Meta:
         fields: Union[str, list[str]] = [
@@ -59,3 +63,33 @@ class CreateGroupChatSerializer(Serializer):
             )
 
         return super().validate(attrs)
+
+
+class CreateMessageSerializer(Serializer):
+
+    text: str = CharField(max_length=500)
+    chat_id: int = IntegerField(min_value=1, required=False)
+    user_id: int = IntegerField(min_value=1, required=False)
+
+    class Meta:
+        fields: Union[str, list[str]] = [
+            "text",
+            "chat_id"
+            "user_id"
+        ]
+
+    def validate(self, attrs):
+        user_id = attrs.get('user_id')
+        chat_id = attrs.get('chat_id')
+
+        if not user_id and not chat_id:
+            raise ValidationError(
+                CHAT_ID_OR_USER_ID_MUST_BE_PROVIDED_ERROR, HTTP_400_BAD_REQUEST
+            )
+
+        if user_id and chat_id:
+            raise ValidationError(
+                CHAT_ID_AND_USER_ID_CANT_BE_PROVIDED_AT_ONCE_ERROR, HTTP_400_BAD_REQUEST
+            )
+
+        return attrs

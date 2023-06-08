@@ -49,6 +49,13 @@ from rest_framework.serializers import (
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
+from chat.tasks import (
+    create_chat_producer
+)
+from utils import (
+    generate_unique_request_id
+)
+
 
 bulk = TypeVar(Optional[Generator[list[dict[str, int]], None, None]])
 
@@ -211,11 +218,30 @@ def bulk_accpet_or_decline_requests_to_participation(
             pass
 
 
+def create_event_chat(*, 
+        event: Event, 
+        request_user: User
+    ) -> None:
+    event_players_chat_data = {
+        "author": request_user.id,
+        "name": f"{event.date_and_time}/{event.name}",
+        "users": [],
+        "type": "Event_Group",
+        "event_id": event.id
+    }
+
+    create_chat_producer.delay(
+        data=event_players_chat_data,
+        author_id=request_user.id,
+        request_id=generate_unique_request_id()
+    )
+
+
 def event_create(
     *, data: Union[dict[str, Any], OrderedDict[str, Any]], request_user: User
 ) -> dict[str, Any]:
     data = dict(data)
-    users: list[int] = data["current_users"]
+    users: list[User] = data["current_users"]
     data.pop("current_users")
     try:
         contact_number: str = data["contact_number"]
@@ -233,6 +259,7 @@ def event_create(
             InviteToEvent.objects.send_invite(
                 request_user=request_user, invite_user=user, event=event
             )
+        create_event_chat(event=event, request_user=request_user)
         return data
 
 

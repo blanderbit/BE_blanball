@@ -6,9 +6,11 @@ from django.urls.resolvers import (
     URLResolver,
 )
 from chat.views import (
-    CreateGroupChat
+    CreateGroupChat,
+    CreateMessage,
 )
 
 urlpatterns: list[Union[URLResolver, URLPattern]] = [
     path("client/group/chat/create", CreateGroupChat.as_view(), name="group-chat-create"),
+    path("client/create/message", CreateMessage.as_view(), name="create-message"),
 ]

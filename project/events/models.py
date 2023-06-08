@@ -125,7 +125,7 @@ class Event(models.Model):
 
     def __str__(self) -> str:
         return self.name
-
+    
     @staticmethod
     def get_all() -> QuerySet["Event"]:
         """
