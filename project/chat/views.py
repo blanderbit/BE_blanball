@@ -3,7 +3,11 @@ from chat.tasks import (
     create_chat_producer,
 )
 from chat.serializers import (
-    CreateChatSerializer
+    CreatePersonalChatSerializer,
+    CreateGroupChatSerializer,
+)
+from utils.generate_unique_request_id import (
+    generate_unique_request_id
 )
 
 from rest_framework.generics import GenericAPIView
@@ -16,20 +20,23 @@ from rest_framework.status import (
 )
 
 
-class CreateChat(GenericAPIView):
+class CreateGroupChat(GenericAPIView):
 
     """
-    Create chat
+    Create group chat
 
     """
 
-    serializer_class: Type[Serializer] = CreateChatSerializer
+    serializer_class: Type[Serializer] = CreateGroupChatSerializer
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
+        unique_request_id = generate_unique_request_id()
         create_chat_producer.delay(
-            data=serializer.validated_data, 
-            author_id=request.user.id
+            data=serializer.validated_data,
+            author_id=request.user.id,
+            type="Group",
+            request_id=unique_request_id
         )
-        return Response(HTTP_201_CREATED)
+        return Response({"request_id": unique_request_id}, HTTP_201_CREATED)

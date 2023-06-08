@@ -16,7 +16,19 @@ from rest_framework.status import (
 )
 
 
-class CreateChatSerializer(Serializer):
+class CreatePersonalChatSerializer(Serializer):
+
+    name: str = CharField(max_length=255)
+    user: list[int] = IntegerField(min_value=1)
+
+    class Meta:
+        fields: Union[str, list[str]] = [
+            "name",
+            "user"
+        ]
+
+
+class CreateGroupChatSerializer(Serializer):
 
     name: str = CharField(max_length=255)
     users: list[int] = ListField(
