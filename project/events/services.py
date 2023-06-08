@@ -50,7 +50,8 @@ from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
 from chat.tasks import (
-    create_chat_producer
+    create_chat_producer,
+    add_user_to_chat_producer
 )
 from utils import (
     generate_unique_request_id
@@ -171,6 +172,10 @@ def bulk_accept_or_decline_invites_to_events(
                 if invite.event.current_users.count() < invite.event.amount_members:
                     if data["type"] == True:
                         invite.status = invite.Status.ACCEPTED
+                        add_user_to_chat_producer.delay(
+                            user_id=invite.recipient.id,
+                            event_id=invite.event.id
+                        )
                         invite.recipient.current_rooms.add(invite.event)
                     else:
                         invite.status = invite.Status.DECLINED
@@ -205,6 +210,10 @@ def bulk_accpet_or_decline_requests_to_participation(
                     ):
                         request_to_p.status = request_to_p.Status.ACCEPTED
                         request_to_p.sender.current_rooms.add(request_to_p.event)
+                        add_user_to_chat_producer.delay(
+                            user_id=request_to_p.sender.id,
+                            event_id=request_to_p.event.id
+                        )
                 else:
                     request_to_p.status = request_to_p.Status.DECLINED
                 request_to_p.save()
@@ -218,10 +227,10 @@ def bulk_accpet_or_decline_requests_to_participation(
             pass
 
 
-def create_event_chat(*, 
-        event: Event, 
-        request_user: User
-    ) -> None:
+def create_event_chat(*,
+                      event: Event,
+                      request_user: User
+                      ) -> None:
     event_players_chat_data = {
         "author": request_user.id,
         "name": f"{event.date_and_time}/{event.name}",
