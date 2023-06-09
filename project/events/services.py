@@ -51,7 +51,8 @@ from rest_framework.status import (
 )
 from chat.tasks import (
     create_chat_producer,
-    add_user_to_chat_producer
+    add_user_to_chat_producer,
+    remove_user_from_chat_producer
 )
 from utils import (
     generate_unique_request_id
@@ -403,6 +404,10 @@ def not_in_black_list(
 
 def remove_user_from_event(*, user: User, event: Event, reason: str) -> None:
     user.current_rooms.remove(event)
+    remove_user_from_chat_producer.delay(
+        user_id=user.id, 
+        event_id=event.id
+    )
     event.black_list.add(user)
     send_to_user(
         user=user,

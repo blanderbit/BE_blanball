@@ -93,3 +93,15 @@ class CreateMessageSerializer(Serializer):
             )
 
         return attrs
+
+
+class RemoveUserFromChatSerializer(Serializer):
+
+    chat_id: int = IntegerField(min_value=1)
+    user_id: int = IntegerField(min_value=1)
+
+    class Meta:
+        fields: Union[str, list[str]] = [
+            "chat_id"
+            "user_id"
+        ]

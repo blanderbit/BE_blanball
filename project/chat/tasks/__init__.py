@@ -10,10 +10,15 @@ from chat.tasks.add_user_to_chat import (
     add_user_to_chat_producer as add_user_to_chat_producer,
     add_user_to_chat_response_consumer as add_user_to_chat_response_consumer
 )
+from chat.tasks.remove_user_from_chat import (
+    remove_user_from_chat_producer as remove_user_from_chat_producer,
+    remove_user_from_chat_response_consumer as remove_user_from_chat_response_consumer
+)
 
 
 ALL_CONSUMER_TASKS = [
     create_chat_response_consumer,
     create_message_response_consumer,
     add_user_to_chat_response_consumer,
+    remove_user_from_chat_response_consumer,
 ]

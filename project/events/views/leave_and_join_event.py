@@ -32,6 +32,9 @@ from events.services import (
     send_notification_to_event_author,
     validate_user_before_join_to_event,
 )
+from chat.tasks import (
+    remove_user_from_chat_producer
+)
 from rest_framework.exceptions import (
     PermissionDenied,
 )
@@ -152,6 +155,10 @@ class LeaveFromEvent(GenericAPIView):
         event: Event = Event.objects.get(id=serializer.data["event_id"])
         if user.current_rooms.filter(id=serializer.data["event_id"]).exists():
             user.current_rooms.remove(event)
+            remove_user_from_chat_producer.delay(
+                user_id=user.id,
+                event_id=event.id
+            )
             send_message_to_event_author_after_leave_user_from_event(
                 event=event, user=user
             )

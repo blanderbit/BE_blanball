@@ -2,3 +2,5 @@ create_chat
 create_chat_response
 create_message
 create_message_response
+remove_user_from_chat
+remove_user_from_chat_response
