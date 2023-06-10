@@ -52,7 +52,8 @@ from rest_framework.status import (
 from chat.tasks import (
     create_chat_producer,
     add_user_to_chat_producer,
-    remove_user_from_chat_producer
+    remove_user_from_chat_producer,
+    delete_chat_producer,
 )
 from utils import (
     generate_unique_request_id
@@ -70,6 +71,7 @@ def bulk_delete_events(
             event: Event = queryset.get(id=event_id)
             if event.author == user:
                 event.delete()
+                delete_chat_producer.delay()
                 yield {"success": event_id}
         except Event.DoesNotExist:
             pass

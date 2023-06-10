@@ -4,28 +4,24 @@ from kafka import KafkaProducer, KafkaConsumer
 from django.conf import settings
 from config.celery import celery
 
-TOPIC_NAME: str = 'delete_chat'
-RESPONSE_TOPIC_NAME: str = 'delete_chat_response'
+TOPIC_NAME: str = 'disable_chat'
+RESPONSE_TOPIC_NAME: str = 'disable_chat_response'
 
 
 @celery.task
-def delete_chat_producer(*, 
+def disable_chat_producer(*, 
         chat_id: Optional[int] = None, 
         event_id: Optional[int] = None,
-        request_id: str, 
-        user_id: int
     ) -> str:
     producer: KafkaProducer = KafkaProducer(**settings.KAFKA_PRODUCER_CONFIG)
     producer.send(TOPIC_NAME, value={
         "chat_id": chat_id,
-        "user_id": user_id,
-        "request_int": request_id,
         "event_id": event_id,
     })
     producer.flush()
 
 
-def delete_chat_response_consumer() -> None:
+def disable_chat_response_consumer() -> None:
 
     consumer: KafkaConsumer = KafkaConsumer(
         RESPONSE_TOPIC_NAME, **settings.KAFKA_CONSUMER_CONFIG)

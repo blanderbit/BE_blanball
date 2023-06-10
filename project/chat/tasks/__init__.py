@@ -18,6 +18,10 @@ from chat.tasks.delete_chat import (
     delete_chat_producer as delete_chat_producer,
     delete_chat_response_consumer as delete_chat_response_consumer
 )
+from chat.tasks.disable_chat import (
+    disable_chat_producer as disable_chat_producer,
+    disable_chat_response_consumer as disable_chat_response_consumer
+)
 
 
 ALL_CONSUMER_TASKS = [
@@ -26,4 +30,5 @@ ALL_CONSUMER_TASKS = [
     add_user_to_chat_response_consumer,
     remove_user_from_chat_response_consumer,
     delete_chat_response_consumer,
+    disable_chat_response_consumer,
 ]

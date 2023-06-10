@@ -6,3 +6,5 @@ remove_user_from_chat
 remove_user_from_chat_response
 delete_chat
 delete_chat_response
+disable_chat
+disable_chat_response

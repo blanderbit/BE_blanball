@@ -9,6 +9,9 @@ from events.models import Event
 from events.services import (
     send_notification_to_subscribe_event_user,
 )
+from chat.tasks import (
+    disable_chat_producer
+)
 
 
 @celery.task
@@ -53,3 +56,4 @@ def check_event_start_time() -> None:
         elif event_minutes_to_start + event.duration == 0:
             event.status = event.Status.FINISHED
             event.save()
+            disable_chat_producer.delay(event_id=event.id)
