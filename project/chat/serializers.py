@@ -102,6 +102,16 @@ class RemoveUserFromChatSerializer(Serializer):
 
     class Meta:
         fields: Union[str, list[str]] = [
-            "chat_id"
+            "chat_id",
             "user_id"
+        ]
+
+
+class DeleteChatSerializer(Serializer):
+
+    chat_id: int = IntegerField(min_value=1)
+
+    class Meta:
+        fields: Union[str, list[str]] = [
+            "chat_id"
         ]

@@ -4,3 +4,5 @@ create_message
 create_message_response
 remove_user_from_chat
 remove_user_from_chat_response
+delete_chat
+delete_chat_response
