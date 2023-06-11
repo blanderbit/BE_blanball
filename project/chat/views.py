@@ -1,4 +1,4 @@
-from typing import Type
+from typing import Type, Any
 
 from chat.serializers import (
     CreateGroupChatSerializer,
@@ -13,8 +13,16 @@ from chat.tasks import (
     create_message_producer,
     delete_chat_producer,
     edit_chat_producer,
+    get_chats_list_producer,
     remove_user_from_chat_producer,
 )
+from chat.openapi import (
+    chats_list_query_params
+)
+from django.utils.decorators import (
+    method_decorator,
+)
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.generics import GenericAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -141,5 +149,32 @@ class EditChat(GenericAPIView):
             user_id=request.user.id,
             request_id=unique_request_id,
             new_data=serializer.validated_data["new_data"],
+        )
+        return Response({"request_id": unique_request_id}, HTTP_200_OK)
+
+
+@method_decorator(
+    swagger_auto_schema(manual_parameters=chats_list_query_params),
+    name="get",
+)
+class GetChatsList(GenericAPIView):
+    """
+    Get my chats list
+
+    This endpoint allows the creator of a
+    chat to remove another user from the chat
+    """
+
+    def get(self, request: Request) -> Response:
+        unique_request_id: str = generate_unique_request_id()
+
+        query: dict[str, Any] = request.query_params
+
+        get_chats_list_producer.delay(
+            user_id=request.user.id,
+            request_id=unique_request_id,
+            offset=query.get("offset"),
+            page=query.get("page"),
+            search=query.get("search")
         )
         return Response({"request_id": unique_request_id}, HTTP_200_OK)

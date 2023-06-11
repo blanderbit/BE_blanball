@@ -10,3 +10,5 @@ disable_chat
 disable_chat_response
 edit_chat
 edit_chat_response
+get_chats_list
+get_chats_list_response

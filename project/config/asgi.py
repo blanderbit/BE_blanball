@@ -13,7 +13,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 
 
 django_asgi_app = get_asgi_application()
-import notifications.routing
+import config.ws_urls
 from authentication.middlewares import (
     JwtAuthMiddlewareStack,
 )
@@ -22,7 +22,7 @@ application = ProtocolTypeRouter(
     {
         "websocket": AllowedHostsOriginValidator(
             JwtAuthMiddlewareStack(
-                URLRouter(notifications.routing.websocket_urlpatterns)
+                URLRouter(config.ws_urls.websocket_urlpatterns)
             )
         ),
         "http": django_asgi_app,
