@@ -17,9 +17,11 @@ from events.services import (
     bulk_show_or_hide_events,
     bulk_unpin_events,
     event_create,
+    update_event,
+)
+from events.decorators import (
     not_in_black_list,
     only_author,
-    update_event,
 )
 from rest_framework.generics import GenericAPIView
 from rest_framework.mixins import (

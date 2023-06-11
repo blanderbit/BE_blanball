@@ -57,6 +57,13 @@ services:
         ports:
             - 8000:8000
 
+    daphne:
+        <<: *api-common
+        container_name: daphne
+        command: daphne
+        ports:
+            - 10000:10000
+
     celery-worker:
         <<: *api-common
         container_name: celery-worker

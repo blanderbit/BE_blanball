@@ -266,6 +266,10 @@ class User(AbstractBaseUser):
     def group_name(self) -> str:
         return "user_%s" % self.id
 
+    @property
+    def chat_group_name(self) -> str:
+        return "chat_user_%s" % self.id
+
     class Meta:
         # the name of the table in the database for this model
         db_table: str = "user"

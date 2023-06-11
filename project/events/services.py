@@ -3,7 +3,6 @@ from collections import OrderedDict
 from datetime import datetime
 from typing import (
     Any,
-    Callable,
     Generator,
     Optional,
     TypeVar,
@@ -19,7 +18,6 @@ from chat.tasks import (
     edit_chat_producer,
     remove_user_from_chat_producer,
 )
-from config.exceptions import _404
 from django.conf import settings
 from django.db import transaction
 from django.db.models.query import QuerySet
@@ -48,8 +46,6 @@ from notifications.tasks import send_to_user
 from rest_framework.exceptions import (
     PermissionDenied,
 )
-from rest_framework.request import Request
-from rest_framework.response import Response
 from rest_framework.serializers import (
     ValidationError,
 )
@@ -379,37 +375,6 @@ def filter_event_by_user_planned_events_time(
     )
 
 
-def only_author(Object):
-    def wrap(
-        func: Callable[[Request, int, ...], Response]
-    ) -> Callable[[Request, int, ...], Response]:
-        def called(self, request: Request, pk: int, *args: Any, **kwargs: Any) -> Any:
-            try:
-                if self.request.user.id == Object.objects.get(id=pk).author.id:
-                    return func(self, request, pk, *args, **kwargs)
-                raise PermissionDenied()
-            except Object.DoesNotExist:
-                raise _404(object=Object)
-
-        return called
-
-    return wrap
-
-
-def not_in_black_list(
-    func: Callable[[Request, int, ...], Response]
-) -> Callable[[Request, int, ...], Response]:
-    def wrap(self, request: Request, pk: int, *args: Any, **kwargs: Any) -> Any:
-        try:
-            if request.user in Event.objects.get(id=pk).black_list.all():
-                raise PermissionDenied()
-            return func(self, request, pk, *args, **kwargs)
-        except Event.DoesNotExist:
-            raise _404(object=Event)
-
-    return wrap
-
-
 def remove_user_from_event(*, user: User, event: Event, reason: str) -> None:
     user.current_rooms.remove(event)
     remove_user_from_chat_producer.delay(user_id=user.id, event_id=event.id)
@@ -430,20 +395,6 @@ def remove_user_from_event(*, user: User, event: Event, reason: str) -> None:
             },
         },
     )
-
-
-def only_for_event_members(func):
-    def wrap(self, request: Request, *agrs: Any, **kwargs: Any):
-        try:
-            event: Event = Event.objects.get(id=request.data["event"])
-            if request.user in event.current_users.all():
-                return func(self, request, *agrs, **kwargs)
-            else:
-                raise PermissionDenied()
-        except Event.DoesNotExist:
-            return func(self, request, *agrs, **kwargs)
-
-    return wrap
 
 
 def send_message_to_event_author_after_leave_user_from_event(

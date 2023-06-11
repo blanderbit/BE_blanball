@@ -9,7 +9,7 @@ from django.utils.decorators import (
     method_decorator,
 )
 from drf_yasg.utils import swagger_auto_schema
-from events.services import only_for_event_members
+from events.decorators import only_for_event_members
 from rest_framework.generics import (
     CreateAPIView,
     GenericAPIView,
