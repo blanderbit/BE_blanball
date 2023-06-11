@@ -1,8 +1,6 @@
 from typing import Any, Type, final
 
-from config.serializers import (
-    BaseBulkSerializer,
-)
+from config.serializers import BaseBulkSerializer
 from django.db.models.query import QuerySet
 from events.constants.success import (
     EVENT_UPDATE_SUCCESS,
@@ -16,12 +14,12 @@ from events.serializers import (
 from events.services import (
     bulk_delete_events,
     bulk_pin_events,
+    bulk_show_or_hide_events,
     bulk_unpin_events,
     event_create,
     not_in_black_list,
     only_author,
     update_event,
-    bulk_show_or_hide_events,
 )
 from rest_framework.generics import GenericAPIView
 from rest_framework.mixins import (
@@ -89,7 +87,7 @@ class UpdateEvent(GenericAPIView):
         update_event(
             event=self.queryset.filter(id=pk),
             new_data=serializer.validated_data,
-            request_user=request.user
+            request_user=request.user,
         )
         return Response(EVENT_UPDATE_SUCCESS, status=HTTP_200_OK)
 

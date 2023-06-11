@@ -125,7 +125,7 @@ class Event(models.Model):
 
     def __str__(self) -> str:
         return self.name
-    
+
     @staticmethod
     def get_all() -> QuerySet["Event"]:
         """
@@ -233,13 +233,7 @@ class InviteToEventManager(models.Manager):
             raise ValidationError(AUTHOR_CAN_NOT_INVITE_ERROR, HTTP_403_FORBIDDEN)
         if invite_user in event.black_list.all():
             raise ValidationError(THIS_USER_CAN_NOT_BE_INVITED, HTTP_403_FORBIDDEN)
-        if (
-            InviteToEvent.get_all()
-            .filter(
-                recipient=invite_user, event=event
-            )
-            .exists()
-        ):
+        if InviteToEvent.get_all().filter(recipient=invite_user, event=event).exists():
             raise ValidationError(THIS_USER_CAN_NOT_BE_INVITED, HTTP_403_FORBIDDEN)
 
         if (

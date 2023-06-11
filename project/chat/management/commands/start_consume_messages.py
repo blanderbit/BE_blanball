@@ -1,10 +1,13 @@
 import multiprocessing
-from django.core.management.base import BaseCommand
+
 from chat.tasks import ALL_CONSUMER_TASKS
+from django.core.management.base import (
+    BaseCommand,
+)
 
 
 class Command(BaseCommand):
-    help = 'Consume Kafka messages'
+    help = "Consume Kafka messages"
 
     def handle(self, *args, **options):
         processes = []
@@ -21,5 +24,8 @@ class Command(BaseCommand):
         for process in processes:
             process.join()
 
-        self.stdout.write(self.style.SUCCESS(
-            "Message consumption via kafka broker started successfully for all tasks"))
+        self.stdout.write(
+            self.style.SUCCESS(
+                "Message consumption via kafka broker started successfully for all tasks"
+            )
+        )

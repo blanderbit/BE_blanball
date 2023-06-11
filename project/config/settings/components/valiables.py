@@ -1,7 +1,8 @@
-import django
 import json
 from os import getenv, path
 from typing import Any
+
+import django
 from decouple import Csv, config
 from django.conf import settings
 from django.utils.encoding import smart_str
@@ -94,11 +95,11 @@ API_KEY_MAX_LENGTH: int = 255
 
 
 KAFKA_PRODUCER_CONFIG: dict[str, Any] = {
-    'bootstrap_servers': [config("KAFKA_PRODUCER_ADRESS", cast=str)],
-    'value_serializer': lambda v: json.dumps(v).encode('utf-8'),
+    "bootstrap_servers": [config("KAFKA_PRODUCER_ADRESS", cast=str)],
+    "value_serializer": lambda v: json.dumps(v).encode("utf-8"),
 }
 
 KAFKA_CONSUMER_CONFIG: dict[str, Any] = {
-    'bootstrap_servers': [config("KAFKA_CONSUMER_ADRESS", cast=str)],
-    'value_deserializer': lambda v: json.loads(v.decode('utf-8')),
+    "bootstrap_servers": [config("KAFKA_CONSUMER_ADRESS", cast=str)],
+    "value_deserializer": lambda v: json.loads(v.decode("utf-8")),
 }

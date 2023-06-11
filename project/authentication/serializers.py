@@ -139,11 +139,7 @@ class FriendUserSerializer(ModelSerializer):
 
     class Meta:
         model: User = User
-        fields: Union[str, list[str]] = [
-            "id",
-            "profile",
-            "is_online"
-        ]
+        fields: Union[str, list[str]] = ["id", "profile", "is_online"]
 
 
 class ProfileSerializer(ModelSerializer):

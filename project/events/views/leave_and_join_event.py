@@ -6,6 +6,10 @@
 from typing import Any, Type, final
 
 from authentication.models import User
+from chat.tasks import (
+    remove_user_from_chat_producer,
+)
+from drf_yasg.utils import swagger_auto_schema
 from events.constants.errors import (
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,
     EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,
@@ -32,9 +36,6 @@ from events.services import (
     send_notification_to_event_author,
     validate_user_before_join_to_event,
 )
-from chat.tasks import (
-    remove_user_from_chat_producer
-)
 from rest_framework.exceptions import (
     PermissionDenied,
 )
@@ -49,7 +50,6 @@ from rest_framework.status import (
     HTTP_200_OK,
     HTTP_400_BAD_REQUEST,
 )
-from drf_yasg.utils import swagger_auto_schema
 
 
 class JoinToEvent(GenericAPIView):
@@ -63,9 +63,7 @@ class JoinToEvent(GenericAPIView):
 
     serializer_class: Type[Serializer] = JoinOrRemoveRoomSerializer
 
-    @swagger_auto_schema(
-        tags=["event-join"]
-    )
+    @swagger_auto_schema(tags=["event-join"])
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -93,9 +91,7 @@ class FanJoinToEvent(GenericAPIView):
 
     serializer_class: Type[Serializer] = JoinOrRemoveRoomSerializer
 
-    @swagger_auto_schema(
-        tags=["event-join"]
-    )
+    @swagger_auto_schema(tags=["event-join"])
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -121,9 +117,7 @@ class FanLeaveFromEvent(GenericAPIView):
 
     serializer_class: Type[Serializer] = JoinOrRemoveRoomSerializer
 
-    @swagger_auto_schema(
-        tags=["event-leave"]
-    )
+    @swagger_auto_schema(tags=["event-leave"])
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -145,9 +139,7 @@ class LeaveFromEvent(GenericAPIView):
 
     serializer_class: Type[Serializer] = JoinOrRemoveRoomSerializer
 
-    @swagger_auto_schema(
-        tags=["event-leave"]
-    )
+    @swagger_auto_schema(tags=["event-leave"])
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -155,10 +147,7 @@ class LeaveFromEvent(GenericAPIView):
         event: Event = Event.objects.get(id=serializer.data["event_id"])
         if user.current_rooms.filter(id=serializer.data["event_id"]).exists():
             user.current_rooms.remove(event)
-            remove_user_from_chat_producer.delay(
-                user_id=user.id,
-                event_id=event.id
-            )
+            remove_user_from_chat_producer.delay(user_id=user.id, event_id=event.id)
             send_message_to_event_author_after_leave_user_from_event(
                 event=event, user=user
             )
@@ -177,9 +166,7 @@ class RemoveUserFromEvent(GenericAPIView):
 
     serializer_class: Type[Serializer] = RemoveUserFromEventSerializer
 
-    @swagger_auto_schema(
-        tags=["events", "event-leave"]
-    )
+    @swagger_auto_schema(tags=["events", "event-leave"])
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)

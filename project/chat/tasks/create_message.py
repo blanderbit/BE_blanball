@@ -1,19 +1,17 @@
 from typing import Optional
 
-from kafka import KafkaProducer, KafkaConsumer
-from django.conf import settings
 from config.celery import celery
+from django.conf import settings
+from kafka import KafkaConsumer, KafkaProducer
 
-TOPIC_NAME: str = 'create_message'
-RESPONSE_TOPIC_NAME: str = 'create_message_response'
+TOPIC_NAME: str = "create_message"
+RESPONSE_TOPIC_NAME: str = "create_message_response"
 
 
 @celery.task
-def create_message_producer(*,
-        data: dict[str, str],
-        author_id: int,
-        request_id: str
-    ) -> str:
+def create_message_producer(
+    *, data: dict[str, str], author_id: int, request_id: str
+) -> str:
     producer: KafkaProducer = KafkaProducer(**settings.KAFKA_PRODUCER_CONFIG)
     data["author"] = author_id
     data["request_id"] = request_id
@@ -24,7 +22,8 @@ def create_message_producer(*,
 def create_message_response_consumer() -> None:
 
     consumer: KafkaConsumer = KafkaConsumer(
-        RESPONSE_TOPIC_NAME, **settings.KAFKA_CONSUMER_CONFIG)
+        RESPONSE_TOPIC_NAME, **settings.KAFKA_CONSUMER_CONFIG
+    )
 
     for data in consumer:
         print(data.value)

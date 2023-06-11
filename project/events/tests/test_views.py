@@ -200,7 +200,6 @@ class TestEventsViews(SetUpEventsViews):
         self.assertTrue(get_event.data["name"] != self.event_update_data["name"])
         self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)
 
-
     @freeze_time("2022-9-29")
     def test_user_send_request_to_participation(self) -> None:
         self.auth()

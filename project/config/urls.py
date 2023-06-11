@@ -22,7 +22,7 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     path("api/v1/api_keys/", include("api_keys.urls"), name="api_keys"),
     path("api/v1/scheduler/", include("scheduler.urls"), name="scheduler"),
     path("api/v1/hints/", include("hints.urls"), name="hints"),
-    path("api/v1/chat/", include("chat.urls"), name="chat")
+    path("api/v1/chat/", include("chat.urls"), name="chat"),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

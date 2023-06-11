@@ -1,8 +1,9 @@
 from typing import Any, List, Union
+
 from authentication.models import User
 from chat.constants.errors import (
+    CHAT_ID_AND_USER_ID_CANT_BE_PROVIDED_AT_ONCE_ERROR,
     CHAT_ID_OR_USER_ID_MUST_BE_PROVIDED_ERROR,
-    CHAT_ID_AND_USER_ID_CANT_BE_PROVIDED_AT_ONCE_ERROR
 )
 from config.exceptions import _404
 from rest_framework.serializers import (
@@ -26,24 +27,16 @@ class CreatePersonalChatSerializer(Serializer):
     user: int = IntegerField(min_value=1)
 
     class Meta:
-        fields: Union[str, list[str]] = [
-            "name",
-            "user"
-        ]
+        fields: Union[str, list[str]] = ["name", "user"]
 
 
 class CreateGroupChatSerializer(Serializer):
 
     name: str = CharField(max_length=255)
-    users: list[int] = ListField(
-        child=IntegerField(min_value=1), allow_empty=True
-    )
+    users: list[int] = ListField(child=IntegerField(min_value=1), allow_empty=True)
 
     class Meta:
-        fields: Union[str, list[str]] = [
-            "name",
-            "users"
-        ]
+        fields: Union[str, list[str]] = ["name", "users"]
 
     def validate(self, attrs):
         user_ids = set(attrs.get("users", []))
@@ -72,15 +65,11 @@ class CreateMessageSerializer(Serializer):
     user_id: int = IntegerField(min_value=1, required=False)
 
     class Meta:
-        fields: Union[str, list[str]] = [
-            "text",
-            "chat_id"
-            "user_id"
-        ]
+        fields: Union[str, list[str]] = ["text", "chat_id" "user_id"]
 
     def validate(self, attrs):
-        user_id = attrs.get('user_id')
-        chat_id = attrs.get('chat_id')
+        user_id = attrs.get("user_id")
+        chat_id = attrs.get("chat_id")
 
         if not user_id and not chat_id:
             raise ValidationError(
@@ -101,10 +90,7 @@ class RemoveUserFromChatSerializer(Serializer):
     user_id: int = IntegerField(min_value=1)
 
     class Meta:
-        fields: Union[str, list[str]] = [
-            "chat_id",
-            "user_id"
-        ]
+        fields: Union[str, list[str]] = ["chat_id", "user_id"]
 
 
 class DeleteChatSerializer(Serializer):
@@ -112,18 +98,14 @@ class DeleteChatSerializer(Serializer):
     chat_id: int = IntegerField(min_value=1)
 
     class Meta:
-        fields: Union[str, list[str]] = [
-            "chat_id"
-        ]
+        fields: Union[str, list[str]] = ["chat_id"]
 
 
 class NewChatDataSerializer(Serializer):
     name: str = CharField(max_length=255, required=False)
 
     class Meta:
-        fields: Union[str, list[str]] = [
-            "name"
-        ]
+        fields: Union[str, list[str]] = ["name"]
 
 
 class EditChatSerializer(Serializer):
@@ -132,7 +114,4 @@ class EditChatSerializer(Serializer):
     new_data: dict[str, str] = NewChatDataSerializer()
 
     class Meta:
-        fields: Union[str, list[str]] = [
-            "chat_id",
-            "new_data"
-        ]
+        fields: Union[str, list[str]] = ["chat_id", "new_data"]

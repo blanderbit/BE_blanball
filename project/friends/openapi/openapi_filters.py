@@ -5,7 +5,7 @@ from config.openapi import (
 )
 from drf_yasg import openapi
 from friends.filters import (
-    MY_FRIENDS_LIST_SEARCH_FIELDS
+    MY_FRIENDS_LIST_SEARCH_FIELDS,
 )
 
 friend_is_online_query = openapi.Parameter(

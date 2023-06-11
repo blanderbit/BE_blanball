@@ -24,13 +24,13 @@ from authentication.services import (
     profile_update,
     update_profile_avatar,
 )
+from config.exceptions import _404
+from django.db import transaction
+from django.db.models.query import QuerySet
 from django.utils.decorators import (
     method_decorator,
 )
 from drf_yasg.utils import swagger_auto_schema
-from config.exceptions import _404
-from django.db import transaction
-from django.db.models.query import QuerySet
 from rest_framework.generics import GenericAPIView
 from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import (

@@ -1,4 +1,5 @@
 import pandas
+from chat.tasks import disable_chat_producer
 from config.celery import celery
 from django.db.models import Q
 from django.utils import timezone
@@ -8,9 +9,6 @@ from events.constants.notification_types import (
 from events.models import Event
 from events.services import (
     send_notification_to_subscribe_event_user,
-)
-from chat.tasks import (
-    disable_chat_producer
 )
 
 

@@ -9,4 +9,4 @@ from django.core.management import call_command
     default_retry_delay=5,
 )
 def reset_outstanding_jwt_tokens() -> None:
-    call_command('flushexpiredtokens')
+    call_command("flushexpiredtokens")

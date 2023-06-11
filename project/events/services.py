@@ -12,6 +12,13 @@ from typing import (
 
 import pandas
 from authentication.models import User
+from chat.tasks import (
+    add_user_to_chat_producer,
+    create_chat_producer,
+    delete_chat_producer,
+    edit_chat_producer,
+    remove_user_from_chat_producer,
+)
 from config.exceptions import _404
 from django.conf import settings
 from django.db import transaction
@@ -25,19 +32,18 @@ from events.constants.errors import (
     NO_IN_EVENT_FANS_LIST_ERROR,
 )
 from events.constants.notification_types import (
+    EVENT_UPDATE_NOTIFICATION_TYPE,
     LEAVE_USER_FROM_THE_EVENT_NOTIFICATION_TYPE,
     NEW_USER_ON_THE_EVENT_NOTIFICATION_TYPE,
     RESPONSE_TO_THE_INVITE_TO_EVENT_NOTIFICATION_TYPE,
     RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_NOTIFICATION_TYPE,
     USER_REMOVE_FROM_EVENT_NOTIFICATION_TYPE,
-    EVENT_UPDATE_NOTIFICATION_TYPE
 )
 from events.models import (
     Event,
     InviteToEvent,
     RequestToParticipation,
 )
-from chat.tasks import edit_chat_producer
 from notifications.tasks import send_to_user
 from rest_framework.exceptions import (
     PermissionDenied,
@@ -50,16 +56,7 @@ from rest_framework.serializers import (
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
-from chat.tasks import (
-    create_chat_producer,
-    add_user_to_chat_producer,
-    remove_user_from_chat_producer,
-    delete_chat_producer,
-)
-from utils import (
-    generate_unique_request_id
-)
-
+from utils import generate_unique_request_id
 
 bulk = TypeVar(Optional[Generator[list[dict[str, int]], None, None]])
 
@@ -72,28 +69,21 @@ def bulk_delete_events(
             event: Event = queryset.get(id=event_id)
             if event.author == user:
                 event.delete()
-                delete_chat_producer.delay(
-                    event_id=event_id,
-                    user_id=user.id
-                )
+                delete_chat_producer.delay(event_id=event_id, user_id=user.id)
                 yield {"success": event_id}
         except Event.DoesNotExist:
             pass
 
 
-def update_event(*, 
-        event: QuerySet[Event], 
-        new_data: dict[str, Any], 
-        request_user: User
-    ) -> None:
+def update_event(
+    *, event: QuerySet[Event], new_data: dict[str, Any], request_user: User
+) -> None:
     send_notification_to_subscribe_event_user(
         event=event[0], message_type=EVENT_UPDATE_NOTIFICATION_TYPE
     )
     event.update(**new_data)
     edit_chat_producer.delay(
-        event_id=event[0].id, 
-        user_id=request_user.id,
-        new_data=new_data
+        event_id=event[0].id, user_id=request_user.id, new_data=new_data
     )
 
 
@@ -121,8 +111,8 @@ def bulk_show_or_hide_events(
         try:
             event: Event = queryset.get(id=event_id)
             if (
-                user in event.current_users.all() or
-                user in event.current_fans.all()
+                user in event.current_users.all()
+                or user in event.current_fans.all()
                 and event.status == Event.Status.PLANNED
             ):
                 event.hidden = not event.hidden
@@ -196,8 +186,7 @@ def bulk_accept_or_decline_invites_to_events(
                     if data["type"] == True:
                         invite.status = invite.Status.ACCEPTED
                         add_user_to_chat_producer.delay(
-                            user_id=invite.recipient.id,
-                            event_id=invite.event.id
+                            user_id=invite.recipient.id, event_id=invite.event.id
                         )
                         invite.recipient.current_rooms.add(invite.event)
                     else:
@@ -235,7 +224,7 @@ def bulk_accpet_or_decline_requests_to_participation(
                         request_to_p.sender.current_rooms.add(request_to_p.event)
                         add_user_to_chat_producer.delay(
                             user_id=request_to_p.sender.id,
-                            event_id=request_to_p.event.id
+                            event_id=request_to_p.event.id,
                         )
                 else:
                     request_to_p.status = request_to_p.Status.DECLINED
@@ -250,22 +239,19 @@ def bulk_accpet_or_decline_requests_to_participation(
             pass
 
 
-def create_event_chat(*,
-                      event: Event,
-                      request_user: User
-                      ) -> None:
+def create_event_chat(*, event: Event, request_user: User) -> None:
     event_players_chat_data = {
         "author": request_user.id,
         "name": f"{event.date_and_time}/{event.name}",
         "users": [],
         "type": "Event_Group",
-        "event_id": event.id
+        "event_id": event.id,
     }
 
     create_chat_producer.delay(
         data=event_players_chat_data,
         author_id=request_user.id,
-        request_id=generate_unique_request_id()
+        request_id=generate_unique_request_id(),
     )
 
 
@@ -426,10 +412,7 @@ def not_in_black_list(
 
 def remove_user_from_event(*, user: User, event: Event, reason: str) -> None:
     user.current_rooms.remove(event)
-    remove_user_from_chat_producer.delay(
-        user_id=user.id,
-        event_id=event.id
-    )
+    remove_user_from_chat_producer.delay(user_id=user.id, event_id=event.id)
     event.black_list.add(user)
     send_to_user(
         user=user,
@@ -488,7 +471,9 @@ def send_message_to_event_author_after_leave_user_from_event(
     )
 
 
-def invite_users_to_event(*, event_id: int, users_ids: list[int], request_user: User) -> None:
+def invite_users_to_event(
+    *, event_id: int, users_ids: list[int], request_user: User
+) -> None:
     event: Event = Event.objects.get(id=event_id)
 
     for user_id in users_ids:
