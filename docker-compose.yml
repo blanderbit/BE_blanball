@@ -100,7 +100,7 @@ services:
             - blaball-network
         ports:
             - 49280:49299
-    
+
     kafka:
         container_name: kafka
         env_file:
@@ -132,8 +132,8 @@ services:
             - blaball-network
 
 networks:
-  blaball-network:
-    name: blaball-network
+    blaball-network:
+        name: blaball-network
 
 volumes:
     redis-data:
