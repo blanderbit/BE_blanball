@@ -4,9 +4,6 @@ from config.serializers import (
     BaseBulkSerializer,
 )
 from django.db.models.query import QuerySet
-from events.constants.notification_types import (
-    EVENT_UPDATE_NOTIFICATION_TYPE,
-)
 from events.constants.success import (
     EVENT_UPDATE_SUCCESS,
 )
@@ -23,8 +20,8 @@ from events.services import (
     event_create,
     not_in_black_list,
     only_author,
+    update_event,
     bulk_show_or_hide_events,
-    send_notification_to_subscribe_event_user,
 )
 from rest_framework.generics import GenericAPIView
 from rest_framework.mixins import (
@@ -89,11 +86,11 @@ class UpdateEvent(GenericAPIView):
     def put(self, request: Request, pk: int) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        event: Event = self.queryset.filter(id=pk)
-        send_notification_to_subscribe_event_user(
-            event=event[0], message_type=EVENT_UPDATE_NOTIFICATION_TYPE
+        update_event(
+            event=self.queryset.filter(id=pk),
+            new_data=serializer.validated_data,
+            request_user=request.user
         )
-        event.update(**serializer.validated_data)
         return Response(EVENT_UPDATE_SUCCESS, status=HTTP_200_OK)
 
 

@@ -4,11 +4,13 @@ from chat.tasks import (
     create_message_producer,
     remove_user_from_chat_producer,
     delete_chat_producer,
+    edit_chat_producer
 )
 from chat.serializers import (
     CreatePersonalChatSerializer,
     RemoveUserFromChatSerializer,
     CreateGroupChatSerializer,
+    EditChatSerializer,
     DeleteChatSerializer,
     CreateMessageSerializer,
 )
@@ -100,7 +102,7 @@ class RemoveUserFromChat(GenericAPIView):
 
 class DeleteChat(GenericAPIView):
     """
-    Remove user from chat
+    Delete chat
 
     This endpoint allows the creator of a 
     chat to remove another user from the chat
@@ -117,5 +119,29 @@ class DeleteChat(GenericAPIView):
             chat_id=serializer.validated_data["chat_id"],
             user_id=request.user.id,
             request_id=unique_request_id,
+        )
+        return Response({"request_id": unique_request_id}, HTTP_200_OK)
+
+
+class EditChat(GenericAPIView):
+    """
+    Edit chat
+
+    This endpoint allows the creator of a 
+    chat to remove another user from the chat
+    """
+
+    serializer_class: Type[Serializer] = EditChatSerializer
+
+    def post(self, request: Request) -> Response:
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        unique_request_id: str = generate_unique_request_id()
+
+        edit_chat_producer.delay(
+            chat_id=serializer.validated_data["chat_id"],
+            user_id=request.user.id,
+            request_id=unique_request_id,
+            new_data=serializer.validated_data["new_data"]
         )
         return Response({"request_id": unique_request_id}, HTTP_200_OK)

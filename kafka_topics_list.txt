@@ -8,3 +8,5 @@ delete_chat
 delete_chat_response
 disable_chat
 disable_chat_response
+edit_chat
+edit_chat_response

@@ -15,7 +15,6 @@ from authentication.models import User
 from config.exceptions import _404
 from django.conf import settings
 from django.db import transaction
-from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.utils import timezone
 from events.constants.errors import (
@@ -31,12 +30,14 @@ from events.constants.notification_types import (
     RESPONSE_TO_THE_INVITE_TO_EVENT_NOTIFICATION_TYPE,
     RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_NOTIFICATION_TYPE,
     USER_REMOVE_FROM_EVENT_NOTIFICATION_TYPE,
+    EVENT_UPDATE_NOTIFICATION_TYPE
 )
 from events.models import (
     Event,
     InviteToEvent,
     RequestToParticipation,
 )
+from chat.tasks import edit_chat_producer
 from notifications.tasks import send_to_user
 from rest_framework.exceptions import (
     PermissionDenied,
@@ -71,10 +72,29 @@ def bulk_delete_events(
             event: Event = queryset.get(id=event_id)
             if event.author == user:
                 event.delete()
-                delete_chat_producer.delay()
+                delete_chat_producer.delay(
+                    event_id=event_id,
+                    user_id=user.id
+                )
                 yield {"success": event_id}
         except Event.DoesNotExist:
             pass
+
+
+def update_event(*, 
+        event: QuerySet[Event], 
+        new_data: dict[str, Any], 
+        request_user: User
+    ) -> None:
+    send_notification_to_subscribe_event_user(
+        event=event[0], message_type=EVENT_UPDATE_NOTIFICATION_TYPE
+    )
+    event.update(**new_data)
+    edit_chat_producer.delay(
+        event_id=event[0].id, 
+        user_id=request_user.id,
+        new_data=new_data
+    )
 
 
 def bulk_pin_events(
@@ -407,7 +427,7 @@ def not_in_black_list(
 def remove_user_from_event(*, user: User, event: Event, reason: str) -> None:
     user.current_rooms.remove(event)
     remove_user_from_chat_producer.delay(
-        user_id=user.id, 
+        user_id=user.id,
         event_id=event.id
     )
     event.black_list.add(user)
