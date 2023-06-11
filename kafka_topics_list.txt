@@ -14,3 +14,5 @@ get_chats_list
 get_chats_list_response
 edit_message
 edit_message_response
+get_chat_messages_list
+get_chat_messages_list_response

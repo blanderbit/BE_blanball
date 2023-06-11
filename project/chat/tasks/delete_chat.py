@@ -22,7 +22,7 @@ def delete_chat_producer(
         value={
             "chat_id": chat_id,
             "user_id": user_id,
-            "request_int": request_id,
+            "request_id": request_id,
             "event_id": event_id,
         },
     )

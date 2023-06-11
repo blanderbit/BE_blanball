@@ -17,6 +17,7 @@ from chat.tasks import (
     get_chats_list_producer,
     remove_user_from_chat_producer,
     edit_message_producer,
+    get_chat_messages_list_producer,
 )
 from chat.openapi import (
     chats_list_query_params
@@ -175,6 +176,34 @@ class GetChatsList(GenericAPIView):
 
         get_chats_list_producer.delay(
             user_id=request.user.id,
+            request_id=unique_request_id,
+            offset=query.get("offset"),
+            page=query.get("page"),
+            search=query.get("search")
+        )
+        return Response({"request_id": unique_request_id}, HTTP_200_OK)
+
+
+@method_decorator(
+    swagger_auto_schema(manual_parameters=chats_list_query_params),
+    name="get",
+)
+class GetChatMessagesList(GenericAPIView):
+    """
+    Get messages list of certain chat
+
+    This endpoint allows the creator of a
+    chat to remove another user from the chat
+    """
+
+    def get(self, request: Request, pk: int) -> Response:
+        unique_request_id: str = generate_unique_request_id()
+
+        query: dict[str, Any] = request.query_params
+
+        get_chat_messages_list_producer.delay(
+            user_id=request.user.id,
+            chat_id=pk,
             request_id=unique_request_id,
             offset=query.get("offset"),
             page=query.get("page"),
