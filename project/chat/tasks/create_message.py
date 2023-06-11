@@ -9,13 +9,19 @@ RESPONSE_TOPIC_NAME: str = "create_message_response"
 
 
 @celery.task
-def create_message_producer(
-    *, data: dict[str, str], author_id: int, request_id: str
-) -> str:
+def create_message_producer(*,
+                            text: str,
+                            user_id: int,
+                            chat_id: int,
+                            request_id: str
+                            ) -> str:
     producer: KafkaProducer = KafkaProducer(**settings.KAFKA_PRODUCER_CONFIG)
-    data["author"] = author_id
-    data["request_id"] = request_id
-    producer.send(TOPIC_NAME, value=data)
+    producer.send(TOPIC_NAME, value={
+        "text": text,
+        "user_id": user_id,
+        "chat_id": chat_id,
+        "request_id": request_id
+    })
     producer.flush()
 
 

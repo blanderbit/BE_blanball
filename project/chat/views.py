@@ -74,9 +74,10 @@ class CreateMessage(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         unique_request_id: str = generate_unique_request_id()
         create_message_producer.delay(
-            data=serializer.validated_data,
-            author_id=request.user.id,
-            request_id=unique_request_id,
+            text=serializer.validated_data["text"],
+            chat_id=serializer.validated_data["chat_id"],
+            user_id=request.user.id,
+            request_id=unique_request_id
         )
         return Response({"request_id": unique_request_id}, HTTP_200_OK)
 

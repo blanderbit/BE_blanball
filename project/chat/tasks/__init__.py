@@ -47,6 +47,7 @@ from chat.tasks.get_chats_list import (
     get_chats_list_response_consumer as get_chats_list_response_consumer
 )
 
+
 ALL_CONSUMER_TASKS = [
     create_chat_response_consumer,
     create_message_response_consumer,
