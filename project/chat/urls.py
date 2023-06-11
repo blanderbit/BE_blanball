@@ -7,6 +7,7 @@ from chat.views import (
     EditChat,
     RemoveUserFromChat,
     GetChatsList,
+    EditChatMessage
 )
 from django.urls import path
 from django.urls.resolvers import (
@@ -27,4 +28,5 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     path("client/delete/chat", DeleteChat.as_view(), name="remove-user-from-chat"),
     path("client/edit/chat", EditChat.as_view(), name="edit-chat"),
     path("client/get/chats/list", GetChatsList.as_view(), name="get-chat-lists"),
+    path("client/edit/chat/message", EditChatMessage.as_view(), name="edit-chat-message")
 ]

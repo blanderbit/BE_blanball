@@ -46,6 +46,12 @@ from chat.tasks.get_chats_list import (
 from chat.tasks.get_chats_list import (
     get_chats_list_response_consumer as get_chats_list_response_consumer
 )
+from chat.tasks.edit_message import (
+    edit_message_producer as edit_message_producer
+)
+from chat.tasks.edit_message import (
+    edit_message_response_consumer as edit_message_response_consumer
+)
 
 
 ALL_CONSUMER_TASKS = [
@@ -57,4 +63,5 @@ ALL_CONSUMER_TASKS = [
     disable_chat_response_consumer,
     edit_chat_response_consumer,
     get_chats_list_response_consumer,
+    edit_message_response_consumer,
 ]

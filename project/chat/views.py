@@ -6,6 +6,7 @@ from chat.serializers import (
     CreatePersonalChatSerializer,
     DeleteChatSerializer,
     EditChatSerializer,
+    EditChatMessageSerializer,
     RemoveUserFromChatSerializer,
 )
 from chat.tasks import (
@@ -15,6 +16,7 @@ from chat.tasks import (
     edit_chat_producer,
     get_chats_list_producer,
     remove_user_from_chat_producer,
+    edit_message_producer,
 )
 from chat.openapi import (
     chats_list_query_params
@@ -177,5 +179,29 @@ class GetChatsList(GenericAPIView):
             offset=query.get("offset"),
             page=query.get("page"),
             search=query.get("search")
+        )
+        return Response({"request_id": unique_request_id}, HTTP_200_OK)
+
+
+class EditChatMessage(GenericAPIView):
+    """
+    Edit chat message
+
+    This endpoint allows the creator of a
+    chat to remove another user from the chat
+    """
+
+    serializer_class: Type[Serializer] = EditChatMessageSerializer
+
+    def post(self, request: Request) -> Response:
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        unique_request_id: str = generate_unique_request_id()
+
+        edit_message_producer.delay(
+            message_id=serializer.validated_data["message_id"],
+            user_id=request.user.id,
+            request_id=unique_request_id,
+            new_data=serializer.validated_data["new_data"],
         )
         return Response({"request_id": unique_request_id}, HTTP_200_OK)
