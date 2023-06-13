@@ -16,3 +16,7 @@ edit_message
 edit_message_response
 get_chat_messages_list
 get_chat_messages_list_response
+read_or_unread_messages
+read_or_unread_messages_response
+delete_messages
+delete_messages_response

@@ -58,6 +58,18 @@ from chat.tasks.get_chat_messages_list import (
 from chat.tasks.get_chat_messages_list import (
     get_chat_messages_list_response_consumer as get_chat_messages_list_response_consumer
 )
+from chat.tasks.read_or_unread_messages import (
+    read_or_unread_messages_producer as read_or_unread_messages_producer
+)
+from chat.tasks.read_or_unread_messages import (
+    read_or_unread_messages_response_consumer as read_or_unread_messages_response_consumer
+)
+from chat.tasks.delete_messages import (
+    delete_messages_producer as delete_messages_producer
+)
+from chat.tasks.delete_messages import (
+    delete_messages_response_consumer as delete_messages_response_consumer
+)
 
 
 ALL_CONSUMER_TASKS = [
@@ -71,4 +83,6 @@ ALL_CONSUMER_TASKS = [
     get_chats_list_response_consumer,
     edit_message_response_consumer,
     get_chat_messages_list_response_consumer,
+    read_or_unread_messages_response_consumer,
+    delete_messages_response_consumer,
 ]

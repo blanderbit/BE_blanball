@@ -1,33 +1,19 @@
 from typing import Any, List, Union
 
 from authentication.models import User
-from chat.constants.errors import (
-    CHAT_ID_AND_USER_ID_CANT_BE_PROVIDED_AT_ONCE_ERROR,
-    CHAT_ID_OR_USER_ID_MUST_BE_PROVIDED_ERROR,
-)
-from config.exceptions import _404
 from rest_framework.serializers import (
-    BooleanField,
     CharField,
-    EmailField,
     IntegerField,
     ListField,
     Serializer,
-    SerializerMethodField,
     ValidationError,
-)
-from rest_framework.status import (
-    HTTP_400_BAD_REQUEST,
+    ChoiceField,
 )
 
-
-class CreatePersonalChatSerializer(Serializer):
-
-    name: str = CharField(max_length=255)
-    user: int = IntegerField(min_value=1)
-
-    class Meta:
-        fields: Union[str, list[str]] = ["name", "user"]
+EVENT_TYPE_CHOICES: tuple[tuple[str]] = (
+    ('read', 'read'),
+    ('unread', 'unread')
+)
 
 
 class CreateGroupChatSerializer(Serializer):
@@ -114,3 +100,18 @@ class EditChatMessageSerializer(Serializer):
 
     class Meta:
         fields: Union[str, list[str]] = ["message_id", "new_data"]
+
+
+class ReadOrUnreadMessagesSerializer(Serializer):
+    message_ids: list[int] = ListField(child=IntegerField(min_value=0))
+    action: str = ChoiceField(choices=EVENT_TYPE_CHOICES)
+
+    class Meta:
+        fields: Union[str, list[str]] = ["message_ids", "action"]
+
+
+class DeleteMessagesSerializer(Serializer):
+    message_ids: list[int] = ListField(child=IntegerField(min_value=0))
+
+    class Meta:
+        fields: Union[str, list[str]] = ["message_ids"]

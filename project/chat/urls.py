@@ -9,6 +9,8 @@ from chat.views import (
     GetChatsList,
     EditChatMessage,
     GetChatMessagesList,
+    ReadOrUnreadMessages,
+    DeleteChatMessages,
 )
 from django.urls import path
 from django.urls.resolvers import (
@@ -31,4 +33,6 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     path("client/get/chats/list", GetChatsList.as_view(), name="get-chat-lists"),
     path("client/edit/chat/message", EditChatMessage.as_view(), name="edit-chat-message"),
     path("client/chat/messages/list/<int:pk>", GetChatMessagesList.as_view(), name="chat-messages-list"),
+    path("client/read/or/unread/messages", ReadOrUnreadMessages.as_view(), name="read-or-unread-messages"),
+    path("client/delete/chat/messages", DeleteChatMessages.as_view(), name="delete-chat-messages"),
 ]

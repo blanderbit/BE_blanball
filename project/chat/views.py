@@ -3,11 +3,12 @@ from typing import Type, Any
 from chat.serializers import (
     CreateGroupChatSerializer,
     CreateMessageSerializer,
-    CreatePersonalChatSerializer,
     DeleteChatSerializer,
     EditChatSerializer,
+    ReadOrUnreadMessagesSerializer,
     EditChatMessageSerializer,
     RemoveUserFromChatSerializer,
+    DeleteMessagesSerializer,
 )
 from chat.tasks import (
     create_chat_producer,
@@ -17,7 +18,9 @@ from chat.tasks import (
     get_chats_list_producer,
     remove_user_from_chat_producer,
     edit_message_producer,
+    read_or_unread_messages_producer,
     get_chat_messages_list_producer,
+    delete_messages_producer,
 )
 from chat.openapi import (
     chats_list_query_params
@@ -42,8 +45,8 @@ class CreateGroupChat(GenericAPIView):
     """
     Create group chat
 
-    This endpoint allows the user to create
-    a group chat and invite other users there.
+    This endpoint allows the 
+    user to create a group chat.
     """
 
     serializer_class: Type[Serializer] = CreateGroupChatSerializer
@@ -66,8 +69,8 @@ class CreateMessage(GenericAPIView):
     """
     Create message
 
-    This endpoint allows the user to create
-    a group chat and invite other users there.
+    This endpoint allows the user to create a 
+    message in the chat if he is a member of it.
     """
 
     serializer_class: Type[Serializer] = CreateMessageSerializer
@@ -90,8 +93,8 @@ class RemoveUserFromChat(GenericAPIView):
     """
     Remove user from chat
 
-    This endpoint allows the creator of a
-    chat to remove another user from the chat
+    This endpoint allows the user to remove other 
+    users from the chat if he is the author or admin.
     """
 
     serializer_class: Type[Serializer] = RemoveUserFromChatSerializer
@@ -114,8 +117,8 @@ class DeleteChat(GenericAPIView):
     """
     Delete chat
 
-    This endpoint allows the creator of a
-    chat to remove another user from the chat
+    This endpoint allows the user to delete 
+    the chat if he is its author or admin.
     """
 
     serializer_class: Type[Serializer] = DeleteChatSerializer
@@ -137,8 +140,8 @@ class EditChat(GenericAPIView):
     """
     Edit chat
 
-    This endpoint allows the creator of a
-    chat to remove another user from the chat
+    This endpoint allows the user 
+    to edit the chat data.
     """
 
     serializer_class: Type[Serializer] = EditChatSerializer
@@ -165,8 +168,8 @@ class GetChatsList(GenericAPIView):
     """
     Get my chats list
 
-    This endpoint allows the creator of a
-    chat to remove another user from the chat
+    This endpoint allows the user to get a 
+    list of chats in which he is a member.
     """
 
     def get(self, request: Request) -> Response:
@@ -192,8 +195,8 @@ class GetChatMessagesList(GenericAPIView):
     """
     Get messages list of certain chat
 
-    This endpoint allows the creator of a
-    chat to remove another user from the chat
+    This endpoint allows the user to get a 
+    list of messages in the chat they are members of.
     """
 
     def get(self, request: Request, pk: int) -> Response:
@@ -216,8 +219,8 @@ class EditChatMessage(GenericAPIView):
     """
     Edit chat message
 
-    This endpoint allows the creator of a
-    chat to remove another user from the chat
+    This endpoint allows the user to edit a 
+    previously sent chat message.
     """
 
     serializer_class: Type[Serializer] = EditChatMessageSerializer
@@ -232,5 +235,52 @@ class EditChatMessage(GenericAPIView):
             user_id=request.user.id,
             request_id=unique_request_id,
             new_data=serializer.validated_data["new_data"],
+        )
+        return Response({"request_id": unique_request_id}, HTTP_200_OK)
+
+
+class ReadOrUnreadMessages(GenericAPIView):
+    """
+    Read or Unread messages
+
+    This endpoint allows the user to mark 
+    messages as read or, conversely, as unread.
+    """
+
+    serializer_class: Type[Serializer] = ReadOrUnreadMessagesSerializer
+
+    def post(self, request: Request) -> Response:
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        unique_request_id: str = generate_unique_request_id()
+
+        read_or_unread_messages_producer.delay(
+            message_ids=serializer.validated_data["message_ids"],
+            user_id=request.user.id,
+            request_id=unique_request_id,
+            action=serializer.validated_data["action"],
+        )
+        return Response({"request_id": unique_request_id}, HTTP_200_OK)
+
+
+class DeleteChatMessages(GenericAPIView):
+    """
+    Delete chat messages
+
+    This endpoint allows the user to delete 
+    messages in a chat that he previously sent.
+    """
+
+    serializer_class: Type[Serializer] = DeleteMessagesSerializer
+
+    def post(self, request: Request) -> Response:
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        unique_request_id: str = generate_unique_request_id()
+
+        delete_messages_producer.delay(
+            message_ids=serializer.validated_data["message_ids"],
+            user_id=request.user.id,
+            request_id=unique_request_id,
         )
         return Response({"request_id": unique_request_id}, HTTP_200_OK)

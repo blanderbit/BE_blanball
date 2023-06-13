@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Union
+from typing import Any, Union, Optional
 
 from asgiref.sync import async_to_sync
 from authentication.models import User
@@ -20,13 +20,18 @@ from notifications.models import Notification
     soft_time_limit=3,
     default_retry_delay=5,
 )
-def send(user: User, data: dict[str, Any]) -> None:
-    async_to_sync(get_channel_layer().group_send)(user.group_name, data)
+def send(data: dict[str, Any], user: Optional[User] = None, group_name: Optional[str] = None) -> None:
+    group_name_to_send: str = ''
+    if user:
+        group_name_to_send = user.group_name
+    elif group_name:
+        group_name_to_send = group_name
+    async_to_sync(get_channel_layer().group_send)(group_name_to_send, data)
 
 
 def send_to_user(
-    user: User,
     message_type: str,
+    user: User,
     data: dict[str, Union[str, int, datetime, bool]] = None,
 ) -> None:
     notification = Notification.objects.create(
@@ -45,16 +50,58 @@ def send_to_user(
     )
 
 
+def send_to_group_by_group_name(
+    message_type: str,
+    group_name: str,
+    data: dict[str, Union[str, int, datetime, bool]] = None,
+) -> None:
+    send(
+        group_name=group_name,
+        data={
+            "type": "kafka.message",
+            "message": {
+                "message_type": message_type,
+                "data": data,
+            },
+        },
+    )
+
+
+def send_to_chat_layer(
+    message_type: str,
+    user_id: int,
+    data: dict[str, Union[str, int, datetime, bool]] = None,
+) -> None:
+
+    group_name_to_send: str = f"chat_user_{user_id}"
+
+    send(
+        group_name=group_name_to_send,
+        data={
+            "type": "chat.action.message",
+            "message": {
+                "message_type": message_type,
+                "data": data,
+            },
+        },
+    )
+
+
 def send_to_general_layer(
     message_type: str,
     data: dict[str, Union[str, int, datetime, bool]] = None,
 ) -> None:
 
-    async_to_sync(get_channel_layer().group_send)(
-        "general",
-        {
+    group_name_to_send: str = "general"
+
+    send(
+        group_name=group_name_to_send,
+        data={
             "type": "general.message",
-            "message": {"message_type": message_type, "data": data},
+            "message": {
+                "message_type": message_type,
+                "data": data,
+            },
         },
     )
 
