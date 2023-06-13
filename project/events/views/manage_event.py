@@ -5,6 +5,10 @@ from django.db.models.query import QuerySet
 from events.constants.success import (
     EVENT_UPDATE_SUCCESS,
 )
+from events.decorators import (
+    not_in_black_list,
+    only_author,
+)
 from events.models import Event
 from events.serializers import (
     CreateEventSerializer,
@@ -18,10 +22,6 @@ from events.services import (
     bulk_unpin_events,
     event_create,
     update_event,
-)
-from events.decorators import (
-    not_in_black_list,
-    only_author,
 )
 from rest_framework.generics import GenericAPIView
 from rest_framework.mixins import (

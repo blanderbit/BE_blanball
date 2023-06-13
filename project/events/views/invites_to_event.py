@@ -16,6 +16,7 @@ from django.utils.decorators import (
     method_decorator,
 )
 from drf_yasg.utils import swagger_auto_schema
+from events.decorators import not_in_black_list
 from events.models import (
     Event,
     InviteToEvent,
@@ -31,9 +32,6 @@ from events.services import (
     bulk_accept_or_decline_invites_to_events,
     bulk_accpet_or_decline_requests_to_participation,
     invite_users_to_event,
-)
-from events.decorators import (
-    not_in_black_list
 )
 from rest_framework.generics import (
     GenericAPIView,

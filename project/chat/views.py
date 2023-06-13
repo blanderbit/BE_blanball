@@ -1,29 +1,27 @@
-from typing import Type, Any
+from typing import Any, Type
 
+from chat.openapi import chats_list_query_params
 from chat.serializers import (
     CreateGroupChatSerializer,
     CreateMessageSerializer,
     DeleteChatSerializer,
+    DeleteMessagesSerializer,
+    EditChatMessageSerializer,
     EditChatSerializer,
     ReadOrUnreadMessagesSerializer,
-    EditChatMessageSerializer,
     RemoveUserFromChatSerializer,
-    DeleteMessagesSerializer,
 )
 from chat.tasks import (
     create_chat_producer,
     create_message_producer,
     delete_chat_producer,
-    edit_chat_producer,
-    get_chats_list_producer,
-    remove_user_from_chat_producer,
-    edit_message_producer,
-    read_or_unread_messages_producer,
-    get_chat_messages_list_producer,
     delete_messages_producer,
-)
-from chat.openapi import (
-    chats_list_query_params
+    edit_chat_producer,
+    edit_message_producer,
+    get_chat_messages_list_producer,
+    get_chats_list_producer,
+    read_or_unread_messages_producer,
+    remove_user_from_chat_producer,
 )
 from django.utils.decorators import (
     method_decorator,
@@ -45,7 +43,7 @@ class CreateGroupChat(GenericAPIView):
     """
     Create group chat
 
-    This endpoint allows the 
+    This endpoint allows the
     user to create a group chat.
     """
 
@@ -69,7 +67,7 @@ class CreateMessage(GenericAPIView):
     """
     Create message
 
-    This endpoint allows the user to create a 
+    This endpoint allows the user to create a
     message in the chat if he is a member of it.
     """
 
@@ -83,7 +81,7 @@ class CreateMessage(GenericAPIView):
             text=serializer.validated_data["text"],
             chat_id=serializer.validated_data["chat_id"],
             user_id=request.user.id,
-            request_id=unique_request_id
+            request_id=unique_request_id,
         )
         return Response({"request_id": unique_request_id}, HTTP_200_OK)
 
@@ -93,7 +91,7 @@ class RemoveUserFromChat(GenericAPIView):
     """
     Remove user from chat
 
-    This endpoint allows the user to remove other 
+    This endpoint allows the user to remove other
     users from the chat if he is the author or admin.
     """
 
@@ -117,7 +115,7 @@ class DeleteChat(GenericAPIView):
     """
     Delete chat
 
-    This endpoint allows the user to delete 
+    This endpoint allows the user to delete
     the chat if he is its author or admin.
     """
 
@@ -140,7 +138,7 @@ class EditChat(GenericAPIView):
     """
     Edit chat
 
-    This endpoint allows the user 
+    This endpoint allows the user
     to edit the chat data.
     """
 
@@ -168,7 +166,7 @@ class GetChatsList(GenericAPIView):
     """
     Get my chats list
 
-    This endpoint allows the user to get a 
+    This endpoint allows the user to get a
     list of chats in which he is a member.
     """
 
@@ -182,7 +180,7 @@ class GetChatsList(GenericAPIView):
             request_id=unique_request_id,
             offset=query.get("offset"),
             page=query.get("page"),
-            search=query.get("search")
+            search=query.get("search"),
         )
         return Response({"request_id": unique_request_id}, HTTP_200_OK)
 
@@ -195,7 +193,7 @@ class GetChatMessagesList(GenericAPIView):
     """
     Get messages list of certain chat
 
-    This endpoint allows the user to get a 
+    This endpoint allows the user to get a
     list of messages in the chat they are members of.
     """
 
@@ -210,7 +208,7 @@ class GetChatMessagesList(GenericAPIView):
             request_id=unique_request_id,
             offset=query.get("offset"),
             page=query.get("page"),
-            search=query.get("search")
+            search=query.get("search"),
         )
         return Response({"request_id": unique_request_id}, HTTP_200_OK)
 
@@ -219,7 +217,7 @@ class EditChatMessage(GenericAPIView):
     """
     Edit chat message
 
-    This endpoint allows the user to edit a 
+    This endpoint allows the user to edit a
     previously sent chat message.
     """
 
@@ -243,7 +241,7 @@ class ReadOrUnreadMessages(GenericAPIView):
     """
     Read or Unread messages
 
-    This endpoint allows the user to mark 
+    This endpoint allows the user to mark
     messages as read or, conversely, as unread.
     """
 
@@ -267,7 +265,7 @@ class DeleteChatMessages(GenericAPIView):
     """
     Delete chat messages
 
-    This endpoint allows the user to delete 
+    This endpoint allows the user to delete
     messages in a chat that he previously sent.
     """
 

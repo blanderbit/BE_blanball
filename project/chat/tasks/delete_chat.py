@@ -1,11 +1,9 @@
-from typing import Optional, Any
+from typing import Any, Optional
 
 from config.celery import celery
 from django.conf import settings
 from kafka import KafkaConsumer, KafkaProducer
-from notifications.tasks import (
-    send_to_chat_layer
-)
+from notifications.tasks import send_to_chat_layer
 
 TOPIC_NAME: str = "delete_chat"
 RESPONSE_TOPIC_NAME: str = "delete_chat_response"
@@ -49,7 +47,7 @@ def delete_chat_response_consumer() -> None:
                     message_type=message_type,
                     data={
                         "chat_id": all_recieved_data["chat_id"],
-                    }
+                    },
                 )
         except Exception:
             pass

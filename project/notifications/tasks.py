@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Union, Optional
+from typing import Any, Optional, Union
 
 from asgiref.sync import async_to_sync
 from authentication.models import User
@@ -20,8 +20,10 @@ from notifications.models import Notification
     soft_time_limit=3,
     default_retry_delay=5,
 )
-def send(data: dict[str, Any], user: Optional[User] = None, group_name: Optional[str] = None) -> None:
-    group_name_to_send: str = ''
+def send(
+    data: dict[str, Any], user: Optional[User] = None, group_name: Optional[str] = None
+) -> None:
+    group_name_to_send: str = ""
     if user:
         group_name_to_send = user.group_name
     elif group_name:

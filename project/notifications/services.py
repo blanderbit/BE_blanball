@@ -12,10 +12,10 @@ from notifications.constants.notification_types import (
     NOTIFICATIONS_BULK_DELETE_NOTIFICATION_TYPE,
     NOTIFICATIONS_BULK_READ_NOTIFICATION_TYPE,
 )
-from notifications.models import Notification
 from notifications.decorators import (
-    send_message_after_bulk_method
+    send_message_after_bulk_method,
 )
+from notifications.models import Notification
 from notifications.tasks import (
     send_to_general_layer,
 )

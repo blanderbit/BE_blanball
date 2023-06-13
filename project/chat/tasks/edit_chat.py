@@ -3,9 +3,7 @@ from typing import Any, Optional
 from config.celery import celery
 from django.conf import settings
 from kafka import KafkaConsumer, KafkaProducer
-from notifications.tasks import (
-    send_to_chat_layer
-)
+from notifications.tasks import send_to_chat_layer
 
 TOPIC_NAME: str = "edit_chat"
 RESPONSE_TOPIC_NAME: str = "edit_chat_response"
@@ -51,8 +49,8 @@ def edit_chat_response_consumer() -> None:
                     message_type=message_type,
                     data={
                         "chat_id": all_recieved_data["chat_id"],
-                        "chat_new_data": all_recieved_data["new_data"]
-                    }
+                        "chat_new_data": all_recieved_data["new_data"],
+                    },
                 )
         except Exception:
             pass

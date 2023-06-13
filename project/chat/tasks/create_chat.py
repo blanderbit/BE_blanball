@@ -1,11 +1,9 @@
-from typing import Optional, Any
+from typing import Any, Optional
 
 from config.celery import celery
 from django.conf import settings
 from kafka import KafkaConsumer, KafkaProducer
-from notifications.tasks import (
-    send_to_chat_layer
-)
+from notifications.tasks import send_to_chat_layer
 
 TOPIC_NAME: str = "create_chat"
 RESPONSE_TOPIC_NAME: str = "create_chat_response"
@@ -39,9 +37,7 @@ def create_chat_response_consumer() -> None:
                 send_to_chat_layer(
                     user_id=user["user_id"],
                     message_type=message_type,
-                    data={
-                        "chat_data": all_recieved_data["chat_data"]
-                    }
+                    data={"chat_data": all_recieved_data["chat_data"]},
                 )
         except Exception:
             pass

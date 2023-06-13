@@ -1,5 +1,6 @@
 from typing import Union
 
+from chat.consumers import UserChatConsumer
 from django.urls import path
 from django.urls.resolvers import (
     URLPattern,
@@ -8,9 +9,6 @@ from django.urls.resolvers import (
 from notifications.consumers import (
     GeneralConsumer,
     UserConsumer,
-)
-from chat.consumers import (
-    UserChatConsumer
 )
 
 websocket_urlpatterns: list[Union[URLResolver, URLPattern]] = [

@@ -1,9 +1,6 @@
-from typing import (
-    Any,
-)
-from events.models import (
-    Event,
-)
+from typing import Any
+
+from events.models import Event
 from rest_framework.exceptions import (
     PermissionDenied,
 )

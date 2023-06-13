@@ -1,5 +1,6 @@
 import json
 from typing import Any, Literal, Optional
+
 from authentication.models import User
 from channels.db import database_sync_to_async
 from channels.generic.websocket import (

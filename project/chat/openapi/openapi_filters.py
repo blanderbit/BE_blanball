@@ -1,11 +1,9 @@
+from chat.filters import CHATS_LIST_SEARCH_FIELDS
 from config.openapi import (
     concat_search_fields,
     offset_query,
 )
 from drf_yasg import openapi
-from chat.filters import (
-    CHATS_LIST_SEARCH_FIELDS,
-)
 
 chats_searh_query = openapi.Parameter(
     "search",

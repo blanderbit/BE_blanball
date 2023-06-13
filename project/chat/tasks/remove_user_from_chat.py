@@ -3,9 +3,7 @@ from typing import Any, Optional
 from config.celery import celery
 from django.conf import settings
 from kafka import KafkaConsumer, KafkaProducer
-from notifications.tasks import (
-    send_to_chat_layer
-)
+from notifications.tasks import send_to_chat_layer
 
 TOPIC_NAME: str = "remove_user_from_chat"
 RESPONSE_TOPIC_NAME: str = "remove_user_from_chat_response"
@@ -53,8 +51,8 @@ def remove_user_from_chat_response_consumer() -> None:
                         "chat_id": all_recieved_data["chat_id"],
                         "removed_user": {
                             "id": all_recieved_data["removed_user"],
-                        }
-                    }
+                        },
+                    },
                 )
         except Exception:
             pass

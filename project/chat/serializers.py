@@ -3,17 +3,14 @@ from typing import Any, List, Union
 from authentication.models import User
 from rest_framework.serializers import (
     CharField,
+    ChoiceField,
     IntegerField,
     ListField,
     Serializer,
     ValidationError,
-    ChoiceField,
 )
 
-EVENT_TYPE_CHOICES: tuple[tuple[str]] = (
-    ('read', 'read'),
-    ('unread', 'unread')
-)
+EVENT_TYPE_CHOICES: tuple[tuple[str]] = (("read", "read"), ("unread", "unread"))
 
 
 class CreateGroupChatSerializer(Serializer):

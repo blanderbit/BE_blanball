@@ -1,7 +1,5 @@
-from typing import (
-    Any,
-    Callable,
-)
+from typing import Any, Callable
+
 from config.exceptions import _404
 from rest_framework.exceptions import (
     PermissionDenied,

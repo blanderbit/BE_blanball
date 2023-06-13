@@ -1,11 +1,6 @@
-from typing import (
-    Any,
-    Callable,
-)
+from typing import Any, Callable
 
-from notifications.tasks import (
-    send,
-)
+from notifications.tasks import send
 
 
 def send_message_after_bulk_method(message_type: str) -> ...:

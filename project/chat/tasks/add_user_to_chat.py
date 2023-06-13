@@ -1,14 +1,10 @@
 from typing import Any
 
+from authentication.models import User
 from config.celery import celery
 from django.conf import settings
 from kafka import KafkaConsumer, KafkaProducer
-from notifications.tasks import (
-    send_to_chat_layer
-)
-from authentication.models import (
-    User
-)
+from notifications.tasks import send_to_chat_layer
 
 TOPIC_NAME: str = "add_user_to_chat"
 RESPONSE_TOPIC_NAME: str = "add_user_to_chat_response"
@@ -43,9 +39,9 @@ def add_user_to_chat_response_consumer() -> None:
                             "id": new_user.id,
                             "name": new_user.profile.name,
                             "last_name": new_user.profile.last_name,
-                            "avatar": new_user.profile.avatar_url
-                        }
-                    }
+                            "avatar": new_user.profile.avatar_url,
+                        },
+                    },
                 )
         except Exception:
             pass

@@ -1,31 +1,41 @@
-from typing import Any, Optional
-
 from config.celery import celery
 from django.conf import settings
 from kafka import KafkaConsumer, KafkaProducer
 
-TOPIC_NAME: str = "read_or_unread_messages"
-RESPONSE_TOPIC_NAME: str = "read_or_unread_messages_response"
+TOPIC_NAME: str = "get_chat_users_list"
+RESPONSE_TOPIC_NAME: str = "get_chat_users_list_response"
 
 
 @celery.task
-def read_or_unread_messages_producer(
-    *, message_ids: int, request_id: Optional[str] = None, action: str, user_id: int
+def get_chat_users_list_producer(
+    *,
+    request_id: str,
+    user_id: int,
+    chat_id: int,
+    page: int = 1,
+    offset: int = 10,
 ) -> str:
+
+    if page is None:
+        page = 1
+    if offset is None:
+        offset = 10
+
     producer: KafkaProducer = KafkaProducer(**settings.KAFKA_PRODUCER_CONFIG)
     producer.send(
         TOPIC_NAME,
         value={
-            "message_ids": message_ids,
             "user_id": user_id,
+            "chat_id": chat_id,
             "request_id": request_id,
-            "action": action,
+            "page": page,
+            "offset": offset,
         },
     )
     producer.flush()
 
 
-def read_or_unread_messages_response_consumer() -> None:
+def get_chat_users_list_response_consumer() -> None:
 
     consumer: KafkaConsumer = KafkaConsumer(
         RESPONSE_TOPIC_NAME, **settings.KAFKA_CONSUMER_CONFIG

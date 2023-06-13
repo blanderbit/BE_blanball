@@ -20,3 +20,5 @@ read_or_unread_messages
 read_or_unread_messages_response
 delete_messages
 delete_messages_response
+get_chat_users_list
+get_chat_users_list_response

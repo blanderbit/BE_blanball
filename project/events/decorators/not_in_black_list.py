@@ -1,11 +1,7 @@
-from typing import (
-    Any,
-    Callable,
-)
+from typing import Any, Callable
+
 from config.exceptions import _404
-from events.models import (
-    Event,
-)
+from events.models import Event
 from rest_framework.exceptions import (
     PermissionDenied,
 )

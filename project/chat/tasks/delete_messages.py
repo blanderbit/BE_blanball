@@ -3,9 +3,7 @@ from typing import Any, Optional
 from config.celery import celery
 from django.conf import settings
 from kafka import KafkaConsumer, KafkaProducer
-from notifications.tasks import (
-    send_to_chat_layer
-)
+from notifications.tasks import send_to_chat_layer
 
 TOPIC_NAME: str = "delete_messages"
 RESPONSE_TOPIC_NAME: str = "delete_messages_response"
@@ -13,10 +11,7 @@ RESPONSE_TOPIC_NAME: str = "delete_messages_response"
 
 @celery.task
 def delete_messages_producer(
-    *,
-    message_ids: int,
-    request_id: Optional[str] = None,
-    user_id: int
+    *, message_ids: int, request_id: Optional[str] = None, user_id: int
 ) -> str:
     producer: KafkaProducer = KafkaProducer(**settings.KAFKA_PRODUCER_CONFIG)
     producer.send(
@@ -46,6 +41,6 @@ def delete_messages_response_consumer() -> None:
                 message_type=message_type,
                 data={
                     "chat_id": all_recieved_data["chat_id"],
-                    "message": all_recieved_data["message_data"]
-                }
+                    "message": all_recieved_data["message_data"],
+                },
             )
