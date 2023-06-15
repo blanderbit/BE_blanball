@@ -76,6 +76,12 @@ from chat.tasks.get_chat_users_list import (
 from chat.tasks.get_chat_users_list import (
     get_chat_users_list_response_consumer as get_chat_users_list_response_consumer
 )
+from chat.tasks.set_chat_admin import (
+    set_chat_admin_producer as set_chat_admin_producer
+)
+from chat.tasks.set_chat_admin import (
+    set_chat_admin_response_consumer as set_chat_admin_response_consumer
+)
 
 
 ALL_CONSUMER_TASKS = [
@@ -92,4 +98,5 @@ ALL_CONSUMER_TASKS = [
     read_or_unread_messages_response_consumer,
     delete_messages_response_consumer,
     get_chat_users_list_response_consumer,
+    set_chat_admin_response_consumer,
 ]

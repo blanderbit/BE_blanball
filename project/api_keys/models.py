@@ -21,10 +21,13 @@ from rest_framework.status import (
 @final
 class ApiKey(models.Model):
     value: str = models.CharField(
-        max_length=settings.API_KEY_MAX_LENGTH, null=True, unique=True
+        max_length=settings.API_KEY_MAX_LENGTH, null=True, unique=True,
+        db_index=True
     )
     created_at: datetime = models.DateTimeField(auto_now_add=True)
-    expire_time: Optional[datetime] = models.DateTimeField(null=True)
+    expire_time: Optional[datetime] = models.DateTimeField(
+        null=True, db_index=True
+    )
     name: str = models.CharField(max_length=55, unique=True)
 
     def get_only_active() -> QuerySet["ApiKey"]:

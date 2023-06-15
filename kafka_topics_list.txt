@@ -22,3 +22,5 @@ delete_messages
 delete_messages_response
 get_chat_users_list
 get_chat_users_list_response
+set_chat_admin
+set_chat_admin_response

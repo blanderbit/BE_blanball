@@ -12,13 +12,16 @@ class Notification(models.Model):
         UNREAD: str = "Unread"
         READ: str = "Read"
 
-    user: User = models.ForeignKey(User, on_delete=models.CASCADE)
+    user: User = models.ForeignKey(
+        User, on_delete=models.CASCADE, db_index=True
+    )
     type: str = models.CharField(
-        choices=Type.choices, max_length=6, default=Type.UNREAD
+        choices=Type.choices, max_length=6, default=Type.UNREAD,
+        db_index=True
     )
     time_created: datetime = models.DateTimeField(auto_now_add=True)
     message_type: str = models.CharField(max_length=100)
-    data: dict[str, Any] = models.JSONField()
+    data: dict[str, Any] = models.JSONField(db_index=True)
 
     def __repr__(self) -> str:
         return "<Notification %s>" % self.id

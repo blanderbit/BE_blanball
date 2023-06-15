@@ -71,7 +71,7 @@ class Event(models.Model):
         MINUTES_180: int = 180
 
     author: User = models.ForeignKey(User, on_delete=models.CASCADE)
-    name: str = models.CharField(max_length=255)
+    name: str = models.CharField(max_length=255, db_index=True)
     description: str = models.TextField()
     place: dict[str, Union[str, float]] = models.JSONField()
     gender: str = models.CharField(choices=Gender.choices, max_length=10)
@@ -88,7 +88,7 @@ class Event(models.Model):
     price_description: Optional[str] = models.CharField(max_length=265, null=True)
     need_form: bool = models.BooleanField()
     privacy: bool = models.BooleanField()
-    pinned: bool = models.BooleanField(default=False)
+    pinned: bool = models.BooleanField(default=False, db_index=True)
     hidden: bool = models.BooleanField(default=False)
     duration: int = models.PositiveSmallIntegerField(choices=Duration.choices)
     forms: str = models.JSONField(null=True)
@@ -96,13 +96,13 @@ class Event(models.Model):
         choices=Status.choices, max_length=10, default=Status.PLANNED
     )
     current_users: list[Optional[User]] = models.ManyToManyField(
-        User, related_name="current_rooms", blank=True
+        User, related_name="current_rooms", blank=True, db_index=True
     )
     current_fans: list[Optional[User]] = models.ManyToManyField(
-        User, related_name="current_views_rooms", blank=True
+        User, related_name="current_views_rooms", blank=True, db_index=True
     )
     black_list: list[Optional[User]] = models.ManyToManyField(
-        User, related_name="black_list", blank=True
+        User, related_name="black_list", blank=True, db_index=True
     )
     coordinates: Point = PointField(null=True, srid=4326)
 

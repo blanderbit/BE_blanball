@@ -127,8 +127,8 @@ class Profile(models.Model):
         LEFT: str = "Left"
         RIGHT: str = "Right"
 
-    name: str = models.CharField(max_length=20)
-    last_name: str = models.CharField(max_length=20)
+    name: str = models.CharField(max_length=20, db_index=True)
+    last_name: str = models.CharField(max_length=20, db_index=True)
     gender: Optional[str] = models.CharField(
         choices=Gender.choices, max_length=10, null=True
     )
@@ -161,7 +161,7 @@ class Profile(models.Model):
     working_leg: Optional[str] = models.CharField(
         choices=Leg.choices, max_length=255, null=True
     )
-    place: Optional[dict[str, Union[str, float]]] = models.JSONField(null=True)
+    place: Optional[dict[str, Union[str, float]]] = models.JSONField(null=True, db_index=True)
     coordinates: Optional[Point] = PointField(null=True, srid=4326)
 
     def __repr__(self) -> str:
@@ -220,7 +220,7 @@ class User(AbstractBaseUser):
     email: str = models.EmailField(max_length=255, unique=True, db_index=True)
     phone: str = PhoneNumberField(unique=True)
     is_verified: bool = models.BooleanField(default=False)
-    is_online: bool = models.BooleanField(default=False)
+    is_online: bool = models.BooleanField(default=False, db_index=True)
     get_planned_events: str = models.CharField(max_length=10, default="1m")
     role: str = models.CharField(choices=Role.choices, max_length=10, null=True)
     updated_at: str = models.DateTimeField(auto_now=True)

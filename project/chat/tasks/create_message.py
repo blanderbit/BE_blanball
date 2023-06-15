@@ -13,16 +13,20 @@ RESPONSE_TOPIC_NAME: str = "create_message_response"
 
 @celery.task
 def create_message_producer(
-    *, text: str, user_id: int, chat_id: int, request_id: str
+    *,
+    data: dict[str, Any],
+    user_id: int,
+    request_id: str,
 ) -> str:
     producer: KafkaProducer = KafkaProducer(**settings.KAFKA_PRODUCER_CONFIG)
     producer.send(
         TOPIC_NAME,
         value={
-            "text": text,
+            "text": data.get("text"),
             "user_id": user_id,
-            "chat_id": chat_id,
+            "chat_id": data.get("chat_id"),
             "request_id": request_id,
+            "reply_to_message_id": data.get("reply_to_message_id"),
         },
     )
     producer.flush()

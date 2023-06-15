@@ -14,7 +14,8 @@ from events.models import Event
 @final
 class Review(models.Model):
     author: User = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="author"
+        User, on_delete=models.CASCADE, related_name="author",
+        db_index=True
     )
     text: str = models.CharField(max_length=200)
     time_created: datetime = models.DateTimeField(auto_now_add=True)
@@ -25,7 +26,8 @@ class Review(models.Model):
         ]
     )
     user: User = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="reviews"
+        User, on_delete=models.CASCADE, related_name="reviews",
+        db_index=True
     )
 
     def __repr__(self) -> str:
