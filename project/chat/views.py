@@ -1,6 +1,9 @@
 from typing import Any, Type
 
-from chat.openapi import chats_list_query_params
+from chat.openapi import (
+    chats_list_query_params,
+    chat_users_list_query_params
+)
 from chat.serializers import (
     CreateGroupChatSerializer,
     CreateMessageSerializer,
@@ -9,6 +12,7 @@ from chat.serializers import (
     EditChatMessageSerializer,
     EditChatSerializer,
     ReadOrUnreadMessagesSerializer,
+    SetChatAdminSerializer,
     RemoveUserFromChatSerializer,
 )
 from chat.tasks import (
@@ -22,6 +26,8 @@ from chat.tasks import (
     get_chats_list_producer,
     read_or_unread_messages_producer,
     remove_user_from_chat_producer,
+    set_or_unset_chat_admin_producer,
+    get_chat_users_list_producer,
 )
 from django.utils.decorators import (
     method_decorator,
@@ -212,6 +218,33 @@ class GetChatMessagesList(GenericAPIView):
         return Response({"request_id": unique_request_id}, HTTP_200_OK)
 
 
+@method_decorator(
+    swagger_auto_schema(manual_parameters=chat_users_list_query_params),
+    name="get",
+)
+class GetChatUsersList(GenericAPIView):
+    """
+    Get users list of certain chat
+
+    This endpoint allows the user to get a
+    list of users in the chat they are members of.
+    """
+
+    def get(self, request: Request, pk: int) -> Response:
+        unique_request_id: str = generate_unique_request_id()
+
+        query: dict[str, Any] = request.query_params
+
+        get_chat_users_list_producer.delay(
+            user_id=request.user.id,
+            chat_id=pk,
+            request_id=unique_request_id,
+            offset=query.get("offset"),
+            page=query.get("page"),
+        )
+        return Response({"request_id": unique_request_id}, HTTP_200_OK)
+
+
 class EditChatMessage(GenericAPIView):
     """
     Edit chat message
@@ -278,6 +311,29 @@ class DeleteChatMessages(GenericAPIView):
         delete_messages_producer.delay(
             message_ids=serializer.validated_data["message_ids"],
             user_id=request.user.id,
+            request_id=unique_request_id,
+        )
+        return Response({"request_id": unique_request_id}, HTTP_200_OK)
+
+
+class SetChatAdmin(GenericAPIView):
+    """
+    Set chat admin
+
+    This endpoint allows the user to delete
+    messages in a chat that he previously sent.
+    """
+
+    serializer_class: Type[Serializer] = SetChatAdminSerializer
+
+    def post(self, request: Request) -> Response:
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        unique_request_id: str = generate_unique_request_id()
+
+        set_or_unset_chat_admin_producer.delay(
+            data=serializer.validated_data,
+            author_id=request.user.id,
             request_id=unique_request_id,
         )
         return Response({"request_id": unique_request_id}, HTTP_200_OK)

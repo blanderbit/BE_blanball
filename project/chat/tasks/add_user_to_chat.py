@@ -27,7 +27,7 @@ def add_user_to_chat_response_consumer() -> None:
         try:
             all_recieved_data: dict[str, Any] = data.value["data"]
             message_type: str = data.value["message_type"]
-            users: list[dict[str, Any]] = data.value["data"]["users"]
+            users: list[dict[str, int]] = data.value["data"]["users"]
             new_user: User = User.objects.get(id=all_recieved_data["new_user"])
             for user in users:
                 send_to_chat_layer(

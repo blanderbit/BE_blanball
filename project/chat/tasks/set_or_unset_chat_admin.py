@@ -1,38 +1,36 @@
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 from config.celery import celery
 from django.conf import settings
 from kafka import KafkaConsumer, KafkaProducer
 from notifications.tasks import send_to_chat_layer
 
-TOPIC_NAME: str = "set_chat_admin"
-RESPONSE_TOPIC_NAME: str = "set_chat_admin_response"
+TOPIC_NAME: str = "set_or_unset_chat_admin_admin"
+RESPONSE_TOPIC_NAME: str = "set_or_unset_chat_admin_response"
 
 
 @celery.task
-def set_chat_admin_producer(
+def set_or_unset_chat_admin_producer(
     *,
-    user_id: int,
+    data: dict[str, Union[str, int]],
     request_id: str,
-    event_id: Optional[int] = None,
-    chat_id: Optional[int] = None,
-    sender_user_id: Optional[int] = None
+    author_id: int,
 ) -> None:
     producer: KafkaProducer = KafkaProducer(**settings.KAFKA_PRODUCER_CONFIG)
     producer.send(
         TOPIC_NAME,
         value={
-            "user_id": user_id,
-            "sender_user_id": sender_user_id,
-            "event_id": event_id,
-            "chat_id": chat_id,
+            "user_id": data["user_id"],
+            "action": data["action"],
+            "chat_id": data["chat_id"],
+            "author_id": author_id,
             "request_id": request_id,
         },
     )
     producer.flush()
 
 
-def set_chat_admin_response_consumer() -> None:
+def set_or_unset_chat_admin_response_consumer() -> None:
     consumer: KafkaConsumer = KafkaConsumer(
         RESPONSE_TOPIC_NAME, **settings.KAFKA_CONSUMER_CONFIG
     )
@@ -42,16 +40,14 @@ def set_chat_admin_response_consumer() -> None:
         try:
             all_recieved_data: dict[str, Any] = data.value["data"]
             message_type: str = data.value["message_type"]
-            users: list[dict[str, Any]] = data.value["data"]["users"]
+            users: list[dict[str, int]] = data.value["data"]["users"]
             for user in users:
                 send_to_chat_layer(
                     user_id=user,
                     message_type=message_type,
                     data={
                         "chat_id": all_recieved_data["chat_id"],
-                        "removed_user": {
-                            "id": all_recieved_data["removed_user"],
-                        },
+                        "new_admin_id": all_recieved_data["new_admin_id"]
                     },
                 )
         except Exception:

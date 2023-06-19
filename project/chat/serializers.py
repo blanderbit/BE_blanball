@@ -10,7 +10,8 @@ from rest_framework.serializers import (
     ValidationError,
 )
 
-EVENT_TYPE_CHOICES: tuple[tuple[str]] = (("read", "read"), ("unread", "unread"))
+READ_OR_UNREAD_MESSAGE_CHOICES: tuple[tuple[str]] = (("read", "read"), ("unread", "unread"))
+SER_OR_UNSET_ADMIM_CHOICES: tuple[tuple[str]] = (("read", "read"), ("unread", "unread"))
 
 
 class CreateGroupChatSerializer(Serializer):
@@ -106,7 +107,7 @@ class EditChatMessageSerializer(Serializer):
 
 class ReadOrUnreadMessagesSerializer(Serializer):
     message_ids: list[int] = ListField(child=IntegerField(min_value=0))
-    action: str = ChoiceField(choices=EVENT_TYPE_CHOICES)
+    action: str = ChoiceField(choices=READ_OR_UNREAD_MESSAGE_CHOICES)
 
     class Meta:
         fields: Union[str, list[str]] = ["message_ids", "action"]
@@ -117,3 +118,16 @@ class DeleteMessagesSerializer(Serializer):
 
     class Meta:
         fields: Union[str, list[str]] = ["message_ids"]
+
+
+class SetChatAdminSerializer(Serializer):
+    user_id: int = IntegerField(min_value=1)
+    chat_id: int = IntegerField(min_value=1)
+    action: str = ChoiceField(choices=SER_OR_UNSET_ADMIM_CHOICES)
+
+    class Meta:
+        fields: Union[str, list[str]] = [
+            "user_id",
+            "chat_id",
+            "action"
+        ]

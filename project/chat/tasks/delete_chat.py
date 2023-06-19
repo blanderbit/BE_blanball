@@ -39,7 +39,7 @@ def delete_chat_response_consumer() -> None:
     for data in consumer:
         try:
             all_recieved_data: dict[str, Any] = data.value["data"]
-            users: list[dict[str, Any]] = data.value["data"]["users"]
+            users: list[dict[str, int]] = data.value["data"]["users"]
             message_type: str = data.value["message_type"]
             for user in users:
                 send_to_chat_layer(

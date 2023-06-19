@@ -22,3 +22,8 @@ chats_list_query_params: list[openapi.Parameter] = [
     chats_searh_query,
     offset_query,
 ]
+
+
+chat_users_list_query_params: list[openapi.Parameter] = [
+    offset_query,
+]
