@@ -3,6 +3,9 @@ from typing import Any, Optional
 from config.celery import celery
 from django.conf import settings
 from kafka import KafkaConsumer, KafkaProducer
+from project.chat.utils.send_response_message_from_chat_to_the_ws import (
+    send_response_from_chat_message_to_the_ws
+)
 
 TOPIC_NAME: str = "read_or_unread_messages"
 RESPONSE_TOPIC_NAME: str = "read_or_unread_messages_response"
@@ -32,4 +35,6 @@ def read_or_unread_messages_response_consumer() -> None:
     )
 
     for data in consumer:
-        print(data.value)
+        send_response_from_chat_message_to_the_ws(
+            data=data.value
+        )

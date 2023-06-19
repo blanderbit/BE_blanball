@@ -3,7 +3,9 @@ from typing import Any, Optional
 from config.celery import celery
 from django.conf import settings
 from kafka import KafkaConsumer, KafkaProducer
-from notifications.tasks import send_to_chat_layer
+from project.chat.utils.send_response_message_from_chat_to_the_ws import (
+    send_response_message_from_chat_to_the_ws
+)
 
 TOPIC_NAME: str = "edit_message"
 RESPONSE_TOPIC_NAME: str = "edit_message_response"
@@ -37,18 +39,6 @@ def edit_message_response_consumer() -> None:
     )
 
     for data in consumer:
-        try:
-            all_recieved_data: dict[str, Any] = data.value["data"]
-            users: list[dict[str, int]] = all_recieved_data["users"]
-            message_type: str = data.value["message_type"]
-            for user in users:
-                send_to_chat_layer(
-                    user_id=user["user_id"],
-                    message_type=message_type,
-                    data={
-                        "chat_id": all_recieved_data["chat_id"],
-                        "messsage_new_data": all_recieved_data["new_data"],
-                    },
-                )
-        except Exception:
-            pass
+        send_response_from_chat_message_to_the_ws(
+            data=data.value
+        )

@@ -3,9 +3,10 @@ from typing import Any, Optional
 from config.celery import celery
 from django.conf import settings
 from kafka import KafkaConsumer, KafkaProducer
-from notifications.tasks import (
-    send_to_group_by_group_name,
+from chat.utils import (
+    send_response_from_chat_message_to_the_ws
 )
+
 
 TOPIC_NAME: str = "create_message"
 RESPONSE_TOPIC_NAME: str = "create_message_response"
@@ -37,21 +38,7 @@ def create_message_response_consumer() -> None:
     consumer: KafkaConsumer = KafkaConsumer(
         RESPONSE_TOPIC_NAME, **settings.KAFKA_CONSUMER_CONFIG
     )
-
     for data in consumer:
-        try:
-            all_recieved_data: dict[str, Any] = data.value["data"]
-            users: list[dict[str, int]] = all_recieved_data["users"]
-            message_type: str = data.value["message_type"]
-            for user in users:
-                send_to_group_by_group_name(
-                    group_name=f"user_{user['user_id']}",
-                    message_type=message_type,
-                    data={
-                        "chat_id": all_recieved_data["chat_id"],
-                        "message": all_recieved_data["message_data"],
-                        "not_read_messages_count": all_recieved_data["not_read_messages_count"]
-                    },
-                )
-        except Exception:
-            pass
+        send_response_from_chat_message_to_the_ws(
+            data=data.value
+        )

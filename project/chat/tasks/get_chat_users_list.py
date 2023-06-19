@@ -1,6 +1,9 @@
 from config.celery import celery
 from django.conf import settings
 from kafka import KafkaConsumer, KafkaProducer
+from project.chat.utils.send_response_message_from_chat_to_the_ws import (
+    send_response_from_chat_message_to_the_ws
+)
 
 TOPIC_NAME: str = "get_chat_users_list"
 RESPONSE_TOPIC_NAME: str = "get_chat_users_list_response"
@@ -42,4 +45,6 @@ def get_chat_users_list_response_consumer() -> None:
     )
 
     for data in consumer:
-        print(data.value)
+        send_response_from_chat_message_to_the_ws(
+            data=data.value
+        )

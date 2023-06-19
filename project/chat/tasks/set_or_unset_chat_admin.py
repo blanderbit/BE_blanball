@@ -1,9 +1,11 @@
-from typing import Any, Optional, Union
+from typing import Any, Union
 
 from config.celery import celery
 from django.conf import settings
 from kafka import KafkaConsumer, KafkaProducer
-from notifications.tasks import send_to_chat_layer
+from project.chat.utils.send_response_message_from_chat_to_the_ws import (
+    send_response_from_chat_message_to_the_ws
+)
 
 TOPIC_NAME: str = "set_or_unset_chat_admin_admin"
 RESPONSE_TOPIC_NAME: str = "set_or_unset_chat_admin_response"
@@ -36,19 +38,6 @@ def set_or_unset_chat_admin_response_consumer() -> None:
     )
 
     for data in consumer:
-
-        try:
-            all_recieved_data: dict[str, Any] = data.value["data"]
-            message_type: str = data.value["message_type"]
-            users: list[dict[str, int]] = data.value["data"]["users"]
-            for user in users:
-                send_to_chat_layer(
-                    user_id=user,
-                    message_type=message_type,
-                    data={
-                        "chat_id": all_recieved_data["chat_id"],
-                        "new_admin_id": all_recieved_data["new_admin_id"]
-                    },
-                )
-        except Exception:
-            pass
+        send_response_from_chat_message_to_the_ws(
+            data=data.value
+        )
