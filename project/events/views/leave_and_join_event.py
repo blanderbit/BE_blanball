@@ -147,7 +147,7 @@ class LeaveFromEvent(GenericAPIView):
         event: Event = Event.objects.get(id=serializer.data["event_id"])
         if user.current_rooms.filter(id=serializer.data["event_id"]).exists():
             user.current_rooms.remove(event)
-            remove_user_from_chat_producer.delay(user_id=user.id, event_id=event.id)
+            remove_user_from_chat_producer(user_id=user.id, event_id=event.id)
             send_message_to_event_author_after_leave_user_from_event(
                 event=event, user=user
             )

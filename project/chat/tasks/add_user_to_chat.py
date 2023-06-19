@@ -1,22 +1,24 @@
-from typing import Any
-
-from authentication.models import User
-from config.celery import celery
 from django.conf import settings
-from kafka import KafkaConsumer, KafkaProducer
+from kafka import KafkaConsumer
 from chat.utils import (
-    send_response_from_chat_message_to_the_ws
+    send_response_message_from_chat_to_the_ws
+)
+from chat.tasks.default_producer import (
+    default_producer
 )
 
 TOPIC_NAME: str = "add_user_to_chat"
 RESPONSE_TOPIC_NAME: str = "add_user_to_chat_response"
 
 
-@celery.task
 def add_user_to_chat_producer(*, user_id: int, event_id: int) -> None:
-    producer: KafkaProducer = KafkaProducer(**settings.KAFKA_PRODUCER_CONFIG)
-    producer.send(TOPIC_NAME, value={"user_id": user_id, "event_id": event_id})
-    producer.flush()
+
+    data_to_send: dict[str, int] = {
+        "user_id": user_id,
+        "event_id": event_id
+    }
+
+    default_producer.delay(topic_name=TOPIC_NAME, data=data_to_send)
 
 
 def add_user_to_chat_response_consumer() -> None:
@@ -25,6 +27,6 @@ def add_user_to_chat_response_consumer() -> None:
     )
 
     for data in consumer:
-        send_response_from_chat_message_to_the_ws(
+        send_response_message_from_chat_to_the_ws(
             data=data.value
         )

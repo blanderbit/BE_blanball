@@ -65,7 +65,7 @@ def bulk_delete_events(
             event: Event = queryset.get(id=event_id)
             if event.author == user:
                 event.delete()
-                delete_chat_producer.delay(event_id=event_id, user_id=user.id)
+                delete_chat_producer(event_id=event_id, user_id=user.id)
                 yield {"success": event_id}
         except Event.DoesNotExist:
             pass
@@ -181,7 +181,7 @@ def bulk_accept_or_decline_invites_to_events(
                 if invite.event.current_users.count() < invite.event.amount_members:
                     if data["type"] == True:
                         invite.status = invite.Status.ACCEPTED
-                        add_user_to_chat_producer.delay(
+                        add_user_to_chat_producer(
                             user_id=invite.recipient.id, event_id=invite.event.id
                         )
                         invite.recipient.current_rooms.add(invite.event)
@@ -218,7 +218,7 @@ def bulk_accpet_or_decline_requests_to_participation(
                     ):
                         request_to_p.status = request_to_p.Status.ACCEPTED
                         request_to_p.sender.current_rooms.add(request_to_p.event)
-                        add_user_to_chat_producer.delay(
+                        add_user_to_chat_producer(
                             user_id=request_to_p.sender.id,
                             event_id=request_to_p.event.id,
                         )
@@ -244,7 +244,7 @@ def create_event_chat(*, event: Event, request_user: User) -> None:
         "event_id": event.id,
     }
 
-    create_chat_producer.delay(
+    create_chat_producer(
         data=event_players_chat_data,
         author_id=request_user.id,
         request_id=generate_unique_request_id(),
@@ -377,7 +377,7 @@ def filter_event_by_user_planned_events_time(
 
 def remove_user_from_event(*, user: User, event: Event, reason: str) -> None:
     user.current_rooms.remove(event)
-    remove_user_from_chat_producer.delay(user_id=user.id, event_id=event.id)
+    remove_user_from_chat_producer(user_id=user.id, event_id=event.id)
     event.black_list.add(user)
     send_to_user(
         user=user,

@@ -2,16 +2,18 @@ from typing import Any, Optional
 
 from config.celery import celery
 from django.conf import settings
-from kafka import KafkaConsumer, KafkaProducer
-from project.chat.utils.send_response_message_from_chat_to_the_ws import (
+from kafka import KafkaConsumer
+from chat.utils.send_response_message_from_chat_to_the_ws import (
     send_response_message_from_chat_to_the_ws
+)
+from chat.tasks.default_producer import (
+    default_producer
 )
 
 TOPIC_NAME: str = "edit_message"
 RESPONSE_TOPIC_NAME: str = "edit_message_response"
 
 
-@celery.task
 def edit_message_producer(
     *,
     message_id: int,
@@ -19,17 +21,15 @@ def edit_message_producer(
     new_data: dict[str, Any],
     user_id: int
 ) -> str:
-    producer: KafkaProducer = KafkaProducer(**settings.KAFKA_PRODUCER_CONFIG)
-    producer.send(
-        TOPIC_NAME,
-        value={
-            "message_id": message_id,
-            "user_id": user_id,
-            "request_id": request_id,
-            "new_data": new_data,
-        },
-    )
-    producer.flush()
+
+    data_to_send: dict[str, Any] = {
+        "message_id": message_id,
+        "user_id": user_id,
+        "request_id": request_id,
+        "new_data": new_data,
+    }
+
+    default_producer.delay(topic_name=TOPIC_NAME, data=data_to_send)
 
 
 def edit_message_response_consumer() -> None:
@@ -39,6 +39,6 @@ def edit_message_response_consumer() -> None:
     )
 
     for data in consumer:
-        send_response_from_chat_message_to_the_ws(
+        send_response_message_from_chat_to_the_ws(
             data=data.value
         )

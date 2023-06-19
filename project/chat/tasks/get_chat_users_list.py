@@ -1,15 +1,18 @@
-from config.celery import celery
+from typing import Union
+
 from django.conf import settings
-from kafka import KafkaConsumer, KafkaProducer
-from project.chat.utils.send_response_message_from_chat_to_the_ws import (
-    send_response_from_chat_message_to_the_ws
+from kafka import KafkaConsumer
+from chat.utils.send_response_message_from_chat_to_the_ws import (
+    send_response_message_from_chat_to_the_ws
+)
+from chat.tasks.default_producer import (
+    default_producer
 )
 
 TOPIC_NAME: str = "get_chat_users_list"
 RESPONSE_TOPIC_NAME: str = "get_chat_users_list_response"
 
 
-@celery.task
 def get_chat_users_list_producer(
     *,
     request_id: str,
@@ -24,18 +27,15 @@ def get_chat_users_list_producer(
     if offset is None:
         offset = 10
 
-    producer: KafkaProducer = KafkaProducer(**settings.KAFKA_PRODUCER_CONFIG)
-    producer.send(
-        TOPIC_NAME,
-        value={
-            "user_id": user_id,
-            "chat_id": chat_id,
-            "request_id": request_id,
-            "page": page,
-            "offset": offset,
-        },
-    )
-    producer.flush()
+    data_to_send: dict[str, Union[str, int]] = {
+        "user_id": user_id,
+        "chat_id": chat_id,
+        "request_id": request_id,
+        "page": page,
+        "offset": offset,
+    }
+
+    default_producer.delay(topic_name=TOPIC_NAME, data=data_to_send)
 
 
 def get_chat_users_list_response_consumer() -> None:
@@ -45,6 +45,6 @@ def get_chat_users_list_response_consumer() -> None:
     )
 
     for data in consumer:
-        send_response_from_chat_message_to_the_ws(
+        send_response_message_from_chat_to_the_ws(
             data=data.value
         )

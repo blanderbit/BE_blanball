@@ -54,4 +54,4 @@ def check_event_start_time() -> None:
         elif event_minutes_to_start + event.duration == 0:
             event.status = event.Status.FINISHED
             event.save()
-            disable_chat_producer.delay(event_id=event.id)
+            disable_chat_producer(event_id=event.id)

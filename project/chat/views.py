@@ -59,7 +59,7 @@ class CreateGroupChat(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         unique_request_id: str = generate_unique_request_id()
-        create_chat_producer.delay(
+        create_chat_producer(
             data=serializer.validated_data,
             author_id=request.user.id,
             type="Group",
@@ -83,7 +83,7 @@ class CreateMessage(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         unique_request_id: str = generate_unique_request_id()
-        create_message_producer.delay(
+        create_message_producer(
             data=serializer.validated_data,
             user_id=request.user.id,
             request_id=unique_request_id,
@@ -107,7 +107,7 @@ class RemoveUserFromChat(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         unique_request_id: str = generate_unique_request_id()
 
-        remove_user_from_chat_producer.delay(
+        remove_user_from_chat_producer(
             user_id=serializer.validated_data["user_id"],
             chat_id=serializer.validated_data["chat_id"],
             request_id=unique_request_id,
@@ -131,7 +131,7 @@ class DeleteChat(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         unique_request_id: str = generate_unique_request_id()
 
-        delete_chat_producer.delay(
+        delete_chat_producer(
             chat_id=serializer.validated_data["chat_id"],
             user_id=request.user.id,
             request_id=unique_request_id,
@@ -180,7 +180,7 @@ class GetChatsList(GenericAPIView):
 
         query: dict[str, Any] = request.query_params
 
-        get_chats_list_producer.delay(
+        get_chats_list_producer(
             user_id=request.user.id,
             request_id=unique_request_id,
             offset=query.get("offset"),
@@ -207,7 +207,7 @@ class GetChatMessagesList(GenericAPIView):
 
         query: dict[str, Any] = request.query_params
 
-        get_chat_messages_list_producer.delay(
+        get_chat_messages_list_producer(
             user_id=request.user.id,
             chat_id=pk,
             request_id=unique_request_id,
@@ -235,7 +235,7 @@ class GetChatUsersList(GenericAPIView):
 
         query: dict[str, Any] = request.query_params
 
-        get_chat_users_list_producer.delay(
+        get_chat_users_list_producer(
             user_id=request.user.id,
             chat_id=pk,
             request_id=unique_request_id,
@@ -260,7 +260,7 @@ class EditChatMessage(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         unique_request_id: str = generate_unique_request_id()
 
-        edit_message_producer.delay(
+        edit_message_producer(
             message_id=serializer.validated_data["message_id"],
             user_id=request.user.id,
             request_id=unique_request_id,
@@ -284,7 +284,7 @@ class ReadOrUnreadMessages(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         unique_request_id: str = generate_unique_request_id()
 
-        read_or_unread_messages_producer.delay(
+        read_or_unread_messages_producer(
             message_ids=serializer.validated_data["message_ids"],
             user_id=request.user.id,
             request_id=unique_request_id,
@@ -308,7 +308,7 @@ class DeleteChatMessages(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         unique_request_id: str = generate_unique_request_id()
 
-        delete_messages_producer.delay(
+        delete_messages_producer(
             message_ids=serializer.validated_data["message_ids"],
             user_id=request.user.id,
             request_id=unique_request_id,
@@ -331,7 +331,7 @@ class SetChatAdmin(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         unique_request_id: str = generate_unique_request_id()
 
-        set_or_unset_chat_admin_producer.delay(
+        set_or_unset_chat_admin_producer(
             data=serializer.validated_data,
             author_id=request.user.id,
             request_id=unique_request_id,
