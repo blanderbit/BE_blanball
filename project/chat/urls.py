@@ -37,12 +37,12 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
         "client/edit/chat/message", EditChatMessage.as_view(), name="edit-chat-message"
     ),
     path(
-        "client/chat/messages/list/<int:pk>",
+        "client/chat/messages/list/<int:chat_id>",
         GetChatMessagesList.as_view(),
         name="chat-messages-list",
     ),
     path(
-        "client/chat/users/list/<int:pk>",
+        "client/chat/users/list/<int:chat_id>",
         GetChatUsersList.as_view(),
         name="chat-users-list",
     ),

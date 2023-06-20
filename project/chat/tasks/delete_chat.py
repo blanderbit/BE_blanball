@@ -18,12 +18,12 @@ def delete_chat_producer(
     chat_id: Optional[int] = None,
     event_id: Optional[int] = None,
     request_id: Optional[str] = None,
-    user_id: int
+    request_user_id: int
 ) -> str:
 
     data_to_send: dict[str, Any] = {
         "chat_id": chat_id,
-        "user_id": user_id,
+        "request_user_id": request_user_id,
         "request_id": request_id,
         "event_id": event_id,
     }

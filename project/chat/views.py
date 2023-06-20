@@ -85,7 +85,7 @@ class CreateMessage(GenericAPIView):
         unique_request_id: str = generate_unique_request_id()
         create_message_producer(
             data=serializer.validated_data,
-            user_id=request.user.id,
+            request_user_id=request.user.id,
             request_id=unique_request_id,
         )
         return Response({"request_id": unique_request_id}, HTTP_200_OK)
@@ -111,6 +111,7 @@ class RemoveUserFromChat(GenericAPIView):
             user_id=serializer.validated_data["user_id"],
             chat_id=serializer.validated_data["chat_id"],
             request_id=unique_request_id,
+            request_user_id=request.user.id,
             sender_user_id=request.user.id,
         )
         return Response({"request_id": unique_request_id}, HTTP_200_OK)
@@ -133,7 +134,7 @@ class DeleteChat(GenericAPIView):
 
         delete_chat_producer(
             chat_id=serializer.validated_data["chat_id"],
-            user_id=request.user.id,
+            request_user_id=request.user.id,
             request_id=unique_request_id,
         )
         return Response({"request_id": unique_request_id}, HTTP_200_OK)
@@ -181,7 +182,7 @@ class GetChatsList(GenericAPIView):
         query: dict[str, Any] = request.query_params
 
         get_chats_list_producer(
-            user_id=request.user.id,
+            request_user_id=request.user.id,
             request_id=unique_request_id,
             offset=query.get("offset"),
             page=query.get("page"),
@@ -202,14 +203,14 @@ class GetChatMessagesList(GenericAPIView):
     list of messages in the chat they are members of.
     """
 
-    def get(self, request: Request, pk: int) -> Response:
+    def get(self, request: Request, chat_id: int) -> Response:
         unique_request_id: str = generate_unique_request_id()
 
         query: dict[str, Any] = request.query_params
 
         get_chat_messages_list_producer(
-            user_id=request.user.id,
-            chat_id=pk,
+            request_user_id=request.user.id,
+            chat_id=chat_id,
             request_id=unique_request_id,
             offset=query.get("offset"),
             page=query.get("page"),
@@ -230,14 +231,14 @@ class GetChatUsersList(GenericAPIView):
     list of users in the chat they are members of.
     """
 
-    def get(self, request: Request, pk: int) -> Response:
+    def get(self, request: Request, chat_id: int) -> Response:
         unique_request_id: str = generate_unique_request_id()
 
         query: dict[str, Any] = request.query_params
 
         get_chat_users_list_producer(
-            user_id=request.user.id,
-            chat_id=pk,
+            request_user_id=request.user.id,
+            chat_id=chat_id,
             request_id=unique_request_id,
             offset=query.get("offset"),
             page=query.get("page"),
@@ -262,7 +263,7 @@ class EditChatMessage(GenericAPIView):
 
         edit_message_producer(
             message_id=serializer.validated_data["message_id"],
-            user_id=request.user.id,
+            request_user_id=request.user.id,
             request_id=unique_request_id,
             new_data=serializer.validated_data["new_data"],
         )
@@ -286,7 +287,7 @@ class ReadOrUnreadMessages(GenericAPIView):
 
         read_or_unread_messages_producer(
             message_ids=serializer.validated_data["message_ids"],
-            user_id=request.user.id,
+            request_user_id=request.user.id,
             request_id=unique_request_id,
             action=serializer.validated_data["action"],
         )
@@ -310,7 +311,7 @@ class DeleteChatMessages(GenericAPIView):
 
         delete_messages_producer(
             message_ids=serializer.validated_data["message_ids"],
-            user_id=request.user.id,
+            request_user_id=request.user.id,
             request_id=unique_request_id,
         )
         return Response({"request_id": unique_request_id}, HTTP_200_OK)
@@ -333,7 +334,7 @@ class SetChatAdmin(GenericAPIView):
 
         set_or_unset_chat_admin_producer(
             data=serializer.validated_data,
-            author_id=request.user.id,
+            request_user_id=request.user.id,
             request_id=unique_request_id,
         )
         return Response({"request_id": unique_request_id}, HTTP_200_OK)

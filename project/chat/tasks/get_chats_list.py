@@ -16,7 +16,7 @@ RESPONSE_TOPIC_NAME: str = "get_chats_list_response"
 def get_chats_list_producer(
     *,
     request_id: str,
-    user_id: int,
+    request_user_id: int,
     page: int = 1,
     offset: int = 10,
     search: Optional[str] = None
@@ -28,7 +28,7 @@ def get_chats_list_producer(
         offset = 10
 
     data_to_send: dict[str, Union[str, int]] = {
-        "user_id": user_id,
+        "request_user_id": request_user_id,
         "request_id": request_id,
         "page": page,
         "offset": offset,

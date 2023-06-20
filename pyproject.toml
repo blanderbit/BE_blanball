@@ -44,6 +44,7 @@ drf-standardized-errors = "^0.12.3"
 novaposhta-api-client = {git = "https://github.com/semolex/novaposhta-api-client"}
 googlemaps = "^4.10.0"
 kafka-python = "^2.0.2"
+loguru = "^0.7.0"
 
 [tool.poetry.dev-dependencies]
 

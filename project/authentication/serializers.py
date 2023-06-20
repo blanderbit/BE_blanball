@@ -88,7 +88,7 @@ class EventUsersProfileSerializer(ModelSerializer):
         ]
 
 
-class EventAuthorProfileSerializer(ModelSerializer):
+class CommonUserProfileSerializer(ModelSerializer):
     class Meta:
         model: Profile = Profile
         fields: Union[str, list[str]] = [
@@ -100,7 +100,7 @@ class EventAuthorProfileSerializer(ModelSerializer):
 
 
 class EventAuthorSerializer(ModelSerializer):
-    profile = EventAuthorProfileSerializer()
+    profile = CommonUserProfileSerializer()
 
     class Meta:
         model: User = User
@@ -123,19 +123,9 @@ class EventUsersSerializer(ModelSerializer):
         ]
 
 
-class FriendProfileSerializer(ModelSerializer):
-    class Meta:
-        model: Profile = Profile
-        fields: Union[str, list[str]] = [
-            "id",
-            "name",
-            "last_name",
-            "avatar_url",
-        ]
-
 
 class FriendUserSerializer(ModelSerializer):
-    profile = FriendProfileSerializer()
+    profile = CommonUserProfileSerializer()
 
     class Meta:
         model: User = User

@@ -65,7 +65,7 @@ def bulk_delete_events(
             event: Event = queryset.get(id=event_id)
             if event.author == user:
                 event.delete()
-                delete_chat_producer(event_id=event_id, user_id=user.id)
+                delete_chat_producer(event_id=event_id, request_user_id=user.id)
                 yield {"success": event_id}
         except Event.DoesNotExist:
             pass

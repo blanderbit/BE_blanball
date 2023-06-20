@@ -19,12 +19,12 @@ def edit_message_producer(
     message_id: int,
     request_id: Optional[str] = None,
     new_data: dict[str, Any],
-    user_id: int
+    request_user_id: int
 ) -> str:
 
     data_to_send: dict[str, Any] = {
         "message_id": message_id,
-        "user_id": user_id,
+        "request_user_id": request_user_id,
         "request_id": request_id,
         "new_data": new_data,
     }

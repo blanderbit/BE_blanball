@@ -19,15 +19,15 @@ def remove_user_from_chat_producer(
     request_id: str,
     event_id: Optional[int] = None,
     chat_id: Optional[int] = None,
-    sender_user_id: Optional[int] = None
+    request_user_id: Optional[int] = None
 ) -> None:
 
     data_to_send: dict[str, Union[str, None, int]] = {
         "user_id": user_id,
-        "sender_user_id": sender_user_id,
         "event_id": event_id,
         "chat_id": chat_id,
         "request_id": request_id,
+        "request_user_id": request_user_id
     }
 
     default_producer.delay(topic_name=TOPIC_NAME, data=data_to_send)

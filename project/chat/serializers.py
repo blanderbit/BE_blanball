@@ -1,12 +1,20 @@
 from typing import Any, List, Union
 
-from authentication.models import User
+from authentication.models import (
+    User,
+    Profile
+)
+from authentication.serializers import (
+    CommonUserProfileSerializer
+)
 from rest_framework.serializers import (
     CharField,
     ChoiceField,
     IntegerField,
     ListField,
     Serializer,
+    ModelSerializer,
+    BooleanField,
     ValidationError,
 )
 
@@ -131,3 +139,53 @@ class SetChatAdminSerializer(Serializer):
             "chat_id",
             "action"
         ]
+
+
+class ChatUserProfileSerializer(CommonUserProfileSerializer):
+    def to_representation(self, value):
+        return dict(super().to_representation(value))
+
+
+class ChatUserSerializer(ModelSerializer):
+    profile: Profile = ChatUserProfileSerializer()
+
+    class Meta:
+        model: User = User
+        fields: Union[str, list[str]] = [
+            "id",
+            "role",
+            "is_online",
+            "profile",
+        ]
+
+    def to_representation(self, value):
+        return dict(super().to_representation(value))
+
+
+class GetChatUsersListSerializer(Serializer):
+    author: bool = BooleanField()
+    disabled: bool = BooleanField()
+    removed: bool = BooleanField()
+    admin: bool = BooleanField()
+    chat_deleted: bool = BooleanField()
+    user_data: User = ChatUserSerializer(read_only=True)
+
+    class Meta:
+        fields: Union[str, list[str]] = [
+            "author",
+            "disabled",
+            "removed",
+            "admin",
+            "chat_deleted",
+            "user_data"
+        ]
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        users_list = self.context.get("users_list")
+        if users_list:
+            for user in users_list:
+                serializer = ChatUserSerializer(user)
+                user_data = serializer.data
+                data['user_data'] = user_data
+        return data
