@@ -1,110 +1,109 @@
 version: '3.8'
 
-x-api-common: &api-common
+x-blanball-api-common-test: &blanball-api-common-test
     image: registry.it-flumx.com/flumx_te_blanball_be_test:latest
 
     env_file:
-        - .env
+        - stack.env
     entrypoint: scripts/entrypoint.sh
 
     depends_on:
-        db:
+        blanball-db-test:
             condition: service_healthy
-        redis:
+        blanball-redis-test:
             condition: service_healthy
     networks:
-        - app-network
-    links:
-        - redis
+        - blaball-network-test
+        - blanball-chat-connection-network-test
 
 services:
-    proxy:
-        container_name: proxy
+    blanball-proxy-test:
+        container_name: blanball-proxy-test
         env_file:
-            - .env
+            - stack.env
         image: registry.it-flumx.com/blanball-proxy-test:latest
         ports:
             - 49299:80
         networks:
-            - app-network
+            - blaball-network-test
         depends_on:
-            api:
+            blanball-api-test:
                 condition: service_started
 
-    api:
-        <<: *api-common
-        container_name: api
+    blanball-api-test:
+        <<: *blanball-api-common-test
+        container_name: api-test
         command: api-deploy
         user: deploy
         ports:
             - 49200:8000
 
-    daphne:
-        <<: *api-common
-        container_name: daphne
+    blanball-daphne-test:
+        <<: *blanball-api-common-test
+        container_name: blanball-daphne-test
         command: daphne
         user: deploy
         ports:
             - 49290:10000
 
-    celery-worker:
-        <<: *api-common
-        container_name: celery-worker
+    blanball-celery-worker-test:
+        <<: *blanball-api-common-test
+        container_name: blanball-celery-worker-test
         user: deploy
         command: celery-worker
 
-    celery-beat:
-        <<: *api-common
-        container_name: celery-beat
+    blanball-celery-beat-test:
+        <<: *blanball-api-common-test
+        container_name: blanball-celery-beat-test
         command: celery-beat
 
-    db:
-        container_name: db
+    blanball-db-test:
+        container_name: blanball-db-test
         env_file:
-            - .env
+            - stack.env
         image: postgis/postgis:latest
         restart: always
         volumes:
             - db-data:/var/lib/postgresql/data
         networks:
-            - app-network
+            - blaball-network
         healthcheck:
             test: pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
             timeout: 5s
             retries: 20
 
-    redis:
-        container_name: redis
+    blanball-redis-test:
+        container_name: blanball-redis-test
         env_file:
-            - .env
+            - stack.env
         image: redis:latest
         restart: always
         volumes:
             - redis-data:/usr/src/blanball/storage/redis/data
         networks:
-            - app-network
+            - blaball-network-test
         healthcheck:
             test: ['CMD-SHELL', 'redis-cli ping | grep PONG']
             timeout: 3s
             retries: 5
 
-    pgadmin:
-        container_name: pgadmin
+    blanball-pgadmin-test:
+        container_name: blanball-pgadmin-test
         env_file:
-            - .env
+            - stack.env
         image: dpage/pgadmin4:latest
         restart: always
         volumes:
             - pgadmin-data:/usr/src/blanball/storage/pgadmin/data
         networks:
-            - app-network
+            - blaball-network-test
         ports:
             - 49280:${PGADMIN_LISTEN_PORT}
 
-    minio:
-        container_name: minio
+    blanball-minio-test:
+        container_name: blanball-minio-test
         env_file:
-            - .env
+            - stack.env
         image: minio/minio
         volumes:
             - minio-data:/minio-data
@@ -119,11 +118,46 @@ services:
             timeout: 20s
             retries: 3
         networks:
-            - app-network
+            - blaball-network
+
+    blanball-kafka-test:
+        container_name: blanball-kafka-test
+        env_file:
+            - stack.env
+        image: confluentinc/cp-kafka:latest
+        depends_on:
+            - blanball-zookeeper-test
+        ports:
+            - 49293:9092
+            - 49294:9093
+        restart: always
+        volumes:
+            - kafka-data:/usr/src/blanball/storage/kafka/data
+        networks:
+            - blaball-network-test
+            - blanball-chat-connection-network-test
+
+    blanball-zookeeper-test:
+        container_name: blanball-zookeeper-test
+        env_file:
+            - stack.env
+        image: zookeeper:latest
+        ports:
+            - 49295:2181
+        restart: always
+        volumes:
+            - zookeeper-data:/usr/src/blanball/storage/zookeeper/data \
+            - zookeeper-logs-data:/usr/src/blanball/storage/zookeeper-logs/data \
+        networks:
+            - blaball-network-test
+            - blanball-chat-connection-network-test
 
 networks:
-    app-network:
-        driver: bridge
+    blaball-network-test:
+        name: blaball-network-test
+    blanball-chat-connection-network-test:
+        external:
+            name: blanball-chat-connection-network-test
 
 volumes:
     redis-data:
@@ -131,3 +165,6 @@ volumes:
     db-backup-data:
     minio-data:
     db-data:
+    zookeeper-data:
+    zookeeper-logs-data:
+    kafka-data:

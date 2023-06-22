@@ -1,6 +1,6 @@
 version: '3.8'
 
-x-api-common: &api-common
+x-blanball-api-common-dev: &blanball-api-common-dev
     env_file:
         - .env
     entrypoint: scripts/entrypoint.sh
@@ -10,74 +10,69 @@ x-api-common: &api-common
     volumes:
         - .:/usr/src/blanball
     networks:
-        - blaball-network
+        - blaball-network-dev
+        - blanball-chat-connection-network-dev
     depends_on:
-        db:
+        blanball-db-dev:
             condition: service_healthy
-        redis:
+        blanball-redis-dev:
             condition: service_healthy
-    links:
-        - redis
 
 services:
-    db:
-        container_name: db
+    blanball-db-dev:
+        container_name: blanball-db-dev
         env_file:
             - .env
         image: postgis/postgis:latest
         volumes:
             - ./postgres-data:/var/lib/postgresql/data
         networks:
-            - blaball-network
-        ports:
-            - 5432:5432
+            - blaball-network-dev
         healthcheck:
             test: pg_isready -U postgres -d postgres
             timeout: 5s
             retries: 20
 
-    redis:
-        container_name: redis
+    blanball-redis-dev:
+        container_name: blanball-redis-dev
         env_file:
             - .env
         image: redis:7.0.4-alpine
         volumes:
             - redis-data:/usr/src/blanball/storage/redis/data
         networks:
-            - blaball-network
+            - blaball-network-dev
         healthcheck:
             test: ['CMD-SHELL', 'redis-cli ping | grep PONG']
             timeout: 5s
             retries: 20
 
-    api:
-        <<: *api-common
-        container_name: api
+    blanball-api-dev:
+        <<: *blanball-api-common-dev
+        container_name: blanball-api-dev
         command: api
         ports:
             - 8000:8000
 
-    daphne:
-        <<: *api-common
-        container_name: daphne
+    blanball-daphne-dev:
+        <<: *blanball-api-common-dev
+        container_name: blanball-daphne-dev
         command: daphne
         ports:
             - 10000:10000
 
-    celery-worker:
-        <<: *api-common
-        container_name: celery-worker
+    blanball-celery-worker-dev:
+        <<: *blanball-api-common-dev
+        container_name: blanball-celery-worker-dev
         command: celery-worker
-        user: deploy
 
-    celery-beat:
-        <<: *api-common
-        container_name: celery-beat
+    blanball-celery-beat-dev:
+        <<: *blanball-api-common-dev
+        container_name: blanball-celery-beat-dev
         command: celery-beat
-        user: deploy
 
-    minio:
-        container_name: minio
+    blanball-minio-dev:
+        container_name: blanball-minio-dev
         env_file:
             - .env
         image: minio/minio
@@ -94,9 +89,9 @@ services:
             timeout: 20s
             retries: 3
         networks:
-            - blaball-network
-    pgadmin:
-        container_name: pgadmin
+            - blaball-network-dev
+    blanball-pgadmin-dev:
+        container_name: blanball-pgadmin-dev
         env_file:
             - .env
         image: dpage/pgadmin4:latest
@@ -104,17 +99,17 @@ services:
         volumes:
             - pgadmin-data:/usr/src/blanball/storage/pgadmin/data
         networks:
-            - blaball-network
+            - blaball-network-dev
         ports:
             - 49280:49299
 
-    kafka:
-        container_name: kafka
+    blanball-kafka-dev:
+        container_name: blanball-kafka-dev
         env_file:
             - .env
         image: confluentinc/cp-kafka:latest
         depends_on:
-            - zookeeper
+            - blanball-zookeeper-dev
         ports:
             - 9092:9092
             - 9093:9093
@@ -122,10 +117,11 @@ services:
         volumes:
             - kafka-data:/usr/src/blanball/storage/kafka/data
         networks:
-            - blaball-network
+            - blaball-network-dev
+            - blanball-chat-connection-network-dev
 
-    zookeeper:
-        container_name: zookeeper
+    blanball-zookeeper-dev:
+        container_name: blanball-zookeeper-dev
         env_file:
             - .env
         image: zookeeper:latest
@@ -136,11 +132,15 @@ services:
             - zookeeper-data:/usr/src/blanball/storage/zookeeper/data \
             - zookeeper-logs-data:/usr/src/blanball/storage/zookeeper-logs/data \
         networks:
-            - blaball-network
+            - blaball-network-dev
+            - blanball-chat-connection-network-dev
 
 networks:
-    blaball-network:
-        name: blaball-network
+    blaball-network-dev:
+        name: blaball-network-dev
+    blanball-chat-connection-network-dev:
+        external:
+            name: blanball-chat-connection-network-dev
 
 volumes:
     redis-data:

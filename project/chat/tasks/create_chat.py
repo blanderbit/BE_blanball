@@ -12,10 +12,13 @@ TOPIC_NAME: str = "create_chat"
 RESPONSE_TOPIC_NAME: str = "create_chat_response"
 
 
-def create_chat_producer(
-    *, data: dict[str, str], author_id: int, type: Optional[str] = None, request_id: str
+def create_chat_producer(*, 
+      data: dict[str, str],
+      author_id: int, 
+      type: Optional[str] = None, 
+      request_id: str
 ) -> str:
-    data["author"] = author_id
+    data["request_user_id"] = author_id
     data["request_id"] = request_id
     if type:
         data["type"] = type

@@ -1,7 +1,7 @@
 #!/bin/bash
 cd project
 
-BackendDeploy()
+ApiDeploy()
 {
     python manage.py migrate --noinput
     python manage.py loaddata */fixtures/*.json
@@ -9,7 +9,7 @@ BackendDeploy()
     python manage.py start_consume_messages
 }
 
-Backend()
+Api()
 {
     python manage.py makemigrations --noinput
     python manage.py migrate --noinput
@@ -38,8 +38,8 @@ CeleryBeat()
 
 case $1
 in
-    api) Backend ;;
-    api-deploy) BackendDeploy;;
+    api) Api ;;
+    api-deploy) ApiDeploy;;
     celery-worker) CeleryWorker ;;
     celery-beat) CeleryBeat ;;
     daphne) Daphne;;

@@ -35,17 +35,17 @@ def create_message_producer(
 def process_response_data(data: dict[str, Any]) -> None:
     if isinstance(data["data"], dict):
         message_data = data["data"]["message_data"]
-        sender_id = message_data.pop("sender_id", None)
+        sender_id: Optional[int] = message_data.pop("sender_id", None)
 
         if sender_id is not None:
             try:
-                sender_user = User.objects.get(id=sender_id)
+                sender_user: User = User.objects.get(id=sender_id)
                 serializer = ChatUserSerializer(sender_user)
                 message_data["sender"] = dict(serializer.data)
             except User.DoesNotExist:
                 pass
 
-    send_response_message_from_chat_to_the_ws(data=data)
+    send_response_message_from_chat_to_the_ws(data=data, ws_layer='user')
 
 
 def create_message_response_consumer() -> None:

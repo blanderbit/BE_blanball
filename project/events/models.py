@@ -132,10 +132,10 @@ class Event(models.Model):
         getting all records with optimized selection from the database
         """
         return Event.objects.select_related("author").prefetch_related(
-            "current_users", "current_fans"
+            "current_users", "current_fans", "black_list"
         )
 
-    def get_user_role(self, pk: Optional[int] = None):
+    def user_role(self, pk: Optional[int] = None):
         if pk:
             try:
                 user = User.objects.get(id=pk)
@@ -162,7 +162,7 @@ class Event(models.Model):
 
     @property
     def request_user_role(self) -> Optional[str]:
-        return self.get_user_role()
+        return self.user_role()
 
     def save(self, *args: Any, **kwargs: Any) -> None:
         if self.place != None:
