@@ -66,7 +66,7 @@ services:
         volumes:
             - db-data:/var/lib/postgresql/data
         networks:
-            - blaball-network
+            - blaball-network-test
         healthcheck:
             test: pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
             timeout: 5s
@@ -118,7 +118,7 @@ services:
             timeout: 20s
             retries: 3
         networks:
-            - blaball-network
+            - blaball-network-test
 
     blanball-kafka-test:
         container_name: blanball-kafka-test
