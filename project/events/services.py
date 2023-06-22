@@ -79,7 +79,7 @@ def update_event(
     )
     event.update(**new_data)
     edit_chat_producer(
-        event_id=event[0].id, request_id=request_user.id, new_data=new_data
+        event_id=event[0].id, request_user_id=request_user.id, new_data=new_data
     )
 
 
