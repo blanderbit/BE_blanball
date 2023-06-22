@@ -157,7 +157,7 @@ class EditChat(GenericAPIView):
 
         edit_chat_producer(
             chat_id=serializer.validated_data["chat_id"],
-            user_id=request.user.id,
+            request_id=request.user.id,
             request_id=unique_request_id,
             new_data=serializer.validated_data["new_data"],
         )
