@@ -11,9 +11,11 @@ from django.db.models.query import QuerySet
 from events.models import Event
 
 
+@final
 class Review(models.Model):
     author: User = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="author"
+        User, on_delete=models.CASCADE, related_name="author",
+        db_index=True
     )
     text: str = models.CharField(max_length=200)
     time_created: datetime = models.DateTimeField(auto_now_add=True)
@@ -24,14 +26,13 @@ class Review(models.Model):
         ]
     )
     user: User = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="reviews"
+        User, on_delete=models.CASCADE, related_name="reviews",
+        db_index=True
     )
 
-    @final
     def __repr__(self) -> str:
         return "<Review %s>" % self.id
 
-    @final
     @staticmethod
     def get_all() -> QuerySet["Review"]:
         """
@@ -39,7 +40,6 @@ class Review(models.Model):
         """
         return Review.objects.select_related("user", "author")
 
-    @final
     def __str__(self) -> str:
         return str(self.id)
 
@@ -52,6 +52,7 @@ class Review(models.Model):
         ordering: list[str] = ["-id"]
 
 
+@final
 class EventReview(models.Model):
     author: User = models.ForeignKey(User, on_delete=models.CASCADE)
     text: str = models.CharField(max_length=200, null=True)
@@ -64,11 +65,9 @@ class EventReview(models.Model):
     )
     event: Event = models.ForeignKey(Event, on_delete=models.CASCADE)
 
-    @final
     def __repr__(self) -> str:
         return "<EventReview %s>" % self.id
 
-    @final
     @staticmethod
     def get_all() -> QuerySet["EventReview"]:
         """
@@ -76,7 +75,6 @@ class EventReview(models.Model):
         """
         return EventReview.objects.select_related("user", "event")
 
-    @final
     def __str__(self) -> str:
         return str(self.id)
 

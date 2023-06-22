@@ -1,7 +1,4 @@
-from typing import (
-    Any,
-    Callable,
-)
+from typing import Any, Callable
 
 from django.db.models import Q
 from django.db.models.query import QuerySet

@@ -34,6 +34,7 @@ from rest_framework.status import (
 )
 
 
+@final
 class Event(models.Model):
     class Type(models.TextChoices):
         FOOTBALL: str = "Football"
@@ -70,7 +71,7 @@ class Event(models.Model):
         MINUTES_180: int = 180
 
     author: User = models.ForeignKey(User, on_delete=models.CASCADE)
-    name: str = models.CharField(max_length=255)
+    name: str = models.CharField(max_length=255, db_index=True)
     description: str = models.TextField()
     place: dict[str, Union[str, float]] = models.JSONField()
     gender: str = models.CharField(choices=Gender.choices, max_length=10)
@@ -87,7 +88,7 @@ class Event(models.Model):
     price_description: Optional[str] = models.CharField(max_length=265, null=True)
     need_form: bool = models.BooleanField()
     privacy: bool = models.BooleanField()
-    pinned: bool = models.BooleanField(default=False)
+    pinned: bool = models.BooleanField(default=False, db_index=True)
     hidden: bool = models.BooleanField(default=False)
     duration: int = models.PositiveSmallIntegerField(choices=Duration.choices)
     forms: str = models.JSONField(null=True)
@@ -95,13 +96,13 @@ class Event(models.Model):
         choices=Status.choices, max_length=10, default=Status.PLANNED
     )
     current_users: list[Optional[User]] = models.ManyToManyField(
-        User, related_name="current_rooms", blank=True
+        User, related_name="current_rooms", blank=True, db_index=True
     )
     current_fans: list[Optional[User]] = models.ManyToManyField(
-        User, related_name="current_views_rooms", blank=True
+        User, related_name="current_views_rooms", blank=True, db_index=True
     )
     black_list: list[Optional[User]] = models.ManyToManyField(
-        User, related_name="black_list", blank=True
+        User, related_name="black_list", blank=True, db_index=True
     )
     coordinates: Point = PointField(null=True, srid=4326)
 
@@ -119,25 +120,22 @@ class Event(models.Model):
         """
         return self.current_fans.count()
 
-    @final
     def __repr__(self) -> str:
         return "<Event %s>" % self.id
 
-    @final
     def __str__(self) -> str:
         return self.name
 
-    @final
     @staticmethod
     def get_all() -> QuerySet["Event"]:
         """
         getting all records with optimized selection from the database
         """
         return Event.objects.select_related("author").prefetch_related(
-            "current_users", "current_fans"
+            "current_users", "current_fans", "black_list"
         )
 
-    def get_user_role(self, pk: Optional[int] = None):
+    def user_role(self, pk: Optional[int] = None):
         if pk:
             try:
                 user = User.objects.get(id=pk)
@@ -164,9 +162,8 @@ class Event(models.Model):
 
     @property
     def request_user_role(self) -> Optional[str]:
-        return self.get_user_role()
+        return self.user_role()
 
-    @final
     def save(self, *args: Any, **kwargs: Any) -> None:
         if self.place != None:
             self.coordinates = Point(self.place["lon"], self.place["lat"])
@@ -236,13 +233,7 @@ class InviteToEventManager(models.Manager):
             raise ValidationError(AUTHOR_CAN_NOT_INVITE_ERROR, HTTP_403_FORBIDDEN)
         if invite_user in event.black_list.all():
             raise ValidationError(THIS_USER_CAN_NOT_BE_INVITED, HTTP_403_FORBIDDEN)
-        if (
-            InviteToEvent.get_all()
-            .filter(
-                recipient=invite_user, event=event
-            )
-            .exists()
-        ):
+        if InviteToEvent.get_all().filter(recipient=invite_user, event=event).exists():
             raise ValidationError(THIS_USER_CAN_NOT_BE_INVITED, HTTP_403_FORBIDDEN)
 
         if (
@@ -282,19 +273,17 @@ class InviteToEventManager(models.Manager):
             )
 
 
+@final
 class InviteToEvent(RequestToParticipation):
 
     objects = InviteToEventManager()
 
-    @final
     def __repr__(self) -> str:
         return "<InviteToEvent %s>" % self.id
 
-    @final
     def __str__(self) -> str:
         return str(self.id)
 
-    @final
     @staticmethod
     def get_all() -> QuerySet["InviteToEvent"]:
         """

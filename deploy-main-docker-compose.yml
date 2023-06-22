@@ -1,6 +1,6 @@
 version: '3.8'
 
-x-api-common: &api-common
+x-blanball-api-common: &blanball-api-common
     image: registry.it-flumx.com/flumx_blanball_be_prod:latest
 
     env_file:
@@ -8,18 +8,17 @@ x-api-common: &api-common
     entrypoint: scripts/entrypoint.sh
 
     depends_on:
-        db-prod:
+        blanball-db-prod:
             condition: service_healthy
-        redis-prod:
+        blanball-redis-prod:
             condition: service_healthy
     networks:
         - registry_default
-    links:
-        - redis-prod
+        - blaball-network-prod
 
 services:
-    proxy-prod:
-        container_name: proxy-prod
+    blanball-proxy-prod:
+        container_name: blanball-proxy-prod
         env_file:
             - stack.env
         image: registry.it-flumx.com/blanball-proxy-prod:latest
@@ -27,50 +26,51 @@ services:
             - 49298:80
         networks:
             - registry_default
+            - blaball-network-prod
         depends_on:
-            api-prod:
+            blanball-api-prod:
                 condition: service_started
 
-    api-prod:
-        <<: *api-common
-        container_name: api-prod
+    blanball-api-prod:
+        <<: *blanball-api-common
+        container_name: blanball-api-prod
         command: api-deploy
         expose:
             - '8000'
         labels:
             - 'traefik.enable=true'
-            - 'traefik.http.routers.api-prod.rule=Host(`${BLANBALL_API_DOMAIN_NAME}`) && PathPrefix(`/api`)'
-            - 'traefik.http.routers.api-prod.entrypoints=websecure'
-            - 'traefik.http.routers.api-prod.tls.certresolver=myresolver'
-            - 'traefik.http.routers.api-prod.service=api-prod'
-            - 'traefik.http.services.api-prod.loadbalancer.server.port=8000'
+            - 'traefik.http.routers.blanball-api-prod.rule=Host(`${BLANBALL_API_DOMAIN_NAME}`) && PathPrefix(`/api`)'
+            - 'traefik.http.routers.blanball-api-prod.entrypoints=websecure'
+            - 'traefik.http.routers.blanball-api-prod.tls.certresolver=myresolver'
+            - 'traefik.http.routers.blanball-api-prod.service=blanball-api-prod'
+            - 'traefik.http.services.blanball-api-prod.loadbalancer.server.port=8000'
 
-    daphne-prod:
-        <<: *api-common
-        container_name: daphne-prod
+    blanball-daphne-prod:
+        <<: *blanball-api-common
+        container_name: blanball-daphne-prod
         command: daphne
         expose:
             - '10000'
         labels:
             - 'traefik.enable=true'
-            - 'traefik.http.routers.daphne-prod.rule=Host(`${BLANBALL_WS_DOMAIN_NAME}`) && PathPrefix(`/ws`)'
-            - 'traefik.http.routers.daphne-prod.entrypoints=websecure'
-            - 'traefik.http.routers.daphne-prod.tls.certresolver=myresolver'
-            - 'traefik.http.routers.daphne-prod.service=daphne-prod'
-            - 'traefik.http.services.daphne-prod.loadbalancer.server.port=10000'
+            - 'traefik.http.routers.blanball-daphne-prod.rule=Host(`${BLANBALL_WS_DOMAIN_NAME}`) && PathPrefix(`/ws`)'
+            - 'traefik.http.routers.blanball-daphne-prod.entrypoints=websecure'
+            - 'traefik.http.routers.blanball-daphne-prod.tls.certresolver=myresolver'
+            - 'traefik.http.routers.blanball-daphne-prod.service=blanball-daphne-prod'
+            - 'traefik.http.services.blanball-daphne-prod.loadbalancer.server.port=10000'
 
-    celery-worker-prod:
-        <<: *api-common
-        container_name: celery-worker-prod
+    blanball-celery-worker-prod:
+        <<: *blanball-api-common
+        container_name: blanball-celery-worker-prod
         command: celery-worker
 
-    celery-beat-prod:
-        <<: *api-common
-        container_name: celery-beat-prod
+    blanball-celery-beat-prod:
+        <<: *blanball-api-common
+        container_name: blanball-celery-beat-prod
         command: celery-beat
 
-    db-prod:
-        container_name: db-prod
+    blanball-db-prod:
+        container_name: blanball-db-prod
         env_file:
             - stack.env
         image: postgis/postgis:latest
@@ -79,13 +79,14 @@ services:
             - db-data-prod:/var/lib/postgresql/data
         networks:
             - registry_default
+            - blaball-network-prod
         healthcheck:
             test: pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
             timeout: 5s
             retries: 20
 
-    redis-prod:
-        container_name: redis-prod
+    blanball-redis-prod:
+        container_name: blanball-redis-prod
         env_file:
             - stack.env
         image: redis:latest
@@ -94,13 +95,14 @@ services:
             - redis-data-prod:/usr/src/blanball/storage/redis-prod/data
         networks:
             - registry_default
+            - blaball-network-prod
         healthcheck:
             test: ['CMD-SHELL', 'redis-cli ping | grep PONG']
             timeout: 3s
             retries: 5
 
-    pgadmin-prod:
-        container_name: pgadmin-prod
+    blanball-pgadmin-prod:
+        container_name: blanball-pgadmin-prod
         env_file:
             - stack.env
         image: dpage/pgadmin4:latest
@@ -109,10 +111,11 @@ services:
             - pgadmin-data-prod:/usr/src/blanball/storage/pgadmin-prod/data
         networks:
             - registry_default
+            - blaball-network-prod
         ports:
             - 49283:${PGADMIN_LISTEN_PORT}
-    minio-prod:
-        container_name: minio-prod
+    blanball-minio-prod:
+        container_name: blanball-minio-prod
         image: minio/minio
         volumes:
             - minio-data-prod:/minio-data-prod
@@ -123,26 +126,31 @@ services:
         env_file:
             - stack.env
         labels:
-            - "traefik.enable=true"
+            - 'traefik.enable=true'
             # Console
-            - "traefik.http.routers.minio-console.rule=Host(`${BLANBALL_STORAGE_CONSOLE_DOMAIN_NAME}`)"
-            - "traefik.http.routers.minio-console.entrypoints=websecure"
-            - "traefik.http.routers.minio-console.tls.certresolver=myresolver"
-            - "traefik.http.routers.minio-console.service=minio-console"
-            - "traefik.http.services.minio-console.loadbalancer.server.port=9001"
+            - 'traefik.http.routers.minio-console.rule=Host(`${BLANBALL_STORAGE_CONSOLE_DOMAIN_NAME}`)'
+            - 'traefik.http.routers.minio-console.entrypoints=websecure'
+            - 'traefik.http.routers.minio-console.tls.certresolver=myresolver'
+            - 'traefik.http.routers.minio-console.service=minio-console'
+            - 'traefik.http.services.minio-console.loadbalancer.server.port=9001'
             # APi
-            - "traefik.http.routers.minio-prod.rule=Host(`${BLANBALL_STORAGE_API_DOMAIN_NAME}`)"
-            - "traefik.http.routers.minio-prod.entrypoints=websecure"
-            - "traefik.http.routers.minio-prod.tls.certresolver=myresolver"
-            - "traefik.http.routers.minio-prod.service=minio-prod"
-            - "traefik.http.services.minio-prod.loadbalancer.server.port=9000"
+            - 'traefik.http.routers.blanball-minio-prod.rule=Host(`${BLANBALL_STORAGE_API_DOMAIN_NAME}`)'
+            - 'traefik.http.routers.blanball-minio-prod.entrypoints=websecure'
+            - 'traefik.http.routers.blanball-minio-prod.tls.certresolver=myresolver'
+            - 'traefik.http.routers.blanball-minio-prod.service=blanball-minio-prod'
+            - 'traefik.http.services.blanball-minio-prod.loadbalancer.server.port=9000'
         networks:
+            - blaball-network-prod
             - registry_default
-
 
 networks:
     registry_default:
         external: true
+    blaball-network-prod:
+        name: blaball-network-prod
+    blanball-chat-connection-network-prod:
+        external:
+            name: blanball-chat-connection-network-prod
 
 volumes:
     redis-data-prod:

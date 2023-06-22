@@ -5,12 +5,12 @@ from celery.schedules import crontab
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 
-app = Celery("config")
+celery = Celery("config")
 
-app.config_from_object("django.conf:settings", namespace="CELERY")
-app.autodiscover_tasks()
+celery.config_from_object("django.conf:settings", namespace="CELERY")
+celery.autodiscover_tasks()
 
-app.conf.beat_schedule = {
+celery.conf.beat_schedule = {
     "delete_expire_codes": {
         "task": "authentication.tasks.delete_expire_codes",
         "schedule": crontab(minute="*/10"),
@@ -38,5 +38,5 @@ app.conf.beat_schedule = {
     "remove_expired_invitations_to_friends": {
         "task": "friends.tasks.remove_expired_invitations_to_friends",
         "schedule": crontab(hour="*/8"),
-    }
+    },
 }

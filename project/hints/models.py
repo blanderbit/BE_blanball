@@ -1,7 +1,5 @@
+from datetime import datetime
 from typing import final
-from datetime import (
-    datetime
-)
 
 from django.db import models
 from django.db.models.query import QuerySet
@@ -12,15 +10,12 @@ class Hint(models.Model):
     name: str = models.CharField(max_length=255, unique=True)
     time_created: datetime = models.DateTimeField(auto_now_add=True)
 
-    @final
     def __repr__(self) -> str:
         return "<UserHint %s>" % self.id
 
-    @final
     def __str__(self) -> str:
         return self.name
 
-    @final
     @staticmethod
     def get_all() -> QuerySet["Hint"]:
         """

@@ -88,9 +88,6 @@ target/
 __pycache__/
 local_settings.py
 
-.env
-db.env
-
 celerybeat-schedule
 backup/
 
@@ -100,3 +97,5 @@ qa.txt
 
 .vscode/
 .env.prod
+.env.test
+.env

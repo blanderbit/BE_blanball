@@ -1,19 +1,12 @@
 import json
 from typing import Any, Literal, Optional
 
-from authentication.constants.notification_types import (
-    UPDATE_MESSAGE_USER_OFFLINE,
-    UPDATE_MESSAGE_USER_ONLINE,
-)
 from authentication.models import User
 from channels.db import database_sync_to_async
 from channels.generic.websocket import (
     AsyncWebsocketConsumer,
 )
 from django.utils import timezone
-from notifications.services import (
-    send_to_general_layer,
-)
 
 
 class UserConsumer(AsyncWebsocketConsumer):
@@ -29,48 +22,29 @@ class UserConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def check_user(self) -> Optional[Literal[True]]:
-        user: User = User.get_all().filter(email=self.scope["user"])
-        if user:
-            return True
+        return bool(User.get_all().filter(email=self.scope["user"]))
 
     @database_sync_to_async
     def check_user_group_name(self) -> Optional[Literal[True]]:
         user: User = User.get_all().filter(email=self.scope["user"])
-        if user[0].group_name == self.room_group_name:
-            return True
+        return bool(user[0].group_name == self.room_group_name)
 
     @database_sync_to_async
     def room_groop_name(self) -> User:
-        return User.get_all().get(email=self.scope["user"]).group_name
+        return User.objects.get(email=self.scope["user"]).group_name
 
     @database_sync_to_async
     def add_user_to_active(self) -> None:
         self.disconnect(200)
-        user: User = User.get_all().get(email=self.scope["user"])
+        user: User = User.objects.get(email=self.scope["user"])
         user.is_online = True
         user.save()
-        send_to_general_layer(
-            message_type=UPDATE_MESSAGE_USER_ONLINE,
-            data={
-                "user": {
-                    "id": user.id,
-                }
-            },
-        )
 
     @database_sync_to_async
     def delete_user_from_active(self) -> None:
-        user: User = User.get_all().get(email=self.scope["user"])
+        user: User = User.objects.get(email=self.scope["user"])
         user.is_online = False
         user.save()
-        send_to_general_layer(
-            message_type=UPDATE_MESSAGE_USER_OFFLINE,
-            data={
-                "user": {
-                    "id": user.id,
-                }
-            },
-        )
 
     async def disconnect(self, close_code: int) -> None:
         # Leave room group

@@ -72,4 +72,3 @@ class GetPlaceNameByCoordinates(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         place = get_place_name_by_coordinates(data=serializer.data)
         return Response(place, HTTP_200_OK)
-

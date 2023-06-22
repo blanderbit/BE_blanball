@@ -1,5 +1,6 @@
 import pandas
-from config.celery import app
+from chat.tasks import disable_chat_producer
+from config.celery import celery
 from django.db.models import Q
 from django.utils import timezone
 from events.constants.notification_types import (
@@ -11,7 +12,7 @@ from events.services import (
 )
 
 
-@app.task
+@celery.task
 def check_event_start_time() -> None:
 
     rounded_current_datetime = (
@@ -53,3 +54,4 @@ def check_event_start_time() -> None:
         elif event_minutes_to_start + event.duration == 0:
             event.status = event.Status.FINISHED
             event.save()
+            disable_chat_producer(event_id=event.id)

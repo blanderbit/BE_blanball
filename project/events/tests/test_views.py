@@ -67,7 +67,7 @@ class TestEventsViews(SetUpEventsViews):
         self.client.force_authenticate(None)
         self.client.post(reverse("register"), self.user_reg_data_2)
         self.client.force_authenticate(
-            User.get_all().get(email=self.user_reg_data_2["email"])
+            User.objects.get(email=self.user_reg_data_2["email"])
         )
         response = self.client.post(
             reverse("join-to-event"), {"event_id": Event.objects.first().id}
@@ -137,7 +137,7 @@ class TestEventsViews(SetUpEventsViews):
         self.client.force_authenticate(None)
         self.client.post(reverse("register"), self.user_reg_data_2)
         self.client.force_authenticate(
-            User.get_all().get(email=self.user_reg_data_2["email"])
+            User.objects.get(email=self.user_reg_data_2["email"])
         )
         get_user_events_list_2 = self.client.get(reverse("my-events-list"))
         self.assertEqual(Event.objects.count(), 10)
@@ -199,7 +199,6 @@ class TestEventsViews(SetUpEventsViews):
         )
         self.assertTrue(get_event.data["name"] != self.event_update_data["name"])
         self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)
-
 
     @freeze_time("2022-9-29")
     def test_user_send_request_to_participation(self) -> None:
@@ -272,10 +271,10 @@ class TestEventsViews(SetUpEventsViews):
         register = self.client.post(reverse("register"), self.user_reg_data_2)
         self.assertEqual(register.status_code, HTTP_201_CREATED)
         return self.client.force_authenticate(
-            User.get_all().get(email=self.user_reg_data_2["email"])
+            User.objects.get(email=self.user_reg_data_2["email"])
         )
 
     def auth(self) -> NoneType:
         self.client.post(reverse("register"), self.user_reg_data)
-        user = User.get_all().get(email=self.user_reg_data["email"])
+        user = User.objects.get(email=self.user_reg_data["email"])
         return self.client.force_authenticate(user)

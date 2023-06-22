@@ -6,24 +6,26 @@ from django.db import models
 from django.db.models.query import QuerySet
 
 
+@final
 class Notification(models.Model):
     class Type(models.TextChoices):
         UNREAD: str = "Unread"
         READ: str = "Read"
 
-    user: User = models.ForeignKey(User, on_delete=models.CASCADE)
+    user: User = models.ForeignKey(
+        User, on_delete=models.CASCADE, db_index=True
+    )
     type: str = models.CharField(
-        choices=Type.choices, max_length=6, default=Type.UNREAD
+        choices=Type.choices, max_length=6, default=Type.UNREAD,
+        db_index=True
     )
     time_created: datetime = models.DateTimeField(auto_now_add=True)
     message_type: str = models.CharField(max_length=100)
-    data: dict[str, Any] = models.JSONField()
+    data: dict[str, Any] = models.JSONField(db_index=True)
 
-    @final
     def __repr__(self) -> str:
         return "<Notification %s>" % self.id
 
-    @final
     @staticmethod
     def get_all() -> QuerySet["Notification"]:
         """
@@ -31,7 +33,6 @@ class Notification(models.Model):
         """
         return Notification.objects.select_related("user")
 
-    @final
     def __str__(self) -> str:
         return str(self.id)
 

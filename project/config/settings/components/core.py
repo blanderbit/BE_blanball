@@ -36,6 +36,7 @@ INSTALLED_APPS: list[str] = [
     "friends.apps.FriendsConfig",
     "scheduler.apps.SchedulerConfig",
     "hints.apps.HintsConfig",
+    "chat.apps.ChatConfig",
 ]
 
 if not os.environ.get("GITHUB_WORKFLOW"):
@@ -138,4 +139,4 @@ CORS_ALLOW_HEADERS: list[str] = config(
     "CORS_ALLOW_HEADERS", cast=lambda v: [s.strip() for s in v.split(",")]
 )
 
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

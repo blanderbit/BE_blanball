@@ -103,7 +103,7 @@ def send_update_message_after_response(
                 instance.Status.ACCEPTED: True,
                 instance.Status.DECLINED: False,
             }
-            notification = Notification.get_all().get(
+            notification = Notification.objects.get(
                 message_type=INVITE_USER_TO_EVENT_NOTIFICATION_TYPE,
                 data__invite__id=instance.id,
             )
