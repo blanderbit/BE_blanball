@@ -155,7 +155,7 @@ class EditChat(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         unique_request_id: str = generate_unique_request_id()
 
-        edit_chat_producer.delay(
+        edit_chat_producer(
             chat_id=serializer.validated_data["chat_id"],
             user_id=request.user.id,
             request_id=unique_request_id,

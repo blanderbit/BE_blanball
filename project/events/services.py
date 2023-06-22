@@ -78,7 +78,7 @@ def update_event(
         event=event[0], message_type=EVENT_UPDATE_NOTIFICATION_TYPE
     )
     event.update(**new_data)
-    edit_chat_producer.delay(
+    edit_chat_producer(
         event_id=event[0].id, user_id=request_user.id, new_data=new_data
     )
 

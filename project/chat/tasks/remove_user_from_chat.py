@@ -16,7 +16,7 @@ RESPONSE_TOPIC_NAME: str = "remove_user_from_chat_response"
 def remove_user_from_chat_producer(
     *,
     user_id: int,
-    request_id: str,
+    request_id: Optional[str] = None,
     event_id: Optional[int] = None,
     chat_id: Optional[int] = None,
     request_user_id: Optional[int] = None
