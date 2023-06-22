@@ -32,7 +32,7 @@ services:
 
     blanball-api-test:
         <<: *blanball-api-common-test
-        container_name: api-test
+        container_name: blanball-api-test
         command: api-deploy
         user: deploy
         ports:
