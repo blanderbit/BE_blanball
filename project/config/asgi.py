@@ -20,9 +20,7 @@ from authentication.middlewares import (
 
 application = ProtocolTypeRouter(
     {
-        "websocket": AllowedHostsOriginValidator(
-            JwtAuthMiddlewareStack(URLRouter(config.ws_urls.websocket_urlpatterns))
-        ),
+        "websocket": JwtAuthMiddlewareStack(URLRouter(config.ws_urls.websocket_urlpatterns)),
         "http": django_asgi_app,
     }
 )

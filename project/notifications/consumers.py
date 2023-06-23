@@ -22,12 +22,12 @@ class UserConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def check_user(self) -> Optional[Literal[True]]:
-        return bool(User.get_all().filter(email=self.scope["user"]))
+        return User.get_all().filter(email=self.scope["user"]).exists()
 
     @database_sync_to_async
     def check_user_group_name(self) -> Optional[Literal[True]]:
         user: User = User.get_all().filter(email=self.scope["user"])
-        return bool(user[0].group_name == self.room_group_name)
+        return user[0].chat_group_name == self.room_group_name
 
     @database_sync_to_async
     def room_groop_name(self) -> User:
