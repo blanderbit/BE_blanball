@@ -19,7 +19,7 @@ from rest_framework.serializers import (
 )
 
 READ_OR_UNREAD_MESSAGE_CHOICES: tuple[tuple[str]] = (("read", "read"), ("unread", "unread"))
-SER_OR_UNSET_ADMIM_CHOICES: tuple[tuple[str]] = (("read", "read"), ("unread", "unread"))
+SER_OR_UNSET_ADMIM_CHOICES: tuple[tuple[str]] = (("set", "set"), ("unset", "unset"))
 
 
 class CreateGroupChatSerializer(Serializer):
