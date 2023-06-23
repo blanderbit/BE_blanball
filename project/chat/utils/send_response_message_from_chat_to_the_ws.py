@@ -26,6 +26,6 @@ def send_response_message_from_chat_to_the_ws(
 def send_message_to_group(group_name: str, message_type: str, data: dict[str, Any]) -> None:
     print(data)
     try:
-        send_to_group_by_group_name(group_name, message_type, data)
+        send_to_group_by_group_name(message_type, group_name, data)
     except Exception as _err:
         logger.debug(_err)

@@ -28,6 +28,7 @@ def send(
         group_name_to_send = user.group_name
     elif group_name:
         group_name_to_send = group_name
+    print(group_name_to_send, '++++++++++++++')
     async_to_sync(get_channel_layer().group_send)(group_name_to_send, data)
 
 
@@ -60,34 +61,13 @@ def send_to_group_by_group_name(
     send(
         group_name=group_name,
         data={
-            "type": "kafka.message",
+            "type": "chat.message",
             "message": {
                 "message_type": message_type,
                 "data": data,
             },
         },
     )
-
-
-def send_to_chat_layer(
-    message_type: str,
-    user_id: int,
-    data: dict[str, Union[str, int, datetime, bool]] = None,
-) -> None:
-
-    group_name_to_send: str = f"chat_user_{user_id}"
-
-    send(
-        group_name=group_name_to_send,
-        data={
-            "type": "chat.action.message",
-            "message": {
-                "message_type": message_type,
-                "data": data,
-            },
-        },
-    )
-
 
 def send_to_general_layer(
     message_type: str,
