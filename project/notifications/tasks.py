@@ -28,7 +28,6 @@ def send(
         group_name_to_send = user.group_name
     elif group_name:
         group_name_to_send = group_name
-    print(group_name_to_send, '++++++++++++++')
     async_to_sync(get_channel_layer().group_send)(group_name_to_send, data)
 
 
