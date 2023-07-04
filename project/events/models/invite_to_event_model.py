@@ -1,14 +1,11 @@
-from datetime import datetime
-from typing import Any, Optional, Union, final
 
-from authentication.models import Gender, User
-from django.contrib.gis.db.models import (
-    PointField,
+from typing import final
+from authentication.models import User
+from events.models.event_model import (
+    Event
 )
-from django.contrib.gis.geos import Point
-from django.core.validators import (
-    MaxValueValidator,
-    MinValueValidator,
+from events.models.invite_to_event_model import (
+    RequestToParticipation
 )
 from django.db import models
 from django.db.models.query import QuerySet
@@ -21,19 +18,13 @@ from events.constants.errors import (
 from events.constants.notification_types import (
     INVITE_USER_TO_EVENT_NOTIFICATION_TYPE,
 )
-from events.middlewares import current_request
 from notifications.tasks import send_to_user
-from phonenumber_field.modelfields import (
-    PhoneNumberField,
-)
 from rest_framework.serializers import (
     ValidationError,
 )
 from rest_framework.status import (
     HTTP_403_FORBIDDEN,
 )
-
-
 
 
 class InviteToEventManager(models.Manager):
