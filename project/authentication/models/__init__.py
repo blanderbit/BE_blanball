@@ -7,3 +7,6 @@ from authentication.models.profile_model import (
 from authentication.models.code_model import (
     Code as Code
 )
+from authentication.models.user_model import (
+    Gender as Gender
+)

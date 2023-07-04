@@ -1,10 +1,7 @@
 
 from typing import final
 from authentication.models import User
-from events.models.event_model import (
-    Event
-)
-from events.models.invite_to_event_model import (
+from events.models.request_to_participation_model import (
     RequestToParticipation
 )
 from django.db import models
@@ -29,7 +26,7 @@ from rest_framework.status import (
 
 class InviteToEventManager(models.Manager):
     def send_invite(
-        self, request_user: User, invite_user: User, event: Event
+        self, request_user: User, invite_user: User, event: "Event"
     ) -> "InviteToEvent":
 
         if invite_user.id == request_user.id:
