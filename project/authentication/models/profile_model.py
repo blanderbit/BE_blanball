@@ -1,3 +1,4 @@
+
 import os
 from datetime import date, datetime
 from typing import Any, Optional, Union, final
@@ -9,7 +10,6 @@ from authentication.constants.errors import (
 )
 from django.conf import settings
 from django.contrib.auth.models import (
-    AbstractBaseUser,
     BaseUserManager,
 )
 from django.contrib.gis.db.models import (
@@ -27,25 +27,16 @@ from django.db import models, transaction
 from django.db.models.fields.files import (
     ImageFieldFile,
 )
-from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.utils.encoding import smart_bytes
 from django.utils.http import (
     urlsafe_base64_encode,
-)
-from hints.models import Hint
-from phonenumber_field.modelfields import (
-    PhoneNumberField,
 )
 from rest_framework.serializers import (
     ValidationError,
 )
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
-)
-from rest_framework_simplejwt.tokens import (
-    AccessToken,
-    RefreshToken,
 )
 
 
@@ -76,14 +67,6 @@ def validate_birthday(value: date) -> None:
         raise ValidationError(MAX_AGE_VALUE_ERROR, HTTP_400_BAD_REQUEST)
     if timezone.now().date() - value < timezone.timedelta(days=2191):
         raise ValidationError(MIN_AGE_VALUE_ERROR, HTTP_400_BAD_REQUEST)
-
-
-@final
-def configuration_dict() -> dict[str, bool]:
-    """
-    the default configuration field value for the user
-    """
-    return {"email": True, "phone": True, "show_reviews": True}
 
 
 def image_file_name(instance: "Profile", filename: str) -> str:
@@ -209,98 +192,3 @@ class Profile(models.Model):
         db_table: str = "profile"
         verbose_name: str = "profile"
         verbose_name_plural: str = "profiles"
-
-
-@final
-class User(AbstractBaseUser):
-    class Role(models.TextChoices):
-        USER: str = "User"
-        ADMIN: str = "Admin"
-
-    email: str = models.EmailField(max_length=255, unique=True, db_index=True)
-    phone: str = PhoneNumberField(unique=True)
-    is_verified: bool = models.BooleanField(default=False)
-    is_online: bool = models.BooleanField(default=False, db_index=True)
-    get_planned_events: str = models.CharField(max_length=10, default="1m")
-    role: str = models.CharField(choices=Role.choices, max_length=10, null=True)
-    updated_at: str = models.DateTimeField(auto_now=True)
-    raiting: Optional[float] = models.FloatField(null=True)
-    profile: Profile = models.ForeignKey(
-        Profile, on_delete=models.CASCADE, null=True, related_name="user"
-    )
-    configuration: dict[str, bool] = models.JSONField(default=configuration_dict)
-    checked_hints: list[Optional[Hint]] = models.ManyToManyField(Hint, blank=True)
-
-    USERNAME_FIELD: str = "email"
-
-    objects = UserManager()
-
-    def __repr__(self) -> str:
-        return "<User %s>" % self.id
-
-    def __str__(self) -> str:
-        return self.email
-
-    @staticmethod
-    def get_all() -> QuerySet["User"]:
-        """
-        getting all records with optimized selection from the database
-        """
-        return User.objects.select_related("profile")
-
-    def tokens(self) -> dict[str, str]:
-        """
-        generating jwt tokens for user object
-        """
-        refresh: RefreshToken = RefreshToken.for_user(self)
-        access: AccessToken = AccessToken.for_user(self)
-        return {"refresh": str(refresh), "access": str(access)}
-
-    @property
-    def count_pinned_events(self) -> int:
-        from events.models import Event
-
-        return Event.get_all().filter(author_id=self.id, pinned=True).count()
-
-    @property
-    def group_name(self) -> str:
-        return "user_%s" % self.id
-
-    @property
-    def chat_group_name(self) -> str:
-        return "chat_user_%s" % self.id
-
-    class Meta:
-        # the name of the table in the database for this model
-        db_table: str = "user"
-        verbose_name: str = "user"
-        verbose_name_plural: str = "users"
-        # sorting database records for this model by default
-        ordering: list[str] = ["-id"]
-
-
-@final
-class Code(models.Model):
-    verify_code: str = models.CharField(max_length=5, unique=True)
-    life_time: datetime = models.DateTimeField(null=True)
-    type: str = models.CharField(max_length=20)
-    user_email: str = models.CharField(max_length=255)
-    dop_info: Optional[str] = models.CharField(max_length=255, null=True)
-
-    def get_only_expired() -> QuerySet["Code"]:
-        """
-        get all expired codes
-        """
-        return Code.objects.filter(life_time__lt=timezone.now())
-
-    def __repr__(self) -> str:
-        return "<Code %s>" % self.id
-
-    def __str__(self) -> str:
-        return self.verify_code
-
-    class Meta:
-        # the name of the table in the database for this model
-        db_table: str = "code"
-        verbose_name: str = "code"
-        verbose_name_plural: str = "codes"

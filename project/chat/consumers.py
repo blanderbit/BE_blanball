@@ -39,7 +39,7 @@ class UserChatConsumer(AsyncWebsocketConsumer):
                 self.room_group_name, self.channel_name
             )
 
-    async def chat_message(self, event: dict[str, Any]) -> None:
+    async def send_message(self, event: dict[str, Any]) -> None:
         # Send message to WebSocket
         text_data: bytes = json.dumps(
             {"message": event["message"], "date_time": str(timezone.now())},

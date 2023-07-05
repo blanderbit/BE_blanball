@@ -27,6 +27,7 @@ def create_message_producer(
         "chat_id": data.get("chat_id"),
         "request_id": request_id,
         "reply_to_message_id": data.get("reply_to_message_id"),
+        "user_id_for_request_chat": data.get("user_id_for_request_chat")
     }
 
     default_producer.delay(topic_name=TOPIC_NAME, data=data_to_send)

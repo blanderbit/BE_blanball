@@ -42,7 +42,7 @@ def send_to_user(
     send(
         user=user,
         data={
-            "type": "kafka.message",
+            "type": "send.message",
             "message": {
                 "message_type": message_type,
                 "notification_id": notification.id,
@@ -60,7 +60,7 @@ def send_to_group_by_group_name(
     send(
         group_name=group_name,
         data={
-            "type": "chat.message",
+            "type": "send.message",
             "message": {
                 "message_type": message_type,
                 "data": data,
@@ -78,7 +78,7 @@ def send_to_general_layer(
     send(
         group_name=group_name_to_send,
         data={
-            "type": "general.message",
+            "type": "send.message",
             "message": {
                 "message_type": message_type,
                 "data": data,
@@ -103,7 +103,7 @@ def read_all_user_notifications(*, request_user_id: int) -> None:
             send(
                 user=User.objects.get(id=request_user_id),
                 data={
-                    "type": "kafka.message",
+                    "type": "send.message",
                     "message": {
                         "message_type": ALL_USER_NOTIFICATIONS_READED_NOTIFICATION_TYPE,
                     },
