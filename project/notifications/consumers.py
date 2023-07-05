@@ -54,7 +54,7 @@ class UserConsumer(AsyncWebsocketConsumer):
             )
             await self.delete_user_from_active()
 
-    async def kafka_message(self, event: dict[str, Any]) -> None:
+    async def send_message(self, event: dict[str, Any]) -> None:
         # Send message to WebSocket
         text_data: bytes = json.dumps(
             {"message": event["message"], "date_time": str(timezone.now())},
@@ -70,7 +70,7 @@ class GeneralConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
 
-    async def general_message(self, event: dict[str, Any]) -> None:
+    async def send_message(self, event: dict[str, Any]) -> None:
         text_data: bytes = json.dumps(
             {"message": event["message"], "date_time": str(timezone.now())},
             ensure_ascii=False,
