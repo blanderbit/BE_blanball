@@ -8,6 +8,10 @@ from chat.utils.send_response_message_from_chat_to_the_ws import (
 from chat.tasks.default_producer import (
     default_producer
 )
+from chat.serializers import (
+    GetChatMessagesListSerializer
+)
+from authentication.models import User
 
 TOPIC_NAME: str = "get_chat_messages_list"
 RESPONSE_TOPIC_NAME: str = "get_chat_messages_list_response"
@@ -40,6 +44,28 @@ def get_chat_messages_list_producer(
     default_producer.delay(topic_name=TOPIC_NAME, data=data_to_send)
 
 
+def process_response_data(data: dict[str, Any]) -> None:
+    results_messages_list = None
+
+    if isinstance(data["data"], dict):
+        results_messages_list = data["data"].get("results")
+
+    if results_messages_list:
+        user_ids = [item['sender_id'] for item in results_messages_list]
+        users = User.objects.filter(id__in=user_ids)
+        users_list = {user for user in users}
+
+        serializer = GetChatMessagesListSerializer(
+            results_messages_list,
+            many=True,
+            context={'users_list': users_list}
+        )
+
+        data["data"]["results"] = [dict(result) for result in serializer.data]
+
+    send_response_message_from_chat_to_the_ws(data=data)
+
+
 def get_chat_messages_list_response_consumer() -> None:
 
     consumer: KafkaConsumer = KafkaConsumer(
@@ -47,6 +73,4 @@ def get_chat_messages_list_response_consumer() -> None:
     )
 
     for data in consumer:
-        send_response_message_from_chat_to_the_ws(
-            data=data.value
-        )
+        process_response_data(data.value)

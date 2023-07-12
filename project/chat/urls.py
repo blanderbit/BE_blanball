@@ -12,7 +12,8 @@ from chat.views import (
     ReadOrUnreadMessages,
     RemoveUserFromChat,
     GetChatUsersList,
-    SetChatAdmin,
+    SetOrUnsetChatAdmin,
+    GetInfoAboutMeInChat,
 )
 from django.urls import path
 from django.urls.resolvers import (
@@ -33,6 +34,11 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     path("client/delete/chat", DeleteChat.as_view(), name="remove-user-from-chat"),
     path("client/edit/chat", EditChat.as_view(), name="edit-chat"),
     path("client/get/chats/list", GetChatsList.as_view(), name="get-chat-lists"),
+    path(
+        "client/get/info/about/me/in/chat/<int:chat_id>",
+        GetInfoAboutMeInChat.as_view(),
+        name="get-info-about-me-in-chat"
+    ),
     path(
         "client/edit/chat/message", EditChatMessage.as_view(), name="edit-chat-message"
     ),
@@ -57,8 +63,8 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
         name="delete-chat-messages",
     ),
     path(
-        "client/chat/set/admin",
-        SetChatAdmin.as_view(),
-        name="chat-set-admin",
+        "client/chat/set/or/unset/admin",
+        SetOrUnsetChatAdmin.as_view(),
+        name="chat-set-or-unset-admin",
     ),
 ]

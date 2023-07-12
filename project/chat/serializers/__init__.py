@@ -26,8 +26,11 @@ from chat.serializers.remove_user_from_chat_serializer import (
     RemoveUserFromChatSerializer as RemoveUserFromChatSerializer
 )
 from chat.serializers.set_or_unset_chat_admin_serializer import (
-    SetChatAdminSerializer as SetChatAdminSerializer
+    SetOrUnsetChatAdminSerializer as SetOrUnsetChatAdminSerializer
 )
 from chat.serializers.edit_chat_serializer import (
     EditChatSerializer as EditChatSerializer
+)
+from chat.serializers.get_chat_messages_list_serializer import (
+    GetChatMessagesListSerializer as GetChatMessagesListSerializer
 )

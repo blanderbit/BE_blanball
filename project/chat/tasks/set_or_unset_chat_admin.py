@@ -9,7 +9,7 @@ from chat.tasks.default_producer import (
     default_producer
 )
 
-TOPIC_NAME: str = "set_or_unset_chat_admin_admin"
+TOPIC_NAME: str = "set_or_unset_chat_admin"
 RESPONSE_TOPIC_NAME: str = "set_or_unset_chat_admin_response"
 
 

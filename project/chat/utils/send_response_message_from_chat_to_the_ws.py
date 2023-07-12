@@ -18,7 +18,6 @@ def send_response_message_from_chat_to_the_ws(
         users = main_data.pop("users")
         for user in users:
             group_name = f"{ws_layer}_{user['user_id']}"
-            print(group_name)
             send_message_to_group(group_name, message_type, data)
     except Exception:
         group_name = f"{ws_layer}_{data['request_data']['request_user_id']}"

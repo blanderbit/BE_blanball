@@ -68,6 +68,7 @@ def send_to_group_by_group_name(
         },
     )
 
+
 def send_to_general_layer(
     message_type: str,
     data: dict[str, Union[str, int, datetime, bool]] = None,
