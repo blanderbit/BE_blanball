@@ -23,6 +23,7 @@ class GetChatUsersListSerializer(Serializer):
 
     class Meta:
         fields: Union[str, list[str]] = [
+            "id",
             "author",
             "disabled",
             "removed",
@@ -35,8 +36,12 @@ class GetChatUsersListSerializer(Serializer):
         data = super().to_representation(instance)
         users_list = self.context.get("users_list")
         if users_list:
+            user_id = instance['user_id']
             for user in users_list:
-                serializer = ChatUserSerializer(user)
-                user_data = serializer.data
-                data['user_data'] = user_data
+                if user.id == user_id:
+                    serializer = ChatUserSerializer(user)
+                    user_data = serializer.data
+                    data['id'] = user.id
+                    data['user_data'] = user_data
+                    break
         return data

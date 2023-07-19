@@ -9,11 +9,11 @@ from chat.tasks.default_producer import (
     default_producer
 )
 
-TOPIC_NAME: str = "set_or_unset_chat_admin"
-RESPONSE_TOPIC_NAME: str = "set_or_unset_chat_admin_response"
+TOPIC_NAME: str = "off_or_on_push_notifications"
+RESPONSE_TOPIC_NAME: str = "off_or_on_push_notifications_response"
 
 
-def set_or_unset_chat_admin_producer(
+def off_or_on_push_notifications_producer(
     *,
     data: dict[str, Union[str, int]],
     request_id: str,
@@ -21,7 +21,6 @@ def set_or_unset_chat_admin_producer(
 ) -> None:
 
     data_to_send: dict[str, Union[str, None, int]] = {
-        "user_id": data["user_id"],
         "action": data["action"],
         "chat_id": data["chat_id"],
         "request_user_id": request_user_id,
@@ -31,7 +30,7 @@ def set_or_unset_chat_admin_producer(
     default_producer.delay(topic_name=TOPIC_NAME, data=data_to_send)
 
 
-def set_or_unset_chat_admin_response_consumer() -> None:
+def off_or_on_push_notifications_response_consumer() -> None:
     consumer: KafkaConsumer = KafkaConsumer(
         RESPONSE_TOPIC_NAME, **settings.KAFKA_CONSUMER_CONFIG
     )

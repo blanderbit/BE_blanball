@@ -9,7 +9,7 @@ from rest_framework.serializers import (
 
 
 class NewChatDataSerializer(Serializer):
-    name: str = CharField(max_length=255, required=False)
+    name: str = CharField(max_length=355, required=False)
 
     class Meta:
         fields: Union[str, list[str]] = ["name"]

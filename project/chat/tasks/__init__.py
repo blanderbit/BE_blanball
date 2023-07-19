@@ -82,7 +82,18 @@ from chat.tasks.set_or_unset_chat_admin import (
 from chat.tasks.set_or_unset_chat_admin import (
     set_or_unset_chat_admin_response_consumer as set_or_unset_chat_admin_response_consumer
 )
-
+from chat.tasks.get_user_info_in_chat import (
+    get_user_info_in_chat_producer as get_user_info_in_chat_producer
+)
+from chat.tasks.get_user_info_in_chat import (
+    get_user_info_in_chat_response_consumer as get_user_info_in_chat_response_consumer
+)
+from chat.tasks.off_or_on_push_notifications import (
+    off_or_on_push_notifications_response_consumer as off_or_on_push_notifications_response_consumer
+)
+from chat.tasks.off_or_on_push_notifications import (
+    off_or_on_push_notifications_producer as off_or_on_push_notifications_producer
+)
 
 ALL_CONSUMER_TASKS = [
     create_chat_response_consumer,
@@ -99,4 +110,6 @@ ALL_CONSUMER_TASKS = [
     delete_messages_response_consumer,
     get_chat_users_list_response_consumer,
     set_or_unset_chat_admin_response_consumer,
+    get_user_info_in_chat_response_consumer,
+    off_or_on_push_notifications_response_consumer,
 ]

@@ -12,8 +12,9 @@ from chat.serializers import (
     EditChatMessageSerializer,
     EditChatSerializer,
     ReadOrUnreadMessagesSerializer,
-    SetChatAdminSerializer,
+    SetOrUnsetChatAdminSerializer,
     RemoveUserFromChatSerializer,
+    OffOrOnChatPushNotificationsSerializer,
 )
 from chat.tasks import (
     create_chat_producer,
@@ -28,6 +29,8 @@ from chat.tasks import (
     remove_user_from_chat_producer,
     set_or_unset_chat_admin_producer,
     get_chat_users_list_producer,
+    get_user_info_in_chat_producer,
+    off_or_on_push_notifications_producer
 )
 from django.utils.decorators import (
     method_decorator,
@@ -112,7 +115,6 @@ class RemoveUserFromChat(GenericAPIView):
             chat_id=serializer.validated_data["chat_id"],
             request_id=unique_request_id,
             request_user_id=request.user.id,
-            sender_user_id=request.user.id,
         )
         return Response({"request_id": unique_request_id}, HTTP_200_OK)
 
@@ -311,13 +313,14 @@ class DeleteChatMessages(GenericAPIView):
 
         delete_messages_producer(
             message_ids=serializer.validated_data["message_ids"],
+            chat_id=serializer.validated_data["chat_id"],
             request_user_id=request.user.id,
             request_id=unique_request_id,
         )
         return Response({"request_id": unique_request_id}, HTTP_200_OK)
 
 
-class SetChatAdmin(GenericAPIView):
+class SetOrUnsetChatAdmin(GenericAPIView):
     """
     Set chat admin
 
@@ -325,7 +328,7 @@ class SetChatAdmin(GenericAPIView):
     messages in a chat that he previously sent.
     """
 
-    serializer_class: Type[Serializer] = SetChatAdminSerializer
+    serializer_class: Type[Serializer] = SetOrUnsetChatAdminSerializer
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
@@ -334,6 +337,48 @@ class SetChatAdmin(GenericAPIView):
 
         set_or_unset_chat_admin_producer(
             data=serializer.validated_data,
+            request_user_id=request.user.id,
+            request_id=unique_request_id,
+        )
+        return Response({"request_id": unique_request_id}, HTTP_200_OK)
+
+
+class OffOrOnChatPushNotifications(GenericAPIView):
+    """
+    Off or on chat push notifications
+
+    This endpoint allows the user to delete
+    messages in a chat that he previously sent.
+    """
+
+    serializer_class: Type[Serializer] = OffOrOnChatPushNotificationsSerializer
+
+    def post(self, request: Request) -> Response:
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        unique_request_id: str = generate_unique_request_id()
+
+        off_or_on_push_notifications_producer(
+            data=serializer.validated_data,
+            request_user_id=request.user.id,
+            request_id=unique_request_id,
+        )
+        return Response({"request_id": unique_request_id}, HTTP_200_OK)
+
+
+class GetInfoAboutMeInChat(GenericAPIView):
+    """
+    Info about me in chat
+
+    This endpoint allows the user to delete
+    messages in a chat that he previously sent.
+    """
+
+    def get(self, request: Request, chat_id: int) -> Response:
+        unique_request_id: str = generate_unique_request_id()
+
+        get_user_info_in_chat_producer(
+            chat_id=chat_id,
             request_user_id=request.user.id,
             request_id=unique_request_id,
         )

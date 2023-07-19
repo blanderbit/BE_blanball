@@ -24,7 +24,6 @@ from events.constants.success import (
 )
 from events.models import (
     Event,
-    RequestToParticipation,
 )
 from events.serializers import (
     JoinOrRemoveRoomSerializer,
@@ -33,8 +32,8 @@ from events.serializers import (
 from events.services import (
     remove_user_from_event,
     send_message_to_event_author_after_leave_user_from_event,
-    send_notification_to_event_author,
-    validate_user_before_join_to_event,
+    join_event,
+    join_event_as_fan,
 )
 from rest_framework.exceptions import (
     PermissionDenied,
@@ -67,17 +66,11 @@ class JoinToEvent(GenericAPIView):
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user: User = request.user
-        event: Event = Event.objects.get(id=serializer.data["event_id"])
-        validate_user_before_join_to_event(user=user, event=event)
-        if not event.privacy:
-            user.current_rooms.add(event)
-            send_notification_to_event_author(event=event, request_user=request.user)
-            return Response(JOIN_TO_EVENT_SUCCESS, status=HTTP_200_OK)
-        RequestToParticipation.objects.create(
-            recipient=event.author, sender=user, event=event
+        response: Response = join_event(
+            request_user=request.user,
+            data=serializer.validated_data
         )
-        return Response(SENT_REQUEST_TO_PARTICIPATION_SUCCESS, status=HTTP_200_OK)
+        return response
 
 
 class FanJoinToEvent(GenericAPIView):
@@ -95,16 +88,11 @@ class FanJoinToEvent(GenericAPIView):
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user: User = request.user
-        event: Event = Event.objects.get(id=serializer.data["event_id"])
-        if event.author.id == request.user.id:
-            raise ValidationError(EVENT_AUTHOR_CAN_NOT_JOIN_ERROR, HTTP_400_BAD_REQUEST)
-        if not user.current_views_rooms.filter(id=serializer.data["event_id"]).exists():
-            user.current_views_rooms.add(event)
-            return Response(JOIN_TO_EVENT_SUCCESS, status=HTTP_200_OK)
-        return Response(
-            ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, status=HTTP_400_BAD_REQUEST
+        response: Response = join_event_as_fan(
+            request_user=request.user,
+            data=serializer.validated_data
         )
+        return response
 
 
 class FanLeaveFromEvent(GenericAPIView):

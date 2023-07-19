@@ -29,6 +29,10 @@ from events.constants.errors import (
     GET_PLANNED_EVENTS_ERROR,
     NO_IN_EVENT_FANS_LIST_ERROR,
 )
+from events.constants.success import (
+    JOIN_TO_EVENT_SUCCESS,
+    SENT_REQUEST_TO_PARTICIPATION_SUCCESS,
+)
 from events.constants.notification_types import (
     EVENT_UPDATE_NOTIFICATION_TYPE,
     LEAVE_USER_FROM_THE_EVENT_NOTIFICATION_TYPE,
@@ -50,8 +54,12 @@ from rest_framework.serializers import (
     ValidationError,
 )
 from rest_framework.status import (
+    HTTP_200_OK,
     HTTP_400_BAD_REQUEST,
 )
+from rest_framework.response import Response
+
+
 from utils import generate_unique_request_id
 
 bulk = TypeVar(Optional[Generator[list[dict[str, int]], None, None]])
@@ -437,3 +445,29 @@ def invite_users_to_event(
             yield {"success": invite_user.id}
         except ValidationError:
             pass
+
+
+def join_event(*, request_user: User, data: dict[str, Any]) -> Response:
+    event: Event = Event.objects.get(id=data["event_id"])
+    validate_user_before_join_to_event(user=request_user, event=event)
+    if not event.privacy:
+        request_user.current_rooms.add(event)
+        add_user_to_chat_producer(
+            user_id=request_user.id, event_id=event.id
+        )
+        send_notification_to_event_author(event=event, request_user=request_user)
+        return Response(JOIN_TO_EVENT_SUCCESS, status=HTTP_200_OK)
+    RequestToParticipation.objects.create(
+        recipient=event.author, sender=request_user, event=event
+    )
+    return Response(SENT_REQUEST_TO_PARTICIPATION_SUCCESS, status=HTTP_200_OK)
+
+
+def join_event_as_fan(*, request_user: User, data: dict[str, Any]) -> Response:
+    event: Event = Event.objects.get(id=data["event_id"])
+    if event.author.id == request_user.id:
+        raise ValidationError(EVENT_AUTHOR_CAN_NOT_JOIN_ERROR, HTTP_400_BAD_REQUEST)
+    if not request_user.current_views_rooms.filter(id=data["event_id"]).exists():
+        request_user.current_views_rooms.add(event)
+        return Response(JOIN_TO_EVENT_SUCCESS, status=HTTP_200_OK)
+    return Response(ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, HTTP_400_BAD_REQUEST)
