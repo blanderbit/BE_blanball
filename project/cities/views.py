@@ -1,3 +1,4 @@
+from json import load as json_load
 from typing import Type
 
 from cities.serializers import (
@@ -72,3 +73,19 @@ class GetPlaceNameByCoordinates(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         place = get_place_name_by_coordinates(data=serializer.data)
         return Response(place, HTTP_200_OK)
+
+
+class GetUkraineCitiesList(APIView):
+    """
+    Get Ukraine cities list
+
+    This endpoint allows the user to get 
+    a complete list of Ukrainian cities
+    """
+
+    def get(self, request) -> Response:
+        ukraine_cities_json_file = './cities/mocks/ukraine_cities.json'
+
+        with open(ukraine_cities_json_file, 'r') as file:
+            ukraine_cities_json_data = json_load(file)
+            return Response(ukraine_cities_json_data, HTTP_200_OK)

@@ -14,6 +14,7 @@ from chat.views import (
     GetChatUsersList,
     SetOrUnsetChatAdmin,
     GetInfoAboutMeInChat,
+    OffOrOnChatPushNotifications,
 )
 from django.urls import path
 from django.urls.resolvers import (
@@ -26,6 +27,11 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
         "client/group/chat/create", CreateGroupChat.as_view(), name="group-chat-create"
     ),
     path("client/create/message", CreateMessage.as_view(), name="create-message"),
+    path(
+        "client/off/or/on/chat/push/notifications",
+        OffOrOnChatPushNotifications.as_view(),
+        name="off-or-on-chat-push-notifications"
+    ),
     path(
         "client/remove/user/from/chat",
         RemoveUserFromChat.as_view(),

@@ -25,4 +25,6 @@ get_chat_users_list_response
 set_chat_admin
 set_chat_admin_response
 get_user_info_in_chat
-get_user_info_in_chatn_response
+get_user_info_in_chat_response
+off_or_on_push_notifications
+off_or_on_push_notifications_response

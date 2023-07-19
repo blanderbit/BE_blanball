@@ -14,6 +14,7 @@ from chat.serializers import (
     ReadOrUnreadMessagesSerializer,
     SetOrUnsetChatAdminSerializer,
     RemoveUserFromChatSerializer,
+    OffOrOnChatPushNotificationsSerializer,
 )
 from chat.tasks import (
     create_chat_producer,
@@ -29,6 +30,7 @@ from chat.tasks import (
     set_or_unset_chat_admin_producer,
     get_chat_users_list_producer,
     get_user_info_in_chat_producer,
+    off_or_on_push_notifications_producer
 )
 from django.utils.decorators import (
     method_decorator,
@@ -334,6 +336,29 @@ class SetOrUnsetChatAdmin(GenericAPIView):
         unique_request_id: str = generate_unique_request_id()
 
         set_or_unset_chat_admin_producer(
+            data=serializer.validated_data,
+            request_user_id=request.user.id,
+            request_id=unique_request_id,
+        )
+        return Response({"request_id": unique_request_id}, HTTP_200_OK)
+
+
+class OffOrOnChatPushNotifications(GenericAPIView):
+    """
+    Off or on chat push notifications
+
+    This endpoint allows the user to delete
+    messages in a chat that he previously sent.
+    """
+
+    serializer_class: Type[Serializer] = OffOrOnChatPushNotificationsSerializer
+
+    def post(self, request: Request) -> Response:
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        unique_request_id: str = generate_unique_request_id()
+
+        off_or_on_push_notifications_producer(
             data=serializer.validated_data,
             request_user_id=request.user.id,
             request_id=unique_request_id,

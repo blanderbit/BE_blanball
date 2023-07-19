@@ -13,7 +13,6 @@ def send_response_message_from_chat_to_the_ws(
 
     main_data: dict[str, Any] = data["data"]
     message_type: str = data.pop("message_type")
-
     try:
         users = main_data.pop("users")
         for user in users:
