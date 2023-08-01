@@ -9,7 +9,7 @@ from django.db.models import QuerySet
 from django.utils import timezone
 from notifications.constants.notification_types import (
     ALL_USER_NOTIFICATIONS_DELETED_NOTIFICATION_TYPE,
-    ALL_USER_NOTIFICATIONS_READED_NOTIFICATION_TYPE,
+    ALL_USER_NOTIFICATIONS_READ_NOTIFICATION_TYPE,
 )
 from notifications.models import Notification
 
@@ -106,7 +106,7 @@ def read_all_user_notifications(*, request_user_id: int) -> None:
                 data={
                     "type": "send.message",
                     "message": {
-                        "message_type": ALL_USER_NOTIFICATIONS_READED_NOTIFICATION_TYPE,
+                        "message_type": ALL_USER_NOTIFICATIONS_READ_NOTIFICATION_TYPE,
                     },
                 },
             )

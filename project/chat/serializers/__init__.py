@@ -37,3 +37,6 @@ from chat.serializers.get_chat_messages_list_serializer import (
 from chat.serializers.off_or_on_push_notifications_serializer import (
     OffOrOnChatPushNotificationsSerializer as OffOrOnChatPushNotificationsSerializer
 )
+from chat.serializers.get_chats_list_serializer import (
+    GetChatsListSerializer as GetChatsListSerializer
+)

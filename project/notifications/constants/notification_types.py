@@ -18,6 +18,6 @@ NOTIFICATIONS_BULK_READ_NOTIFICATION_TYPE: str = "bulk_notifications_read"
 ALL_USER_NOTIFICATIONS_DELETED_NOTIFICATION_TYPE: str = "all_user_notifications_deleted"
 
 # SERVICE MESSAGE that is sent to the user when he reads all his notifications
-ALL_USER_NOTIFICATIONS_READED_NOTIFICATION_TYPE: str = "all_user_notifications_readed"
+ALL_USER_NOTIFICATIONS_READ_NOTIFICATION_TYPE: str = "all_user_notifications_read"
 
 # ================================================================================

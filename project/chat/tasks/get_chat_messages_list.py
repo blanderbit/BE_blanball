@@ -51,7 +51,7 @@ def process_response_data(data: dict[str, Any]) -> None:
         results_messages_list = data["data"].get("results")
 
     if results_messages_list:
-        user_ids = [item['sender_id'] for item in results_messages_list]
+        user_ids = [item.get('sender_id') for item in results_messages_list]
         users = User.objects.filter(id__in=user_ids)
         serializer = GetChatMessagesListSerializer(
             results_messages_list,
@@ -59,7 +59,7 @@ def process_response_data(data: dict[str, Any]) -> None:
             context={'users_list': [user for user in users]}
         )
 
-        data["data"]["results"] = [result for result in serializer.data]
+        data["data"]["results"] = [dict(result) for result in serializer.data]
 
     send_response_message_from_chat_to_the_ws(data=data)
 

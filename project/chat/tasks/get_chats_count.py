@@ -9,19 +9,17 @@ from chat.tasks.default_producer import (
     default_producer
 )
 
-TOPIC_NAME: str = "get_user_info_in_chat"
-RESPONSE_TOPIC_NAME: str = "get_user_info_in_chat_response"
+TOPIC_NAME: str = "get_chats_count"
+RESPONSE_TOPIC_NAME: str = "get_chats_count_response"
 
 
-def get_user_info_in_chat_producer(
+def get_chats_count_producer(
     *,
-    chat_id: int,
     request_id: Optional[str] = None,
     request_user_id: int
 ) -> str:
 
     data_to_send: dict[str, Any] = {
-        "chat_id": chat_id,
         "request_user_id": request_user_id,
         "request_id": request_id,
     }
@@ -29,7 +27,7 @@ def get_user_info_in_chat_producer(
     default_producer.delay(topic_name=TOPIC_NAME, data=data_to_send)
 
 
-def get_user_info_in_chat_response_consumer() -> None:
+def get_chats_count_response_consumer() -> None:
 
     consumer: KafkaConsumer = KafkaConsumer(
         RESPONSE_TOPIC_NAME, **settings.KAFKA_CONSUMER_CONFIG

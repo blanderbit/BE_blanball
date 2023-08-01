@@ -29,8 +29,9 @@ from chat.tasks import (
     remove_user_from_chat_producer,
     set_or_unset_chat_admin_producer,
     get_chat_users_list_producer,
-    get_user_info_in_chat_producer,
-    off_or_on_push_notifications_producer
+    get_chat_detail_data_producer,
+    off_or_on_push_notifications_producer,
+    get_chats_count_producer,
 )
 from django.utils.decorators import (
     method_decorator,
@@ -189,6 +190,7 @@ class GetChatsList(GenericAPIView):
             offset=query.get("offset"),
             page=query.get("page"),
             search=query.get("search"),
+            chats_type=query.get("chats_type")
         )
         return Response({"request_id": unique_request_id}, HTTP_200_OK)
 
@@ -366,9 +368,9 @@ class OffOrOnChatPushNotifications(GenericAPIView):
         return Response({"request_id": unique_request_id}, HTTP_200_OK)
 
 
-class GetInfoAboutMeInChat(GenericAPIView):
+class GetChatDetailData(GenericAPIView):
     """
-    Info about me in chat
+    Chat detail data
 
     This endpoint allows the user to delete
     messages in a chat that he previously sent.
@@ -377,8 +379,26 @@ class GetInfoAboutMeInChat(GenericAPIView):
     def get(self, request: Request, chat_id: int) -> Response:
         unique_request_id: str = generate_unique_request_id()
 
-        get_user_info_in_chat_producer(
+        get_chat_detail_data_producer(
             chat_id=chat_id,
+            request_user_id=request.user.id,
+            request_id=unique_request_id,
+        )
+        return Response({"request_id": unique_request_id}, HTTP_200_OK)
+
+
+class GetMyChatsCount(GenericAPIView):
+    """
+    Get all my chats count
+
+    This endpoint allows the user to delete
+    messages in a chat that he previously sent.
+    """
+
+    def get(self, request: Request) -> Response:
+        unique_request_id: str = generate_unique_request_id()
+
+        get_chats_count_producer(
             request_user_id=request.user.id,
             request_id=unique_request_id,
         )
