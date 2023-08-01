@@ -13,8 +13,9 @@ from chat.views import (
     RemoveUserFromChat,
     GetChatUsersList,
     SetOrUnsetChatAdmin,
-    GetInfoAboutMeInChat,
+    GetChatDetailData,
     OffOrOnChatPushNotifications,
+    GetMyChatsCount,
 )
 from django.urls import path
 from django.urls.resolvers import (
@@ -41,9 +42,14 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     path("client/edit/chat", EditChat.as_view(), name="edit-chat"),
     path("client/get/chats/list", GetChatsList.as_view(), name="get-chat-lists"),
     path(
-        "client/get/info/about/me/in/chat/<int:chat_id>",
-        GetInfoAboutMeInChat.as_view(),
-        name="get-info-about-me-in-chat"
+        "client/get/chat/detail/data/<int:chat_id>",
+        GetChatDetailData.as_view(),
+        name="get-chat-detail-data"
+    ),
+    path(
+        "client/get/all/my/chats/count",
+        GetMyChatsCount.as_view(),
+        name="get-all-my-chats-count"
     ),
     path(
         "client/edit/chat/message", EditChatMessage.as_view(), name="edit-chat-message"

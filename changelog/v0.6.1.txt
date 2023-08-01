@@ -1,5 +1,5 @@
 EN
-- Added 2 new notification updates "all_user_notifications_deleted" and "all_user_notifications_readed"
+- Added 2 new notification updates "all_user_notifications_deleted" and "all_user_notifications_read"
 - Changed notification update for delete bulk and notification read bulk
 - Fixed a bug when a user could read another user's notifications
 - Added an endpoint to get a list of user reviews by id
@@ -9,7 +9,7 @@ EN
 - Added the ability to filter the list of events within a user-specified radius
 - Added location field to user profile
 RU
-- Добавлены 2 новые апдейт нотификации “all_user_notifications_deleted“ и “all_user_notifications_readed“
+- Добавлены 2 новые апдейт нотификации “all_user_notifications_deleted“ и “all_user_notifications_read“
 - Изменены апдейт  нотификации для балк удаления и балк чтения нотификаций 
 - Исправлен баг когда пользователь мог прочитать нотификации другого пользователя
 - Добавлен ендпоинт для получения списка отзывов пользоватлея по айди

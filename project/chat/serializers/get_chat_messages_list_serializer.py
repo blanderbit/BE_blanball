@@ -5,7 +5,8 @@ from rest_framework.serializers import (
     IntegerField,
     CharField,
     ListField,
-    BooleanField
+    BooleanField,
+    JSONField
 )
 from chat.serializers.chat_user_serializer import (
     ChatUserSerializer
@@ -19,8 +20,8 @@ class GetChatMessagesListSerializer(Serializer):
     service = BooleanField()
     type = CharField()
     time_created = CharField()
-    reply_to = IntegerField()
-    readed_by = ListField()
+    reply_to = JSONField()
+    read_by = ListField()
     sender = ChatUserSerializer(read_only=True)
 
     class Meta:
@@ -30,19 +31,18 @@ class GetChatMessagesListSerializer(Serializer):
             "text",
             "time_created",
             "edited",
-            "readed_by",
+            "read_by",
             "reply_to",
             "type",
-            "service"
+            "service",
         ]
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
         users_list = self.context.get("users_list")
         if users_list:
-            user_id = instance['sender_id']
+            user_id = instance.get('sender_id')
             for user in users_list:
-                print(user)
                 if user.id == user_id:
                     serializer = ChatUserSerializer(user)
                     user_data = serializer.data

@@ -18,7 +18,7 @@ from notifications.constants.errors import (
 from notifications.constants.success import (
     MAINTENANCE_UPDATED_SUCCESS,
     NOTIFICATIONS_DELETED_SUCCESS,
-    NOTIFICATIONS_READED_SUCCESS,
+    NOTIFICATIONS_READ_SUCCESS,
 )
 from notifications.filters import (
     NotificationsFilterSet,
@@ -281,7 +281,7 @@ class ReadAllUserNotifications(APIView):
 
     def get(self, request: Request) -> Response:
         read_all_user_notifications.delay(request_user_id=request.user.id)
-        return Response(NOTIFICATIONS_READED_SUCCESS, status=HTTP_200_OK)
+        return Response(NOTIFICATIONS_READ_SUCCESS, status=HTTP_200_OK)
 
 
 class GetNotificationsIds(GenericAPIView):

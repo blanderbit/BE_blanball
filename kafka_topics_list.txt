@@ -24,7 +24,9 @@ get_chat_users_list
 get_chat_users_list_response
 set_chat_admin
 set_chat_admin_response
-get_user_info_in_chat
-get_user_info_in_chat_response
+get_chat_detail_data
+get_chat_detail_data_response
 off_or_on_push_notifications
 off_or_on_push_notifications_response
+get_chats_count
+get_chats_count_response
