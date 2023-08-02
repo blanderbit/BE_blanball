@@ -1,13 +1,10 @@
 from typing import Any, Optional
 
-from django.conf import settings
-from kafka import KafkaConsumer
+
 from chat.utils.send_response_message_from_chat_to_the_ws import (
     send_response_message_from_chat_to_the_ws
 )
-from chat.tasks.default_producer import (
-    default_producer
-)
+from chat.helpers import default_producer, default_consumer
 
 TOPIC_NAME: str = "get_chats_count"
 RESPONSE_TOPIC_NAME: str = "get_chats_count_response"
@@ -29,9 +26,7 @@ def get_chats_count_producer(
 
 def get_chats_count_response_consumer() -> None:
 
-    consumer: KafkaConsumer = KafkaConsumer(
-        RESPONSE_TOPIC_NAME, **settings.KAFKA_CONSUMER_CONFIG
-    )
+    consumer = default_consumer.delay(RESPONSE_TOPIC_NAME)
 
     for data in consumer:
         send_response_message_from_chat_to_the_ws(
