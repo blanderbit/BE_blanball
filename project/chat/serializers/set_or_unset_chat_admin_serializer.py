@@ -1,4 +1,3 @@
-
 from typing import Union
 
 from rest_framework.serializers import (
@@ -6,7 +5,6 @@ from rest_framework.serializers import (
     IntegerField,
     Serializer,
 )
-
 
 SER_OR_UNSET_ADMIM_CHOICES: tuple[tuple[str]] = (("set", "set"), ("unset", "unset"))
 
@@ -17,8 +15,4 @@ class SetOrUnsetChatAdminSerializer(Serializer):
     action: str = ChoiceField(choices=SER_OR_UNSET_ADMIM_CHOICES)
 
     class Meta:
-        fields: Union[str, list[str]] = [
-            "user_id",
-            "chat_id",
-            "action"
-        ]
+        fields: Union[str, list[str]] = ["user_id", "chat_id", "action"]

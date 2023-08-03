@@ -1,17 +1,13 @@
 from typing import Any
 
 from authentication.models import User
-from django.db.models.signals import (
-    m2m_changed,
-)
+from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
 from events.constants.notification_types import (
     LAST_USER_ON_THE_EVENT_NOTIFICATION_TYPE,
     YOU_ARE_LAST_USER_ON_THE_EVENT_NOTIFICATION_TYPE,
 )
-from events.models import (
-    Event,
-)
+from events.models import Event
 from notifications.tasks import send_to_user
 
 

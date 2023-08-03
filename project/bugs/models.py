@@ -1,11 +1,9 @@
 from os import path
 from typing import Optional, final
 
-from authentication.models import (
-    User,
-)
+from authentication.models import User
 from authentication.models.profile_model import (
-    validate_image
+    validate_image,
 )
 from django.conf import settings
 from django.db import models

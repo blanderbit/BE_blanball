@@ -30,8 +30,8 @@ from rest_framework.serializers import (
     IntegerField,
     ModelSerializer,
     Serializer,
-    ValidationError,
     SerializerMethodField,
+    ValidationError,
 )
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
@@ -147,7 +147,7 @@ class EventListSerializer(ModelSerializer):
             "count_current_users",
             "count_current_fans",
             "request_user_role",
-            "pk_user_role"
+            "pk_user_role",
         ]
 
     def get_pk_user_role(self, instance):

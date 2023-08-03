@@ -7,15 +7,15 @@ from chat.views import (
     DeleteChatMessages,
     EditChat,
     EditChatMessage,
+    GetChatDetailData,
     GetChatMessagesList,
     GetChatsList,
+    GetChatUsersList,
+    GetMyChatsCount,
+    OffOrOnChatPushNotifications,
     ReadOrUnreadMessages,
     RemoveUserFromChat,
-    GetChatUsersList,
     SetOrUnsetChatAdmin,
-    GetChatDetailData,
-    OffOrOnChatPushNotifications,
-    GetMyChatsCount,
 )
 from django.urls import path
 from django.urls.resolvers import (
@@ -31,7 +31,7 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     path(
         "client/off/or/on/chat/push/notifications",
         OffOrOnChatPushNotifications.as_view(),
-        name="off-or-on-chat-push-notifications"
+        name="off-or-on-chat-push-notifications",
     ),
     path(
         "client/remove/user/from/chat",
@@ -44,12 +44,12 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
     path(
         "client/get/chat/detail/data/<int:chat_id>",
         GetChatDetailData.as_view(),
-        name="get-chat-detail-data"
+        name="get-chat-detail-data",
     ),
     path(
         "client/get/all/my/chats/count",
         GetMyChatsCount.as_view(),
-        name="get-all-my-chats-count"
+        name="get-all-my-chats-count",
     ),
     path(
         "client/edit/chat/message", EditChatMessage.as_view(), name="edit-chat-message"

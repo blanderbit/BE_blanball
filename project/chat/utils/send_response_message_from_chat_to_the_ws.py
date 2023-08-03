@@ -1,14 +1,14 @@
 from typing import Any
-from loguru import logger
 
-from notifications.tasks import send_to_group_by_group_name
+from notifications.tasks import (
+    send_to_group_by_group_name,
+)
 
-WS_LAYERS: dict[str, str] = {'chat': 'chat_user', 'user': 'user'}
+WS_LAYERS: dict[str, str] = {"chat": "chat_user", "user": "user"}
 
 
 def send_response_message_from_chat_to_the_ws(
-    data: dict[str, Any],
-    ws_layer: str = WS_LAYERS['chat']
+    data: dict[str, Any], ws_layer: str = WS_LAYERS["chat"]
 ) -> None:
 
     main_data: dict[str, Any] = data["data"]
@@ -23,8 +23,10 @@ def send_response_message_from_chat_to_the_ws(
         send_message_to_group(group_name, message_type, data)
 
 
-def send_message_to_group(group_name: str, message_type: str, data: dict[str, Any]) -> None:
+def send_message_to_group(
+    group_name: str, message_type: str, data: dict[str, Any]
+) -> None:
     try:
         send_to_group_by_group_name(message_type, group_name, data)
     except Exception as _err:
-        logger.debug(_err)
+        print(_err)

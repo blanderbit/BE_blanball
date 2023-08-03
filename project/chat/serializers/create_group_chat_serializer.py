@@ -1,9 +1,6 @@
-
 from typing import Union
 
-from authentication.models import (
-    User,
-)
+from authentication.models import User
 from rest_framework.serializers import (
     CharField,
     IntegerField,

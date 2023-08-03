@@ -121,7 +121,7 @@ class Event(models.Model):
 
     def user_role(self, pk: Optional[int] = None):
         from events.models.request_to_participation_model import (
-            RequestToParticipation
+            RequestToParticipation,
         )
 
         if pk:

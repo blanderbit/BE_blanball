@@ -1,9 +1,7 @@
 from typing import Any
-from events.models import (
-    Event,
-)
-from notifications.tasks import send_to_user
 
+from events.models import Event
+from notifications.tasks import send_to_user
 
 
 def send_message_to_all_event_users(

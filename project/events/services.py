@@ -29,10 +29,6 @@ from events.constants.errors import (
     GET_PLANNED_EVENTS_ERROR,
     NO_IN_EVENT_FANS_LIST_ERROR,
 )
-from events.constants.success import (
-    JOIN_TO_EVENT_SUCCESS,
-    SENT_REQUEST_TO_PARTICIPATION_SUCCESS,
-)
 from events.constants.notification_types import (
     EVENT_UPDATE_NOTIFICATION_TYPE,
     LEAVE_USER_FROM_THE_EVENT_NOTIFICATION_TYPE,
@@ -40,6 +36,10 @@ from events.constants.notification_types import (
     RESPONSE_TO_THE_INVITE_TO_EVENT_NOTIFICATION_TYPE,
     RESPONSE_TO_THE_REQUEST_FOR_PARTICIPATION_NOTIFICATION_TYPE,
     USER_REMOVE_FROM_EVENT_NOTIFICATION_TYPE,
+)
+from events.constants.success import (
+    JOIN_TO_EVENT_SUCCESS,
+    SENT_REQUEST_TO_PARTICIPATION_SUCCESS,
 )
 from events.models import (
     Event,
@@ -50,6 +50,7 @@ from notifications.tasks import send_to_user
 from rest_framework.exceptions import (
     PermissionDenied,
 )
+from rest_framework.response import Response
 from rest_framework.serializers import (
     ValidationError,
 )
@@ -57,9 +58,6 @@ from rest_framework.status import (
     HTTP_200_OK,
     HTTP_400_BAD_REQUEST,
 )
-from rest_framework.response import Response
-
-
 from utils import generate_unique_request_id
 
 bulk = TypeVar(Optional[Generator[list[dict[str, int]], None, None]])
@@ -452,9 +450,7 @@ def join_event(*, request_user: User, data: dict[str, Any]) -> Response:
     validate_user_before_join_to_event(user=request_user, event=event)
     if not event.privacy:
         request_user.current_rooms.add(event)
-        add_user_to_chat_producer(
-            user_id=request_user.id, event_id=event.id
-        )
+        add_user_to_chat_producer(user_id=request_user.id, event_id=event.id)
         send_notification_to_event_author(event=event, request_user=request_user)
         return Response(JOIN_TO_EVENT_SUCCESS, status=HTTP_200_OK)
     RequestToParticipation.objects.create(

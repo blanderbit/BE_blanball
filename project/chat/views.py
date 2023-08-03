@@ -1,8 +1,8 @@
 from typing import Any, Type
 
 from chat.openapi import (
+    chat_users_list_query_params,
     chats_list_query_params,
-    chat_users_list_query_params
 )
 from chat.serializers import (
     CreateGroupChatSerializer,
@@ -11,10 +11,10 @@ from chat.serializers import (
     DeleteMessagesSerializer,
     EditChatMessageSerializer,
     EditChatSerializer,
-    ReadOrUnreadMessagesSerializer,
-    SetOrUnsetChatAdminSerializer,
-    RemoveUserFromChatSerializer,
     OffOrOnChatPushNotificationsSerializer,
+    ReadOrUnreadMessagesSerializer,
+    RemoveUserFromChatSerializer,
+    SetOrUnsetChatAdminSerializer,
 )
 from chat.tasks import (
     create_chat_producer,
@@ -23,15 +23,15 @@ from chat.tasks import (
     delete_messages_producer,
     edit_chat_producer,
     edit_message_producer,
+    get_chat_detail_data_producer,
     get_chat_messages_list_producer,
+    get_chat_users_list_producer,
+    get_chats_count_producer,
     get_chats_list_producer,
+    off_or_on_push_notifications_producer,
     read_or_unread_messages_producer,
     remove_user_from_chat_producer,
     set_or_unset_chat_admin_producer,
-    get_chat_users_list_producer,
-    get_chat_detail_data_producer,
-    off_or_on_push_notifications_producer,
-    get_chats_count_producer,
 )
 from django.utils.decorators import (
     method_decorator,
@@ -190,7 +190,7 @@ class GetChatsList(GenericAPIView):
             offset=query.get("offset"),
             page=query.get("page"),
             search=query.get("search"),
-            chats_type=query.get("chats_type")
+            chats_type=query.get("chats_type"),
         )
         return Response({"request_id": unique_request_id}, HTTP_200_OK)
 

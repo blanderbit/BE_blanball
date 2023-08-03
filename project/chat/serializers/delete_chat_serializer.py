@@ -1,4 +1,5 @@
 from typing import Union
+
 from rest_framework.serializers import (
     IntegerField,
     Serializer,

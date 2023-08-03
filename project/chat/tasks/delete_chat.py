@@ -1,10 +1,8 @@
 from typing import Any, Optional
 
-
-from chat.utils import (
-    send_response_message_from_chat_to_the_ws
+from chat.helpers.default_producer import (
+    default_producer,
 )
-from chat.helpers import default_producer, default_consumer
 
 TOPIC_NAME: str = "delete_chat"
 RESPONSE_TOPIC_NAME: str = "delete_chat_response"
@@ -26,13 +24,3 @@ def delete_chat_producer(
     }
 
     default_producer.delay(topic_name=TOPIC_NAME, data=data_to_send)
-
-
-def delete_chat_response_consumer() -> None:
-
-    consumer = default_consumer.delay(RESPONSE_TOPIC_NAME)
-
-    for data in consumer:
-        send_response_message_from_chat_to_the_ws(
-            data=data.value
-        )

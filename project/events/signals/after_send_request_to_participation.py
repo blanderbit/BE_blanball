@@ -1,14 +1,11 @@
 from typing import Any
-from django.db.models.signals import (
-    post_save,
-)
+
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 from events.constants.notification_types import (
     NEW_REQUEST_TO_PARTICIPATION_NOTIFICATION_TYPE,
 )
-from events.models import (
-    RequestToParticipation,
-)
+from events.models import RequestToParticipation
 from notifications.tasks import send_to_user
 
 

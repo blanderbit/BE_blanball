@@ -1,14 +1,15 @@
 from typing import Any, Optional
 
-
-from chat.utils.send_response_message_from_chat_to_the_ws import (
-    send_response_message_from_chat_to_the_ws
-)
-from chat.helpers import default_producer, default_consumer
-from chat.serializers import (
-    GetChatMessagesListSerializer
-)
 from authentication.models import User
+from chat.helpers.default_producer import (
+    default_producer,
+)
+from chat.serializers import (
+    GetChatMessagesListSerializer,
+)
+from chat.utils.send_response_message_from_chat_to_the_ws import (
+    send_response_message_from_chat_to_the_ws,
+)
 
 TOPIC_NAME: str = "get_chat_messages_list"
 RESPONSE_TOPIC_NAME: str = "get_chat_messages_list_response"
@@ -48,22 +49,14 @@ def process_response_data(data: dict[str, Any]) -> None:
         results_messages_list = data["data"].get("results")
 
     if results_messages_list:
-        user_ids = [item.get('sender_id') for item in results_messages_list]
+        user_ids = [item.get("sender_id") for item in results_messages_list]
         users = User.objects.filter(id__in=user_ids)
         serializer = GetChatMessagesListSerializer(
             results_messages_list,
             many=True,
-            context={'users_list': [user for user in users]}
+            context={"users_list": [user for user in users]},
         )
 
         data["data"]["results"] = [dict(result) for result in serializer.data]
 
     send_response_message_from_chat_to_the_ws(data=data)
-
-
-def get_chat_messages_list_response_consumer() -> None:
-
-    consumer = default_consumer.delay(RESPONSE_TOPIC_NAME)
-
-    for data in consumer:
-        process_response_data(data.value)

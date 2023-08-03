@@ -22,18 +22,16 @@ from events.constants.success import (
     SENT_REQUEST_TO_PARTICIPATION_SUCCESS,
     USER_REMOVED_FROM_EVENT_SUCCESS,
 )
-from events.models import (
-    Event,
-)
+from events.models import Event
 from events.serializers import (
     JoinOrRemoveRoomSerializer,
     RemoveUserFromEventSerializer,
 )
 from events.services import (
-    remove_user_from_event,
-    send_message_to_event_author_after_leave_user_from_event,
     join_event,
     join_event_as_fan,
+    remove_user_from_event,
+    send_message_to_event_author_after_leave_user_from_event,
 )
 from rest_framework.exceptions import (
     PermissionDenied,
@@ -67,8 +65,7 @@ class JoinToEvent(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         response: Response = join_event(
-            request_user=request.user,
-            data=serializer.validated_data
+            request_user=request.user, data=serializer.validated_data
         )
         return response
 
@@ -89,8 +86,7 @@ class FanJoinToEvent(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         response: Response = join_event_as_fan(
-            request_user=request.user,
-            data=serializer.validated_data
+            request_user=request.user, data=serializer.validated_data
         )
         return response
 

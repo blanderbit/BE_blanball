@@ -123,7 +123,6 @@ class EventUsersSerializer(ModelSerializer):
         ]
 
 
-
 class FriendUserSerializer(ModelSerializer):
     profile = CommonUserProfileSerializer()
 

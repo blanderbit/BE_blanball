@@ -1,15 +1,11 @@
-from django.db.models.signals import (
-    post_save,
-)
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 from events.constants.notification_types import (
     EVENT_HAS_BEEN_ENDEN_NOTIFICATION_TYPE,
 )
-from events.models import (
-    Event,
-)
+from events.models import Event
 from events.utils import (
-    send_message_to_all_event_users as send_message_to_all_event_users
+    send_message_to_all_event_users as send_message_to_all_event_users,
 )
 
 

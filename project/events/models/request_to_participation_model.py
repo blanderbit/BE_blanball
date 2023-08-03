@@ -1,11 +1,9 @@
 from datetime import datetime
 
 from authentication.models import User
-from events.models.event_model import (
-    Event
-)
 from django.db import models
 from django.db.models.query import QuerySet
+from events.models.event_model import Event
 
 
 class RequestToParticipation(models.Model):

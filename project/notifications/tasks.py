@@ -39,7 +39,7 @@ def send_to_user(
     notification = Notification.objects.create(
         user=user, message_type=message_type, data=data
     )
-    send(
+    send.delay(
         user=user,
         data={
             "type": "send.message",
@@ -57,7 +57,7 @@ def send_to_group_by_group_name(
     group_name: str,
     data: dict[str, Union[str, int, datetime, bool]] = None,
 ) -> None:
-    send(
+    send.delay(
         group_name=group_name,
         data={
             "type": "send.message",
@@ -76,7 +76,7 @@ def send_to_general_layer(
 
     group_name_to_send: str = "general"
 
-    send(
+    send.delay(
         group_name=group_name_to_send,
         data={
             "type": "send.message",
