@@ -38,6 +38,7 @@ def default_consumer() -> None:
         raw_messages = consumer.poll(timeout_ms=100, max_records=200)
         for topic_partition, messages in raw_messages.items():
             for message in messages:
+                print(message)
                 topic_name: str = message.topic
                 module_name: str = remove_from_end_of_string(topic_name, "_response")
                 chat_task = import_module(f"chat.tasks.{module_name}")

@@ -14,6 +14,12 @@ from notifications.constants.notification_types import (
 from notifications.models import Notification
 
 
+@celery.task(
+    ignore_result=True,
+    time_limit=5,
+    soft_time_limit=3,
+    default_retry_delay=5,
+)
 def send(
     data: dict[str, Any], user: Optional[User] = None, group_name: Optional[str] = None
 ) -> None:
@@ -51,7 +57,7 @@ def send_to_group_by_group_name(
     group_name: str,
     data: dict[str, Union[str, int, datetime, bool]] = None,
 ) -> None:
-    send(
+    send.delay(
         group_name=group_name,
         data={
             "type": "send.message",
