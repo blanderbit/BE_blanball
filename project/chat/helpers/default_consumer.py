@@ -22,7 +22,7 @@ def create_topics() -> list:
     consumer_topics = [
         NewTopic(name=topic, num_partitions=1, replication_factor=1)
         for topic in all_kafka_topics
-        if (topic.endswith("response") or topic in existing_topics)
+        if (topic.endswith("response") and topic not in existing_topics)
     ]
     admin_client.create_topics(new_topics=consumer_topics, validate_only=False)
     return admin_client.list_topics()
