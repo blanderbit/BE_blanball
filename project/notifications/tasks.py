@@ -39,7 +39,7 @@ def send_to_user(
     notification = Notification.objects.create(
         user=user, message_type=message_type, data=data
     )
-    send.delay(
+    send(
         user=user,
         data={
             "type": "send.message",
@@ -76,7 +76,7 @@ def send_to_general_layer(
 
     group_name_to_send: str = "general"
 
-    send.delay(
+    send(
         group_name=group_name_to_send,
         data={
             "type": "send.message",

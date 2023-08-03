@@ -22,7 +22,7 @@ def create_topics() -> list:
     consumer_topics = [
         NewTopic(name=topic, num_partitions=1, replication_factor=1)
         for topic in all_kafka_topics
-        if (topic.endswith("response") or topic in existing_topics)
+        if (topic.endswith("response") and topic not in existing_topics)
     ]
     admin_client.create_topics(new_topics=consumer_topics, validate_only=False)
     return admin_client.list_topics()
@@ -38,6 +38,7 @@ def default_consumer() -> None:
         raw_messages = consumer.poll(timeout_ms=100, max_records=200)
         for topic_partition, messages in raw_messages.items():
             for message in messages:
+                print(message)
                 topic_name: str = message.topic
                 module_name: str = remove_from_end_of_string(topic_name, "_response")
                 chat_task = import_module(f"chat.tasks.{module_name}")
