@@ -1,4 +1,8 @@
 from typing import Any, Optional, final
+
+from authentication.models.profile_model import (
+    Profile,
+)
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
@@ -6,9 +10,6 @@ from django.contrib.auth.models import (
 from django.db import models
 from django.db.models.query import QuerySet
 from hints.models import Hint
-from authentication.models.profile_model import (
-    Profile
-)
 from phonenumber_field.modelfields import (
     PhoneNumberField,
 )

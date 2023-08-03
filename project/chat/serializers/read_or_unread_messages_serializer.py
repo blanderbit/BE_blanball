@@ -1,4 +1,5 @@
 from typing import Union
+
 from rest_framework.serializers import (
     ChoiceField,
     IntegerField,
@@ -6,7 +7,10 @@ from rest_framework.serializers import (
     Serializer,
 )
 
-READ_OR_UNREAD_MESSAGE_CHOICES: tuple[tuple[str]] = (("read", "read"), ("unread", "unread"))
+READ_OR_UNREAD_MESSAGE_CHOICES: tuple[tuple[str]] = (
+    ("read", "read"),
+    ("unread", "unread"),
+)
 
 
 class ReadOrUnreadMessagesSerializer(Serializer):

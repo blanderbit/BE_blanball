@@ -33,7 +33,8 @@ class Migration(migrations.Migration):
             model_name="profile",
             name="birthday",
             field=models.DateField(
-                blank=True, validators=[authentication.models.profile_model.validate_birthday]
+                blank=True,
+                validators=[authentication.models.profile_model.validate_birthday],
             ),
         ),
         migrations.AlterField(

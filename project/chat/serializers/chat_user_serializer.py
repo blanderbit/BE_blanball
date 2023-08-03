@@ -1,11 +1,8 @@
 from typing import Union
 
-from authentication.models import (
-    User,
-    Profile
-)
+from authentication.models import Profile, User
 from authentication.serializers import (
-    CommonUserProfileSerializer
+    CommonUserProfileSerializer,
 )
 from rest_framework.serializers import (
     ModelSerializer,

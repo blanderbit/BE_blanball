@@ -12,7 +12,4 @@ class DeleteMessagesSerializer(Serializer):
     message_ids: list[int] = ListField(child=IntegerField(min_value=0))
 
     class Meta:
-        fields: Union[str, list[str]] = [
-            "chat_id",
-            "message_ids"
-        ]
+        fields: Union[str, list[str]] = ["chat_id", "message_ids"]

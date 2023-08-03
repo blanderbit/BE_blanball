@@ -1,15 +1,15 @@
-
 from typing import Union
-from rest_framework.serializers import (
-    Serializer,
-    IntegerField,
-    CharField,
-    ListField,
-    BooleanField,
-    JSONField
-)
+
 from chat.serializers.chat_user_serializer import (
-    ChatUserSerializer
+    ChatUserSerializer,
+)
+from rest_framework.serializers import (
+    BooleanField,
+    CharField,
+    IntegerField,
+    JSONField,
+    ListField,
+    Serializer,
 )
 
 
@@ -41,11 +41,11 @@ class GetChatMessagesListSerializer(Serializer):
         data = super().to_representation(instance)
         users_list = self.context.get("users_list")
         if users_list:
-            user_id = instance.get('sender_id')
+            user_id = instance.get("sender_id")
             for user in users_list:
                 if user.id == user_id:
                     serializer = ChatUserSerializer(user)
                     user_data = serializer.data
-                    data['sender'] = user_data
+                    data["sender"] = user_data
                     break
         return data

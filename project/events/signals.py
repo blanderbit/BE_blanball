@@ -27,6 +27,3 @@ from events.services import (
 )
 from notifications.models import Notification
 from notifications.tasks import send, send_to_user
-
-
-

@@ -1,14 +1,11 @@
-
 from typing import Union
 
+from chat.serializers import ChatUserSerializer
 from rest_framework.serializers import (
     BooleanField,
     CharField,
     IntegerField,
     Serializer,
-)
-from chat.serializers import (
-    ChatUserSerializer
 )
 
 
@@ -57,11 +54,11 @@ class GetChatsListSerializer(Serializer):
         data = super().to_representation(instance)
         users_list = self.context.get("users_list")
         if users_list:
-            user_id = instance['last_message'].get('sender_id')
+            user_id = instance["last_message"].get("sender_id")
             for user in users_list:
                 if user.id == user_id:
                     serializer = ChatUserSerializer(user)
                     user_data = serializer.data
-                    data['last_message']['sender'] = user_data
+                    data["last_message"]["sender"] = user_data
                     break
         return data

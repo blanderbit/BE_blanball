@@ -11,7 +11,7 @@ x-blanball-api-common-dev: &blanball-api-common-dev
         - .:/usr/src/blanball
     networks:
         - blaball-network-dev
-        - blanball-chat-connection-network-dev
+        - test-chat-network
     depends_on:
         blanball-db-dev:
             condition: service_healthy
@@ -28,6 +28,7 @@ services:
             - ./postgres-data:/var/lib/postgresql/data
         networks:
             - blaball-network-dev
+            - test-chat-network
         healthcheck:
             test: pg_isready -U postgres -d postgres
             timeout: 5s
@@ -42,6 +43,7 @@ services:
             - redis-data:/usr/src/blanball/storage/redis/data
         networks:
             - blaball-network-dev
+            - test-chat-network
         healthcheck:
             test: ['CMD-SHELL', 'redis-cli ping | grep PONG']
             timeout: 5s
@@ -90,6 +92,7 @@ services:
             retries: 3
         networks:
             - blaball-network-dev
+            - test-chat-network
     blanball-pgadmin-dev:
         container_name: blanball-pgadmin-dev
         env_file:
@@ -100,6 +103,7 @@ services:
             - pgadmin-data:/usr/src/blanball/storage/pgadmin/data
         networks:
             - blaball-network-dev
+            - test-chat-network
         ports:
             - 49280:49299
 
@@ -118,7 +122,7 @@ services:
             - kafka-data:/usr/src/blanball/storage/kafka/data
         networks:
             - blaball-network-dev
-            - blanball-chat-connection-network-dev
+            - test-chat-network
 
     blanball-zookeeper-dev:
         container_name: blanball-zookeeper-dev
@@ -133,14 +137,14 @@ services:
             - zookeeper-logs-data:/usr/src/blanball/storage/zookeeper-logs/data \
         networks:
             - blaball-network-dev
-            - blanball-chat-connection-network-dev
+            - test-chat-network
 
 networks:
     blaball-network-dev:
         name: blaball-network-dev
-    blanball-chat-connection-network-dev:
-        external:
-            name: blanball-chat-connection-network-dev
+    test-chat-network:
+      external:
+        name: test-chat-network
 
 volumes:
     redis-data:

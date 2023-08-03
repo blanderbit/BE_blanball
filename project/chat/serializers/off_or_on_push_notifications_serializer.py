@@ -1,11 +1,15 @@
 from typing import Union
+
 from rest_framework.serializers import (
     ChoiceField,
     IntegerField,
     Serializer,
 )
 
-OFF_OR_ON_CHAT_PUSH_NOTIFICATIONS_CHOICES: tuple[tuple[str]] = (("on", "on"), ("off", "off"))
+OFF_OR_ON_CHAT_PUSH_NOTIFICATIONS_CHOICES: tuple[tuple[str]] = (
+    ("on", "on"),
+    ("off", "off"),
+)
 
 
 class OffOrOnChatPushNotificationsSerializer(Serializer):

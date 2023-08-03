@@ -1,4 +1,3 @@
-
 import os
 from datetime import date, datetime
 from typing import Any, Optional, Union, final
@@ -144,7 +143,9 @@ class Profile(models.Model):
     working_leg: Optional[str] = models.CharField(
         choices=Leg.choices, max_length=255, null=True
     )
-    place: Optional[dict[str, Union[str, float]]] = models.JSONField(null=True, db_index=True)
+    place: Optional[dict[str, Union[str, float]]] = models.JSONField(
+        null=True, db_index=True
+    )
     coordinates: Optional[Point] = PointField(null=True, srid=4326)
 
     def __repr__(self) -> str:

@@ -1,10 +1,9 @@
-
 from typing import Union
 
 from rest_framework.serializers import (
-    Serializer,
     CharField,
     IntegerField,
+    Serializer,
 )
 
 

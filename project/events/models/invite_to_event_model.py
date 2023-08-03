@@ -1,9 +1,6 @@
-
 from typing import final
+
 from authentication.models import User
-from events.models.request_to_participation_model import (
-    RequestToParticipation
-)
 from django.db import models
 from django.db.models.query import QuerySet
 from events.constants.errors import (
@@ -14,6 +11,9 @@ from events.constants.errors import (
 )
 from events.constants.notification_types import (
     INVITE_USER_TO_EVENT_NOTIFICATION_TYPE,
+)
+from events.models.request_to_participation_model import (
+    RequestToParticipation,
 )
 from notifications.tasks import send_to_user
 from rest_framework.serializers import (

@@ -9,4 +9,3 @@ from kafka import KafkaProducer
 def default_producer(*, topic_name: str, data: dict[str, Any]) -> str:
     producer: KafkaProducer = KafkaProducer(**settings.KAFKA_PRODUCER_CONFIG)
     producer.send(topic_name, value=data)
-    producer.flush()
