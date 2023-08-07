@@ -148,9 +148,6 @@ networks:
         external: true
     blaball-network-prod:
         name: blaball-network-prod
-    blanball-chat-connection-network-prod:
-        external:
-            name: blanball-chat-connection-network-prod
 
 volumes:
     redis-data-prod:
