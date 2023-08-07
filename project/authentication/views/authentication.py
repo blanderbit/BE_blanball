@@ -29,6 +29,7 @@ from authentication.constants.success import (
     EMAIL_VERIFY_SUCCESS_BODY_TITLE,
     EMAIL_VERIFY_SUCCESS_TEXT,
     EMAIL_VERIFY_SUCCESS_TITLE,
+    LOGOUT_SUCCESS,
     PASSWORD_RESET_SUCCESS,
     PHONE_IS_VALID_SUCCESS,
     REGISTER_SUCCESS_BODY_TITLE,
@@ -39,7 +40,6 @@ from authentication.constants.success import (
     TEMPLATE_SUCCESS_BODY_TITLE,
     TEMPLATE_SUCCESS_TEXT,
     TEMPLATE_SUCCESS_TITLE,
-    LOGOUT_SUCCESS,
 )
 from authentication.models import (
     Code,
@@ -47,29 +47,30 @@ from authentication.models import (
     User,
 )
 from authentication.permissions import (
-    IsNotAuthenticated,
     AllowAny,
+    IsNotAuthenticated,
 )
 from authentication.serializers import (
     CheckCodeSerializer,
     EmailSerializer,
     LoginSerializer,
+    LogoutSerializer,
     RegisterSerializer,
     RequestChangePasswordSerializer,
     ResetPasswordSerializer,
     ValidatePhoneByUniqueSerializer,
     ValidateResetPasswordCodeSerializer,
-    LogoutSerializer,
 )
 from authentication.services import (
     code_create,
     count_age,
-    reset_password,
     logout,
+    reset_password,
     send_email_template,
 )
 from config.exceptions import _404
 from django.db import transaction
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.generics import GenericAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -82,7 +83,6 @@ from rest_framework.status import (
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
 )
-from drf_yasg.utils import swagger_auto_schema
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
@@ -124,7 +124,7 @@ class RegisterUser(GenericAPIView):
         )
         count_age(profile=profile, data=serializer.validated_data["profile"].items())
         serializer.save(profile=profile)
-        user: User = User.get_all().get(profile=profile.id)
+        user: User = User.objects.get(profile=profile.id)
         send_email_template(
             user=user,
             body_title=REGISTER_SUCCESS_BODY_TITLE,
@@ -207,7 +207,7 @@ class RequestPasswordReset(GenericAPIView):
     def post(self, request: Request) -> Response:
         email: str = request.data.get("email", "")
         try:
-            User.get_all().get(email=email)
+            User.objects.get(email=email)
             code_create(email=email, type=PASSWORD_RESET_CODE_TYPE, dop_info=None)
             return Response(SENT_CODE_TO_EMAIL_SUCCESS, status=HTTP_200_OK)
         except User.DoesNotExist:
@@ -394,7 +394,7 @@ class CheckCode(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         verify_code: str = serializer.validated_data["verify_code"]
         self.code: Code = Code.objects.get(verify_code=verify_code)
-        self.user: User = User.get_all().get(id=request.user.id)
+        self.user: User = User.objects.get(id=request.user.id)
         if self.code.user_email != self.user.email:
             raise ValidationError(NO_PERMISSIONS_ERROR, HTTP_400_BAD_REQUEST)
 

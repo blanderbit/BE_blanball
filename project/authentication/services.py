@@ -11,6 +11,9 @@ from authentication.constants.code_types import (
     PASSWORD_CHANGE_CODE_TYPE,
     PASSWORD_RESET_CODE_TYPE,
 )
+from authentication.constants.errors import (
+    INVALID_REFRESH_TOKEN,
+)
 from authentication.constants.notification_types import (
     UPDATE_MESSAGE_USER_UPDATED_AVATAR,
 )
@@ -19,9 +22,6 @@ from authentication.constants.success import (
     TEMPLATE_SUCCESS_BODY_TITLE,
     TEMPLATE_SUCCESS_TEXT,
     TEMPLATE_SUCCESS_TITLE,
-)
-from authentication.constants.errors import (
-    INVALID_REFRESH_TOKEN,
 )
 from authentication.models import (
     Code,
@@ -42,13 +42,16 @@ from minio.commonconfig import REPLACE, CopySource
 from notifications.tasks import (
     send_to_general_layer,
 )
-from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from rest_framework.serializers import (
     Serializer,
     ValidationError,
 )
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
+)
+from rest_framework_simplejwt.tokens import (
+    RefreshToken,
+    TokenError,
 )
 
 
@@ -107,7 +110,7 @@ def code_create(*, email: str, type: str, dop_info: str) -> None:
         life_time=timezone.now()
         + timezone.timedelta(minutes=settings.CODE_EXPIRE_MINUTES_TIME),
     )
-    user: User = User.get_all().get(email=email)
+    user: User = User.objects.get(email=email)
     context: dict = {
         "title": check_code_type(code=code),
         "code": code.verify_code,
@@ -175,7 +178,7 @@ def update_profile_avatar(*, user: User, data: dict[str, Any]) -> None:
 def reset_password(*, data: dict[str, Any]) -> None:
     verify_code: str = data["verify_code"]
     code: Code = Code.objects.get(verify_code=verify_code)
-    user: User = User.get_all().get(email=code.user_email)
+    user: User = User.objects.get(email=code.user_email)
     user.set_password(data["new_password"])
     user.save()
     code.delete()

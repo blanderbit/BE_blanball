@@ -8,9 +8,7 @@ from authentication.serializers import (
 )
 from cities.serializers import PlaceSerializer
 from config.exceptions import _404
-from config.serializers import (
-    BaseBulkSerializer,
-)
+from config.serializers import BaseBulkSerializer
 from events.constants.errors import (
     ALREADY_IN_EVENT_FANS_LIST_ERROR,
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,
@@ -32,6 +30,7 @@ from rest_framework.serializers import (
     IntegerField,
     ModelSerializer,
     Serializer,
+    SerializerMethodField,
     ValidationError,
 )
 from rest_framework.status import (
@@ -124,6 +123,7 @@ class PopularEventsListSerializer(ModelSerializer):
 class EventListSerializer(ModelSerializer):
     place = PlaceSerializer()
     author = EventAuthorSerializer()
+    pk_user_role = SerializerMethodField()
 
     class Meta:
         model: Event = Event
@@ -147,19 +147,16 @@ class EventListSerializer(ModelSerializer):
             "count_current_users",
             "count_current_fans",
             "request_user_role",
+            "pk_user_role",
         ]
 
-    def to_representation(self, instance):
+    def get_pk_user_role(self, instance):
         try:
-            event_id = instance.id
             user_id = self.context.get("request").parser_context["kwargs"]["pk"]
-            event = Event.objects.get(id=event_id)
-            data = super().to_representation(instance)
-            data["pk_user_role"] = event.get_user_role(pk=user_id)
-            return data
+            return instance.user_role(pk=user_id)
         except KeyError:
-            data = super().to_representation(instance)
-            return data
+            pass
+
 
 class MyPlannedParticipantAndViewEventsListSerializer(ModelSerializer):
     place = PlaceSerializer()
@@ -249,7 +246,7 @@ class JoinOrRemoveRoomSerializer(Serializer):
     def validate(self, attrs: OrderedDict) -> OrderedDict:
         event_id: int = attrs.get("event_id")
         try:
-            event: Event = Event.get_all().get(id=event_id)
+            event: Event = Event.objects.get(id=event_id)
             if event.status != event.Status.PLANNED:
                 raise ValidationError(EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST)
             if event.amount_members < event.count_current_users + 1:
@@ -263,19 +260,18 @@ class InviteUsersToEventSerializer(BaseBulkSerializer):
     event_id: int = IntegerField(min_value=0)
 
     class Meta:
-        fields: Union[str, list[str]] = [
-            "ids",
-            "event_id"
-        ]
+        fields: Union[str, list[str]] = ["ids", "event_id"]
 
     def validate(self, attrs) -> OrderedDict[str, Any]:
         try:
-            event: Event = Event.get_all().get(id=attrs.get("event_id"))
+            event: Event = Event.objects.get(id=attrs.get("event_id"))
 
             for user_id in attrs.get("ids"):
-                invite_user: User = User.get_all().get(id=user_id)
+                invite_user: User = User.objects.get(id=user_id)
                 if event.status == Event.Status.FINISHED:
-                    raise ValidationError(EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST)
+                    raise ValidationError(
+                        EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST
+                    )
                 if invite_user.current_rooms.filter(id=event.id).exists():
                     raise ValidationError(
                         ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, HTTP_400_BAD_REQUEST
@@ -305,8 +301,8 @@ class RemoveUserFromEventSerializer(Serializer):
 
     def validate(self, attrs) -> OrderedDict[str, Any]:
         try:
-            removed_user: User = User.get_all().get(id=attrs.get("user_id"))
-            event: Event = Event.get_all().get(id=attrs.get("event_id"))
+            removed_user: User = User.objects.get(id=attrs.get("user_id"))
+            event: Event = Event.objects.get(id=attrs.get("event_id"))
             if event.status == event.Status.FINISHED:
                 raise ValidationError(EVENT_TIME_EXPIRED_ERROR, HTTP_400_BAD_REQUEST)
             if not removed_user.current_rooms.filter(id=event.id).exists():

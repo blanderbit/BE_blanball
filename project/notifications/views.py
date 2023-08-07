@@ -2,9 +2,7 @@ import json
 from typing import Any, Type
 
 from api_keys.permissions import ApiKeyPermission
-from config.serializers import (
-    BaseBulkSerializer,
-)
+from config.serializers import BaseBulkSerializer
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
     method_decorator,
@@ -13,10 +11,6 @@ from django_filters.rest_framework import (
     DjangoFilterBackend,
 )
 from drf_yasg.utils import swagger_auto_schema
-from utils import (
-    skip_objects_from_response_by_id,
-    paginate_by_offset
-)
 from notifications.constants.errors import (
     MAINTENANCE_CAN_NOT_GET_ERROR,
     MAINTENANCE_CAN_NOT_UPDATE_ERROR,
@@ -24,7 +18,7 @@ from notifications.constants.errors import (
 from notifications.constants.success import (
     MAINTENANCE_UPDATED_SUCCESS,
     NOTIFICATIONS_DELETED_SUCCESS,
-    NOTIFICATIONS_READED_SUCCESS,
+    NOTIFICATIONS_READ_SUCCESS,
 )
 from notifications.filters import (
     NotificationsFilterSet,
@@ -62,6 +56,10 @@ from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
 )
 from rest_framework.views import APIView
+from utils import (
+    paginate_by_offset,
+    skip_objects_from_response_by_id,
+)
 
 
 @method_decorator(
@@ -283,7 +281,7 @@ class ReadAllUserNotifications(APIView):
 
     def get(self, request: Request) -> Response:
         read_all_user_notifications.delay(request_user_id=request.user.id)
-        return Response(NOTIFICATIONS_READED_SUCCESS, status=HTTP_200_OK)
+        return Response(NOTIFICATIONS_READ_SUCCESS, status=HTTP_200_OK)
 
 
 class GetNotificationsIds(GenericAPIView):

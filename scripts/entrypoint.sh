@@ -1,20 +1,22 @@
-#!/bin/bash -x
+#!/bin/bash
 cd project
 
-BackendDeploy()
+ApiDeploy()
 {
     python manage.py migrate --noinput
     python manage.py loaddata */fixtures/*.json
-    uwsgi --ini uwsgi.ini
+    uwsgi --ini uwsgi.ini &
+    python manage.py wait_for_kafka_broker
 }
 
-Backend()
+Api()
 {
     python manage.py makemigrations --noinput
     python manage.py migrate --noinput
     python manage.py collectstatic --noinput
     python manage.py loaddata */fixtures/*.json
-    python manage.py runserver 0.0.0.0:8000
+    python manage.py runserver 0.0.0.0:8000 &
+    python manage.py wait_for_kafka_broker
 }
 
 Daphne()
@@ -36,8 +38,8 @@ CeleryBeat()
 
 case $1
 in
-    api) Backend ;;
-    api-deploy) BackendDeploy;;
+    api) Api ;;
+    api-deploy) ApiDeploy;;
     celery-worker) CeleryWorker ;;
     celery-beat) CeleryBeat ;;
     daphne) Daphne;;

@@ -88,7 +88,7 @@ class EventUsersProfileSerializer(ModelSerializer):
         ]
 
 
-class EventAuthorProfileSerializer(ModelSerializer):
+class CommonUserProfileSerializer(ModelSerializer):
     class Meta:
         model: Profile = Profile
         fields: Union[str, list[str]] = [
@@ -100,7 +100,7 @@ class EventAuthorProfileSerializer(ModelSerializer):
 
 
 class EventAuthorSerializer(ModelSerializer):
-    profile = EventAuthorProfileSerializer()
+    profile = CommonUserProfileSerializer()
 
     class Meta:
         model: User = User
@@ -123,27 +123,12 @@ class EventUsersSerializer(ModelSerializer):
         ]
 
 
-class FriendProfileSerializer(ModelSerializer):
-    class Meta:
-        model: Profile = Profile
-        fields: Union[str, list[str]] = [
-            "id",
-            "name",
-            "last_name",
-            "avatar_url",
-        ]
-
-
 class FriendUserSerializer(ModelSerializer):
-    profile = FriendProfileSerializer()
+    profile = CommonUserProfileSerializer()
 
     class Meta:
         model: User = User
-        fields: Union[str, list[str]] = [
-            "id",
-            "profile",
-            "is_online"
-        ]
+        fields: Union[str, list[str]] = ["id", "profile", "is_online"]
 
 
 class ProfileSerializer(ModelSerializer):
@@ -287,7 +272,7 @@ class LoginSerializer(ModelSerializer):
     tokens = SerializerMethodField()
 
     def get_tokens(self, obj) -> dict[str, str]:
-        user: User = User.get_all().get(email=obj["email"])
+        user: User = User.objects.get(email=obj["email"])
         return {"refresh": user.tokens()["refresh"], "access": user.tokens()["access"]}
 
     class Meta:
@@ -470,7 +455,7 @@ class CheckUserActiveSerializer(Serializer):
     def validate(self, attrs: OrderedDict[str, Any]) -> OrderedDict[str, Any]:
         user_id: int = attrs.get("user_id")
         try:
-            User.get_all().get(id=user_id)
+            User.objects.get(id=user_id)
             return super().validate(attrs)
         except User.DoesNotExist:
             raise _404(object=User)

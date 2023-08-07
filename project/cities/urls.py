@@ -3,6 +3,7 @@ from typing import Union
 from cities.views import (
     GetCoordinatesByPlaceName,
     GetPlaceNameByCoordinates,
+    GetUkraineCitiesList,
 )
 from django.urls import path
 from django.urls.resolvers import (
@@ -20,5 +21,10 @@ urlpatterns: list[Union[URLResolver, URLPattern]] = [
         "client/get/place/name/by/coordinates",
         GetPlaceNameByCoordinates.as_view(),
         name="get-place-name-by-coordinates",
+    ),
+    path(
+        "client/ukraine/cities/list",
+        GetUkraineCitiesList.as_view(),
+        name="get-ukraine-cities-list",
     ),
 ]

@@ -1,8 +1,8 @@
 from os import path
 from typing import Optional, final
 
-from authentication.models import (
-    User,
+from authentication.models import User
+from authentication.models.profile_model import (
     validate_image,
 )
 from django.conf import settings
@@ -14,6 +14,7 @@ from django.db.models.query import QuerySet
 from django.utils import timezone
 
 
+@final
 def bug_image_name(instance: "BugImage", filename: str) -> str:
     """
     setting the name for uploaded bug report image
@@ -23,6 +24,7 @@ def bug_image_name(instance: "BugImage", filename: str) -> str:
     return path.join("bugs", filename)
 
 
+@final
 class BugImage(models.Model):
     image: Optional[ImageFieldFile] = models.ImageField(
         null=True, upload_to=bug_image_name, validators=[validate_image], default=None
@@ -39,11 +41,9 @@ class BugImage(models.Model):
             return self.image.url.replace("minio:9000", settings.MINIO_IMAGE_HOST)
         return None
 
-    @final
     def __repr__(self) -> str:
         return "<BugImage %s>" % self.id
 
-    @final
     def __str__(self) -> str:
         return self.image
 
@@ -54,6 +54,7 @@ class BugImage(models.Model):
         verbose_name_plural: str = "bug_images"
 
 
+@final
 class Bug(models.Model):
     class Type(models.TextChoices):
         CLOSED: str = "Closed"
@@ -67,7 +68,6 @@ class Bug(models.Model):
     images: Optional[BugImage] = models.ManyToManyField(BugImage, blank=True)
     type: str = models.CharField(choices=Type.choices, max_length=15, default=Type.OPEN)
 
-    @final
     @staticmethod
     def get_all() -> QuerySet["Bug"]:
         """
@@ -75,11 +75,9 @@ class Bug(models.Model):
         """
         return Bug.objects.prefetch_related("images").select_related("author")
 
-    @final
     def __repr__(self) -> str:
         return "<Bug %s>" % self.id
 
-    @final
     def __str__(self) -> str:
         return self.title
 

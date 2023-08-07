@@ -6,6 +6,10 @@
 from typing import Any, Type, final
 
 from authentication.models import User
+from chat.tasks import (
+    remove_user_from_chat_producer,
+)
+from drf_yasg.utils import swagger_auto_schema
 from events.constants.errors import (
     ALREADY_IN_EVENT_MEMBERS_LIST_ERROR,
     EVENT_AUTHOR_CAN_NOT_JOIN_ERROR,
@@ -18,19 +22,16 @@ from events.constants.success import (
     SENT_REQUEST_TO_PARTICIPATION_SUCCESS,
     USER_REMOVED_FROM_EVENT_SUCCESS,
 )
-from events.models import (
-    Event,
-    RequestToParticipation,
-)
+from events.models import Event
 from events.serializers import (
     JoinOrRemoveRoomSerializer,
     RemoveUserFromEventSerializer,
 )
 from events.services import (
+    join_event,
+    join_event_as_fan,
     remove_user_from_event,
     send_message_to_event_author_after_leave_user_from_event,
-    send_notification_to_event_author,
-    validate_user_before_join_to_event,
 )
 from rest_framework.exceptions import (
     PermissionDenied,
@@ -46,7 +47,6 @@ from rest_framework.status import (
     HTTP_200_OK,
     HTTP_400_BAD_REQUEST,
 )
-from drf_yasg.utils import swagger_auto_schema
 
 
 class JoinToEvent(GenericAPIView):
@@ -60,23 +60,14 @@ class JoinToEvent(GenericAPIView):
 
     serializer_class: Type[Serializer] = JoinOrRemoveRoomSerializer
 
-    @swagger_auto_schema(
-        tags=["event-join"]
-    )
+    @swagger_auto_schema(tags=["event-join"])
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user: User = request.user
-        event: Event = Event.get_all().get(id=serializer.data["event_id"])
-        validate_user_before_join_to_event(user=user, event=event)
-        if not event.privacy:
-            user.current_rooms.add(event)
-            send_notification_to_event_author(event=event, request_user=request.user)
-            return Response(JOIN_TO_EVENT_SUCCESS, status=HTTP_200_OK)
-        RequestToParticipation.objects.create(
-            recipient=event.author, sender=user, event=event
+        response: Response = join_event(
+            request_user=request.user, data=serializer.validated_data
         )
-        return Response(SENT_REQUEST_TO_PARTICIPATION_SUCCESS, status=HTTP_200_OK)
+        return response
 
 
 class FanJoinToEvent(GenericAPIView):
@@ -90,22 +81,14 @@ class FanJoinToEvent(GenericAPIView):
 
     serializer_class: Type[Serializer] = JoinOrRemoveRoomSerializer
 
-    @swagger_auto_schema(
-        tags=["event-join"]
-    )
+    @swagger_auto_schema(tags=["event-join"])
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user: User = request.user
-        event: Event = Event.get_all().get(id=serializer.data["event_id"])
-        if event.author.id == request.user.id:
-            raise ValidationError(EVENT_AUTHOR_CAN_NOT_JOIN_ERROR, HTTP_400_BAD_REQUEST)
-        if not user.current_views_rooms.filter(id=serializer.data["event_id"]).exists():
-            user.current_views_rooms.add(event)
-            return Response(JOIN_TO_EVENT_SUCCESS, status=HTTP_200_OK)
-        return Response(
-            ALREADY_IN_EVENT_MEMBERS_LIST_ERROR, status=HTTP_400_BAD_REQUEST
+        response: Response = join_event_as_fan(
+            request_user=request.user, data=serializer.validated_data
         )
+        return response
 
 
 class FanLeaveFromEvent(GenericAPIView):
@@ -118,14 +101,12 @@ class FanLeaveFromEvent(GenericAPIView):
 
     serializer_class: Type[Serializer] = JoinOrRemoveRoomSerializer
 
-    @swagger_auto_schema(
-        tags=["event-leave"]
-    )
+    @swagger_auto_schema(tags=["event-leave"])
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         user: User = request.user
-        event: Event = Event.get_all().get(id=serializer.data["event_id"])
+        event: Event = Event.objects.get(id=serializer.data["event_id"])
         if user.current_views_rooms.filter(id=serializer.data["event_id"]).exists():
             user.current_views_rooms.remove(event)
             return Response(DISCONNECT_FROM_EVENT_SUCCESS, status=HTTP_200_OK)
@@ -142,16 +123,15 @@ class LeaveFromEvent(GenericAPIView):
 
     serializer_class: Type[Serializer] = JoinOrRemoveRoomSerializer
 
-    @swagger_auto_schema(
-        tags=["event-leave"]
-    )
+    @swagger_auto_schema(tags=["event-leave"])
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         user: User = request.user
-        event: Event = Event.get_all().get(id=serializer.data["event_id"])
+        event: Event = Event.objects.get(id=serializer.data["event_id"])
         if user.current_rooms.filter(id=serializer.data["event_id"]).exists():
             user.current_rooms.remove(event)
+            remove_user_from_chat_producer(user_id=user.id, event_id=event.id)
             send_message_to_event_author_after_leave_user_from_event(
                 event=event, user=user
             )
@@ -170,14 +150,12 @@ class RemoveUserFromEvent(GenericAPIView):
 
     serializer_class: Type[Serializer] = RemoveUserFromEventSerializer
 
-    @swagger_auto_schema(
-        tags=["events", "event-leave"]
-    )
+    @swagger_auto_schema(tags=["events", "event-leave"])
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        event: Event = Event.get_all().get(id=serializer.data["event_id"])
-        user: User = User.get_all().get(id=serializer.data["user_id"])
+        event: Event = Event.objects.get(id=serializer.data["event_id"])
+        user: User = User.objects.get(id=serializer.data["user_id"])
         if request.user.id != event.author.id:
             raise PermissionDenied()
         remove_user_from_event(

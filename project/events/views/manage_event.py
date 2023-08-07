@@ -1,14 +1,13 @@
 from typing import Any, Type, final
 
-from config.serializers import (
-    BaseBulkSerializer,
-)
+from config.serializers import BaseBulkSerializer
 from django.db.models.query import QuerySet
-from events.constants.notification_types import (
-    EVENT_UPDATE_NOTIFICATION_TYPE,
-)
 from events.constants.success import (
     EVENT_UPDATE_SUCCESS,
+)
+from events.decorators import (
+    not_in_black_list,
+    only_author,
 )
 from events.models import Event
 from events.serializers import (
@@ -19,12 +18,10 @@ from events.serializers import (
 from events.services import (
     bulk_delete_events,
     bulk_pin_events,
+    bulk_show_or_hide_events,
     bulk_unpin_events,
     event_create,
-    not_in_black_list,
-    only_author,
-    bulk_show_or_hide_events,
-    send_notification_to_subscribe_event_user,
+    update_event,
 )
 from rest_framework.generics import GenericAPIView
 from rest_framework.mixins import (
@@ -89,11 +86,11 @@ class UpdateEvent(GenericAPIView):
     def put(self, request: Request, pk: int) -> Response:
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        event: Event = self.queryset.filter(id=pk)
-        send_notification_to_subscribe_event_user(
-            event=event[0], message_type=EVENT_UPDATE_NOTIFICATION_TYPE
+        update_event(
+            event=self.queryset.filter(id=pk),
+            new_data=serializer.validated_data,
+            request_user=request.user,
         )
-        event.update(**serializer.validated_data)
         return Response(EVENT_UPDATE_SUCCESS, status=HTTP_200_OK)
 
 
@@ -140,7 +137,7 @@ class PinMyEvents(GenericAPIView):
             user=request.user,
         )
         return Response(data, status=HTTP_200_OK)
-    
+
 
 class ShowOrHideMyEvents(GenericAPIView):
     """

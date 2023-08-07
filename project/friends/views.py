@@ -1,5 +1,10 @@
 from typing import Any, Type, final
 
+from config.openapi import (
+    offset_query,
+    skip_param_query,
+)
+from config.serializers import BaseBulkSerializer
 from django.db.models.query import QuerySet
 from django.utils.decorators import (
     method_decorator,
@@ -8,51 +13,40 @@ from django_filters.rest_framework import (
     DjangoFilterBackend,
 )
 from drf_yasg.utils import swagger_auto_schema
-from friends.models import (
-    Friend,
-    InviteToFriends
-)
-from friends.serializers import (
-    MyFriendsListSerializer,
-    InvitesToFriendsListSerializer,
-    BulkAcceptOrDeclineInvitionsToFriendsSerializer,
-)
 from friends.filters import (
     MY_FRIENDS_LIST_ORDERING_FIELDS,
     MY_FRIENDS_LIST_SEARCH_FIELDS,
-    MyFriendsListFilterSet
+    MyFriendsListFilterSet,
 )
+from friends.models import Friend, InviteToFriends
 from friends.openapi import (
-    my_friends_list_query_params
+    my_friends_list_query_params,
+)
+from friends.serializers import (
+    BulkAcceptOrDeclineInvitionsToFriendsSerializer,
+    InvitesToFriendsListSerializer,
+    MyFriendsListSerializer,
 )
 from friends.services import (
-    invite_users_to_friends,
     bulk_accept_or_decline_invitions_to_friends,
+    invite_users_to_friends,
 )
-from config.openapi import (
-    offset_query,
-    skip_param_query,
-)
-from config.serializers import (
-    BaseBulkSerializer
-)
-from utils import (
-    skip_objects_from_response_by_id,
-    paginate_by_offset
-)
-
 from rest_framework.filters import (
     OrderingFilter,
     SearchFilter,
 )
 from rest_framework.generics import (
-    ListAPIView,
     GenericAPIView,
+    ListAPIView,
 )
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 from rest_framework.status import HTTP_200_OK
+from utils import (
+    paginate_by_offset,
+    skip_objects_from_response_by_id,
+)
 
 
 @method_decorator(
@@ -82,7 +76,7 @@ class MyFriendsList(ListAPIView):
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Friend]:
         return self.queryset.filter(user_id=self.request.user.id)
-    
+
 
 @method_decorator(
     swagger_auto_schema(
@@ -109,7 +103,6 @@ class InvitesToFriendsList(ListAPIView):
         return self.queryset.filter(recipient=self.request.user)
 
 
-
 class InviteUsersToFriends(GenericAPIView):
     """
     Invite user to friends
@@ -125,11 +118,10 @@ class InviteUsersToFriends(GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = invite_users_to_friends(
-            users_ids=serializer.validated_data["ids"],
-            request_user=request.user
+            users_ids=serializer.validated_data["ids"], request_user=request.user
         )
         return Response(data, status=HTTP_200_OK)
-    
+
 
 class BulkAcceptOrDeclineInvitesToFriends(GenericAPIView):
     """
@@ -139,11 +131,8 @@ class BulkAcceptOrDeclineInvitesToFriends(GenericAPIView):
     accept or decline invitations to friends
     """
 
-    serializer_class: Type[
-        Serializer
-    ] = BulkAcceptOrDeclineInvitionsToFriendsSerializer
+    serializer_class: Type[Serializer] = BulkAcceptOrDeclineInvitionsToFriendsSerializer
     queryset: QuerySet[InviteToFriends] = InviteToFriends.get_all()
-
 
     def post(self, request: Request) -> Response:
         serializer = self.serializer_class(data=request.data)

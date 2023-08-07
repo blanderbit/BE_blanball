@@ -37,7 +37,9 @@ else:
         "default": {
             "BACKEND": "channels_redis.core.RedisChannelLayer",
             "CONFIG": {
-                "hosts": [(config("REDIS_HOST", cast=str), config("REDIS_PORT", cast=int))],
+                "hosts": [
+                    (config("REDIS_HOST", cast=str), config("REDIS_PORT", cast=int))
+                ],
             },
         },
     }

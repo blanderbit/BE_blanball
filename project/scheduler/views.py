@@ -1,40 +1,33 @@
+from typing import Type
+
+from django.db.models import QuerySet
 from django.utils.decorators import (
     method_decorator,
 )
 from drf_yasg.utils import swagger_auto_schema
-from typing import Type
-from utils import (
-    paginate_by_offset,
-    skip_objects_from_response_by_id
+from events.models import Event
+from rest_framework.generics import (
+    GenericAPIView,
+    ListAPIView,
+)
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.serializers import Serializer
+from rest_framework.status import HTTP_200_OK
+from scheduler.openapi import (
+    scheduled_events_list_query_params,
 )
 from scheduler.serializers import (
-    UserScheduledEventsSerializer,
     ListOfUserScheduledEventsOnSpecificDaySerializer,
-)
-from scheduler.openapi import (
-    scheduled_events_list_query_params
+    UserScheduledEventsSerializer,
 )
 from scheduler.services import (
     get_user_scheduled_events_data,
     get_user_scheduled_events_on_specific_day,
 )
-from events.models import (
-    Event,
-)
-from django.db.models import (
-    QuerySet,
-)
-from rest_framework.generics import (
-    GenericAPIView,
-    ListAPIView
-)
-from rest_framework.serializers import (
-    Serializer,
-)
-from rest_framework.request import Request
-from rest_framework.response import Response
-from rest_framework.status import (
-    HTTP_200_OK,
+from utils import (
+    paginate_by_offset,
+    skip_objects_from_response_by_id,
 )
 
 
@@ -46,6 +39,7 @@ class UserScheduledEvents(GenericAPIView):
     get the number of events scheduled by
     the user for the date range
     """
+
     serializer_class: Type[Serializer] = UserScheduledEventsSerializer
     queryset: QuerySet[Event] = Event.get_all()
 
@@ -54,8 +48,7 @@ class UserScheduledEvents(GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         scheduled_events_data = get_user_scheduled_events_data(
-            serializer.validated_data,
-            self.queryset
+            serializer.validated_data, self.queryset
         )
 
         return Response(scheduled_events_data, status=HTTP_200_OK)
@@ -76,11 +69,11 @@ class ListOfUserScheduledEventsOnSpecificDay(ListAPIView):
     get the list of events scheduled on specific day
     """
 
-    serializer_class: Type[Serializer] = ListOfUserScheduledEventsOnSpecificDaySerializer
+    serializer_class: Type[
+        Serializer
+    ] = ListOfUserScheduledEventsOnSpecificDaySerializer
     queryset: QuerySet[Event] = Event.get_all()
 
     @skip_objects_from_response_by_id
     def get_queryset(self) -> QuerySet[Event]:
-        return get_user_scheduled_events_on_specific_day(
-            self.request, self.queryset
-        )
+        return get_user_scheduled_events_on_specific_day(self.request, self.queryset)

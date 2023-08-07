@@ -1,32 +1,39 @@
 from datetime import datetime
-from typing import Any, Union
+from typing import Any, Optional, Union
 
 from asgiref.sync import async_to_sync
 from authentication.models import User
 from channels.layers import get_channel_layer
-from config.celery import app
+from config.celery import celery
 from django.db.models import QuerySet
 from django.utils import timezone
 from notifications.constants.notification_types import (
     ALL_USER_NOTIFICATIONS_DELETED_NOTIFICATION_TYPE,
-    ALL_USER_NOTIFICATIONS_READED_NOTIFICATION_TYPE,
+    ALL_USER_NOTIFICATIONS_READ_NOTIFICATION_TYPE,
 )
 from notifications.models import Notification
 
 
-@app.task(
+@celery.task(
     ignore_result=True,
     time_limit=5,
     soft_time_limit=3,
     default_retry_delay=5,
 )
-def send(user: User, data: dict[str, Any]) -> None:
-    async_to_sync(get_channel_layer().group_send)(user.group_name, data)
+def send(
+    data: dict[str, Any], user: Optional[User] = None, group_name: Optional[str] = None
+) -> None:
+    group_name_to_send: str = ""
+    if user:
+        group_name_to_send = user.group_name
+    elif group_name:
+        group_name_to_send = group_name
+    async_to_sync(get_channel_layer().group_send)(group_name_to_send, data)
 
 
 def send_to_user(
-    user: User,
     message_type: str,
+    user: User,
     data: dict[str, Union[str, int, datetime, bool]] = None,
 ) -> None:
     notification = Notification.objects.create(
@@ -35,10 +42,27 @@ def send_to_user(
     send(
         user=user,
         data={
-            "type": "kafka.message",
+            "type": "send.message",
             "message": {
                 "message_type": message_type,
                 "notification_id": notification.id,
+                "data": data,
+            },
+        },
+    )
+
+
+def send_to_group_by_group_name(
+    message_type: str,
+    group_name: str,
+    data: dict[str, Union[str, int, datetime, bool]] = None,
+) -> None:
+    send.delay(
+        group_name=group_name,
+        data={
+            "type": "send.message",
+            "message": {
+                "message_type": message_type,
                 "data": data,
             },
         },
@@ -50,16 +74,21 @@ def send_to_general_layer(
     data: dict[str, Union[str, int, datetime, bool]] = None,
 ) -> None:
 
-    async_to_sync(get_channel_layer().group_send)(
-        "general",
-        {
-            "type": "general.message",
-            "message": {"message_type": message_type, "data": data},
+    group_name_to_send: str = "general"
+
+    send(
+        group_name=group_name_to_send,
+        data={
+            "type": "send.message",
+            "message": {
+                "message_type": message_type,
+                "data": data,
+            },
         },
     )
 
 
-@app.task(
+@celery.task(
     ignore_result=True,
     time_limit=5,
     soft_time_limit=3,
@@ -75,9 +104,9 @@ def read_all_user_notifications(*, request_user_id: int) -> None:
             send(
                 user=User.objects.get(id=request_user_id),
                 data={
-                    "type": "kafka.message",
+                    "type": "send.message",
                     "message": {
-                        "message_type": ALL_USER_NOTIFICATIONS_READED_NOTIFICATION_TYPE,
+                        "message_type": ALL_USER_NOTIFICATIONS_READ_NOTIFICATION_TYPE,
                     },
                 },
             )
@@ -85,7 +114,7 @@ def read_all_user_notifications(*, request_user_id: int) -> None:
             pass
 
 
-@app.task(
+@celery.task(
     ignore_result=True,
     time_limit=5,
     soft_time_limit=3,
@@ -111,7 +140,7 @@ def delete_all_user_notifications(*, request_user_id: int) -> None:
             pass
 
 
-@app.task
+@celery.task
 def delete_expire_notifications():
     Notification.objects.filter(
         time_created__lte=timezone.now() - timezone.timedelta(days=85)
