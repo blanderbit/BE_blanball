@@ -5,8 +5,7 @@ ApiDeploy()
 {
     python manage.py migrate --noinput
     python manage.py loaddata */fixtures/*.json
-    uwsgi --ini uwsgi.ini &
-    python manage.py wait_for_kafka_broker
+    uwsgi --ini uwsgi.ini
 }
 
 Api()
