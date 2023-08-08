@@ -24,7 +24,9 @@ FILE_UPLOAD_MAX_MEMORY_SIZE: int = 1024
 SECRET_KEY: str = config("SECRET_KEY", cast=str)
 
 # list of allowed project hosts
-ALLOWED_HOSTS: list[str] = config("ALLOWED_HOSTS", cast=Csv())
+ALLOWED_HOSTS: list[str] = config(
+    "ALLOWED_HOSTS", cast=lambda v: [s.strip() for s in v.split(",")]
+)
 ################################################################
 
 # the path where you can open any static file
