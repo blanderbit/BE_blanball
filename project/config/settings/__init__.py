@@ -11,6 +11,7 @@ _base_settings: list[str] = [
     "components/celery.py",
     "components/smtp.py",
     "components/valiables.py",
+    "components/kafka.py",
 ]
 
 # Include settings:

@@ -5,6 +5,7 @@ ApiDeploy()
 {
     python manage.py migrate --noinput
     python manage.py loaddata */fixtures/*.json
+    python manage.py collectstatic --noinput
     uwsgi --ini uwsgi.ini
 }
 
