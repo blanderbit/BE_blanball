@@ -73,7 +73,7 @@ services:
         container_name: blanball-db-prod
         env_file:
             - stack.env
-        image: postgis/postgis:15.4
+        image: postgis/postgis:15-3.4
         restart: always
         volumes:
             - db-data-prod:/var/lib/postgresql/data
